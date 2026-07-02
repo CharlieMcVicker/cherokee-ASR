@@ -369,10 +369,13 @@ class BatchInferenceRequest(BaseModel):
 @app.post("/api/batch_inference")
 def run_batch_inference(req: BatchInferenceRequest):
     try:
-        import pandas as pd
         import os
         import sys
         import subprocess
+        import shutil
+        import uuid
+        import tempfile
+        import pandas as pd
         
         if not req.target_folders:
             raise HTTPException(status_code=400, detail="No folders selected.")
@@ -380,43 +383,58 @@ def run_batch_inference(req: BatchInferenceRequest):
         output_csv = os.path.join(AppConfig.SANDBOX_DIR, "data/results/batch_inference_results.csv")
         os.makedirs(os.path.dirname(output_csv), exist_ok=True)
         
-        all_csvs = []
-        for rel_folder in req.target_folders:
-            folder = os.path.join(AppConfig.SANDBOX_DIR, rel_folder)
-            temp_csv = os.path.join(folder, "inference_temp.csv")
+        with tempfile.TemporaryDirectory() as temp_batch_dir:
+            mapping = {}
+            for rel_folder in req.target_folders:
+                folder = os.path.join(AppConfig.SANDBOX_DIR, rel_folder)
+                if not os.path.isdir(folder):
+                    continue
+                for f in os.listdir(folder):
+                    if f.lower().endswith('.wav'):
+                        orig_path = os.path.join(folder, f)
+                        temp_name = f"{uuid.uuid4().hex}.wav"
+                        temp_path = os.path.join(temp_batch_dir, temp_name)
+                        
+                        shutil.copy2(orig_path, temp_path)
+                        rel_orig_path = os.path.relpath(orig_path, AppConfig.SANDBOX_DIR).replace("\\\\", "/")
+                        mapping[temp_name] = rel_orig_path
+                        
+            if not mapping:
+                raise Exception("No .wav files found in selected folders.")
+                
+            temp_csv = os.path.join(temp_batch_dir, "inference_temp.csv")
+            python_exe = os.path.join(AppConfig.SANDBOX_DIR, "venv", "Scripts", "python.exe")
+            if not os.path.exists(python_exe):
+                python_exe = sys.executable
+
             cmd = [
-                sys.executable,
+                python_exe,
                 "src/transcription/inference/batch.py",
-                folder,
+                temp_batch_dir,
                 "--checkpoint", req.checkpoint,
                 "--processor", req.checkpoint,
                 "--output", temp_csv
             ]
-            print(f"Running batch inference on: {folder}")
-            result = subprocess.run(cmd, capture_output=True, text=True)
+            print(f"Running batched inference on {len(mapping)} files...", flush=True)
+            result = subprocess.run(cmd)
             if result.returncode != 0:
-                print(f"Error on {folder}: {result.stderr}")
-                continue
-            if os.path.exists(temp_csv):
-                all_csvs.append(temp_csv)
+                raise Exception(f"Batch inference failed with exit code {result.returncode}. Check terminal for details.")
                 
-        if not all_csvs:
-            raise Exception("Batch inference failed for all subfolders.")
+            if not os.path.exists(temp_csv):
+                raise Exception("Batch inference failed to generate CSV.")
+                
+            df = pd.read_csv(temp_csv)
+            df["file_path"] = df["file_path"].apply(lambda x: mapping[os.path.basename(x)])
+            df["filename"] = df["file_path"].apply(lambda x: os.path.basename(x))
             
-        # Combine all CSVs
-        df_list = [pd.read_csv(csv_f) for csv_f in all_csvs]
-        final_df = pd.concat(df_list, ignore_index=True)
-        final_df.to_csv(output_csv, index=False)
-        
-        # Cleanup temp csvs
-        for csv_f in all_csvs:
-            os.remove(csv_f)
+            df.to_csv(output_csv, index=False)
             
-        return {"message": f"Batch inference complete for {len(req.target_folders)} folders.", "csv_path": output_csv}
+        return {"message": f"Batch inference complete for {len(mapping)} files across {len(req.target_folders)} folders.", "csv_path": output_csv}
     except Exception as e:
         import traceback
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
+
 
 
 

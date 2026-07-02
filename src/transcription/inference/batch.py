@@ -42,7 +42,6 @@ def init_worker(processor_path, arpa_path, token, revision):
     torch.set_num_threads(1)
     
     from transformers import Wav2Vec2Processor
-    from pyctcdecode import build_ctcdecoder
     import os
 
     global_processor = Wav2Vec2Processor.from_pretrained(
@@ -50,6 +49,8 @@ def init_worker(processor_path, arpa_path, token, revision):
     )
 
     if arpa_path and os.path.exists(arpa_path):
+        from pyctcdecode import build_ctcdecoder
+        
         vocab_dict_sorted = global_processor.tokenizer.get_vocab()
         sorted_vocab = sorted(vocab_dict_sorted.items(), key=lambda kv: kv[1])
         labels = [t for t, _ in sorted_vocab]

@@ -149,7 +149,7 @@ function View0({ theme }) {
             folderSet.add(parts.slice(0, -1).join('/'));
           }
         });
-        setFiles({ wav_files: allWavs, folders: Array.from(folderSet) });
+        setFiles({ wav_files: allWavs, folders: Array.from(folderSet).sort((a, b) => a.split('/').length - b.split('/').length || a.localeCompare(b)) });
       }).catch(err => console.log("Failed to fetch files", err));
   }, []);
 
@@ -296,7 +296,7 @@ function View1({ theme }) {
             folderSet.add(parts.slice(0, -1).join('/'));
           }
         });
-        setFiles({ wav_files: allWavs, folders: Array.from(folderSet) });
+        setFiles({ wav_files: allWavs, folders: Array.from(folderSet).sort((a, b) => a.split('/').length - b.split('/').length || a.localeCompare(b)) });
       }).catch(err => console.log("Failed to fetch files", err));
   }, []);
 
@@ -562,15 +562,17 @@ function View2({ theme }) {
        
        <div className="mb-4">
          <label className={`block text-sm font-medium ${t.label} mb-1`}>Results CSV File</label>
-         <FileTreeSelector 
-           files={csvFiles} 
-           selectedFile={selectedCsv} 
-           onSelect={f => {
-             setSelectedCsv(f);
-             loadData(f);
-           }} 
-           theme={t} 
-         />
+          <select 
+            className={`w-full p-3 ${t.input}`} 
+            value={selectedCsv} 
+            onChange={e => {
+              setSelectedCsv(e.target.value);
+              loadData(e.target.value);
+            }}
+          >
+            <option value="">-- Select CSV File --</option>
+            {csvFiles.map(f => <option key={f} value={f}>{f}</option>)}
+          </select>
        </div>
 
        <p className={`text-sm mb-4 ${t.inputInfoSub}`}>Sorted by lowest confidence.</p>
