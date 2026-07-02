@@ -227,57 +227,148 @@ def save_elan(req: SaveElanRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+class FileSetting(BaseModel):
+    silence_thresh: int = -40
+    min_silence_len: int = 500
+    keep_silence: int = 100
+
 class PreviewSegmentRequest(BaseModel):
     target_path: str
     silence_thresh: int = -40
     min_silence_len: int = 500
     keep_silence: int = 100
+    file_settings: dict[str, FileSetting] = {}
+
+def process_file_preview(rel_path, default_thresh, default_min_silence, default_keep_silence, custom_setting=None):
+    from transcription.audio.segment import get_energy_profile, segment_audio_from_profile
+    from pydub import AudioSegment
+    
+    thresh = custom_setting.silence_thresh if custom_setting else default_thresh
+    min_silence = custom_setting.min_silence_len if custom_setting else default_min_silence
+    keep_silence = custom_setting.keep_silence if custom_setting else default_keep_silence
+
+    full_audio_path = os.path.join(AppConfig.SANDBOX_DIR, rel_path)
+    cache_key = rel_path
+    mtime = os.path.getmtime(full_audio_path)
+
+    if cache_key not in audio_profile_cache or audio_profile_cache[cache_key]['mtime'] != mtime:
+        audio = AudioSegment.from_file(full_audio_path)
+        total_len = len(audio)
+        dbfs_profile = get_energy_profile(audio, step_ms=10)
+        audio_profile_cache[cache_key] = {
+            'profile': dbfs_profile,
+            'total_len': total_len,
+            'mtime': mtime
+        }
+
+    cached = audio_profile_cache[cache_key]
+    total_len_ms = cached['total_len']
+    dbfs_profile = cached['profile']
+
+    segments = segment_audio_from_profile(
+        dbfs_profile,
+        total_len_ms,
+        step_ms=10,
+        min_silence_len=min_silence,
+        silence_thresh=thresh,
+        keep_silence=keep_silence
+    )
+
+    total_duration = round(total_len_ms / 1000.0, 2)
+    segment_count = len(segments)
+    
+    # Calculate non-overlapping result duration and overlap
+    sorted_segs = sorted(segments, key=lambda s: s['start'])
+    result_duration_ms = sum(s['duration'] for s in sorted_segs)
+    
+    overlap_ms = 0
+    for i in range(len(sorted_segs) - 1):
+        cur_end = sorted_segs[i]['end']
+        nxt_start = sorted_segs[i+1]['start']
+        if nxt_start < cur_end:
+            overlap_ms += min(cur_end, sorted_segs[i+1]['end']) - nxt_start
+
+    result_duration = round(result_duration_ms / 1000.0, 2)
+    coverage_percent = round((result_duration / total_duration * 100.0), 1) if total_duration > 0 else 0.0
+    overlap_duration = round(overlap_ms / 1000.0, 2)
+    overlap_percent = round((overlap_duration / total_duration * 100.0), 1) if total_duration > 0 else 0.0
+
+    # Duration Histogram bins: <1s, 1-2s, 2-4s, 4-7s, 7-10s, >10s
+    histogram = {"<1s": 0, "1-2s": 0, "2-4s": 0, "4-7s": 0, "7-10s": 0, ">10s": 0}
+    for s in sorted_segs:
+        dur_s = s['duration'] / 1000.0
+        if dur_s < 1.0:
+            histogram["<1s"] += 1
+        elif dur_s < 2.0:
+            histogram["1-2s"] += 1
+        elif dur_s < 4.0:
+            histogram["2-4s"] += 1
+        elif dur_s < 7.0:
+            histogram["4-7s"] += 1
+        elif dur_s < 10.0:
+            histogram["7-10s"] += 1
+        else:
+            histogram[">10s"] += 1
+
+    return {
+        "file": rel_path,
+        "filename": os.path.basename(rel_path),
+        "total_duration": total_duration,
+        "segment_count": segment_count,
+        "result_duration": result_duration,
+        "coverage_percent": coverage_percent,
+        "overlap_duration": overlap_duration,
+        "overlap_percent": overlap_percent,
+        "histogram": histogram,
+        "settings": {
+            "silence_thresh": thresh,
+            "min_silence_len": min_silence,
+            "keep_silence": keep_silence
+        }
+    }
 
 @app.post("/api/preview_segments")
 def preview_segments(req: PreviewSegmentRequest):
     try:
-        from transcription.audio.segment import get_energy_profile, segment_audio_from_profile
-        from pydub import AudioSegment
         import os
-        
+        from concurrent.futures import ThreadPoolExecutor
+
         target_full_path = os.path.join(AppConfig.SANDBOX_DIR, req.target_path)
         if not os.path.exists(target_full_path):
             raise HTTPException(status_code=404, detail=f"Path not found: {req.target_path}")
 
         files_to_process = []
         if os.path.isdir(target_full_path):
-            for f in os.listdir(target_full_path):
+            for f in sorted(os.listdir(target_full_path)):
                 if f.lower().endswith(('.wav', '.mp3', '.m4a', '.flac')):
                     files_to_process.append(os.path.join(req.target_path, f))
         else:
             files_to_process.append(req.target_path)
-            
-        # Get up to 3 example files
-        example_files = files_to_process[:3]
-        results = []
-        
-        for rel_path in example_files:
-            full_audio_path = os.path.join(AppConfig.SANDBOX_DIR, rel_path)
-            audio = AudioSegment.from_file(full_audio_path)
-            total_len = len(audio)
-            dbfs_profile = get_energy_profile(audio, step_ms=10)
-            
-            segments = segment_audio_from_profile(
-                dbfs_profile,
-                total_len,
-                step_ms=10,
-                min_silence_len=req.min_silence_len,
-                silence_thresh=req.silence_thresh,
-                keep_silence=req.keep_silence
-            )
-            
-            sec_segments = [{"start": round(seg['start'] / 1000.0, 3), "end": round(seg['end'] / 1000.0, 3)} for seg in segments]
-            results.append({
-                "file": rel_path,
-                "segments": sec_segments
-            })
-            
-        return {"previews": results}
+
+        def worker(rel_path):
+            custom = req.file_settings.get(rel_path)
+            return process_file_preview(rel_path, req.silence_thresh, req.min_silence_len, req.keep_silence, custom)
+
+        with ThreadPoolExecutor(max_workers=min(8, max(1, len(files_to_process)))) as executor:
+            results = list(executor.map(worker, files_to_process))
+
+        total_files = len(results)
+        total_batch_duration = round(sum(r['total_duration'] for r in results), 2)
+        total_segments = sum(r['segment_count'] for r in results)
+        total_result_duration = round(sum(r['result_duration'] for r in results), 2)
+        overall_coverage_percent = round((total_result_duration / total_batch_duration * 100.0), 1) if total_batch_duration > 0 else 0.0
+        total_overlap_duration = round(sum(r['overlap_duration'] for r in results), 2)
+
+        summary = {
+            "total_files": total_files,
+            "total_batch_duration": total_batch_duration,
+            "total_segments": total_segments,
+            "total_result_duration": total_result_duration,
+            "overall_coverage_percent": overall_coverage_percent,
+            "total_overlap_duration": total_overlap_duration
+        }
+
+        return {"previews": results, "summary": summary}
     except Exception as e:
         import traceback
         traceback.print_exc()
@@ -288,6 +379,7 @@ class BatchSegmentRequest(BaseModel):
     silence_thresh: int = -40
     min_silence_len: int = 500
     keep_silence: int = 100
+    file_settings: dict[str, FileSetting] = {}
 
 @app.post("/api/batch_segment")
 def batch_segment(req: BatchSegmentRequest):
@@ -303,7 +395,7 @@ def batch_segment(req: BatchSegmentRequest):
 
         files_to_process = []
         if os.path.isdir(target_full_path):
-            for f in os.listdir(target_full_path):
+            for f in sorted(os.listdir(target_full_path)):
                 if f.lower().endswith(('.wav', '.mp3', '.m4a', '.flac')):
                     files_to_process.append(os.path.join(req.target_path, f))
         else:
@@ -326,23 +418,37 @@ def batch_segment(req: BatchSegmentRequest):
             for rel_path in files_to_process:
                 full_audio_path = os.path.join(AppConfig.SANDBOX_DIR, rel_path)
                 print(f"Segmenting {rel_path}...")
-                audio = AudioSegment.from_file(full_audio_path)
-                total_len = len(audio)
-                dbfs_profile = get_energy_profile(audio, step_ms=10)
-                
+
+                custom = req.file_settings.get(rel_path)
+                thresh = custom.silence_thresh if custom else req.silence_thresh
+                min_silence = custom.min_silence_len if custom else req.min_silence_len
+                keep_silence = custom.keep_silence if custom else req.keep_silence
+
+                cache_key = rel_path
+                mtime = os.path.getmtime(full_audio_path)
+
+                if cache_key in audio_profile_cache and audio_profile_cache[cache_key]['mtime'] == mtime:
+                    cached = audio_profile_cache[cache_key]
+                    total_len = cached['total_len']
+                    dbfs_profile = cached['profile']
+                    audio = AudioSegment.from_file(full_audio_path)
+                else:
+                    audio = AudioSegment.from_file(full_audio_path)
+                    total_len = len(audio)
+                    dbfs_profile = get_energy_profile(audio, step_ms=10)
+
                 segments = segment_audio_from_profile(
                     dbfs_profile,
                     total_len,
                     step_ms=10,
-                    min_silence_len=req.min_silence_len,
-                    silence_thresh=req.silence_thresh,
-                    keep_silence=req.keep_silence
+                    min_silence_len=min_silence,
+                    silence_thresh=thresh,
+                    keep_silence=keep_silence
                 )
                 
                 original_filename = os.path.basename(rel_path)
                 base_name = os.path.splitext(original_filename)[0]
                 
-                # Make a subfolder for this original file
                 subfolder_path = os.path.join(out_dir, base_name)
                 os.makedirs(subfolder_path, exist_ok=True)
                 
@@ -433,6 +539,7 @@ def get_batch_stats(req: BatchStatsRequest):
 class BatchInferenceRequest(BaseModel):
     target_folders: list[str]
     checkpoint: str = "charliemcvicker/asr-cherokee"
+    output_csv_name: str = "batch_inference_results.csv"
 
 @app.post("/api/batch_inference")
 def run_batch_inference(req: BatchInferenceRequest):
@@ -448,27 +555,40 @@ def run_batch_inference(req: BatchInferenceRequest):
         if not req.target_folders:
             raise HTTPException(status_code=400, detail="No folders selected.")
             
-        output_csv = os.path.join(AppConfig.SANDBOX_DIR, "data/results/batch_inference_results.csv")
+        out_name = req.output_csv_name.strip()
+        if not out_name.endswith('.csv'):
+            out_name += '.csv'
+            
+        output_csv = os.path.join(AppConfig.SANDBOX_DIR, "data/results", out_name)
         os.makedirs(os.path.dirname(output_csv), exist_ok=True)
         
         with tempfile.TemporaryDirectory() as temp_batch_dir:
             mapping = {}
             for rel_folder in req.target_folders:
                 folder = os.path.join(AppConfig.SANDBOX_DIR, rel_folder)
-                if not os.path.isdir(folder):
+                if not os.path.exists(folder):
                     continue
-                for f in os.listdir(folder):
-                    if f.lower().endswith('.wav'):
-                        orig_path = os.path.join(folder, f)
-                        temp_name = f"{uuid.uuid4().hex}.wav"
-                        temp_path = os.path.join(temp_batch_dir, temp_name)
-                        
-                        shutil.copy2(orig_path, temp_path)
-                        rel_orig_path = os.path.relpath(orig_path, AppConfig.SANDBOX_DIR).replace("\\\\", "/")
-                        mapping[temp_name] = rel_orig_path
-                        
+                
+                if os.path.isfile(folder):
+                    candidate_files = [folder]
+                else:
+                    candidate_files = []
+                    for root, dirs, files in os.walk(folder):
+                        for f in files:
+                            candidate_files.append(os.path.join(root, f))
+
+                for orig_path in candidate_files:
+                    if orig_path.lower().endswith(('.wav', '.mp3', '.m4a', '.flac', '.ogg')):
+                        rel_orig_path = os.path.relpath(orig_path, AppConfig.SANDBOX_DIR).replace("\\", "/")
+                        if rel_orig_path not in mapping.values():
+                            ext = os.path.splitext(orig_path)[1]
+                            temp_name = f"{uuid.uuid4().hex}{ext}"
+                            temp_path = os.path.join(temp_batch_dir, temp_name)
+                            shutil.copy2(orig_path, temp_path)
+                            mapping[temp_name] = rel_orig_path
+
             if not mapping:
-                raise Exception("No .wav files found in selected folders.")
+                raise Exception("No supported audio files (.wav, .mp3, etc.) found in selected folders.")
                 
             temp_csv = os.path.join(temp_batch_dir, "inference_temp.csv")
             python_exe = os.path.join(AppConfig.SANDBOX_DIR, "venv", "Scripts", "python.exe")
@@ -949,18 +1069,46 @@ def get_labeler_data(file: str = "data/results/batch_inference_results.csv"):
                 if audio_rel_path.startswith("sentence_audio/"):
                     audio_rel_path = f"data/processed/{audio_rel_path}"
                     
+                greedy_txt = row.get(txt_col, "")
                 import json
                 word_confs = []
                 if "word_confidences" in row and row["word_confidences"]:
                     try:
                         word_confs = json.loads(row["word_confidences"])
+                        greedy_words = [w for w in greedy_txt.strip().split() if w]
+                        if len(word_confs) == 1 and len(greedy_words) > 1:
+                            all_chars = word_confs[0].get("chars", [])
+                            new_word_confs = []
+                            char_idx = 0
+                            for tw in greedy_words:
+                                w_chars = []
+                                for i in range(len(tw)):
+                                    if char_idx < len(all_chars):
+                                        w_chars.append(all_chars[char_idx])
+                                        char_idx += 1
+                                if w_chars:
+                                    avg_c = float(np.mean([c.get("confidence", 0.0) for c in w_chars])) if w_chars else 0.0
+                                    new_word_confs.append({
+                                        "word": tw,
+                                        "confidence": avg_c,
+                                        "chars": w_chars
+                                    })
+                            if char_idx < len(all_chars):
+                                rem = all_chars[char_idx:]
+                                avg_c = float(np.mean([c.get("confidence", 0.0) for c in rem])) if rem else 0.0
+                                new_word_confs.append({
+                                    "word": "".join([c.get("char", "") for c in rem]),
+                                    "confidence": avg_c,
+                                    "chars": rem
+                                })
+                            word_confs = new_word_confs
                     except:
                         pass
                 
                 data.append({
                     "file_path": audio_rel_path,
                     "filename": row.get("filename", os.path.basename(audio_rel_path)),
-                    "greedy_transcription": row.get(txt_col, ""),
+                    "greedy_transcription": greedy_txt,
                     "greedy_confidence": float(row.get("greedy_confidence", 0.0)) if row.get("greedy_confidence") else 0.0,
                     "word_confidences": word_confs
                 })

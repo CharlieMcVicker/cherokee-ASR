@@ -87,10 +87,16 @@ def calculate_word_confidences(probs, pred_ids, processor):
     top_k_indices = np.argsort(probs, axis=-1)[:, -top_k:][:, ::-1]
     top_k_probs = np.take_along_axis(probs, top_k_indices, axis=-1)
     
+    word_delimiter_token_id = getattr(processor.tokenizer, "word_delimiter_token_id", None)
+    
     prev_id = -1
     for i, token_id in enumerate(pred_ids):
         if token_id != pad_id and token_id != prev_id:
-            token_str = processor.decode([token_id])
+            if token_id == word_delimiter_token_id:
+                token_str = " "
+            else:
+                token_str = processor.decode([token_id])
+                
             if token_str:
                 chars.append(token_str)
                 char_probs.append(float(token_probs[i]))
@@ -100,7 +106,10 @@ def calculate_word_confidences(probs, pred_ids, processor):
                     alt_id = top_k_indices[i, k]
                     alt_prob = float(top_k_probs[i, k])
                     if alt_id != token_id:
-                        alt_str = processor.decode([alt_id])
+                        if alt_id == word_delimiter_token_id:
+                            alt_str = " "
+                        else:
+                            alt_str = processor.decode([alt_id])
                         if alt_str:
                             alts.append({"char": alt_str, "confidence": alt_prob})
                 char_alts.append(alts)

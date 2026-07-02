@@ -61,68 +61,129 @@ const THEMES = {
   }
 };
 
-function PreviewSurfer({ preview, theme, zoom }) {
-  const containerRef = useRef(null);
-  const [ws, setWs] = useState(null);
-  const [wsRegions, setWsRegions] = useState(null);
+function formatDuration(seconds) {
+  if (!seconds || seconds <= 0) return "0s";
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  const s = Math.floor(seconds % 60);
+  if (h > 0) return `${h}h ${m}m ${s}s`;
+  if (m > 0) return `${m}m ${s}s`;
+  return `${seconds.toFixed(1)}s`;
+}
 
-  useEffect(() => {
-    if (!containerRef.current) return;
-    
-    const regions = RegionsPlugin.create();
-    const wavesurfer = WaveSurfer.create({
-      container: containerRef.current,
-      waveColor: 'rgb(200, 0, 200)',
-      progressColor: 'rgb(100, 0, 100)',
-      url: `http://localhost:8000/api/audio/${preview.file}`,
-      plugins: [regions],
-      height: 64,
-      normalize: false,
-      minPxPerSec: Number(zoom)
-    });
-    
-    wavesurfer.on('ready', () => {
-      preview.segments.forEach((seg, index) => {
-        regions.addRegion({
-          start: seg.start,
-          end: seg.end,
-          color: index % 2 === 0 ? 'rgba(0, 200, 0, 0.2)' : 'rgba(0, 255, 0, 0.1)'
-        });
-      });
-    });
-
-    setWs(wavesurfer);
-    setWsRegions(regions);
-
-    return () => {
-      wavesurfer.destroy();
-    };
-  }, [preview, zoom]);
-
-  useEffect(() => {
-    if (ws) {
-      try {
-        const wrapper = ws.getWrapper();
-        const scrollLeft = wrapper.scrollLeft;
-        const width = wrapper.clientWidth;
-        const scrollWidth = wrapper.scrollWidth;
-        const centerRatio = scrollWidth > 0 ? (scrollLeft + width / 2) / scrollWidth : 0;
-        
-        ws.zoom(Number(zoom));
-        
-        setTimeout(() => {
-          const newScrollWidth = wrapper.scrollWidth;
-          wrapper.scrollLeft = centerRatio * newScrollWidth - width / 2;
-        }, 0);
-      } catch (e) {
-      }
-    }
-  }, [zoom, ws]);
+function SegmentHistogram({ histogram, theme }) {
+  const t = theme || {};
+  if (!histogram) return null;
+  const bins = Object.entries(histogram);
+  const maxCount = Math.max(...bins.map(([_, count]) => count), 1);
 
   return (
-    <div className={`mb-4 p-2 border ${theme.inputInfo}`}>
-      <div className="text-xs text-left mb-2 text-gray-500 font-mono break-all">{preview.file}</div>
-      <div ref={containerRef} className="w-full bg-white" />
+    <div className="mt-3 pt-3 border-t border-gray-300 dark:border-gray-700">
+      <div className="text-xs font-semibold mb-2 text-left opacity-90">Segment Length Distribution</div>
+      <div className={`grid grid-cols-6 gap-1 items-end h-24 p-2 rounded border ${t.inputInfo || 'bg-gray-100 border-gray-300'}`}>
+        {bins.map(([label, count]) => {
+          const heightPct = count > 0 ? Math.max(14, Math.round((count / maxCount) * 100)) : 0;
+          return (
+            <div key={label} className="flex flex-col items-center h-full justify-end group relative">
+              <div className="text-[10px] font-bold opacity-90 mb-1">{count}</div>
+              <div 
+                style={{ height: `${heightPct}%` }} 
+                className={`w-full max-w-[28px] rounded-t transition-all duration-300 ${count > 0 ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700 opacity-50'}`}
+              />
+              <div className="text-[9px] opacity-80 mt-1 font-mono">{label}</div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function FileSegmentCard({ preview, theme, onSettingChange, onResetSetting }) {
+  const t = theme;
+  const [showSettings, setShowSettings] = useState(false);
+  const settings = preview.settings || { silence_thresh: -40, min_silence_len: 500, keep_silence: 100 };
+
+  return (
+    <div className={`p-4 border ${t.card} text-left mb-4 rounded shadow-sm relative`}>
+      <div className="flex flex-wrap items-center justify-between gap-2 mb-3 pb-2 border-b border-gray-300 dark:border-gray-700">
+        <div>
+          <h4 className="font-bold text-base break-all">{preview.filename}</h4>
+          <span className="text-xs opacity-75 font-mono">{preview.file} ({formatDuration(preview.total_duration)})</span>
+        </div>
+        <button 
+          type="button"
+          onClick={() => setShowSettings(!showSettings)}
+          className={`text-xs px-3 py-1 border ${t.buttonSecondary} flex items-center gap-1`}
+        >
+          ⚙️ {showSettings ? "Hide Sliders" : "Custom Sliders"}
+        </button>
+      </div>
+
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-center mb-3">
+        <div className={`p-2.5 rounded border ${t.inputInfo}`}>
+          <div className="text-xs font-semibold opacity-75 mb-1">Segments</div>
+          <div className="text-lg font-bold">{preview.segment_count}</div>
+        </div>
+        <div className={`p-2.5 rounded border ${t.inputInfo}`}>
+          <div className="text-xs font-semibold opacity-75 mb-1">Result Audio</div>
+          <div className="text-lg font-bold">{formatDuration(preview.result_duration)}</div>
+        </div>
+        <div className={`p-2.5 rounded border ${t.inputInfo}`}>
+          <div className="text-xs font-semibold opacity-75 mb-1">Coverage</div>
+          <div className="text-lg font-bold text-green-700 dark:text-green-400">{preview.coverage_percent}%</div>
+        </div>
+        <div className={`p-2.5 rounded border ${t.inputInfo}`}>
+          <div className="text-xs font-semibold opacity-75 mb-1">Overlap</div>
+          <div className="text-lg font-bold text-amber-700 dark:text-amber-400">{preview.overlap_duration}s ({preview.overlap_percent}%)</div>
+        </div>
+      </div>
+
+      <SegmentHistogram histogram={preview.histogram} theme={t} />
+
+      {showSettings && (
+        <div className={`mt-4 p-3 border rounded ${t.inputInfo} text-xs`}>
+          <div className="flex justify-between items-center mb-2 font-bold">
+            <span>File-Specific Settings:</span>
+            <button 
+              type="button" 
+              onClick={() => onResetSetting(preview.file)}
+              className="text-blue-600 dark:text-blue-400 underline hover:text-blue-800"
+            >
+              Reset to Batch Defaults
+            </button>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div>
+              <label className="block font-medium mb-1">Silence Thresh: {settings.silence_thresh} dBFS</label>
+              <input 
+                type="range" min="-80" max="0" step="1" 
+                value={settings.silence_thresh} 
+                onChange={(e) => onSettingChange(preview.file, 'silence_thresh', parseInt(e.target.value) || 0)} 
+                className="w-full"
+              />
+            </div>
+            <div>
+              <label className="block font-medium mb-1">Min Silence: {settings.min_silence_len} ms</label>
+              <input 
+                type="range" min="10" max="1500" step="10" 
+                value={settings.min_silence_len} 
+                onChange={(e) => onSettingChange(preview.file, 'min_silence_len', parseInt(e.target.value) || 0)} 
+                className="w-full"
+              />
+            </div>
+            <div>
+              <label className="block font-medium mb-1">Keep Silence: {settings.keep_silence} ms</label>
+              <input 
+                type="range" min="0" max="500" step="10" 
+                value={settings.keep_silence} 
+                onChange={(e) => onSettingChange(preview.file, 'keep_silence', parseInt(e.target.value) || 0)} 
+                className="w-full"
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -131,11 +192,17 @@ function View0({ theme }) {
   const t = theme;
   const [files, setFiles] = useState({ wav_files: [], folders: [] });
   const [targetPath, setTargetPath] = useState("");
-  const [settings, setSettings] = useState({ silence_thresh: -40, min_silence_len: 500, keep_silence: 100 });
+  const [globalSettings, setGlobalSettings] = useState({ silence_thresh: -40, min_silence_len: 500, keep_silence: 100 });
+  const [fileSettings, setFileSettings] = useState({});
   const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [previewsLoading, setPreviewsLoading] = useState(false);
   const [previews, setPreviews] = useState([]);
-  const [zoom, setZoom] = useState(1);
+  const [summary, setSummary] = useState(null);
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   useEffect(() => {
     fetch("http://localhost:8000/api/files")
@@ -145,8 +212,8 @@ function View0({ theme }) {
         const folderSet = new Set();
         allWavs.forEach(f => {
           const parts = f.split('/');
-          if (parts.length > 1) {
-            folderSet.add(parts.slice(0, -1).join('/'));
+          for (let i = 1; i < parts.length; i++) {
+            folderSet.add(parts.slice(0, i).join('/'));
           }
         });
         setFiles({ wav_files: allWavs, folders: Array.from(folderSet).sort((a, b) => a.split('/').length - b.split('/').length || a.localeCompare(b)) });
@@ -156,26 +223,57 @@ function View0({ theme }) {
   useEffect(() => {
     if (!targetPath) {
       setPreviews([]);
+      setSummary(null);
       return;
     }
     const fetchPreviews = async () => {
+      setPreviewsLoading(true);
       try {
         const res = await fetch("http://localhost:8000/api/preview_segments", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ target_path: targetPath, ...settings })
+          body: JSON.stringify({ 
+            target_path: targetPath, 
+            ...globalSettings,
+            file_settings: fileSettings
+          })
         });
         const data = await res.json();
         if (res.ok) {
           setPreviews(data.previews || []);
+          setSummary(data.summary || null);
         }
       } catch (e) {
         console.log("Failed to fetch previews", e);
+      } finally {
+        setPreviewsLoading(false);
       }
     };
-    const timer = setTimeout(fetchPreviews, 500);
+    const timer = setTimeout(fetchPreviews, 400);
     return () => clearTimeout(timer);
-  }, [targetPath, settings]);
+  }, [targetPath, globalSettings, fileSettings]);
+
+  const handlePerFileSettingChange = (filePath, key, value) => {
+    setFileSettings(prev => ({
+      ...prev,
+      [filePath]: {
+        ...(prev[filePath] || globalSettings),
+        [key]: value
+      }
+    }));
+  };
+
+  const handleResetFileSetting = (filePath) => {
+    setFileSettings(prev => {
+      const next = { ...prev };
+      delete next[filePath];
+      return next;
+    });
+  };
+
+  const handleResetAllFileSettings = () => {
+    setFileSettings({});
+  };
 
   const handleSegment = async () => {
     if (!targetPath) return;
@@ -185,7 +283,11 @@ function View0({ theme }) {
       const res = await fetch("http://localhost:8000/api/batch_segment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ target_path: targetPath, ...settings })
+        body: JSON.stringify({ 
+          target_path: targetPath, 
+          ...globalSettings,
+          file_settings: fileSettings
+        })
       });
       const data = await res.json();
       if (res.ok) {
@@ -199,60 +301,155 @@ function View0({ theme }) {
     setLoading(false);
   };
 
+  const filteredPreviews = useMemo(() => {
+    if (!searchQuery.trim()) return previews;
+    const q = searchQuery.toLowerCase();
+    return previews.filter(p => p.file.toLowerCase().includes(q) || p.filename.toLowerCase().includes(q));
+  }, [previews, searchQuery]);
+
+  const totalPages = Math.ceil(filteredPreviews.length / itemsPerPage) || 1;
+  const currentPreviews = useMemo(() => {
+    const start = (currentPage - 1) * itemsPerPage;
+    return filteredPreviews.slice(start, start + itemsPerPage);
+  }, [filteredPreviews, currentPage]);
+
   return (
-    <div className="max-w-3xl mx-auto text-center ">
+    <div className="max-w-4xl mx-auto text-center">
       <h2 className={`text-3xl font-bold mb-6 ${t.viewTitle}`}>0. Batch Segmentation</h2>
-      <p className={`${t.viewDesc} mb-8`}>Select a single file or a folder to automatically cut up all audio files at once based on silence thresholds.</p>
-      
-      <div className={`${t.card} p-6 `}>
+      <p className={`${t.viewDesc} mb-8`}>Select a single file or a folder to automatically cut up all audio files based on silence thresholds.</p>
+
+      <div className={`${t.card} p-6`}>
         <div className="mb-6 text-left">
           <label className={`block text-sm font-medium ${t.label} mb-2`}>Target File or Folder</label>
-          <select className={`w-full p-3 ${t.input}`} value={targetPath} onChange={e => setTargetPath(e.target.value)}>
+          <select className={`w-full p-3 ${t.input}`} value={targetPath} onChange={e => { setTargetPath(e.target.value); setCurrentPage(1); setFileSettings({}); }}>
             <option value="">-- Select File or Folder --</option>
             {files.folders.length > 0 && <optgroup label="Folders">{files.folders.map(f => <option key={f} value={f}>{f}</option>)}</optgroup>}
             {files.wav_files.length > 0 && <optgroup label="Files">{files.wav_files.map(f => <option key={f} value={f}>{f}</option>)}</optgroup>}
           </select>
         </div>
 
-        <div className={`grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 p-4 border ${t.inputInfo} text-left`}>
-          <div>
-            <label className={`block text-sm font-medium ${t.label} mb-2`}>Silence Threshold (dBFS)</label>
-            <div className="flex items-center gap-2">
-              <input type="range" min="-80" max="0" step="1" value={settings.silence_thresh} onChange={(e) => setSettings({...settings, silence_thresh: parseInt(e.target.value) || 0})} className="w-full" />
-              <input type="number" min="-80" max="0" value={settings.silence_thresh} onChange={(e) => setSettings({...settings, silence_thresh: parseInt(e.target.value) || 0})} className={`w-16 p-1 text-sm ${t.input} mb-0`} />
-            </div>
+        <div className={`p-4 border ${t.inputInfo} text-left mb-6 rounded`}>
+          <div className="flex justify-between items-center mb-3">
+            <h3 className="font-bold text-sm">Global Batch Defaults</h3>
+            {Object.keys(fileSettings).length > 0 && (
+              <button 
+                type="button" 
+                onClick={handleResetAllFileSettings}
+                className="text-xs text-blue-600 dark:text-blue-400 underline"
+              >
+                Reset All Files to Global Defaults ({Object.keys(fileSettings).length} customized)
+              </button>
+            )}
           </div>
-          <div>
-            <label className={`block text-sm font-medium ${t.label} mb-2`}>Min Silence (ms)</label>
-            <div className="flex items-center gap-2">
-              <input type="range" min="10" max="1500" step="10" value={settings.min_silence_len} onChange={(e) => setSettings({...settings, min_silence_len: parseInt(e.target.value) || 0})} className="w-full" />
-              <input type="number" min="10" max="1500" value={settings.min_silence_len} onChange={(e) => setSettings({...settings, min_silence_len: parseInt(e.target.value) || 0})} className={`w-20 p-1 text-sm ${t.input} mb-0`} />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label className={`block text-sm font-medium ${t.label} mb-2`}>Silence Threshold (dBFS)</label>
+              <div className="flex items-center gap-2">
+                <input type="range" min="-80" max="0" step="1" value={globalSettings.silence_thresh} onChange={(e) => setGlobalSettings({...globalSettings, silence_thresh: parseInt(e.target.value) || 0})} className="w-full" />
+                <input type="number" min="-80" max="0" value={globalSettings.silence_thresh} onChange={(e) => setGlobalSettings({...globalSettings, silence_thresh: parseInt(e.target.value) || 0})} className={`w-16 p-1 text-sm ${t.input} mb-0`} />
+              </div>
             </div>
-          </div>
-          <div>
-            <label className={`block text-sm font-medium ${t.label} mb-2`}>Keep Silence (ms)</label>
-            <div className="flex items-center gap-2">
-              <input type="range" min="0" max="500" step="10" value={settings.keep_silence} onChange={(e) => setSettings({...settings, keep_silence: parseInt(e.target.value) || 0})} className="w-full" />
-              <input type="number" min="0" max="500" value={settings.keep_silence} onChange={(e) => setSettings({...settings, keep_silence: parseInt(e.target.value) || 0})} className={`w-20 p-1 text-sm ${t.input} mb-0`} />
+            <div>
+              <label className={`block text-sm font-medium ${t.label} mb-2`}>Min Silence (ms)</label>
+              <div className="flex items-center gap-2">
+                <input type="range" min="10" max="1500" step="10" value={globalSettings.min_silence_len} onChange={(e) => setGlobalSettings({...globalSettings, min_silence_len: parseInt(e.target.value) || 0})} className="w-full" />
+                <input type="number" min="10" max="1500" value={globalSettings.min_silence_len} onChange={(e) => setGlobalSettings({...globalSettings, min_silence_len: parseInt(e.target.value) || 0})} className={`w-20 p-1 text-sm ${t.input} mb-0`} />
+              </div>
+            </div>
+            <div>
+              <label className={`block text-sm font-medium ${t.label} mb-2`}>Keep Silence (ms)</label>
+              <div className="flex items-center gap-2">
+                <input type="range" min="0" max="500" step="10" value={globalSettings.keep_silence} onChange={(e) => setGlobalSettings({...globalSettings, keep_silence: parseInt(e.target.value) || 0})} className="w-full" />
+                <input type="number" min="0" max="500" value={globalSettings.keep_silence} onChange={(e) => setGlobalSettings({...globalSettings, keep_silence: parseInt(e.target.value) || 0})} className={`w-20 p-1 text-sm ${t.input} mb-0`} />
+              </div>
             </div>
           </div>
         </div>
 
-        {previews.length > 0 && (
-          <div className="mb-6">
-            <h3 className="font-bold text-left mb-2">Live Previews (up to 3 files)</h3>
-            <div className="flex items-center gap-3 mb-2">
-                <label className={`text-sm font-medium ${t.label} whitespace-nowrap`}>Preview Zoom:</label>
-                <input 
-                    type="range" 
-                    min="1" 
-                    max="1000" 
-                    value={zoom} 
-                    onChange={(e) => setZoom(e.target.value)} 
-                    className="w-1/2"
-                />
+        {previewsLoading && (
+          <div className={`flex items-center justify-center gap-3 p-4 mb-6 border ${t.inputInfo} font-bold animate-pulse text-blue-700 dark:text-blue-300`}>
+            <svg className="animate-spin h-5 w-5 text-blue-600 dark:text-blue-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <span>Calculating segment statistics for audio files...</span>
+          </div>
+        )}
+
+        {summary && (
+          <div className={`mb-6 p-4 border ${t.inputInfo} rounded text-left`}>
+            <h3 className="font-bold text-base mb-3 border-b pb-1 border-gray-400">Batch Overview</h3>
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-3 text-center">
+              <div>
+                <div className="text-xs font-semibold opacity-75">Files</div>
+                <div className="text-lg font-bold">{summary.total_files}</div>
+              </div>
+              <div>
+                <div className="text-xs font-semibold opacity-75">Total Duration</div>
+                <div className="text-lg font-bold">{formatDuration(summary.total_batch_duration)}</div>
+              </div>
+              <div>
+                <div className="text-xs font-semibold opacity-75">Total Segments</div>
+                <div className="text-lg font-bold">{summary.total_segments}</div>
+              </div>
+              <div>
+                <div className="text-xs font-semibold opacity-75">Result Audio</div>
+                <div className="text-lg font-bold">{formatDuration(summary.total_result_duration)}</div>
+              </div>
+              <div>
+                <div className="text-xs font-semibold opacity-75">Overall Coverage</div>
+                <div className="text-lg font-bold text-green-700 dark:text-green-400">{summary.overall_coverage_percent}%</div>
+              </div>
             </div>
-            {previews.map((p, i) => <PreviewSurfer key={i} preview={p} theme={t} zoom={zoom} />)}
+          </div>
+        )}
+
+        {previews.length > 0 && (
+          <div className="mb-6 text-left">
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
+              <h3 className="font-bold text-lg">All Audio Files ({filteredPreviews.length})</h3>
+              {previews.length > itemsPerPage && (
+                <input 
+                  type="text" 
+                  placeholder="Filter files by name..." 
+                  value={searchQuery}
+                  onChange={e => { setSearchQuery(e.target.value); setCurrentPage(1); }}
+                  className={`p-1 px-3 text-sm border ${t.input} w-60 mb-0`}
+                />
+              )}
+            </div>
+
+            {currentPreviews.map((p) => (
+              <FileSegmentCard 
+                key={p.file} 
+                preview={p} 
+                theme={t} 
+                onSettingChange={handlePerFileSettingChange}
+                onResetSetting={handleResetFileSetting}
+              />
+            ))}
+
+            {totalPages > 1 && (
+              <div className={`flex items-center justify-between mt-4 p-2 border ${t.inputInfo} rounded`}>
+                <button 
+                  type="button"
+                  disabled={currentPage <= 1}
+                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                  className={`px-3 py-1 text-sm border ${t.buttonSecondary} disabled:opacity-40`}
+                >
+                  ◀ Previous
+                </button>
+                <span className="text-xs font-semibold">Page {currentPage} of {totalPages} ({filteredPreviews.length} total)</span>
+                <button 
+                  type="button"
+                  disabled={currentPage >= totalPages}
+                  onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                  className={`px-3 py-1 text-sm border ${t.buttonSecondary} disabled:opacity-40`}
+                >
+                  Next ▶
+                </button>
+              </div>
+            )}
           </div>
         )}
 
@@ -274,13 +471,18 @@ function View0({ theme }) {
   );
 }
 
+
+
 function View1({ theme }) {
   const t = theme;
   const [files, setFiles] = useState({ wav_files: [], folders: [] });
   const [parentFolder, setParentFolder] = useState("");
   const [groupedFiles, setGroupedFiles] = useState({});
   const [selectedSubfolders, setSelectedSubfolders] = useState({});
-  const [form, setForm] = useState({ checkpoint: "charliemcvicker/asr-cherokee" });
+  const [form, setForm] = useState({ 
+    checkpoint: "charliemcvicker/asr-cherokee",
+    output_csv_name: "batch_inference_results.csv"
+  });
   const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(false);
   const [batchStats, setBatchStats] = useState(null);
@@ -294,8 +496,8 @@ function View1({ theme }) {
         const folderSet = new Set();
         allWavs.forEach(f => {
           const parts = f.split('/');
-          if (parts.length > 1) {
-            folderSet.add(parts.slice(0, -1).join('/'));
+          for (let i = 1; i < parts.length; i++) {
+            folderSet.add(parts.slice(0, i).join('/'));
           }
         });
         setFiles({ wav_files: allWavs, folders: Array.from(folderSet).sort((a, b) => a.split('/').length - b.split('/').length || a.localeCompare(b)) });
@@ -385,7 +587,8 @@ function View1({ theme }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           target_folders: targetFolders,
-          checkpoint: form.checkpoint
+          checkpoint: form.checkpoint,
+          output_csv_name: form.output_csv_name
         })
       });
       const data = await res.json();
@@ -514,6 +717,11 @@ function View1({ theme }) {
             <label className={`block text-sm font-medium ${t.label} mb-2`}>Model Checkpoint (HF Repo ID or Path)</label>
             <input type="text" className={`w-full p-3 ${t.input}`} value={form.checkpoint} onChange={e => setForm({...form, checkpoint: e.target.value})} />
           </div>
+
+          <div>
+            <label className={`block text-sm font-medium ${t.label} mb-2`}>Output CSV Name</label>
+            <input type="text" className={`w-full p-3 ${t.input}`} value={form.output_csv_name} onChange={e => setForm({...form, output_csv_name: e.target.value})} placeholder="e.g. batch_inference_results.csv" />
+          </div>
         </div>
 
         <button 
@@ -552,36 +760,123 @@ function View2({ theme }) {
     return showTones ? txt : txt.replace(/[0-9]/g, '');
   };
 
+  const getProcessedWordConfidences = (segment) => {
+    let wordConfs = segment.word_confidences;
+    if (!wordConfs || wordConfs.length === 0) return [];
+
+    const greedyWords = (segment.greedy_transcription || '').trim().split(/\s+/).filter(Boolean);
+    
+    if (wordConfs.length === 1 && greedyWords.length > 1) {
+      const allChars = wordConfs[0].chars || [];
+      const newWords = [];
+      let charIdx = 0;
+
+      for (const targetWord of greedyWords) {
+        const wordChars = [];
+        for (let i = 0; i < targetWord.length && charIdx < allChars.length; i++) {
+          wordChars.push(allChars[charIdx]);
+          charIdx++;
+        }
+        if (wordChars.length > 0) {
+          const avgConf = wordChars.reduce((sum, c) => sum + (c.confidence || 0), 0) / wordChars.length;
+          newWords.push({
+            word: targetWord,
+            confidence: avgConf,
+            chars: wordChars
+          });
+        }
+      }
+      if (charIdx < allChars.length) {
+        const remainingChars = allChars.slice(charIdx);
+        const avgConf = remainingChars.reduce((sum, c) => sum + (c.confidence || 0), 0) / remainingChars.length;
+        newWords.push({
+          word: remainingChars.map(c => c.char).join(''),
+          confidence: avgConf,
+          chars: remainingChars
+        });
+      }
+      return newWords;
+    }
+
+    return wordConfs;
+  };
+
   const renderDetailedTranscription = (segment) => {
-    if (segment.word_confidences && segment.word_confidences.length > 0) {
+    const wordConfs = getProcessedWordConfidences(segment);
+    if (wordConfs && wordConfs.length > 0) {
         return (
-            <div className="flex flex-wrap gap-2 items-center">
-                {segment.word_confidences.map((wordObj, i) => {
+            <div className="flex flex-wrap gap-x-4 gap-y-4 items-end py-1">
+                {wordConfs.map((wordObj, i) => {
                     const formattedWord = formatText(wordObj.word);
                     if (!formattedWord) return null;
+
+                    const getWordConfColor = (conf) => {
+                      if (conf < 0.8) return 'text-red-700 bg-red-100 border-red-300';
+                      if (conf < 0.95) return 'text-orange-700 bg-orange-100 border-orange-300';
+                      return 'text-green-800 bg-green-100 border-green-300';
+                    };
+
                     return (
-                        <span 
+                        <div 
                             key={i} 
-                            className="group relative cursor-pointer border-b border-transparent hover:border-gray-400 pb-[1px]"
-                            title={`Word: ${wordObj.word}\nConfidence: ${wordObj.confidence.toFixed(4)}`}
+                            className="inline-flex flex-col items-center group relative cursor-pointer pt-4 pb-1 px-2 rounded-md bg-gray-50 hover:bg-gray-100 border border-gray-300/80 shadow-sm transition-all"
+                            title={`Word: "${wordObj.word}"\nConfidence: ${(wordObj.confidence * 100).toFixed(1)}%`}
                         >
-                            {wordObj.chars.map((charObj, j) => {
-                                const formattedChar = formatText(charObj.char);
-                                if (!formattedChar) return null;
-                                return (
-                                    <span 
-                                        key={j}
-                                        className={`
-                                            ${charObj.confidence < 0.5 ? 'text-red-500' : charObj.confidence < 0.8 ? 'text-orange-400' : ''}
-                                            hover:bg-blue-500/30 px-[1px] rounded transition-colors duration-150
-                                        `}
-                                        title={`Char: '${charObj.char}'\nConf: ${charObj.confidence.toFixed(4)}${charObj.alternatives && charObj.alternatives.length > 0 ? '\nAlts: ' + charObj.alternatives.map(a => `'${a.char}': ${a.confidence.toFixed(4)}`).join(', ') : ''}`}
-                                    >
-                                        {formattedChar}
-                                    </span>
-                                );
-                            })}
-                        </span>
+                            {/* Characters Row with 2nd best prediction hint above low/mid conf chars */}
+                            <div className="flex items-end leading-none">
+                                {wordObj.chars.map((charObj, j) => {
+                                    const formattedChar = formatText(charObj.char);
+                                    if (!formattedChar) return null;
+
+                                    const isLowMidConf = charObj.confidence < 0.8;
+                                    const topAlt = (charObj.alternatives && charObj.alternatives.length > 0) ? charObj.alternatives[0] : null;
+                                    const formattedAltChar = topAlt ? formatText(topAlt.char) : null;
+
+                                    // Build Top 5 alternatives list for character tooltip
+                                    const allPredictions = [
+                                      { char: charObj.char, confidence: charObj.confidence },
+                                      ...(charObj.alternatives || [])
+                                    ].slice(0, 5);
+
+                                    const charTooltip = `Character: '${charObj.char}' (${(charObj.confidence * 100).toFixed(1)}%)\n\nTop 5 Predictions:\n` +
+                                      allPredictions.map((p, idx) => `${idx + 1}. '${p.char}' — ${(p.confidence * 100).toFixed(1)}%`).join('\n');
+
+                                    return (
+                                        <div key={j} className="relative flex flex-col items-center px-[0.5px]">
+                                            {/* 2nd best prediction floating in small text above character */}
+                                            {isLowMidConf && formattedAltChar && (
+                                                <span 
+                                                    className="text-[10px] font-mono font-bold leading-none text-blue-600 absolute -top-3.5 opacity-80 hover:opacity-100 select-none"
+                                                    title={`2nd Choice: '${topAlt.char}' (${(topAlt.confidence * 100).toFixed(1)}%)`}
+                                                >
+                                                    {formattedAltChar}
+                                                </span>
+                                            )}
+
+                                            {/* Primary character */}
+                                            <span 
+                                                className={`
+                                                    text-xl font-medium leading-none px-0.5 rounded-sm transition-colors duration-150 inline-block
+                                                    ${charObj.confidence < 0.5 ? 'text-red-600 font-bold bg-red-100' : charObj.confidence < 0.8 ? 'text-orange-600 font-semibold bg-orange-100' : 'text-gray-900'}
+                                                    hover:bg-blue-500/30 hover:text-blue-900
+                                                `}
+                                                title={charTooltip}
+                                            >
+                                                {formattedChar}
+                                            </span>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+
+                            {/* Word Confidence display directly below the word */}
+                            <span 
+                                className={`text-[11px] font-mono font-bold leading-tight mt-1.5 px-1.5 py-0.5 rounded border ${getWordConfColor(wordObj.confidence)}`}
+                                title={`Word Confidence: ${(wordObj.confidence * 100).toFixed(2)}%`}
+                            >
+                                {(wordObj.confidence * 100).toFixed(1)}%
+                            </span>
+                        </div>
                     );
                 })}
             </div>
@@ -811,10 +1106,433 @@ function View2({ theme }) {
  );
 }
 
+// A simple Levenshtein distance function
+function levenshtein(s, t) {
+  if (s === t) return 0;
+  if (s.length === 0) return t.length;
+  if (t.length === 0) return s.length;
+
+  const v0 = new Array(t.length + 1);
+  const v1 = new Array(t.length + 1);
+
+  for (let i = 0; i <= t.length; i++) {
+    v0[i] = i;
+  }
+
+  for (let i = 0; i < s.length; i++) {
+    v1[0] = i + 1;
+    for (let j = 0; j < t.length; j++) {
+      const cost = s[i] === t[j] ? 0 : 1;
+      v1[j + 1] = Math.min(v1[j] + 1, v0[j + 1] + 1, v0[j] + cost);
+    }
+    for (let j = 0; j <= t.length; j++) {
+      v0[j] = v1[j];
+    }
+  }
+
+  return v0[t.length];
+}
+
+function View3({ theme }) {
+  const t = theme;
+  const [csvFiles, setCsvFiles] = useState([]);
+  const [selectedCsv, setSelectedCsv] = useState("");
+  const [segments, setSegments] = useState([]);
+  const [status, setStatus] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const [searchVal, setSearchVal] = useState("");
+  const [debouncedSearchVal, setDebouncedSearchVal] = useState("");
+  const [results, setResults] = useState([]);
+  const [manifestMap, setManifestMap] = useState({});
+
+  useEffect(() => {
+    fetch("http://localhost:8000/api/audio/audiofiles-to-transcribe/segmentation_manifest.csv")
+      .then(res => {
+        if (!res.ok) throw new Error("No manifest");
+        return res.text();
+      })
+      .then(text => {
+        const map = {};
+        const lines = text.split('\n');
+        for (let i = 1; i < lines.length; i++) {
+          const cols = lines[i].split(',');
+          if (cols.length >= 4) {
+            const segmentedPath = cols[1].trim();
+            map[segmentedPath] = {
+              original: cols[0].trim(),
+              start: parseInt(cols[2]),
+              end: parseInt(cols[3])
+            };
+          }
+        }
+        setManifestMap(map);
+      })
+      .catch(() => setManifestMap({}));
+  }, []);
+
+  useEffect(() => {
+    fetch("http://localhost:8000/api/files")
+      .then(res => res.json())
+      .then(data => {
+        setCsvFiles(data.csv_files || []);
+      })
+      .catch(err => console.log("Failed to fetch files", err));
+  }, []);
+
+  const loadData = async (file) => {
+    if (!file) return;
+    setLoading(true);
+    setStatus("Loading data...");
+    try {
+      const res = await fetch(`http://localhost:8000/api/labeler/data?file=${encodeURIComponent(file)}`);
+      const result = await res.json();
+      if (res.ok && result.status === 'success') {
+        setSegments(result.data);
+        setStatus(null);
+      } else {
+        setStatus(`❌ Error: ${result.detail || result.message}`);
+      }
+    } catch (err) {
+      setStatus(`❌ Error fetching data: ${err.message}`);
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchVal(searchVal);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchVal]);
+
+  const formatText = (txt) => {
+    if (!txt) return txt;
+    return txt.replace(/[0-9]/g, '');
+  };
+
+  const getProcessedWordConfidences = (segment) => {
+    let wordConfs = segment.word_confidences;
+    if (!wordConfs || wordConfs.length === 0) return [];
+    const greedyWords = (segment.greedy_transcription || '').trim().split(/\s+/).filter(Boolean);
+    if (wordConfs.length === 1 && greedyWords.length > 1) {
+      const allChars = wordConfs[0].chars || [];
+      const newWords = [];
+      let charIdx = 0;
+      for (const targetWord of greedyWords) {
+        const wordChars = [];
+        for (let i = 0; i < targetWord.length && charIdx < allChars.length; i++) {
+          wordChars.push(allChars[charIdx]);
+          charIdx++;
+        }
+        if (wordChars.length > 0) {
+          const avgConf = wordChars.reduce((sum, c) => sum + (c.confidence || 0), 0) / wordChars.length;
+          newWords.push({ word: targetWord, confidence: avgConf, chars: wordChars });
+        }
+      }
+      if (charIdx < allChars.length) {
+        const remainingChars = allChars.slice(charIdx);
+        const avgConf = remainingChars.reduce((sum, c) => sum + (c.confidence || 0), 0) / remainingChars.length;
+        newWords.push({ word: remainingChars.map(c => c.char).join(''), confidence: avgConf, chars: remainingChars });
+      }
+      return newWords;
+    }
+    return wordConfs;
+  };
+
+  useEffect(() => {
+    if (!debouncedSearchVal.trim() || segments.length === 0) {
+      setResults([]);
+      return;
+    }
+
+    const query = formatText(debouncedSearchVal.trim()).toLowerCase();
+    const matched = [];
+
+    segments.forEach((seg, idx) => {
+      const words = getProcessedWordConfidences(seg);
+      let bestDist = Infinity;
+      let matchedWordInfo = null;
+
+      words.forEach(wObj => {
+        const wordClean = formatText(wObj.word).toLowerCase();
+        if (!wordClean) return;
+        
+        let matchTypeDist = Infinity;
+        const levDist = levenshtein(query, wordClean);
+        
+        if (levDist === 0) {
+          matchTypeDist = 0; // Exact match
+        } else if (wordClean.startsWith(query)) {
+          matchTypeDist = 1; // Starts With
+        } else if (wordClean.includes(query)) {
+          matchTypeDist = 2; // Includes
+        } else if (levDist === 1) {
+          matchTypeDist = 3; // 1-Letter Off
+        }
+
+        if (matchTypeDist < bestDist) {
+          bestDist = matchTypeDist;
+          matchedWordInfo = wObj;
+        } else if (matchTypeDist === bestDist && matchedWordInfo && wObj.confidence > matchedWordInfo.confidence) {
+          // If same match type, pick the one with higher confidence
+          matchedWordInfo = wObj;
+        }
+      });
+
+      if (matchedWordInfo) {
+        matched.push({
+          segmentIndex: idx,
+          segment: seg,
+          matchWordInfo: matchedWordInfo,
+          distance: bestDist,
+          confidence: matchedWordInfo.confidence
+        });
+      }
+    });
+
+    // Sort: dist 0 first, then dist 1. For same dist, highest confidence first.
+    matched.sort((a, b) => {
+      if (a.distance !== b.distance) {
+        return a.distance - b.distance;
+      }
+      return b.confidence - a.confidence;
+    });
+
+    setResults(matched);
+  }, [debouncedSearchVal, segments]);
+
+  const renderTranscriptionWithHighlight = (segment, matchedWordInfo) => {
+    const wordConfs = getProcessedWordConfidences(segment);
+    if (!wordConfs || wordConfs.length === 0) {
+      return formatText(segment.greedy_transcription) || <i className="text-gray-400">(Empty)</i>;
+    }
+
+    return (
+      <div className="flex flex-wrap gap-x-4 gap-y-4 items-end py-1">
+        {wordConfs.map((wordObj, i) => {
+          const formattedWord = formatText(wordObj.word);
+          if (!formattedWord) return null;
+          
+          const isMatch = matchedWordInfo && matchedWordInfo.word === wordObj.word;
+          
+          const getWordConfColor = (conf) => {
+            if (conf < 0.8) return 'text-red-700 bg-red-100 border-red-300';
+            if (conf < 0.95) return 'text-orange-700 bg-orange-100 border-orange-300';
+            return 'text-green-800 bg-green-100 border-green-300';
+          };
+
+          const matchClass = isMatch 
+            ? "bg-yellow-100 border-2 border-yellow-400 shadow-md scale-105" 
+            : "bg-gray-50 hover:bg-gray-100 border border-gray-300/80 shadow-sm";
+
+          return (
+            <div 
+                key={i} 
+                className={`inline-flex flex-col items-center group relative cursor-pointer pt-4 pb-1 px-2 rounded-md transition-all ${matchClass}`}
+                title={`Word: "${wordObj.word}"\nConfidence: ${(wordObj.confidence * 100).toFixed(1)}%`}
+            >
+                {/* Characters Row with 2nd best prediction hint above low/mid conf chars */}
+                <div className="flex items-end leading-none">
+                    {wordObj.chars.map((charObj, j) => {
+                        const formattedChar = formatText(charObj.char);
+                        if (!formattedChar) return null;
+
+                        const isLowMidConf = charObj.confidence < 0.8;
+                        const topAlt = (charObj.alternatives && charObj.alternatives.length > 0) ? charObj.alternatives[0] : null;
+                        const formattedAltChar = topAlt ? formatText(topAlt.char) : null;
+
+                        // Build Top 5 alternatives list for character tooltip
+                        const allPredictions = [
+                          { char: charObj.char, confidence: charObj.confidence },
+                          ...(charObj.alternatives || [])
+                        ].slice(0, 5);
+
+                        const charTooltip = `Character: '${charObj.char}' (${(charObj.confidence * 100).toFixed(1)}%)\n\nTop 5 Predictions:\n` +
+                          allPredictions.map((p, idx) => `${idx + 1}. '${p.char}' — ${(p.confidence * 100).toFixed(1)}%`).join('\n');
+
+                        return (
+                            <div key={j} className="relative flex flex-col items-center px-[0.5px]">
+                                {/* 2nd best prediction floating in small text above character */}
+                                {isLowMidConf && formattedAltChar && (
+                                    <span 
+                                        className="text-[10px] font-mono font-bold leading-none text-blue-600 absolute -top-3.5 opacity-80 hover:opacity-100 select-none"
+                                        title={`2nd Choice: '${topAlt.char}' (${(topAlt.confidence * 100).toFixed(1)}%)`}
+                                    >
+                                        {formattedAltChar}
+                                    </span>
+                                )}
+
+                                {/* Primary character */}
+                                <span 
+                                    className={`
+                                        text-xl font-medium leading-none px-0.5 rounded-sm transition-colors duration-150 inline-block
+                                        ${charObj.confidence < 0.5 ? 'text-red-600 font-bold bg-red-100' : charObj.confidence < 0.8 ? 'text-orange-600 font-semibold bg-orange-100' : 'text-gray-900'}
+                                        hover:bg-blue-500/30 hover:text-blue-900
+                                    `}
+                                    title={charTooltip}
+                                >
+                                    {formattedChar}
+                                </span>
+                            </div>
+                        );
+                    })}
+                </div>
+
+                {/* Word Confidence display directly below the word */}
+                <span 
+                    className={`text-[11px] font-mono font-bold leading-tight mt-1.5 px-1.5 py-0.5 rounded border ${getWordConfColor(wordObj.confidence)}`}
+                    title={`Word Confidence: ${(wordObj.confidence * 100).toFixed(2)}%`}
+                >
+                    {(wordObj.confidence * 100).toFixed(1)}%
+                </span>
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
+  const getConfidenceClass = (conf) => {
+    if (conf < 0.8) return "text-red-600 font-bold";
+    if (conf < 0.95) return "text-orange-500 font-bold";
+    return "text-green-600 font-bold";
+  };
+
+  const formatTimestamp = (ms) => {
+    const totalSec = Math.floor(ms / 1000);
+    const min = Math.floor(totalSec / 60);
+    const sec = totalSec % 60;
+    return `${min}:${sec.toString().padStart(2, '0')}.${(ms % 1000).toString().padStart(3, '0')}`;
+  };
+
+  return (
+    <div className="max-w-4xl mx-auto text-left pb-16">
+      <h2 className={`text-3xl font-bold mb-6 text-center ${t.viewTitle}`}>3. Search</h2>
+      <p className={`text-center ${t.viewDesc} mb-8`}>Search for a word across all transcribed segments in a CSV file.</p>
+      
+      <div className={`${t.card} p-6 mb-6`}>
+        <div className="flex flex-col md:flex-row gap-4 mb-4">
+          <div className="flex-1">
+            <label className={`block text-sm font-medium ${t.label} mb-1`}>Results CSV File</label>
+            <select 
+              className={`w-full p-3 ${t.input}`} 
+              value={selectedCsv} 
+              onChange={e => {
+                setSelectedCsv(e.target.value);
+                loadData(e.target.value);
+              }}
+            >
+              <option value="">-- Select CSV File --</option>
+              {csvFiles.map(f => <option key={f} value={f}>{f}</option>)}
+            </select>
+          </div>
+          <div className="flex-1">
+            <label className={`block text-sm font-medium ${t.label} mb-1`}>Search Term</label>
+            <input 
+              type="text" 
+              className={`w-full p-3 ${t.input} mb-0`} 
+              placeholder="Type a word..." 
+              value={searchVal}
+              onChange={e => setSearchVal(e.target.value)}
+              disabled={!selectedCsv || loading}
+            />
+          </div>
+        </div>
+        {status && <div className={`p-2 ${status.includes('❌') ? t.errorMsg : t.inputInfo}`}>{status}</div>}
+      </div>
+
+      {debouncedSearchVal && results.length > 0 && (
+        <div className="mb-4 font-bold opacity-80 text-center">
+          Found {results.length} matches for "{debouncedSearchVal}"
+        </div>
+      )}
+
+      {debouncedSearchVal && results.length === 0 && segments.length > 0 && (
+        <div className={`p-6 text-center border ${t.inputInfo}`}>
+          No matches found for "{debouncedSearchVal}".
+        </div>
+      )}
+
+      <div className="space-y-8">
+        {results.map((res, index) => {
+          const mainIdx = res.segmentIndex;
+          const mainSeg = segments[mainIdx];
+          
+          let manifestInfo = null;
+          for (const key in manifestMap) {
+            if (mainSeg.file_path.endsWith(key)) {
+              manifestInfo = manifestMap[key];
+              break;
+            }
+          }
+
+          return (
+            <div key={`${mainIdx}-${index}`} className={`border ${t.card} p-4 rounded shadow`}>
+              <div className="flex justify-between items-center mb-4 pb-2 border-b border-gray-300 dark:border-gray-700">
+                <div>
+                  <span className="font-bold mr-4 text-lg">Match {index + 1}</span>
+                  {res.distance === 0 && (
+                    <span className="text-sm mr-4 px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 border border-blue-300 dark:border-blue-700 font-bold">
+                      Exact Match
+                    </span>
+                  )}
+                  {res.distance === 1 && (
+                    <span className="text-sm mr-4 px-2 py-0.5 rounded bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 border border-purple-300 dark:border-purple-700 font-bold">
+                      Starts With
+                    </span>
+                  )}
+                  {res.distance === 2 && (
+                    <span className="text-sm mr-4 px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300 border border-gray-300 dark:border-gray-600 font-bold">
+                      Contains
+                    </span>
+                  )}
+                  {res.distance === 3 && (
+                    <span className="text-sm mr-4 px-2 py-0.5 rounded bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200 border border-orange-300 dark:border-orange-700 font-bold">
+                      1-Letter Off
+                    </span>
+                  )}
+                  <span className="text-sm opacity-80">Confidence: </span>
+                  <span className={`text-sm ${getConfidenceClass(res.confidence)}`}>{(res.confidence * 100).toFixed(1)}%</span>
+                </div>
+              </div>
+
+              {manifestInfo && (
+                <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700">
+                  <div className="text-xs font-bold mb-1 opacity-80 uppercase tracking-wider">Full Source Audio</div>
+                  <div className="text-sm mb-2 font-mono text-gray-700 dark:text-gray-300">
+                    {manifestInfo.original} <span className="ml-2 font-bold text-blue-600 dark:text-blue-400">({formatTimestamp(manifestInfo.start)} - {formatTimestamp(manifestInfo.end)})</span>
+                  </div>
+                  <audio 
+                    src={`http://localhost:8000/api/audio/wav/${manifestInfo.original}#t=${manifestInfo.start/1000},${manifestInfo.end/1000}`} 
+                    controls 
+                    className="h-10 w-full opacity-90 hover:opacity-100 transition-opacity" 
+                  />
+                </div>
+              )}
+
+              {/* Main Segment */}
+              <div className="pl-4 border-l-4 border-blue-500 bg-blue-50 dark:bg-blue-900/20 py-2 pr-2">
+                <div className="text-xs mb-1 font-mono text-blue-800 dark:text-blue-300">
+                  Segment: {mainSeg.file_path} 
+                  {!manifestInfo && <span className="ml-2 italic opacity-70">(Source audio mapping not found)</span>}
+                </div>
+                <audio src={`http://localhost:8000/api/audio/${mainSeg.file_path}`} controls className="h-10 w-full mb-3" />
+                <div>{renderTranscriptionWithHighlight(mainSeg, res.matchWordInfo)}</div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 const TABS = [
   { id: 0, name: "Batch Segmentation", title: "Batch Segmentation" },
   { id: 1, name: "Batch Inference", title: "Batch Inference" },
   { id: 2, name: "Review", title: "Review Tool" },
+  { id: 3, name: "Search", title: "Search" },
 ];
 
 export default function App() {
@@ -893,6 +1611,7 @@ export default function App() {
           {activeTab === 0 && <View0 theme={t} />}
           {activeTab === 1 && <View1 theme={t} />}
           {activeTab === 2 && <View2 theme={t} />}
+          {activeTab === 3 && <View3 theme={t} />}
         </div>
       </main>
     </div>

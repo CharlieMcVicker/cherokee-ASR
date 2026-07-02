@@ -9,21 +9,36 @@ from pydub import AudioSegment
 def get_energy_profile(audio, step_ms=10):
     """
     Computes the dBFS energy profile for the audio segment in step_ms increments.
-    Returns a numpy array of dBFS values for each step.
+    Returns a numpy array of dBFS values for each step (vectorized for maximum performance).
     """
-    # pydub calculates dbfs relative to max possible amplitude
-    # We iterate over the audio segment in step_ms increments
     num_steps = len(audio) // step_ms
-    dbfs_profile = np.zeros(num_steps, dtype=np.float32)
+    if num_steps <= 0:
+        return np.array([], dtype=np.float32)
+
+    samples = np.array(audio.get_array_of_samples(), dtype=np.float32)
+    if audio.channels > 1:
+        samples = samples.reshape((-1, audio.channels)).mean(axis=1)
+
+    samples_per_step = int((audio.frame_rate * step_ms) / 1000.0)
+    if samples_per_step <= 0:
+        samples_per_step = 1
+
+    total_needed = num_steps * samples_per_step
+    if len(samples) < total_needed:
+        samples = np.pad(samples, (0, total_needed - len(samples)))
+    else:
+        samples = samples[:total_needed]
+
+    windows = samples.reshape((num_steps, samples_per_step))
+    rms = np.sqrt(np.mean(windows ** 2, axis=1))
     
-    # Pre-extract frame properties for manual calculation to avoid pydub overhead
-    # dbfs = 20 * log10(rms / max_possible_amplitude)
-    # pydub's chunk.dbfs does this. Let's do it efficiently.
-    for i in range(num_steps):
-        chunk = audio[i * step_ms : (i + 1) * step_ms]
-        dbfs_profile[i] = chunk.dBFS
-        
-    return dbfs_profile
+    max_amp = float(audio.max_possible_amplitude) if audio.max_possible_amplitude > 0 else 32768.0
+    rms = np.maximum(rms, 1e-9)
+    dbfs = 20.0 * np.log10(rms / max_amp)
+    dbfs = np.clip(dbfs, -120.0, 0.0)
+
+    return dbfs.astype(np.float32)
+
 
 def segment_audio_from_profile(dbfs_profile, total_duration_ms, step_ms=10, min_silence_len=500, silence_thresh=-40, keep_silence=100):
     """
