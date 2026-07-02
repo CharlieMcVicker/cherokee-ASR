@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-batch_inference.py
+batch.py
 
 Runs speech-to-text inference on a directory of WAV files using the fine-tuned Wav2Vec2 model.
-Optimized using batched GPU inference and multiprocessed CPU CTC/KenLM decoding.
+Optimized using batched GPU inference and multiprocessed CPU CTC decoding with detailed confidence scores.
 """
 
 import os
@@ -13,12 +13,10 @@ import os
 os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
 
 import argparse
-import re
 import sys
 import glob
 import csv
 import torch
-import torchaudio
 import soundfile as sf
 import numpy as np
 from transformers import Wav2Vec2Processor, Wav2Vec2ForCTC
@@ -26,135 +24,57 @@ import time
 import multiprocessing
 from tqdm import tqdm
 
-TARGET_SAMPLE_RATE = 16000
+from transcription.utils.model_utils import get_best_model_config
+from transcription.inference.infer import (
+    TARGET_SAMPLE_RATE,
+    load_and_preprocess_audio,
+    calculate_word_confidences,
+    greedy_inference
+)
 
-# Global variables in the worker processes to avoid serializing the decoder/processor objects
-global_decoder = None
+# Global variables in the worker processes to avoid serializing the processor objects
 global_processor = None
 
 
-def init_worker(processor_path, arpa_path, token, revision):
+def init_worker(processor_path, token, revision):
     """
-    Initialize global decoder and processor in worker processes once.
-    This avoids pickle serialization overhead and limits thread subscription.
+    Initialize global processor in worker processes once.
+    This avoids pickle serialization overhead.
     """
-    global global_decoder, global_processor
+    global global_processor
     # Restrict internal Torch threading in workers to prevent CPU oversubscription
     torch.set_num_threads(1)
     
     from transformers import Wav2Vec2Processor
-    import os
 
     global_processor = Wav2Vec2Processor.from_pretrained(
         processor_path, token=token, revision=revision
     )
 
-    if arpa_path and os.path.exists(arpa_path):
-        from pyctcdecode import build_ctcdecoder
-        
-        vocab_dict_sorted = global_processor.tokenizer.get_vocab()
-        sorted_vocab = sorted(vocab_dict_sorted.items(), key=lambda kv: kv[1])
-        labels = [t for t, _ in sorted_vocab]
-        labels = ["" if t == "[PAD]" else (" " if t == "|" else t) for t in labels]
-
-        global_decoder = build_ctcdecoder(
-            labels=labels,
-            kenlm_model_path=arpa_path,
-            alpha=0.5,
-            beta=1.0,
-        )
-
 
 def decode_worker(item_data):
     """
-    Worker function to decode logits.
+    Worker function to decode logits and compute detailed confidences.
     item_data is a tuple: (index, filename, audio_path, logits_np)
     """
-    global global_decoder, global_processor
+    global global_processor
     import numpy as np
     import torch
+    import json
+    from transcription.inference.infer import calculate_word_confidences, greedy_inference
     
     idx, filename, audio_path, logits_np = item_data
     
-    # 1. Greedy Decode
     logits_tensor = torch.tensor(logits_np)
-    probs = torch.nn.functional.softmax(logits_tensor, dim=-1).numpy()
-    pred_ids = np.argmax(probs, axis=-1)
-    greedy_raw = global_processor.decode(pred_ids).strip()
-
-    # Calculate token level confidence
-    token_probs = probs[np.arange(len(pred_ids)), pred_ids]
-    pad_id = getattr(global_processor.tokenizer, "pad_token_id", None)
-    if pad_id is None:
-        pad_id = global_processor.tokenizer.vocab.get("[PAD]", 0)
-    
-    non_pad_mask = pred_ids != pad_id
-    if non_pad_mask.any():
-        greedy_confidence = float(np.mean(token_probs[non_pad_mask]))
-    else:
-        greedy_confidence = float(np.mean(token_probs))
+    res = greedy_inference(logits_tensor, global_processor)
+    greedy_raw = res["text"]
+    greedy_confidence = res["confidence"]
 
     # Calculate detailed character/word confidences
-    chars = []
-    char_probs = []
-    char_alts = []
-    
-    top_k = 5
-    top_k_indices = np.argsort(probs, axis=-1)[:, -top_k:][:, ::-1]
-    top_k_probs = np.take_along_axis(probs, top_k_indices, axis=-1)
-    
-    prev_id = -1
-    for i, token_id in enumerate(pred_ids):
-        if token_id != pad_id and token_id != prev_id:
-            token_str = global_processor.decode([token_id])
-            if token_str:
-                chars.append(token_str)
-                char_probs.append(float(token_probs[i]))
-                
-                alts = []
-                for k in range(top_k):
-                    alt_id = top_k_indices[i, k]
-                    alt_prob = float(top_k_probs[i, k])
-                    if alt_id != token_id:
-                        alt_str = global_processor.decode([alt_id])
-                        if alt_str:
-                            alts.append({"char": alt_str, "confidence": alt_prob})
-                char_alts.append(alts)
-                
-        prev_id = token_id
-
-    words_details = []
-    current_word = ""
-    current_chars = []
-    for char, prob, alts in zip(chars, char_probs, char_alts):
-        if char == " ":
-            if current_word:
-                word_conf = float(np.mean([c["confidence"] for c in current_chars]))
-                words_details.append({"word": current_word, "confidence": word_conf, "chars": current_chars})
-                current_word = ""
-                current_chars = []
-        else:
-            current_word += char
-            current_chars.append({"char": char, "confidence": prob, "alternatives": alts})
-    if current_word:
-        word_conf = float(np.mean([c["confidence"] for c in current_chars]))
-        words_details.append({"word": current_word, "confidence": word_conf, "chars": current_chars})
-
-    import json
+    probs = torch.nn.functional.softmax(logits_tensor, dim=-1).numpy()
+    pred_ids = np.argmax(probs, axis=-1)
+    words_details = calculate_word_confidences(probs, pred_ids, global_processor)
     word_confidences_json = json.dumps(words_details, ensure_ascii=False)
-
-    # 2. KenLM Decode
-    lm_raw = ""
-    logit_score = 0.0
-    combined_score = 0.0
-    
-    if global_decoder is not None:
-        beams = global_decoder.decode_beams(logits_np)
-        if beams:
-            best_beam = beams[0]
-            lm_raw = best_beam[0].strip()
-            logit_score = float(best_beam[3])
-            combined_score = float(best_beam[4])
 
     return {
         "index": idx,
@@ -162,36 +82,8 @@ def decode_worker(item_data):
         "audio_path": audio_path,
         "greedy_raw": greedy_raw,
         "greedy_confidence": greedy_confidence,
-        "word_confidences": word_confidences_json,
-        "lm_raw": lm_raw,
-        "logit_score": logit_score,
-        "combined_score": combined_score
+        "word_confidences": word_confidences_json
     }
-
-
-from transcription.utils.model_utils import get_best_model_config
-
-def load_audio(audio_path, target_sample_rate):
-    import soundfile as sf
-    import torch
-    import torchaudio
-    speech_array, sample_rate = sf.read(audio_path)
-    waveform = torch.tensor(speech_array, dtype=torch.float32)
-    if len(waveform.shape) == 1:
-        waveform = waveform.unsqueeze(0)
-    else:
-        waveform = waveform.transpose(0, 1)
-    
-    if waveform.shape[0] > 1:
-        waveform = torch.mean(waveform, dim=0, keepdim=True)
-    
-    if sample_rate != target_sample_rate:
-        resampler = torchaudio.transforms.Resample(
-            orig_freq=sample_rate, new_freq=target_sample_rate
-        )
-        waveform = resampler(waveform)
-    
-    return waveform.squeeze(0).numpy()
 
 
 def main():
@@ -218,12 +110,6 @@ def main():
         type=str,
         default=default_repo,
         help="Path to saved processor or Hugging Face Hub repo ID.",
-    )
-    parser.add_argument(
-        "--arpa",
-        type=str,
-        default=None,
-        help="Path to KenLM ARPA model (optional). If omitted, only greedy decoding is done.",
     )
     parser.add_argument(
         "--hf-token",
@@ -310,8 +196,7 @@ def main():
     print(f"Using device: {device}", flush=True)
     model.to(device)
 
-    # Read audio metadata for sorting (lazy loading)
-    # We sort by length to minimize padding overhead during batched inference.
+    # Read audio metadata for sorting (lazy loading to minimize VRAM/RAM)
     loaded_audios = []
     print("Reading audio metadata for sorting...", flush=True)
     audio_load_start = time.time()
@@ -345,16 +230,13 @@ def main():
     pool = multiprocessing.Pool(
         processes=num_workers,
         initializer=init_worker,
-        initargs=(args.processor, args.arpa, token, args.revision)
+        initargs=(args.processor, token, args.revision)
     )
 
     # Initialize CSV headers
     headers = ["file_path", "filename", "greedy_transcription", "greedy_confidence", "word_confidences"]
-    if args.arpa:
-        headers.append("kenlm_transcription")
-        headers.append("kenlm_logit_score")
-        headers.append("kenlm_combined_score")
 
+    os.makedirs(os.path.dirname(args.output), exist_ok=True)
     with open(args.output, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
         writer.writerow(headers)
@@ -371,14 +253,11 @@ def main():
                 with open(args.output, "a", newline="", encoding="utf-8") as f:
                     writer = csv.writer(f)
                     row = [res["audio_path"], res["filename"], res["greedy_raw"], f"{res['greedy_confidence']:.4f}", res.get("word_confidences", "[]")]
-                    if args.arpa:
-                        row.extend([res["lm_raw"], f"{res['logit_score']:.4f}", f"{res['combined_score']:.4f}"])
                     writer.writerow(row)
         finally:
             max_queue.release()
 
     global_idx = 0
-    CHUNK_SIZE_BATCHES = 50
 
     gpu_start_time = time.time()
     print(f"Running batched GPU inference and streaming decoding (batch size: {args.batch_size}, total batches: {len(batches)})...", flush=True)
@@ -388,7 +267,7 @@ def main():
         speech_list = []
         for item in batch:
             try:
-                speech = load_audio(item["audio_path"], TARGET_SAMPLE_RATE)
+                speech = load_and_preprocess_audio(item["audio_path"], TARGET_SAMPLE_RATE)
                 item["speech"] = speech
                 speech_list.append(speech)
             except Exception as e:

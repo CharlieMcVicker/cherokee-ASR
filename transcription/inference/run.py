@@ -5,8 +5,10 @@ import numpy as np
 import torch
 import soundfile as sf
 import librosa
-from transformers import Wav2Vec2ForCTC, Wav2Vec2Processor, Wav2Vec2ProcessorWithLM
+from transformers import Wav2Vec2ForCTC, Wav2Vec2Processor
 import warnings
+
+from transcription.inference.infer import greedy_inference
 
 warnings.filterwarnings("ignore")
 
@@ -30,31 +32,6 @@ def convert_to_human_orthography(input_string):
         output_string = output_string.replace(o, t)
     return output_string
 
-def get_processor_with_lm(processor, model_dir, revision=None):
-    try:
-        from pyctcdecode import build_ctcdecoder
-        arpa_files = glob.glob(os.path.join(model_dir, "*-correct.arpa"))
-        if not arpa_files:
-            arpa_files = glob.glob(os.path.join(model_dir, "*.arpa"))
-            
-        if arpa_files:
-            arpa_path = arpa_files[0]
-            print(f"Loading KenLM from {arpa_path}")
-            vocab_dict = processor.tokenizer.get_vocab()
-            sorted_vocab_dict = {k.lower(): v for k, v in sorted(vocab_dict.items(), key=lambda item: item[1])}
-            decoder = build_ctcdecoder(
-                labels=list(sorted_vocab_dict.keys()),
-                kenlm_model_path=arpa_path,
-            )
-            return Wav2Vec2ProcessorWithLM(
-                feature_extractor=processor.feature_extractor,
-                tokenizer=processor.tokenizer,
-                decoder=decoder,
-            )
-    except Exception as e:
-        print(f"Failed to build KenLM decoder: {e}")
-    return None
-
 def main():
     args = parse_args()
     device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -72,7 +49,6 @@ def main():
     model = Wav2Vec2ForCTC.from_pretrained(args.model_dir, revision=revision).to(device)
     model.eval()
     processor = Wav2Vec2Processor.from_pretrained(args.model_dir, revision=revision)
-    processor_lm = get_processor_with_lm(processor, args.model_dir, revision=revision)
     
     print(f"Loading audio: {args.audio_file}")
     speech, sr = librosa.load(args.audio_file, sr=16000)
@@ -83,11 +59,8 @@ def main():
         with torch.no_grad():
             logits = model(input_dict.input_values.to(device)).logits
             
-        if processor_lm:
-            pred_text = processor_lm.decode(logits[0].cpu().numpy()).text
-        else:
-            pred_ids = torch.argmax(logits, dim=-1)[0]
-            pred_text = processor.decode(pred_ids)
+        res = greedy_inference(logits[0], processor)
+        pred_text = res["text"]
             
         final_text = convert_to_human_orthography(pred_text)
         print(f"TRANSCRIPTION: {final_text}")
@@ -130,11 +103,8 @@ def main():
             with torch.no_grad():
                 logits = model(input_dict.input_values.to(device)).logits
                 
-            if processor_lm:
-                pred_text = processor_lm.decode(logits[0].cpu().numpy()).text
-            else:
-                pred_ids = torch.argmax(logits, dim=-1)[0]
-                pred_text = processor.decode(pred_ids)
+            res = greedy_inference(logits[0], processor)
+            pred_text = res["text"]
                 
             final_text = convert_to_human_orthography(pred_text)
             results.append((start, end, final_text))

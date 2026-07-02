@@ -27,11 +27,10 @@ from transformers import (
     Wav2Vec2ForCTC,
     TrainingArguments,
     Trainer,
-    Wav2Vec2ProcessorWithLM,
 )
 from datasets import Dataset, Audio
-from pyctcdecode import build_ctcdecoder
 from jiwer import wer as jiwer_wer, cer as jiwer_cer
+from transcription.inference.infer import greedy_inference
 
 TARGET_SAMPLE_RATE = 16000
 apostrophe_variants = r"[’‘ʼʻ`´‛]"  # curly, modifier letter, grave/acute, etc.
@@ -544,8 +543,8 @@ def main():
                 sliced = logits_np[i, :actual_len, :]
                 all_logits.append(sliced)
 
-                pred_ids = np.argmax(sliced, axis=-1)
-                hyp_greedy = processor.decode(pred_ids).strip()
+                res = greedy_inference(sliced, processor)
+                hyp_greedy = res["text"]
                 all_greedy_hypotheses.append(hyp_greedy)
 
         all_gold_sentences = [ex["sentence"] for ex in test_ds_prepared]

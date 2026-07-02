@@ -1,35 +1,18 @@
 import os
-import re
-import unicodedata
 import argparse
 import pandas as pd
-import numpy as np
 import torch
-from transformers import Wav2Vec2Processor, Wav2Vec2ForCTC, Wav2Vec2ProcessorWithLM
-from datasets import Dataset, Audio
-from pyctcdecode import build_ctcdecoder
+from transformers import Wav2Vec2Processor, Wav2Vec2ForCTC
+from datasets import Dataset, Audio, Features, Value
 from jiwer import wer as jiwer_wer, cer as jiwer_cer
 from tqdm import tqdm
 
-# Constants
-TARGET_SAMPLE_RATE = 16000
-apostrophe_variants = r"[’‘ʼʻ`´‛]"
-chars_to_remove_regex = r'[\,\?\.\!\-\;\:\"\“\%\”\\(\)\[\]\{\}«»…]'
-
-def normalize_text(text):
-    text = str(text)
-    text = unicodedata.normalize("NFC", text)
-    text = text.lower()
-    text = re.sub(apostrophe_variants, "'", text)
-    text = re.sub(chars_to_remove_regex, "", text)
-    text = re.sub(r"\s+", " ", text).strip()
-    return text
-
-def strip_tones(text):
-    # Remove all digits (0-9) representing tones
-    text = re.sub(r"\d", "", text)
-    text = re.sub(r"\s+", " ", text).strip()
-    return text
+from transcription.inference.infer import (
+    greedy_inference,
+    normalize_text,
+    strip_tones,
+    TARGET_SAMPLE_RATE
+)
 
 def _try_read_csv(path):
     for sep in [",", "\t", ";", "|"]:
@@ -79,7 +62,6 @@ def main():
     parser.add_argument("--audio-dir", type=str, default="data/processed/sentence_audio", help="Directory containing audio files.")
     parser.add_argument("--checkpoint", type=str, default="remote_output_w2v2/checkpoint-800", help="Path or HF repo ID to the model checkpoint.")
     parser.add_argument("--processor", type=str, default=None, help="Path or HF repo ID to the processor (defaults to checkpoint).")
-    parser.add_argument("--arpa", type=str, default="output_w2v2/lm-cim-4-correct.arpa", help="Path to KenLM ARPA model.")
     parser.add_argument("--hf-token", type=str, default=None, help="Hugging Face Hub authentication token.")
     parser.add_argument("--revision", type=str, default=None, help="Specific HF commit hash/branch/tag.")
     args = parser.parse_args()
@@ -123,37 +105,12 @@ def main():
     print(f"Using device: {device}")
     model.to(device)
     
-    # Set up KenLM decoder
-    use_lm = False
-    if os.path.exists(args.arpa):
-        print(f"Building CTC decoder using KenLM ARPA model from {args.arpa}...")
-        vocab_dict_sorted = processor.tokenizer.get_vocab()
-        sorted_vocab = sorted(vocab_dict_sorted.items(), key=lambda kv: kv[1])
-        labels = [t for t, _ in sorted_vocab]
-        labels = ["" if t == "[PAD]" else (" " if t == "|" else t) for t in labels]
-        
-        decoder = build_ctcdecoder(
-            labels=labels,
-            kenlm_model_path=args.arpa,
-            alpha=0.5,
-            beta=1.0,
-        )
-        processor_with_lm = Wav2Vec2ProcessorWithLM(
-            feature_extractor=processor.feature_extractor,
-            tokenizer=processor.tokenizer,
-            decoder=decoder,
-        )
-        use_lm = True
-    else:
-        print(f"Warning: ARPA model '{args.arpa}' not found. Evaluation will run without KenLM decoding.")
-    
     # Prepare Dataset
     print("Preparing HuggingFace dataset...")
     data_dict = {
         "audio": df_test[audio_col].tolist(),
         "sentence": df_test[text_col].tolist()
     }
-    from datasets import Features, Value
     features = Features({
         "audio": Audio(sampling_rate=TARGET_SAMPLE_RATE),
         "sentence": Value("string")
@@ -178,9 +135,9 @@ def main():
         with torch.no_grad():
             logits = model(input_values=input_values).logits
         
-        logits_np = logits.squeeze(0).cpu().numpy()
-        pred_ids = np.argmax(logits_np, axis=-1)
-        hyp_greedy = processor.decode(pred_ids).strip()
+        sliced_logits = logits[0]
+        res = greedy_inference(sliced_logits, processor)
+        hyp_greedy = res["text"]
         
         gold = ex["sentence"]
         
@@ -197,17 +154,6 @@ def main():
             "wer_greedy": wer_g,
             "cer_greedy": cer_g,
         }
-        
-        # Decode with LM if available
-        if use_lm:
-            hyp_lm = processor_with_lm.decoder.decode(logits_np).strip()
-            wer_lm = jiwer_wer(safe(gold), safe(hyp_lm))
-            cer_lm = jiwer_cer(safe(gold), safe(hyp_lm))
-            row_res.update({
-                "kenlm": hyp_lm,
-                "wer_kenlm": wer_lm,
-                "cer_kenlm": cer_lm
-            })
             
         results.append(row_res)
         
@@ -223,11 +169,6 @@ def main():
     print("\n" + "="*50)
     print("OVERALL RAW METRICS ON TEST SET (WITH TONES & ORIGINAL TRANSC):")
     print(f"Greedy: WER = {overall_wer_greedy:.4f} | CER = {overall_cer_greedy:.4f}")
-    if use_lm:
-        kenlms = results_df["kenlm"].tolist()
-        overall_wer_kenlm = jiwer_wer(golds, kenlms)
-        overall_cer_kenlm = jiwer_cer(golds, kenlms)
-        print(f"KenLM:  WER = {overall_wer_kenlm:.4f} | CER = {overall_cer_kenlm:.4f}")
     print("="*50 + "\n")
     
     # Calculate tone-masked metrics
@@ -240,14 +181,10 @@ def main():
     print("="*50)
     print("OVERALL METRICS ON TEST SET WITH TONES MASKED (REMOVED):")
     print(f"Greedy (Masked): WER = {overall_wer_greedy_masked:.4f} | CER = {overall_cer_greedy_masked:.4f}")
-    if use_lm:
-        kenlms_masked = [strip_tones(k) for k in kenlms]
-        overall_wer_kenlm_masked = jiwer_wer(golds_masked, kenlms_masked)
-        overall_cer_kenlm_masked = jiwer_cer(golds_masked, kenlms_masked)
-        print(f"KenLM (Masked):  WER = {overall_wer_kenlm_masked:.4f} | CER = {overall_cer_kenlm_masked:.4f}")
     print("="*50 + "\n")
     
     # Save output to a file
+    os.makedirs("data/results", exist_ok=True)
     results_df.to_csv("data/results/test_inference_results.csv", index=False)
     print("Saved test results to data/results/test_inference_results.csv")
     
@@ -257,8 +194,6 @@ def main():
         row = results_df.iloc[i]
         print(f"\n[{i}] Gold:   {row['gold']}")
         print(f"    Greedy: {row['greedy']} (WER: {row['wer_greedy']:.2f})")
-        if use_lm:
-            print(f"    KenLM:  {row['kenlm']} (WER: {row['wer_kenlm']:.2f})")
 
 if __name__ == "__main__":
     main()

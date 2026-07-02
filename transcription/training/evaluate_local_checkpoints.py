@@ -6,49 +6,29 @@ evaluate_local_checkpoints.py
 Evaluates all local checkpoints in a directory on the test dataset.
 Computes standard metrics as well as vowel-length-masked and tone-masked metrics.
 Avoids downloading from Hugging Face Hub.
-Does not use KenLM at all.
+Uses centralized greedy decoding.
 """
 
 import os
 import re
 import glob
-import unicodedata
 import argparse
 import pandas as pd
 import numpy as np
 import torch
 from transformers import Wav2Vec2Processor, Wav2Vec2ForCTC
-from datasets import Dataset, Audio
+from datasets import Dataset, Audio, Features, Value
 from jiwer import wer as jiwer_wer, cer as jiwer_cer
 from tqdm import tqdm
 
-TARGET_SAMPLE_RATE = 16000
-apostrophe_variants = r"[’‘ʼʻ`´‛]"
-chars_to_remove_regex = r'[\,\?\.\!\-\;\:\"\“\%\”\\(\)\[\]\{\}«»…]'
-
-def normalize_text(text):
-    text = str(text)
-    text = unicodedata.normalize("NFC", text)
-    text = text.lower()
-    text = re.sub(apostrophe_variants, "'", text)
-    text = re.sub(chars_to_remove_regex, "", text)
-    text = re.sub(r"\s+", " ", text).strip()
-    return text
-
-def strip_tones(text):
-    # Remove all digits (0-9) representing tones
-    text = re.sub(r"\d", "", text)
-    text = re.sub(r"\s+", " ", text).strip()
-    return text
-
-def strip_length(text):
-    if not isinstance(text, str):
-        return ""
-    # Collapse any sequence of 2 or more of the same vowel into a single vowel
-    return re.sub(r"([aeiouv])\1+", r"\1", text)
-
-def strip_both(text):
-    return strip_length(strip_tones(text))
+from transcription.inference.infer import (
+    greedy_inference,
+    normalize_text,
+    strip_tones,
+    strip_length,
+    strip_both,
+    TARGET_SAMPLE_RATE
+)
 
 def _try_read_csv(path):
     for sep in [",", "\t", ";", "|"]:
@@ -145,7 +125,6 @@ def main():
     # Load processor
     processor_path = args.processor
     if not processor_path:
-        # Try checking if checkpoints-dir or subfolders have vocab.json
         candidates = [
             args.checkpoints_dir,
             os.path.join(args.checkpoints_dir, "wav2vec2-large-xlsr"),
@@ -167,7 +146,6 @@ def main():
         "audio": df_test[audio_col].tolist(),
         "sentence": df_test[text_col].tolist()
     }
-    from datasets import Features, Value
     features = Features({
         "audio": Audio(sampling_rate=TARGET_SAMPLE_RATE),
         "sentence": Value("string")
@@ -202,9 +180,9 @@ def main():
                 with torch.no_grad():
                     logits = model(input_values=input_values).logits
                 
-                logits_np = logits.squeeze(0).cpu().numpy()
-                pred_ids = np.argmax(logits_np, axis=-1)
-                hyp_greedy = processor.decode(pred_ids).strip()
+                sliced_logits = logits[0]
+                res = greedy_inference(sliced_logits, processor)
+                hyp_greedy = res["text"]
                 
                 gold = ex["sentence"]
                 
