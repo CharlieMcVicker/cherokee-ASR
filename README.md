@@ -150,5 +150,8 @@ docker run --gpus all \
   <image_name> \
   python3 -m transcription.training.train \
     --push-to-hub \
-    --hub-model-id "charliemcvicker/asr-cherokee"
+    --resume-from-repo "charliemcvicker/length-only-20260702-173608-asr-cherokee" \
+    --resume-from-revision "cb9110d86220d2eef2799c3400eed697e96e2999" \
+    --hub-model-id "charliemcvicker/asr-cherokee" \
+    --hub-token "key"
 ```
