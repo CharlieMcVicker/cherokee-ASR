@@ -455,10 +455,48 @@ function View2({ theme }) {
  const [selectedCsv, setSelectedCsv] = useState("");
  const [showTones, setShowTones] = useState(true);
 
- const formatText = (txt) => {
-   if (!txt) return txt;
-   return showTones ? txt : txt.replace(/[0-9]/g, '');
- };
+  const formatText = (txt) => {
+    if (!txt) return txt;
+    return showTones ? txt : txt.replace(/[0-9]/g, '');
+  };
+
+  const renderDetailedTranscription = (segment) => {
+    if (segment.word_confidences && segment.word_confidences.length > 0) {
+        return (
+            <div className="flex flex-wrap gap-2 items-center">
+                {segment.word_confidences.map((wordObj, i) => {
+                    const formattedWord = formatText(wordObj.word);
+                    if (!formattedWord) return null;
+                    return (
+                        <span 
+                            key={i} 
+                            className="group relative cursor-pointer border-b border-transparent hover:border-gray-400 pb-[1px]"
+                            title={`Word: ${wordObj.word}\nConfidence: ${wordObj.confidence.toFixed(4)}`}
+                        >
+                            {wordObj.chars.map((charObj, j) => {
+                                const formattedChar = formatText(charObj.char);
+                                if (!formattedChar) return null;
+                                return (
+                                    <span 
+                                        key={j}
+                                        className={`
+                                            ${charObj.confidence < 0.5 ? 'text-red-500' : charObj.confidence < 0.8 ? 'text-orange-400' : ''}
+                                            hover:bg-blue-500/30 px-[1px] rounded transition-colors duration-150
+                                        `}
+                                        title={`Char: '${charObj.char}'\nConf: ${charObj.confidence.toFixed(4)}${charObj.alternatives && charObj.alternatives.length > 0 ? '\nAlts: ' + charObj.alternatives.map(a => `'${a.char}': ${a.confidence.toFixed(4)}`).join(', ') : ''}`}
+                                    >
+                                        {formattedChar}
+                                    </span>
+                                );
+                            })}
+                        </span>
+                    );
+                })}
+            </div>
+        );
+    }
+    return formatText(segment.greedy_transcription) || <i className="text-gray-400">(Empty)</i>;
+  };
 
  useEffect(() => {
    fetch("http://localhost:8000/api/files")
@@ -615,7 +653,7 @@ function View2({ theme }) {
                  <span className="truncate max-w-[150px] opacity-70" title={seg.filename}>{seg.filename}</span>
                </div>
                <div className="text-sm">
-                 {hasLabel ? <strong>[L] {formatText(seg.labeled_sentence)}</strong> : formatText(seg.greedy_transcription)}
+                 {hasLabel ? <strong>[L] {formatText(seg.labeled_sentence)}</strong> : renderDetailedTranscription(seg)}
                </div>
              </div>
            );
@@ -646,9 +684,9 @@ function View2({ theme }) {
              <label className={`block text-sm font-medium ${t.label} mb-2 uppercase tracking-wide text-gray-500`}>
                Original Transcription (Confidence: {segments[currentIndex].greedy_confidence.toFixed(4)})
              </label>
-             <div className={`p-3 text-lg opacity-80 ${t.inputInfo}`}>
-               {formatText(segments[currentIndex].greedy_transcription) || <i className="text-gray-400">(Empty)</i>}
-             </div>
+              <div className={`p-3 text-lg opacity-80 ${t.inputInfo}`}>
+                {renderDetailedTranscription(segments[currentIndex])}
+              </div>
            </div>
 
            <div className="mb-8">

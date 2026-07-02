@@ -877,11 +877,20 @@ def get_labeler_data(file: str = "data/results/batch_inference_results.csv"):
                 if audio_rel_path.startswith("sentence_audio/"):
                     audio_rel_path = f"data/processed/{audio_rel_path}"
                     
+                import json
+                word_confs = []
+                if "word_confidences" in row and row["word_confidences"]:
+                    try:
+                        word_confs = json.loads(row["word_confidences"])
+                    except:
+                        pass
+                
                 data.append({
                     "file_path": audio_rel_path,
                     "filename": row.get("filename", os.path.basename(audio_rel_path)),
                     "greedy_transcription": row.get(txt_col, ""),
-                    "greedy_confidence": float(row.get("greedy_confidence", 0.0)) if row.get("greedy_confidence") else 0.0
+                    "greedy_confidence": float(row.get("greedy_confidence", 0.0)) if row.get("greedy_confidence") else 0.0,
+                    "word_confidences": word_confs
                 })
         
         # Sort segments by confidence ascending
