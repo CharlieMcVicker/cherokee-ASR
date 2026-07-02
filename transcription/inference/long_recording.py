@@ -699,12 +699,7 @@ import librosa
 import transformers
 from transformers import Wav2Vec2ForCTC
 from transformers import Wav2Vec2Processor
-from transformers import Wav2Vec2ProcessorWithLM
-
-import pyctcdecode
-from pyctcdecode import build_ctcdecoder
-
-import kenlm
+from transcription.inference.infer import greedy_inference
 
 
 #============================================================================
@@ -728,23 +723,6 @@ model = Wav2Vec2ForCTC.from_pretrained(pathCheckpoint).to(typeProcessor)
 model.eval()
 processor = Wav2Vec2Processor.from_pretrained(modelPath)
 
-#============================================================================
-# Build the KenLM decoder and wrap it in a processor-with-LM
-#============================================================================
-vocab_dict = processor.tokenizer.get_vocab()
-sorted_vocab_dict = {k.lower(): v for k, v in sorted(vocab_dict.items(), key=lambda item: item[1])}
-
-tempDecoder = build_ctcdecoder(
-    labels=list(sorted_vocab_dict.keys()),
-    kenlm_model_path=filenameCorrectKenlmModel,
-)
-
-processor_with_lm = Wav2Vec2ProcessorWithLM(
-    feature_extractor=processor.feature_extractor,
-    tokenizer=processor.tokenizer,
-    decoder=tempDecoder,
-)
-
 #===============================================================================
 # Transcribe each chunk
 #===============================================================================
@@ -762,8 +740,9 @@ for wavPath in wavPaths:
     with torch.no_grad():
         logits = model(input_dict.input_values.to(typeProcessor)).logits
 
-    # Single-sample LM decode (no multiprocessing pool -> safe with CUDA)
-    predictionlm = processor_with_lm.decode(logits[0].cpu().numpy()).text
+    # Single-sample greedy decode using centralized helper
+    res = greedy_inference(logits[0], processor)
+    predictionlm = res["text"]
     predictionLM.append(predictionlm)
     print(predictionlm)
 

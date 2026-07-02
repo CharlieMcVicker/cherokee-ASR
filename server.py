@@ -1,7 +1,7 @@
 import os
 import sys
 import random
-sys.path.insert(0, os.path.abspath('src'))
+sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 import subprocess
 import wave
 import contextlib
@@ -752,6 +752,9 @@ def get_devices():
 
 @app.get("/api/checkpoints")
 def get_checkpoints():
+    # WARNING: This logic expects checkpoints to be directly under AppConfig.get_model_dir() (wav2vec2-model/).
+    # However, transcription.training.train writes checkpoints to output_w2v2/wav2vec2-large-xlsr/.
+    # Consequently, these checkpoint paths are going to be messed up / out of sync.
     model_dir = AppConfig.get_model_dir()
     checkpoints = []
     if os.path.exists(model_dir):
@@ -775,19 +778,16 @@ class TrainRequest(BaseModel):
 
 @app.post("/api/train")
 def train_model(req: TrainRequest):
+    # Run the new training script entrypoint instead of scripts/run_training.py
     cmd = [
-        sys.executable, os.path.join(AppConfig.SANDBOX_DIR, "scripts", "run_training.py"),
-        "--sandbox", AppConfig.SANDBOX_DIR,
-        "--train_csv", req.train_csv,
-        "--valid_csv", req.valid_csv,
-        "--test_csv", req.test_csv,
+        sys.executable, "-m", "transcription.training.train",
+        "--train-csv", req.train_csv,
+        "--valid-csv", req.valid_csv,
+        "--test-csv", req.test_csv,
         "--epochs", str(req.epochs),
-        "--ngrams", str(req.ngrams),
-        "--run_id", req.run_id,
-        "--lang_prefix", req.lang_prefix
     ]
     if req.lmplz_path:
-        cmd.extend(["--lmplz_path", req.lmplz_path])
+        cmd.extend(["--lmplz-path", req.lmplz_path])
         
     env = os.environ.copy()
     if req.device == "cpu":
@@ -816,6 +816,8 @@ def transcribe_long(req: TranscribeLongRequest):
         
     out_tsv = os.path.join(AppConfig.SANDBOX_DIR, req.audio_file.rsplit('.', 1)[0] + ".tsv")
     
+    # WARNING: This resolves the checkpoint path against AppConfig.get_model_dir().
+    # Because transcription.training.train outputs to output_w2v2/wav2vec2-large-xlsr, this will be messed up.
     checkpoint_val = req.checkpoint
     if checkpoint_val != "charliemcvicker/asr-cherokee":
         checkpoint_val = os.path.join(AppConfig.get_model_dir(), checkpoint_val)
@@ -868,6 +870,8 @@ def transcribe_mic(
     with open(temp_wav, "wb") as f:
         f.write(audio.file.read())
         
+    # WARNING: This resolves the checkpoint path against AppConfig.get_model_dir().
+    # Because transcription.training.train outputs to output_w2v2/wav2vec2-large-xlsr, this will be messed up.
     checkpoint_val = checkpoint
     if checkpoint_val != "charliemcvicker/asr-cherokee":
         checkpoint_val = os.path.join(AppConfig.get_model_dir(), checkpoint_val)
