@@ -44,16 +44,16 @@ A virtual environment is managed locally via `uv` or standard Python `venv`.
    ```bash
    uv pip install -r requirements.txt
    ```
-3. Set your python path to include `src/`:
+3. Set your python path to the project root:
    ```bash
-   export PYTHONPATH="src:${PYTHONPATH}"
+   export PYTHONPATH=".:${PYTHONPATH}"
    ```
 
 ---
 
 ## Packaged Entrypoints & Main Use Cases
 
-All logic is package-based. Always run commands from the project root directory with `PYTHONPATH=src` (or after exporting it).
+All logic is package-based. Always run commands from the project root directory with `PYTHONPATH=.` (or after exporting it).
 
 ### 1. Audio Segmentation & Extraction
 

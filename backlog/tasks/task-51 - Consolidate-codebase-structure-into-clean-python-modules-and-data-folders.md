@@ -27,5 +27,5 @@ Propose and implement a clean module structure (e.g. src/, data/) to prepare the
 ## Final Summary
 
 <!-- SECTION:FINAL_SUMMARY:BEGIN -->
-Successfully consolidated all root-level python scripts into the new 'src/transcription' package structure, organized all dataset and results files under the 'data/' directory, reorganized 'archive/' files, and updated all imports and file paths inside scripts. Verified execution of inference script using the MPS backend and venv python environment.
+Successfully consolidated all root-level python scripts into the new 'transcription' package structure, organized all dataset and results files under the 'data/' directory, reorganized 'archive/' files, and updated all imports and file paths inside scripts. Verified execution of inference script using the MPS backend and venv python environment.
 <!-- SECTION:FINAL_SUMMARY:END -->

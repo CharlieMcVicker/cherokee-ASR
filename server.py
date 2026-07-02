@@ -477,14 +477,14 @@ def run_batch_inference(req: BatchInferenceRequest):
 
             cmd = [
                 python_exe,
-                "src/transcription/inference/batch.py",
+                "-m", "transcription.inference.batch",
                 temp_batch_dir,
                 "--checkpoint", req.checkpoint,
                 "--processor", req.checkpoint,
                 "--output", temp_csv
             ]
             print(f"Running batched inference on {len(mapping)} files...", flush=True)
-            result = subprocess.run(cmd)
+            result = subprocess.run(cmd, cwd=AppConfig.SANDBOX_DIR)
             if result.returncode != 0:
                 raise Exception(f"Batch inference failed with exit code {result.returncode}. Check terminal for details.")
                 
@@ -798,7 +798,7 @@ def train_model(req: TrainRequest):
 
     try:
         # Run training in a separate process, non-blocking
-        subprocess.Popen(cmd, env=env)
+        subprocess.Popen(cmd, env=env, cwd=AppConfig.SANDBOX_DIR)
         return {"message": "Training started in the background. Check terminal for logs."}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -829,7 +829,7 @@ def transcribe_long(req: TranscribeLongRequest):
         "--processor", checkpoint_val
     ]
     try:
-        res = subprocess.run(cmd, capture_output=True, text=True)
+        res = subprocess.run(cmd, capture_output=True, text=True, cwd=AppConfig.SANDBOX_DIR)
         if res.returncode != 0:
             raise HTTPException(status_code=500, detail=f"Inference failed: {res.stderr}")
             
@@ -884,7 +884,7 @@ def transcribe_mic(
     ]
     
     try:
-        res = subprocess.run(cmd, capture_output=True, text=True)
+        res = subprocess.run(cmd, capture_output=True, text=True, cwd=AppConfig.SANDBOX_DIR)
         if res.returncode != 0:
             raise HTTPException(status_code=500, detail=f"Inference failed: {res.stderr}")
             

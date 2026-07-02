@@ -14,7 +14,7 @@ ordinal: 56000
 ## Description
 
 <!-- SECTION:DESCRIPTION:BEGIN -->
-Update the project README.md to describe the new src/transcription directory layout, how to run different scripts (single/batch inference, training, active labeling server, etc.) via python module entrypoints (python -m), and Docker execution.
+Update the project README.md to describe the new transcription directory layout, how to run different scripts (single/batch inference, training, active labeling server, etc.) via python module entrypoints (python -m), and Docker execution.
 <!-- SECTION:DESCRIPTION:END -->
 
 ## Acceptance Criteria

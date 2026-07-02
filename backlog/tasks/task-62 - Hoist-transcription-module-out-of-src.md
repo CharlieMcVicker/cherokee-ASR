@@ -19,7 +19,7 @@ Move the transcription module from src/ to the project root and update reference
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [x] #1 Identify references to src/transcription or path manipulation of src
+- [x] #1 Identify references to transcription or path manipulation of src
 - [x] #2 Move transcription module to the project root
 - [x] #3 Adjust all import statements and Python path manipulations
 - [x] #4 Verify that all tests and scripts run properly
