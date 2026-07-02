@@ -229,6 +229,24 @@ def main():
         default=None,
         help="Hugging Face Hub Authentication Token.",
     )
+    parser.add_argument(
+        "--resume-from-repo",
+        type=str,
+        default=None,
+        help="Hugging Face repo ID to resume training from.",
+    )
+    parser.add_argument(
+        "--resume-from-revision",
+        type=str,
+        default=None,
+        help="Hugging Face repo revision (commit hash or branch) to resume training from.",
+    )
+    parser.add_argument(
+        "--resume-from-checkpoint",
+        type=str,
+        default=None,
+        help="Path to local checkpoint or 'latest' to resume from the latest local checkpoint.",
+    )
     args = parser.parse_args()
 
     CONFIG["train_csv"] = args.train_csv
@@ -455,8 +473,35 @@ def main():
         tokenizer=processor.feature_extractor,
     )
 
+    resume_checkpoint = None
+    if args.resume_from_repo:
+        print(f"Downloading checkpoint from repository: {args.resume_from_repo} (revision: {args.resume_from_revision or 'main'})")
+        from huggingface_hub import snapshot_download
+        resume_checkpoint = snapshot_download(
+            repo_id=args.resume_from_repo,
+            revision=args.resume_from_revision,
+            token=CONFIG["hub_token"],
+        )
+        print(f"Checkpoint downloaded to: {resume_checkpoint}")
+    elif args.resume_from_checkpoint:
+        if args.resume_from_checkpoint.lower() == "latest":
+            import glob
+            ckpt_dirs = glob.glob(os.path.join(folder_model_files, "checkpoint-*"))
+            if ckpt_dirs:
+                def _step(p):
+                    m = re.search(r"checkpoint-(\d+)", os.path.basename(p))
+                    return int(m.group(1)) if m else -1
+                resume_checkpoint = max(ckpt_dirs, key=_step)
+                print(f"Found latest local checkpoint: {resume_checkpoint}")
+            else:
+                print("No local checkpoints found under the output directory. Starting from scratch.")
+                resume_checkpoint = None
+        else:
+            resume_checkpoint = args.resume_from_checkpoint
+            print(f"Resuming from local checkpoint: {resume_checkpoint}")
+
     print("Starting training...")
-    trainer.train()
+    trainer.train(resume_from_checkpoint=resume_checkpoint)
 
     trainer.save_model(folder_model_files)
     processor.save_pretrained(folder_model_files)
