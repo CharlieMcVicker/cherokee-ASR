@@ -169,6 +169,28 @@ def decode_worker(item_data):
     }
 
 
+def load_audio(audio_path, target_sample_rate):
+    import soundfile as sf
+    import torch
+    import torchaudio
+    speech_array, sample_rate = sf.read(audio_path)
+    waveform = torch.tensor(speech_array, dtype=torch.float32)
+    if len(waveform.shape) == 1:
+        waveform = waveform.unsqueeze(0)
+    else:
+        waveform = waveform.transpose(0, 1)
+    
+    if waveform.shape[0] > 1:
+        waveform = torch.mean(waveform, dim=0, keepdim=True)
+    
+    if sample_rate != target_sample_rate:
+        resampler = torchaudio.transforms.Resample(
+            orig_freq=sample_rate, new_freq=target_sample_rate
+        )
+        waveform = resampler(waveform)
+    
+    return waveform.squeeze(0).numpy()
+
 def main():
     parser = argparse.ArgumentParser(
         description="Run Wav2Vec2 ASR batch inference on a directory of audio files."
@@ -281,39 +303,22 @@ def main():
     print(f"Using device: {device}", flush=True)
     model.to(device)
 
-    # Load and resample audio files (pre-load in memory for batching/sorting)
+    # Read audio metadata for sorting (lazy loading)
     # We sort by length to minimize padding overhead during batched inference.
     loaded_audios = []
-    print("Loading and preparing audio files in memory...", flush=True)
+    print("Reading audio metadata for sorting...", flush=True)
     audio_load_start = time.time()
     for audio_path in wav_files:
         filename = os.path.basename(audio_path)
         try:
-            speech_array, sample_rate = sf.read(audio_path)
-            waveform = torch.tensor(speech_array, dtype=torch.float32)
-            if len(waveform.shape) == 1:
-                waveform = waveform.unsqueeze(0)
-            else:
-                waveform = waveform.transpose(0, 1)
-            
-            if waveform.shape[0] > 1:
-                waveform = torch.mean(waveform, dim=0, keepdim=True)
-            
-            if sample_rate != TARGET_SAMPLE_RATE:
-                resampler = torchaudio.transforms.Resample(
-                    orig_freq=sample_rate, new_freq=TARGET_SAMPLE_RATE
-                )
-                waveform = resampler(waveform)
-            
-            speech = waveform.squeeze(0).numpy()
+            info = sf.info(audio_path)
             loaded_audios.append({
                 "audio_path": audio_path,
                 "filename": filename,
-                "speech": speech,
-                "length": len(speech)
+                "length": info.frames
             })
         except Exception as e:
-            print(f"Error loading {filename}: {e}", flush=True)
+            print(f"Error reading metadata for {filename}: {e}", flush=True)
 
     if not loaded_audios:
         print("No audio files successfully loaded. Exiting.", flush=True)
@@ -373,7 +378,17 @@ def main():
     
     pbar = tqdm(total=len(loaded_audios), desc="Transcribing", unit="file")
     for batch_idx, batch in enumerate(batches, 1):
-        speech_list = [item["speech"] for item in batch]
+        speech_list = []
+        for item in batch:
+            try:
+                speech = load_audio(item["audio_path"], TARGET_SAMPLE_RATE)
+                item["speech"] = speech
+                speech_list.append(speech)
+            except Exception as e:
+                print(f"Error reading audio {item['filename']} during batching: {e}", flush=True)
+                speech = np.zeros(16000, dtype=np.float32)
+                item["speech"] = speech
+                speech_list.append(speech)
         
         inputs = processor(
             speech_list,
@@ -421,20 +436,40 @@ def main():
                     if single_attention_mask is not None:
                         single_attention_mask = single_attention_mask.to(device)
                     
-                    with torch.no_grad():
-                        with torch.backends.cudnn.flags(enabled=False):
-                            if single_attention_mask is not None:
-                                single_logits = model(single_input_values, attention_mask=single_attention_mask).logits
-                            else:
-                                single_logits = model(single_input_values).logits
-                    
-                    input_len = len(item["speech"])
-                    logit_len = int(model._get_feat_extract_output_lengths(input_len))
-                    logits_np = single_logits[0, :logit_len].detach().cpu().numpy().copy()
-                    item_data = (global_idx, item["filename"], item["audio_path"], logits_np)
-                    max_queue.acquire()
-                    pool.apply_async(decode_worker, (item_data,), callback=write_result_callback)
-                    global_idx += 1
+                    try:
+                        with torch.no_grad():
+                            with torch.backends.cudnn.flags(enabled=False):
+                                if single_attention_mask is not None:
+                                    single_logits = model(single_input_values, attention_mask=single_attention_mask).logits
+                                else:
+                                    single_logits = model(single_input_values).logits
+                        
+                        input_len = len(item["speech"])
+                        logit_len = int(model._get_feat_extract_output_lengths(input_len))
+                        logits_np = single_logits[0, :logit_len].detach().cpu().numpy().copy()
+                        item_data = (global_idx, item["filename"], item["audio_path"], logits_np)
+                        max_queue.acquire()
+                        pool.apply_async(decode_worker, (item_data,), callback=write_result_callback)
+                        global_idx += 1
+                    except Exception as seq_e:
+                        print(f"  Fatal OOM on {item['filename']} even with batch_size=1. Skipping file...", flush=True)
+                        empty_np = np.zeros((1, 32), dtype=np.float32)
+                        item_data = (global_idx, item["filename"], item["audio_path"], empty_np)
+                        max_queue.acquire()
+                        pool.apply_async(decode_worker, (item_data,), callback=write_result_callback)
+                        global_idx += 1
+                    finally:
+                        if 'single_logits' in locals(): del single_logits
+                        if 'single_inputs' in locals(): del single_inputs
+                        if 'single_input_values' in locals(): del single_input_values
+                        if 'single_attention_mask' in locals(): del single_attention_mask
+                        if torch.cuda.is_available(): torch.cuda.empty_cache()
+                
+                # Free raw speech memory from batch dicts
+                for item in batch:
+                    item.pop("speech", None)
+                if 'speech_list' in locals(): del speech_list
+                
                 continue
             elif isinstance(e, NotImplementedError) and device == "mps":
                 print("  MPS execution failed. Falling back to CPU backend for this batch...", flush=True)
@@ -469,10 +504,14 @@ def main():
         if 'input_values' in locals(): del input_values
         if 'attention_mask' in locals(): del attention_mask
         
-        # Keep VRAM clean periodically, but no longer block for decoding
-        if batch_idx % CHUNK_SIZE_BATCHES == 0:
-            if torch.cuda.is_available():
-                torch.cuda.empty_cache()
+        # Free raw speech memory from batch dicts
+        for item in batch:
+            item.pop("speech", None)
+        if 'speech_list' in locals(): del speech_list
+        
+        # Keep VRAM heavily defragmented between every batch to accommodate long audio
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
 
     pbar.close()
     pool.close()

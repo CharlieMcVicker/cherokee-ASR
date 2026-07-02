@@ -283,6 +283,8 @@ function View1({ theme }) {
   const [form, setForm] = useState({ checkpoint: "charliemcvicker/asr-cherokee" });
   const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [batchStats, setBatchStats] = useState(null);
+  const [isFetchingStats, setIsFetchingStats] = useState(false);
 
   useEffect(() => {
     fetch("http://localhost:8000/api/files")
@@ -345,8 +347,34 @@ function View1({ theme }) {
     setSelectedSubfolders(sel);
   };
 
+  const targetFolders = Object.keys(selectedSubfolders).filter(k => selectedSubfolders[k]);
+
+  useEffect(() => {
+    if (targetFolders.length === 0) {
+      setBatchStats(null);
+      return;
+    }
+    const timeout = setTimeout(() => {
+        setIsFetchingStats(true);
+        fetch("http://localhost:8000/api/batch_stats", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ target_folders: targetFolders })
+        })
+        .then(res => res.json())
+        .then(data => {
+            setBatchStats(data);
+            setIsFetchingStats(false);
+        })
+        .catch(err => {
+            console.error("Failed to fetch stats", err);
+            setIsFetchingStats(false);
+        });
+    }, 500);
+    return () => clearTimeout(timeout);
+  }, [selectedSubfolders]);
+
   const handleInference = async () => {
-    const targetFolders = Object.keys(selectedSubfolders).filter(k => selectedSubfolders[k]);
     if (targetFolders.length === 0) return;
     
     setLoading(true);
@@ -415,6 +443,70 @@ function View1({ theme }) {
                   </div>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* Stats Dashboard */}
+          {targetFolders.length > 0 && (
+            <div className={`p-5 rounded-xl border border-gray-200 shadow-sm overflow-hidden transition-all duration-300 ${t.card}`}>
+              <h3 className={`text-lg font-bold mb-4 flex items-center ${t.viewTitle}`}>
+                📊 Audio Statistics
+                {isFetchingStats && <span className="ml-3 text-sm font-normal text-blue-500 animate-pulse">Calculating...</span>}
+              </h3>
+              
+              {!isFetchingStats && batchStats && batchStats.count > 0 && (
+                <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                  {/* Summary Pills */}
+                  <div className="flex flex-wrap gap-3">
+                    <div className="flex-1 bg-gradient-to-br from-blue-50 to-blue-100 p-3 rounded-lg border border-blue-200">
+                      <div className="text-xs text-blue-500 font-bold uppercase tracking-wider">Total Files</div>
+                      <div className="text-2xl font-black text-blue-900">{batchStats.count.toLocaleString()}</div>
+                    </div>
+                    <div className="flex-1 bg-gradient-to-br from-indigo-50 to-indigo-100 p-3 rounded-lg border border-indigo-200">
+                      <div className="text-xs text-indigo-500 font-bold uppercase tracking-wider">Total Duration</div>
+                      <div className="text-2xl font-black text-indigo-900">
+                        {batchStats.total_duration > 3600 
+                          ? (batchStats.total_duration / 3600).toFixed(1) + " hrs" 
+                          : (batchStats.total_duration / 60).toFixed(1) + " mins"}
+                      </div>
+                    </div>
+                    <div className="flex-1 bg-gradient-to-br from-purple-50 to-purple-100 p-3 rounded-lg border border-purple-200">
+                      <div className="text-xs text-purple-500 font-bold uppercase tracking-wider">Length Range</div>
+                      <div className="text-xl font-black text-purple-900 mt-1">
+                        {batchStats.min.toFixed(1)}s - {batchStats.max.toFixed(1)}s
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Histogram Chart */}
+                  <div>
+                    <div className="text-xs text-gray-500 font-bold uppercase tracking-wider mb-2">Length Distribution (Seconds)</div>
+                    <div className="flex items-end h-32 gap-1 group">
+                      {batchStats.histogram.map((bin, i) => {
+                        const maxCount = Math.max(...batchStats.histogram.map(b => b.count));
+                        const heightPct = maxCount === 0 ? 0 : (bin.count / maxCount) * 100;
+                        return (
+                          <div key={i} className="relative flex-1 group/bar flex flex-col justify-end h-full">
+                            <div 
+                              className="w-full bg-gradient-to-t from-blue-600 to-blue-400 rounded-t-sm transition-all duration-300 group-hover:opacity-50 group-hover/bar:opacity-100 group-hover/bar:from-indigo-600 group-hover/bar:to-indigo-400 cursor-pointer"
+                              style={{ height: `${heightPct}%`, minHeight: bin.count > 0 ? '4px' : '0' }}
+                            ></div>
+                            {/* Tooltip */}
+                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 opacity-0 group-hover/bar:opacity-100 transition-opacity pointer-events-none z-10 w-max bg-gray-900 text-white text-xs rounded py-1 px-2 shadow-lg">
+                              <div className="font-bold">{bin.start.toFixed(1)}s - {bin.end.toFixed(1)}s</div>
+                              <div>{bin.count} files</div>
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                    <div className="flex justify-between text-xs text-gray-400 mt-1">
+                      <span>{batchStats.min.toFixed(1)}s</span>
+                      <span>{batchStats.max.toFixed(1)}s</span>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 

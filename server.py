@@ -362,6 +362,74 @@ def batch_segment(req: BatchSegmentRequest):
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
 
+class BatchStatsRequest(BaseModel):
+    target_folders: list[str]
+
+@app.post("/api/batch_stats")
+def get_batch_stats(req: BatchStatsRequest):
+    try:
+        import soundfile as sf
+        
+        all_lengths = []
+        for folder in req.target_folders:
+            if not os.path.exists(folder):
+                continue
+            for root, dirs, files in os.walk(folder):
+                for file in files:
+                    if file.lower().endswith('.wav'):
+                        audio_path = os.path.join(root, file)
+                        try:
+                            info = sf.info(audio_path)
+                            duration = info.frames / info.samplerate
+                            all_lengths.append(duration)
+                        except Exception:
+                            pass
+        
+        if not all_lengths:
+            return {"count": 0, "total_duration": 0, "min": 0, "max": 0, "histogram": []}
+            
+        all_lengths.sort()
+        count = len(all_lengths)
+        total = sum(all_lengths)
+        min_val = all_lengths[0]
+        max_val = all_lengths[-1]
+        
+        # Create histogram (20 bins)
+        bins = 20
+        histogram = []
+        if max_val > min_val:
+            bin_size = (max_val - min_val) / bins
+            bin_counts = [0] * bins
+            
+            for length in all_lengths:
+                idx = int((length - min_val) / bin_size)
+                if idx >= bins:
+                    idx = bins - 1
+                bin_counts[idx] += 1
+                
+            for i in range(bins):
+                start = min_val + (i * bin_size)
+                end = start + bin_size
+                histogram.append({
+                    "start": start,
+                    "end": end,
+                    "count": bin_counts[i]
+                })
+        else:
+            histogram = [{"start": min_val, "end": max_val, "count": count}]
+            
+        return {
+            "count": count,
+            "total_duration": total,
+            "min": min_val,
+            "max": max_val,
+            "histogram": histogram
+        }
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+
 class BatchInferenceRequest(BaseModel):
     target_folders: list[str]
     checkpoint: str = "charliemcvicker/asr-cherokee"
