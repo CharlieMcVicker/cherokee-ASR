@@ -227,6 +227,285 @@ def save_elan(req: SaveElanRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+class PreviewSegmentRequest(BaseModel):
+    target_path: str
+    silence_thresh: int = -40
+    min_silence_len: int = 500
+    keep_silence: int = 100
+
+@app.post("/api/preview_segments")
+def preview_segments(req: PreviewSegmentRequest):
+    try:
+        from transcription.audio.segment import get_energy_profile, segment_audio_from_profile
+        from pydub import AudioSegment
+        import os
+        
+        target_full_path = os.path.join(AppConfig.SANDBOX_DIR, req.target_path)
+        if not os.path.exists(target_full_path):
+            raise HTTPException(status_code=404, detail=f"Path not found: {req.target_path}")
+
+        files_to_process = []
+        if os.path.isdir(target_full_path):
+            for f in os.listdir(target_full_path):
+                if f.lower().endswith(('.wav', '.mp3', '.m4a', '.flac')):
+                    files_to_process.append(os.path.join(req.target_path, f))
+        else:
+            files_to_process.append(req.target_path)
+            
+        # Get up to 3 example files
+        example_files = files_to_process[:3]
+        results = []
+        
+        for rel_path in example_files:
+            full_audio_path = os.path.join(AppConfig.SANDBOX_DIR, rel_path)
+            audio = AudioSegment.from_file(full_audio_path)
+            total_len = len(audio)
+            dbfs_profile = get_energy_profile(audio, step_ms=10)
+            
+            segments = segment_audio_from_profile(
+                dbfs_profile,
+                total_len,
+                step_ms=10,
+                min_silence_len=req.min_silence_len,
+                silence_thresh=req.silence_thresh,
+                keep_silence=req.keep_silence
+            )
+            
+            sec_segments = [{"start": round(seg['start'] / 1000.0, 3), "end": round(seg['end'] / 1000.0, 3)} for seg in segments]
+            results.append({
+                "file": rel_path,
+                "segments": sec_segments
+            })
+            
+        return {"previews": results}
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+
+class BatchSegmentRequest(BaseModel):
+    target_path: str
+    silence_thresh: int = -40
+    min_silence_len: int = 500
+    keep_silence: int = 100
+
+@app.post("/api/batch_segment")
+def batch_segment(req: BatchSegmentRequest):
+    try:
+        from transcription.audio.segment import get_energy_profile, segment_audio_from_profile
+        from pydub import AudioSegment
+        import csv
+        import os
+        
+        target_full_path = os.path.join(AppConfig.SANDBOX_DIR, req.target_path)
+        if not os.path.exists(target_full_path):
+            raise HTTPException(status_code=404, detail=f"Path not found: {req.target_path}")
+
+        files_to_process = []
+        if os.path.isdir(target_full_path):
+            for f in os.listdir(target_full_path):
+                if f.lower().endswith(('.wav', '.mp3', '.m4a', '.flac')):
+                    files_to_process.append(os.path.join(req.target_path, f))
+        else:
+            files_to_process.append(req.target_path)
+            
+        out_dir = AppConfig.get_inf_dir()
+        os.makedirs(out_dir, exist_ok=True)
+        
+        segmented_count = 0
+        total_chunks = 0
+        
+        manifest_path = os.path.join(out_dir, "segmentation_manifest.csv")
+        manifest_exists = os.path.exists(manifest_path)
+        
+        with open(manifest_path, mode="a", newline="", encoding="utf-8") as csvfile:
+            writer = csv.writer(csvfile)
+            if not manifest_exists:
+                writer.writerow(["original_filename", "segmented_filepath", "start_ms", "end_ms"])
+            
+            for rel_path in files_to_process:
+                full_audio_path = os.path.join(AppConfig.SANDBOX_DIR, rel_path)
+                print(f"Segmenting {rel_path}...")
+                audio = AudioSegment.from_file(full_audio_path)
+                total_len = len(audio)
+                dbfs_profile = get_energy_profile(audio, step_ms=10)
+                
+                segments = segment_audio_from_profile(
+                    dbfs_profile,
+                    total_len,
+                    step_ms=10,
+                    min_silence_len=req.min_silence_len,
+                    silence_thresh=req.silence_thresh,
+                    keep_silence=req.keep_silence
+                )
+                
+                original_filename = os.path.basename(rel_path)
+                base_name = os.path.splitext(original_filename)[0]
+                
+                # Make a subfolder for this original file
+                subfolder_path = os.path.join(out_dir, base_name)
+                os.makedirs(subfolder_path, exist_ok=True)
+                
+                for i, seg in enumerate(segments):
+                    chunk = audio[seg['start']:seg['end']]
+                    chunk_name = f"{base_name}_{i:04d}.wav"
+                    chunk_out_path = os.path.join(subfolder_path, chunk_name)
+                    chunk.export(chunk_out_path, format="wav")
+                    
+                    writer.writerow([original_filename, f"{base_name}/{chunk_name}", seg['start'], seg['end']])
+                    total_chunks += 1
+                segmented_count += 1
+            
+        return {"message": f"Processed {segmented_count} files into {total_chunks} segments.", "output_dir": out_dir}
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+
+class BatchStatsRequest(BaseModel):
+    target_folders: list[str]
+
+@app.post("/api/batch_stats")
+def get_batch_stats(req: BatchStatsRequest):
+    try:
+        import soundfile as sf
+        
+        all_lengths = []
+        for folder in req.target_folders:
+            if not os.path.exists(folder):
+                continue
+            for root, dirs, files in os.walk(folder):
+                for file in files:
+                    if file.lower().endswith('.wav'):
+                        audio_path = os.path.join(root, file)
+                        try:
+                            info = sf.info(audio_path)
+                            duration = info.frames / info.samplerate
+                            all_lengths.append(duration)
+                        except Exception:
+                            pass
+        
+        if not all_lengths:
+            return {"count": 0, "total_duration": 0, "min": 0, "max": 0, "histogram": []}
+            
+        all_lengths.sort()
+        count = len(all_lengths)
+        total = sum(all_lengths)
+        min_val = all_lengths[0]
+        max_val = all_lengths[-1]
+        
+        # Create histogram (20 bins)
+        bins = 20
+        histogram = []
+        if max_val > min_val:
+            bin_size = (max_val - min_val) / bins
+            bin_counts = [0] * bins
+            
+            for length in all_lengths:
+                idx = int((length - min_val) / bin_size)
+                if idx >= bins:
+                    idx = bins - 1
+                bin_counts[idx] += 1
+                
+            for i in range(bins):
+                start = min_val + (i * bin_size)
+                end = start + bin_size
+                histogram.append({
+                    "start": start,
+                    "end": end,
+                    "count": bin_counts[i]
+                })
+        else:
+            histogram = [{"start": min_val, "end": max_val, "count": count}]
+            
+        return {
+            "count": count,
+            "total_duration": total,
+            "min": min_val,
+            "max": max_val,
+            "histogram": histogram
+        }
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+
+class BatchInferenceRequest(BaseModel):
+    target_folders: list[str]
+    checkpoint: str = "charliemcvicker/asr-cherokee"
+
+@app.post("/api/batch_inference")
+def run_batch_inference(req: BatchInferenceRequest):
+    try:
+        import os
+        import sys
+        import subprocess
+        import shutil
+        import uuid
+        import tempfile
+        import pandas as pd
+        
+        if not req.target_folders:
+            raise HTTPException(status_code=400, detail="No folders selected.")
+            
+        output_csv = os.path.join(AppConfig.SANDBOX_DIR, "data/results/batch_inference_results.csv")
+        os.makedirs(os.path.dirname(output_csv), exist_ok=True)
+        
+        with tempfile.TemporaryDirectory() as temp_batch_dir:
+            mapping = {}
+            for rel_folder in req.target_folders:
+                folder = os.path.join(AppConfig.SANDBOX_DIR, rel_folder)
+                if not os.path.isdir(folder):
+                    continue
+                for f in os.listdir(folder):
+                    if f.lower().endswith('.wav'):
+                        orig_path = os.path.join(folder, f)
+                        temp_name = f"{uuid.uuid4().hex}.wav"
+                        temp_path = os.path.join(temp_batch_dir, temp_name)
+                        
+                        shutil.copy2(orig_path, temp_path)
+                        rel_orig_path = os.path.relpath(orig_path, AppConfig.SANDBOX_DIR).replace("\\\\", "/")
+                        mapping[temp_name] = rel_orig_path
+                        
+            if not mapping:
+                raise Exception("No .wav files found in selected folders.")
+                
+            temp_csv = os.path.join(temp_batch_dir, "inference_temp.csv")
+            python_exe = os.path.join(AppConfig.SANDBOX_DIR, "venv", "Scripts", "python.exe")
+            if not os.path.exists(python_exe):
+                python_exe = sys.executable
+
+            cmd = [
+                python_exe,
+                "src/transcription/inference/batch.py",
+                temp_batch_dir,
+                "--checkpoint", req.checkpoint,
+                "--processor", req.checkpoint,
+                "--output", temp_csv
+            ]
+            print(f"Running batched inference on {len(mapping)} files...", flush=True)
+            result = subprocess.run(cmd)
+            if result.returncode != 0:
+                raise Exception(f"Batch inference failed with exit code {result.returncode}. Check terminal for details.")
+                
+            if not os.path.exists(temp_csv):
+                raise Exception("Batch inference failed to generate CSV.")
+                
+            df = pd.read_csv(temp_csv)
+            df["file_path"] = df["file_path"].apply(lambda x: mapping[os.path.basename(x)])
+            df["filename"] = df["file_path"].apply(lambda x: os.path.basename(x))
+            
+            df.to_csv(output_csv, index=False)
+            
+        return {"message": f"Batch inference complete for {len(mapping)} files across {len(req.target_folders)} folders.", "csv_path": output_csv}
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+
+
 @app.get("/api/files")
 def get_files():
     base_dir = AppConfig.SANDBOX_DIR
@@ -670,11 +949,20 @@ def get_labeler_data(file: str = "data/results/batch_inference_results.csv"):
                 if audio_rel_path.startswith("sentence_audio/"):
                     audio_rel_path = f"data/processed/{audio_rel_path}"
                     
+                import json
+                word_confs = []
+                if "word_confidences" in row and row["word_confidences"]:
+                    try:
+                        word_confs = json.loads(row["word_confidences"])
+                    except:
+                        pass
+                
                 data.append({
                     "file_path": audio_rel_path,
                     "filename": row.get("filename", os.path.basename(audio_rel_path)),
                     "greedy_transcription": row.get(txt_col, ""),
-                    "greedy_confidence": float(row.get("greedy_confidence", 0.0)) if row.get("greedy_confidence") else 0.0
+                    "greedy_confidence": float(row.get("greedy_confidence", 0.0)) if row.get("greedy_confidence") else 0.0,
+                    "word_confidences": word_confs
                 })
         
         # Sort segments by confidence ascending

@@ -61,69 +61,43 @@ const THEMES = {
   }
 };
 
-function View0({ theme }) {
- const t = theme;
- const [files, setFiles] = useState([]);
- const [form, setForm] = useState({ audio_file: "", filename: "" });
- const [settings, setSettings] = useState({ silence_thresh: -40, min_silence_len: 500, keep_silence: 100 });
- const [status, setStatus] = useState(null);
- const [loading, setLoading] = useState(false);
- const [ws, setWs] = useState(null);
- const [wsRegions, setWsRegions] = useState(null);
- const [zoom, setZoom] = useState(1);
- const containerRef = useRef(null);
+function PreviewSurfer({ preview, theme, zoom }) {
+  const containerRef = useRef(null);
+  const [ws, setWs] = useState(null);
+  const [wsRegions, setWsRegions] = useState(null);
 
- useEffect(() => {
- fetch("http://localhost:8000/api/inference_files")
- .then(res => res.json())
- .then(data => {
- setFiles(data.wav_files);
- if (data.wav_files.length > 0) {
- setForm(prev => ({ 
- ...prev, 
- audio_file: data.wav_files[0],
- filename: data.wav_files[0].split('.')[0] + "-annotated.txt"
- }));
- }
- }).catch(err => console.log("Failed to fetch audio files", err));
- }, []);
+  useEffect(() => {
+    if (!containerRef.current) return;
+    
+    const regions = RegionsPlugin.create();
+    const wavesurfer = WaveSurfer.create({
+      container: containerRef.current,
+      waveColor: 'rgb(200, 0, 200)',
+      progressColor: 'rgb(100, 0, 100)',
+      url: `http://localhost:8000/api/audio/${preview.file}`,
+      plugins: [regions],
+      height: 64,
+      normalize: false,
+      minPxPerSec: Number(zoom)
+    });
+    
+    wavesurfer.on('ready', () => {
+      preview.segments.forEach((seg, index) => {
+        regions.addRegion({
+          start: seg.start,
+          end: seg.end,
+          color: index % 2 === 0 ? 'rgba(0, 200, 0, 0.2)' : 'rgba(0, 255, 0, 0.1)'
+        });
+      });
+    });
 
- useEffect(() => {
- if (!containerRef.current || !form.audio_file) return;
+    setWs(wavesurfer);
+    setWsRegions(regions);
 
- if (ws) {
- ws.destroy();
- }
-
- const regions = RegionsPlugin.create();
- 
- const wavesurfer = WaveSurfer.create({
- container: containerRef.current,
- waveColor: 'rgb(200, 0, 200)',
- progressColor: 'rgb(100, 0, 100)',
- url: `http://localhost:8000/api/audio/${form.audio_file}`,
- plugins: [regions],
- height: 128,
- normalize: false,
- minPxPerSec: Number(zoom)
- });
-
- regions.enableDragSelection({ color: 'rgba(255, 0, 0, 0.1)' });
-
- regions.on('region-updated', (region) => {
-   if (region.end - region.start < 0.1) {
-     region.remove();
-   }
- });
-
- setWs(wavesurfer);
- setWsRegions(regions);
-
- return () => {
- wavesurfer.destroy();
- };
- // eslint-disable-next-line react-hooks/exhaustive-deps
- }, [form.audio_file]);
+    return () => {
+      wavesurfer.destroy();
+    };
+  }, [preview, zoom]);
 
   useEffect(() => {
     if (ws) {
@@ -136,784 +110,432 @@ function View0({ theme }) {
         
         ws.zoom(Number(zoom));
         
-        // Wait for next tick to ensure DOM is updated after zoom
         setTimeout(() => {
           const newScrollWidth = wrapper.scrollWidth;
           wrapper.scrollLeft = centerRatio * newScrollWidth - width / 2;
         }, 0);
       } catch (e) {
-        // Audio not yet loaded, safe to ignore
       }
     }
   }, [zoom, ws]);
 
- const fetchSegments = async (currentSettings) => {
-    if (!form.audio_file || !wsRegions) return;
-    setLoading(true);
-    setStatus("Detecting speech regions...");
-    try {
-      const res = await fetch("http://localhost:8000/api/julie_segments", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ filename: form.audio_file, ...currentSettings })
-      });
-      const data = await res.json();
-      if (res.ok) {
-        wsRegions.clearRegions();
-        data.segments.forEach((seg, index) => {
-          wsRegions.addRegion({
-            start: seg.start,
-            end: seg.end,
-            color: index % 2 === 0 ? 'rgba(0, 200, 0, 0.2)' : 'rgba(0, 255, 0, 0.1)'
-          });
-        });
-        setStatus(`✅ Detected ${data.segments.length} regions.`);
-      } else {
-        setStatus(`❌ Error: ${data.detail}`);
-      }
-    } catch (e) {
-      setStatus(`❌ Error: ${e.message}`);
-    }
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (wsRegions) {
-        fetchSegments(settings);
-      }
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [settings, form.audio_file, wsRegions]);
-
- const handleExport = async () => {
- if (!wsRegions) return;
- const regions = wsRegions.getRegions().map(r => ({
- start: r.start,
- end: r.end
- })).sort((a, b) => a.start - b.start);
- 
- if (regions.length === 0) {
- setStatus("❌ Error: No regions to export");
- return;
- }
-
- setLoading(true);
- try {
- const res = await fetch("http://localhost:8000/api/save_elan", {
- method: "POST",
- headers: { "Content-Type": "application/json" },
- body: JSON.stringify({ regions, filename: form.filename })
- });
- const data = await res.json();
- if (res.ok) {
- setStatus(`✅ Exported successfully to ${data.filepath}`);
- } else {
- setStatus(`❌ Error: ${data.detail}`);
- }
- } catch (e) {
- setStatus(`❌ Error: ${e.message}`);
- }
- setLoading(false);
- };
-
- return (
- <div className="max-w-3xl mx-auto text-center ">
- <h2 className={`text-3xl font-bold mb-6 ${t.viewTitle}`}>0. Auto-segment Long Audio</h2>
- <p className={`${t.viewDesc} mb-8`}>Select a long audio file, run SpeechBrain VAD to find sentence boundaries, and visually adjust them before exporting.</p>
- 
- <div className={`${t.card} p-6 `}>
- <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
- <div>
- <label className={`block text-sm font-medium ${t.label} mb-2`}>Audio File</label>
- {files.length === 0 ? (
-   <select className={`w-full p-3 ${t.input}`} disabled>
-     <option>No files found</option>
-   </select>
- ) : (
-   <FileTreeSelector 
-     files={files} 
-     selectedFile={form.audio_file} 
-     onSelect={(f) => {
-       setForm({...form, audio_file: f, filename: f.split('/').pop().split('.')[0] + "-annotated.txt"});
-       setStatus(null);
-     }} 
-     theme={t} 
-   />
- )}
- </div>
- <div>
- <label className={`block text-sm font-medium ${t.label} mb-2`}>Export Filename</label>
- <input type="text" className={`w-full p-3 ${t.input}`} value={form.filename} onChange={e => setForm({...form, filename: e.target.value})} />
- </div>
- </div>
-
- <div className="mb-4">
- <div ref={containerRef} className={`w-full border ${t.inputInfo}`} />
- <div className={`flex flex-col sm:flex-row gap-4 items-center justify-between mt-3 p-3 border ${t.inputInfo}`}>
- <div className="flex items-center gap-3 w-full sm:w-1/2">
- <label className={`text-sm font-medium ${t.label} whitespace-nowrap`}>Zoom:</label>
- <input 
- type="range" 
- min="1" 
- max="1000" 
- value={zoom} 
- onChange={(e) => setZoom(e.target.value)} 
- className="w-full"
- />
- </div>
- <div className="flex gap-2">
- <button onClick={() => {
- if (ws) {
- const wrapper = ws.getWrapper();
- wrapper.scrollBy({ left: -200, behavior: 'smooth' });
- }
- }} className={`px-3 py-1.5 text-sm ${t.buttonSecondary}`}>
- ← Pan
- </button>
- <button onClick={() => ws && ws.playPause()} className={`px-4 py-1.5 text-sm font-bold ${t.buttonSecondary}`}>
- Play / Pause
- </button>
- <button onClick={() => {
- if (ws) {
- const wrapper = ws.getWrapper();
- wrapper.scrollBy({ left: 200, behavior: 'smooth' });
- }
- }} className={`px-3 py-1.5 text-sm ${t.buttonSecondary}`}>
- Pan →
- </button>
- </div>
- </div>
- </div>
-
- <div className={`grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 p-4 border ${t.inputInfo}`}>
-   <div>
-     <label className={`block text-sm font-medium ${t.label} mb-2`}>Silence Threshold (dBFS)</label>
-     <div className="flex items-center gap-2">
-       <input type="range" min="-80" max="0" step="1" value={settings.silence_thresh} onChange={(e) => setSettings({...settings, silence_thresh: parseInt(e.target.value) || 0})} className="w-full" />
-       <input type="number" min="-80" max="0" value={settings.silence_thresh} onChange={(e) => setSettings({...settings, silence_thresh: parseInt(e.target.value) || 0})} className={`w-16 p-1 text-sm ${t.input} mb-0`} />
-     </div>
-   </div>
-   <div>
-     <label className={`block text-sm font-medium ${t.label} mb-2`}>Min Silence (ms)</label>
-     <div className="flex items-center gap-2">
-       <input type="range" min="10" max="300" step="1" value={settings.min_silence_len} onChange={(e) => setSettings({...settings, min_silence_len: parseInt(e.target.value) || 0})} className="w-full" />
-       <input type="number" min="10" max="300" value={settings.min_silence_len} onChange={(e) => setSettings({...settings, min_silence_len: parseInt(e.target.value) || 0})} className={`w-20 p-1 text-sm ${t.input} mb-0`} />
-     </div>
-   </div>
-   <div>
-     <label className={`block text-sm font-medium ${t.label} mb-2`}>Keep Silence (ms)</label>
-     <div className="flex items-center gap-2">
-       <input type="range" min="0" max="300" step="1" value={settings.keep_silence} onChange={(e) => setSettings({...settings, keep_silence: parseInt(e.target.value) || 0})} className="w-full" />
-       <input type="number" min="0" max="300" value={settings.keep_silence} onChange={(e) => setSettings({...settings, keep_silence: parseInt(e.target.value) || 0})} className={`w-20 p-1 text-sm ${t.input} mb-0`} />
-     </div>
-   </div>
- </div>
-
- <div className="flex gap-4 mb-6">
- <button 
- onClick={handleExport} 
- disabled={loading || !form.filename}
- className={`w-full py-3 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.99] ${t.buttonPrimary}`}
- >
- Export to ELAN TXT
- </button>
- </div>
-
- {status && (
- <div className={`mt-6 p-4 border ${status.includes('❌') ? t.errorMsg : (status.includes('✅') ? t.successMsg : t.inputInfo)}`}>
- {status}
- </div>
- )}
- </div>
- </div>
- );
-}
-
-function View1({ theme }) {
- const t = theme;
- const [files, setFiles] = useState({ txt_files: [], wav_files: [] });
- const [txtFile, setTxtFile] = useState("");
- const [wavFile, setWavFile] = useState("");
- const [gender, setGender] = useState("m");
- const [status, setStatus] = useState(null);
- const [loading, setLoading] = useState(false);
-
- useEffect(() => {
- fetch("http://localhost:8000/api/files")
- .then(res => res.json())
- .then(data => {
- setFiles(data);
- if (data.txt_files.length > 0) setTxtFile(data.txt_files[0]);
- if (data.wav_files.length > 0) setWavFile(data.wav_files[0]);
- }).catch(err => console.log("Failed to fetch files", err));
- }, []);
-
- const handleProcess = async () => {
- setLoading(true);
- setStatus("Processing... This may take a moment.");
- try {
- const res = await fetch("http://localhost:8000/api/process_elan", {
- method: "POST",
- headers: { "Content-Type": "application/json" },
- body: JSON.stringify({ txt_file: txtFile, wav_file: wavFile, gender })
- });
- const data = await res.json();
- if (res.ok) {
- setStatus(`✅ Success! Added ${data.rows_added} rows to metadata.`);
- } else {
- setStatus(`❌ Error: ${data.detail}`);
- }
- } catch (e) {
- setStatus(`❌ Error: ${e.message}`);
- }
- setLoading(false);
- };
-
- const getCode = (f) => f ? f.split('-').pop().split('.')[0].toUpperCase() : 'UNKNOWN';
- const getPrefix = (f) => f ? f.split('.')[0] : 'UNKNOWN';
-
- return (
- <div className="max-w-3xl mx-auto text-center ">
- <h2 className={`text-3xl font-bold mb-6 ${t.viewTitle}`}>1. ELAN to WAV and CSV</h2>
- <p className={`${t.viewDesc} mb-8`}>Process your ELAN annotation files and automatically split your audio.</p>
- 
- <div className={`${t.card} p-6 `}>
- <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
- <div>
- <label className={`block text-sm font-medium ${t.label} mb-2`}>Annotation File (.txt)</label>
- {files.txt_files.length === 0 ? (
-   <select className={`w-full p-3 ${t.input}`} disabled>
-     <option>No files found</option>
-   </select>
- ) : (
-   <FileTreeSelector files={files.txt_files} selectedFile={txtFile} onSelect={setTxtFile} theme={t} />
- )}
- </div>
- <div>
- <label className={`block text-sm font-medium ${t.label} mb-2`}>Source Audio (.wav)</label>
- {files.wav_files.length === 0 ? (
-   <select className={`w-full p-3 ${t.input}`} disabled>
-     <option>No files found</option>
-   </select>
- ) : (
-   <FileTreeSelector files={files.wav_files} selectedFile={wavFile} onSelect={setWavFile} theme={t} />
- )}
- </div>
- </div>
-
- <div className="mb-8">
- <label className={`block text-sm font-medium ${t.label} mb-2`}>Speaker Gender</label>
- <select className={`w-full md:w-1/2 p-3 ${t.input}`} value={gender} onChange={e => setGender(e.target.value)}>
- <option value="m">Male (m)</option>
- <option value="f">Female (f)</option>
- <option value="x">Other (x)</option>
- </select>
- </div>
-
- <div className={`${t.inputInfo} p-4 mb-8`}>
- <p className={`text-sm ${t.inputInfoSub} mb-1`}>Auto-detected properties:</p>
- <p><span className={`font-mono ${t.inputInfoHighlight}`}>Speaker Code:</span> {getCode(txtFile)}</p>
- <p><span className={`font-mono ${t.inputInfoHighlight}`}>Audio Prefix:</span> {getPrefix(wavFile)}</p>
- </div>
-
- <button 
- onClick={handleProcess} 
- disabled={loading || !txtFile || !wavFile}
- className={`w-full py-4 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.99] ${t.buttonPrimary}`}
- >
- {loading ? "Processing..." : "Process Files"}
- </button>
-
- {status && (
- <div className={`mt-6 p-4 border ${status.includes('❌') ? t.errorMsg : t.successMsg}`}>
- {status}
- </div>
- )}
- </div>
- </div>
- );
-}
-
-function View2({ theme }) {
- const t = theme;
- const [form, setForm] = useState({ train_pct: 80, valid_pct: 10, test_pct: 10, max_duration: 15, file_prefix: "cim-wav2vec2", use_code_switched: false, use_doubtful: false });
- const [status, setStatus] = useState(null);
- const [loading, setLoading] = useState(false);
-
- const handleGenerate = async () => {
- setLoading(true);
- setStatus("Generating partitions...");
- try {
- const res = await fetch("http://localhost:8000/api/generate_splits", {
- method: "POST",
- headers: { "Content-Type": "application/json" },
- body: JSON.stringify(form)
- });
- const data = await res.json();
- if (res.ok) {
- setStatus(`✅ Success! Train: ${data.train}, Valid: ${data.valid}, Test: ${data.test}`);
- } else {
- setStatus(`❌ Error: ${data.detail}`);
- }
- } catch (e) {
- setStatus(`❌ Error: ${e.message}`);
- }
- setLoading(false);
- };
-
- return (
- <div className="max-w-3xl mx-auto text-center ">
- <h2 className={`text-3xl font-bold mb-6 ${t.viewTitle}`}>2. Generate Wav2Vec2 Train Files</h2>
- <p className={`${t.viewDesc} mb-8`}>Split your preprocessed audio metadata into training, validation, and test sets.</p>
- 
- <div className={`${t.card} p-6 `}>
- <div className="grid grid-cols-3 gap-4 mb-6">
- {["train_pct", "valid_pct", "test_pct"].map(f => (
- <div key={f}>
- <label className={`block text-sm font-medium ${t.label} mb-2 capitalize`}>{f.replace('_pct', ' %')}</label>
- <input type="number" className={`w-full p-3 ${t.input}`} value={form[f]} onChange={e => setForm({...form, [f]: parseInt(e.target.value)})} />
- </div>
- ))}
- </div>
-
- <div className="grid grid-cols-2 gap-4 mb-8">
- <div>
- <label className={`block text-sm font-medium ${t.label} mb-2`}>Max Duration (s)</label>
- <input type="number" className={`w-full p-3 ${t.input}`} value={form.max_duration} onChange={e => setForm({...form, max_duration: parseInt(e.target.value)})} />
- </div>
- <div>
- <label className={`block text-sm font-medium ${t.label} mb-2`}>Output Prefix</label>
- <input type="text" className={`w-full p-3 ${t.input}`} value={form.file_prefix} onChange={e => setForm({...form, file_prefix: e.target.value})} />
- </div>
- </div>
-
- <div className={`flex gap-6 mb-8 p-4 border ${t.checkboxContainer}`}>
- <label className="flex items-center space-x-3 cursor-pointer group">
- <input type="checkbox" className={t.checkbox} checked={form.use_code_switched} onChange={e => setForm({...form, use_code_switched: e.target.checked})} />
- <span className={t.checkboxText}>Include Code-Switched Data</span>
- </label>
- <label className="flex items-center space-x-3 cursor-pointer group">
- <input type="checkbox" className={t.checkbox} checked={form.use_doubtful} onChange={e => setForm({...form, use_doubtful: e.target.checked})} />
- <span className={t.checkboxText}>Include Doubtful Data</span>
- </label>
- </div>
-
- <button 
- onClick={handleGenerate} 
- disabled={loading}
- className={`w-full py-4 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.99] ${t.buttonSecondary}`}
- >
- {loading ? "Generating..." : "Generate Train Files"}
- </button>
-
- {status && (
- <div className={`mt-6 p-4 border ${status.includes('❌') ? t.errorMsg : t.successMsg}`}>
- {status}
- </div>
- )}
- </div>
- </div>
- );
-}
-
-function View3({ theme }) {
- const t = theme;
- const [form, setForm] = useState({ train_csv: "cim-wav2vec2-train.csv", valid_csv: "cim-wav2vec2-valid.csv", test_csv: "cim-wav2vec2-test.csv", epochs: 34, ngrams: 4, run_id: "01", lang_prefix: "cim", lmplz_path: "", device: "all" });
- const [status, setStatus] = useState(null);
- const [loading, setLoading] = useState(false);
- const [devices, setDevices] = useState([]);
-
- useEffect(() => {
- fetch("http://localhost:8000/api/devices")
- .then(res => res.json())
- .then(data => {
- setDevices(data.devices || []);
- if (data.devices && data.devices.length > 0) {
- const hasAll = data.devices.some(d => d.id === "all");
- setForm(prev => ({...prev, device: hasAll ? "all" : data.devices[0].id}));
- }
- }).catch(err => console.log("Failed to fetch devices", err));
- }, []);
-
- const handleTrain = async () => {
- setLoading(true);
- setStatus("Starting training...");
- try {
- const res = await fetch("http://localhost:8000/api/train", {
- method: "POST",
- headers: { "Content-Type": "application/json" },
- body: JSON.stringify(form)
- });
- const data = await res.json();
- if (res.ok) {
- setStatus(`✅ Success! ${data.message}`);
- } else {
- setStatus(`❌ Error: ${data.detail}`);
- }
- } catch (e) {
- setStatus(`❌ Error: ${e.message}`);
- }
- setLoading(false);
- };
-
- return (
- <div className="max-w-3xl mx-auto text-center ">
- <h2 className={`text-3xl font-bold mb-6 ${t.viewTitle}`}>3. Train Wav2Vec2 Model</h2>
- <p className={`${t.viewDesc} mb-8`}>Train your model using the generated partitions. This will take some time and run in the background.</p>
- 
- <div className={`${t.card} p-6 `}>
- <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
- <div>
- <label className={`block text-sm font-medium ${t.label} mb-2`}>Train CSV</label>
- <input type="text" className={`w-full p-3 ${t.input}`} value={form.train_csv} onChange={e => setForm({...form, train_csv: e.target.value})} />
- </div>
- <div>
- <label className={`block text-sm font-medium ${t.label} mb-2`}>Valid CSV</label>
- <input type="text" className={`w-full p-3 ${t.input}`} value={form.valid_csv} onChange={e => setForm({...form, valid_csv: e.target.value})} />
- </div>
- <div>
- <label className={`block text-sm font-medium ${t.label} mb-2`}>Test CSV</label>
- <input type="text" className={`w-full p-3 ${t.input}`} value={form.test_csv} onChange={e => setForm({...form, test_csv: e.target.value})} />
- </div>
- </div>
-
- <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
- <div>
- <label className={`block text-sm font-medium ${t.label} mb-2`}>Epochs</label>
- <input type="number" className={`w-full p-3 ${t.input}`} value={form.epochs} onChange={e => setForm({...form, epochs: parseInt(e.target.value)})} />
- </div>
- <div>
- <label className={`block text-sm font-medium ${t.label} mb-2`}>KenLM n-grams</label>
- <input type="number" className={`w-full p-3 ${t.input}`} value={form.ngrams} onChange={e => setForm({...form, ngrams: parseInt(e.target.value)})} />
- </div>
- <div>
- <label className={`block text-sm font-medium ${t.label} mb-2`}>Run ID</label>
- <input type="text" className={`w-full p-3 ${t.input}`} value={form.run_id} onChange={e => setForm({...form, run_id: e.target.value})} />
- </div>
- <div>
- <label className={`block text-sm font-medium ${t.label} mb-2`}>Lang Prefix</label>
- <input type="text" className={`w-full p-3 ${t.input}`} value={form.lang_prefix} onChange={e => setForm({...form, lang_prefix: e.target.value})} />
- </div>
- </div>
-
- <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
- <div>
- <label className={`block text-sm font-medium ${t.label} mb-2`}>lmplz Path (Optional)</label>
- <input type="text" placeholder="e.g. C:\tools\lmplz.exe" className={`w-full p-3 ${t.input}`} value={form.lmplz_path} onChange={e => setForm({...form, lmplz_path: e.target.value})} />
- </div>
- <div>
- <label className={`block text-sm font-medium ${t.label} mb-2`}>Training Device</label>
- <select className={`w-full p-3 ${t.input}`} value={form.device} onChange={e => setForm({...form, device: e.target.value})}>
- {devices.length === 0 && <option value="all">All GPUs (Default)</option>}
- {devices.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
- </select>
- </div>
- </div>
-
- <button 
- onClick={handleTrain} 
- disabled={loading}
- className={`w-full py-4 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.99] ${t.buttonPrimary}`}
- >
- {loading ? "Starting..." : "Start Training"}
- </button>
-
- {status && (
- <div className={`mt-6 p-4 border ${status.includes('❌') ? t.errorMsg : t.successMsg}`}>
- {status}
- </div>
- )}
- </div>
- </div>
- );
-}
-
-function FileTreeSelector({ files, selectedFile, onSelect, theme }) {
-  const tree = useMemo(() => {
-    const root = { name: "Root", children: {}, path: null, isFolder: true };
-    files.forEach(f => {
-      const parts = f.split('/');
-      let current = root;
-      for (let i = 0; i < parts.length - 1; i++) {
-        if (!current.children[parts[i]]) {
-          current.children[parts[i]] = { name: parts[i], children: {}, path: null, isFolder: true };
-        }
-        current = current.children[parts[i]];
-      }
-      const fileName = parts[parts.length - 1];
-      current.children[fileName] = { name: fileName, children: null, path: f, isFolder: false };
-    });
-    return root;
-  }, [files]);
-
-  const [expanded, setExpanded] = useState({ Root: true });
-  const toggle = (path) => setExpanded(prev => ({...prev, [path]: !prev[path]}));
-
-  const renderNode = (node, pathKey = "") => {
-    if (!node.isFolder) {
-      const isSelected = selectedFile === node.path;
-      return (
-        <div key={node.path} 
-             onClick={() => onSelect(node.path)}
-             className={`cursor-pointer pl-6 py-2 px-2 -ml-2 text-sm ${isSelected ? 'bg-blue-100 text-blue-900 font-medium rounded' : 'hover:bg-gray-100 text-gray-700 rounded'}`}>
-          <span className="text-base mr-2">📄</span> {node.name}
-        </div>
-      );
-    } else {
-      const isExpanded = expanded[pathKey] !== false; // default true
-      return (
-        <div key={pathKey || 'root'} className="pl-4 mt-1">
-          <div className="cursor-pointer py-2 px-2 -ml-2 text-sm font-medium text-gray-800 hover:bg-gray-100 flex items-center rounded" 
-               onClick={() => toggle(pathKey)}>
-            <span className="w-6 h-6 flex items-center justify-center text-xs">{isExpanded ? '▼' : '▶'}</span>
-            <span className="ml-1 text-base mr-2">📁</span> {node.name}
-          </div>
-          {isExpanded && (
-            <div className="ml-3 border-l border-gray-200">
-              {Object.keys(node.children).sort().map(key => renderNode(node.children[key], pathKey ? pathKey + "/" + key : key))}
-            </div>
-          )}
-        </div>
-      );
-    }
-  };
-
   return (
-    <div className={`border rounded p-2 text-left bg-white overflow-y-auto max-h-60 ${theme.input}`}>
-      {Object.keys(tree.children).sort().map(key => renderNode(tree.children[key], key))}
+    <div className={`mb-4 p-2 border ${theme.inputInfo}`}>
+      <div className="text-xs text-left mb-2 text-gray-500 font-mono break-all">{preview.file}</div>
+      <div ref={containerRef} className="w-full bg-white" />
     </div>
   );
 }
 
-function View4({ theme }) {
- const t = theme;
- const [files, setFiles] = useState([]);
- const [checkpoints, setCheckpoints] = useState([]);
- const [form, setForm] = useState({ audio_file: "", checkpoint: "" });
- const [status, setStatus] = useState(null);
- const [loading, setLoading] = useState(false);
- const [transcription, setTranscription] = useState("");
+function View0({ theme }) {
+  const t = theme;
+  const [files, setFiles] = useState({ wav_files: [], folders: [] });
+  const [targetPath, setTargetPath] = useState("");
+  const [settings, setSettings] = useState({ silence_thresh: -40, min_silence_len: 500, keep_silence: 100 });
+  const [status, setStatus] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [previews, setPreviews] = useState([]);
+  const [zoom, setZoom] = useState(1);
 
- useEffect(() => {
- fetch("http://localhost:8000/api/inference_files")
- .then(res => res.json())
- .then(data => {
- setFiles(data.wav_files);
- if (data.wav_files.length > 0) setForm(prev => ({ ...prev, audio_file: data.wav_files[0] }));
- }).catch(err => console.log("Failed to fetch audio files", err));
+  useEffect(() => {
+    fetch("http://localhost:8000/api/files")
+      .then(res => res.json())
+      .then(data => {
+        const allWavs = data.wav_files || [];
+        const folderSet = new Set();
+        allWavs.forEach(f => {
+          const parts = f.split('/');
+          if (parts.length > 1) {
+            folderSet.add(parts.slice(0, -1).join('/'));
+          }
+        });
+        setFiles({ wav_files: allWavs, folders: Array.from(folderSet).sort((a, b) => a.split('/').length - b.split('/').length || a.localeCompare(b)) });
+      }).catch(err => console.log("Failed to fetch files", err));
+  }, []);
 
- fetch("http://localhost:8000/api/checkpoints")
- .then(res => res.json())
- .then(data => {
- setCheckpoints(data.checkpoints);
- if (data.checkpoints.length > 0) setForm(prev => ({ ...prev, checkpoint: data.checkpoints[0] }));
- }).catch(err => console.log("Failed to fetch checkpoints", err));
- }, []);
+  useEffect(() => {
+    if (!targetPath) {
+      setPreviews([]);
+      return;
+    }
+    const fetchPreviews = async () => {
+      try {
+        const res = await fetch("http://localhost:8000/api/preview_segments", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ target_path: targetPath, ...settings })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          setPreviews(data.previews || []);
+        }
+      } catch (e) {
+        console.log("Failed to fetch previews", e);
+      }
+    };
+    const timer = setTimeout(fetchPreviews, 500);
+    return () => clearTimeout(timer);
+  }, [targetPath, settings]);
 
- const handleTranscribe = async () => {
- setLoading(true);
- setStatus("Transcribing... This may take a while depending on file length.");
- setTranscription("");
- try {
- const res = await fetch("http://localhost:8000/api/transcribe_long", {
- method: "POST",
- headers: { "Content-Type": "application/json" },
- body: JSON.stringify(form)
- });
- const data = await res.json();
- if (res.ok) {
- setStatus(`✅ Success! TSV saved to ${data.tsv_file}`);
- if (data.transcription) {
-    setTranscription(data.transcription);
- }
- } else {
- setStatus(`❌ Error: ${data.detail}`);
- }
- } catch (e) {
- setStatus(`❌ Error: ${e.message}`);
- }
- setLoading(false);
- };
+  const handleSegment = async () => {
+    if (!targetPath) return;
+    setLoading(true);
+    setStatus("⏳ Processing batch segmentation...");
+    try {
+      const res = await fetch("http://localhost:8000/api/batch_segment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ target_path: targetPath, ...settings })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setStatus("✅ " + data.message + " Saved to " + data.output_dir);
+      } else {
+        setStatus("❌ Error: " + data.detail);
+      }
+    } catch (e) {
+      setStatus("❌ Error: " + e.message);
+    }
+    setLoading(false);
+  };
 
- const removeNumbers = (str) => {
-   return str.replace(/[0-9]/g, '');
- };
+  return (
+    <div className="max-w-3xl mx-auto text-center ">
+      <h2 className={`text-3xl font-bold mb-6 ${t.viewTitle}`}>0. Batch Segmentation</h2>
+      <p className={`${t.viewDesc} mb-8`}>Select a single file or a folder to automatically cut up all audio files at once based on silence thresholds.</p>
+      
+      <div className={`${t.card} p-6 `}>
+        <div className="mb-6 text-left">
+          <label className={`block text-sm font-medium ${t.label} mb-2`}>Target File or Folder</label>
+          <select className={`w-full p-3 ${t.input}`} value={targetPath} onChange={e => setTargetPath(e.target.value)}>
+            <option value="">-- Select File or Folder --</option>
+            {files.folders.length > 0 && <optgroup label="Folders">{files.folders.map(f => <option key={f} value={f}>{f}</option>)}</optgroup>}
+            {files.wav_files.length > 0 && <optgroup label="Files">{files.wav_files.map(f => <option key={f} value={f}>{f}</option>)}</optgroup>}
+          </select>
+        </div>
 
- return (
- <div className="max-w-3xl mx-auto text-center ">
- <h2 className={`text-3xl font-bold mb-6 ${t.viewTitle}`}>4. Transcribe Long Recording</h2>
- <p className={`${t.viewDesc} mb-8`}>Use a trained model to transcribe a longer audio/video file.</p>
- 
- <div className={`${t.card} p-6 `}>
- <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
- <div>
- <label className={`block text-sm font-medium ${t.label} mb-2`}>Audio File</label>
- {files.length === 0 ? (
-   <select className={`w-full p-3 ${t.input}`} disabled>
-     <option>No files found</option>
-   </select>
- ) : (
-   <FileTreeSelector files={files} selectedFile={form.audio_file} onSelect={(f) => setForm({...form, audio_file: f})} theme={t} />
- )}
- </div>
- <div>
- <label className={`block text-sm font-medium ${t.label} mb-2`}>Model Checkpoint</label>
- <select className={`w-full p-3 ${t.input}`} value={form.checkpoint} onChange={e => setForm({...form, checkpoint: e.target.value})}>
- {checkpoints.length === 0 && <option>No checkpoints found</option>}
- {checkpoints.map(f => <option key={f} value={f}>{f}</option>)}
- </select>
- </div>
- </div>
+        <div className={`grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 p-4 border ${t.inputInfo} text-left`}>
+          <div>
+            <label className={`block text-sm font-medium ${t.label} mb-2`}>Silence Threshold (dBFS)</label>
+            <div className="flex items-center gap-2">
+              <input type="range" min="-80" max="0" step="1" value={settings.silence_thresh} onChange={(e) => setSettings({...settings, silence_thresh: parseInt(e.target.value) || 0})} className="w-full" />
+              <input type="number" min="-80" max="0" value={settings.silence_thresh} onChange={(e) => setSettings({...settings, silence_thresh: parseInt(e.target.value) || 0})} className={`w-16 p-1 text-sm ${t.input} mb-0`} />
+            </div>
+          </div>
+          <div>
+            <label className={`block text-sm font-medium ${t.label} mb-2`}>Min Silence (ms)</label>
+            <div className="flex items-center gap-2">
+              <input type="range" min="10" max="1500" step="10" value={settings.min_silence_len} onChange={(e) => setSettings({...settings, min_silence_len: parseInt(e.target.value) || 0})} className="w-full" />
+              <input type="number" min="10" max="1500" value={settings.min_silence_len} onChange={(e) => setSettings({...settings, min_silence_len: parseInt(e.target.value) || 0})} className={`w-20 p-1 text-sm ${t.input} mb-0`} />
+            </div>
+          </div>
+          <div>
+            <label className={`block text-sm font-medium ${t.label} mb-2`}>Keep Silence (ms)</label>
+            <div className="flex items-center gap-2">
+              <input type="range" min="0" max="500" step="10" value={settings.keep_silence} onChange={(e) => setSettings({...settings, keep_silence: parseInt(e.target.value) || 0})} className="w-full" />
+              <input type="number" min="0" max="500" value={settings.keep_silence} onChange={(e) => setSettings({...settings, keep_silence: parseInt(e.target.value) || 0})} className={`w-20 p-1 text-sm ${t.input} mb-0`} />
+            </div>
+          </div>
+        </div>
 
- <button 
- onClick={handleTranscribe} 
- disabled={loading || !form.audio_file || !form.checkpoint}
- className={`w-full py-4 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.99] ${t.buttonSecondary}`}
- >
- {loading ? "Transcribing..." : "Start Transcription"}
- </button>
+        {previews.length > 0 && (
+          <div className="mb-6">
+            <h3 className="font-bold text-left mb-2">Live Previews (up to 3 files)</h3>
+            <div className="flex items-center gap-3 mb-2">
+                <label className={`text-sm font-medium ${t.label} whitespace-nowrap`}>Preview Zoom:</label>
+                <input 
+                    type="range" 
+                    min="1" 
+                    max="1000" 
+                    value={zoom} 
+                    onChange={(e) => setZoom(e.target.value)} 
+                    className="w-1/2"
+                />
+            </div>
+            {previews.map((p, i) => <PreviewSurfer key={i} preview={p} theme={t} zoom={zoom} />)}
+          </div>
+        )}
 
- {status && (
- <div className={`mt-6 p-4 border ${status.includes('❌') ? t.errorMsg : t.successMsg}`}>
- {status}
- </div>
- )}
+        <button 
+          onClick={handleSegment} 
+          disabled={loading || !targetPath}
+          className={`w-full py-4 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.99] ${t.buttonPrimary}`}
+        >
+          {loading ? "⏳ Segmenting..." : "Start Batch Segmentation"}
+        </button>
 
- {transcription && (
- <div className="mt-6 p-4 border rounded text-left bg-white shadow-sm">
-   <h3 className="font-bold mb-2 text-gray-800">Transcription (with tone)</h3>
-   <p className="mb-4 text-gray-700">{transcription}</p>
-   <h3 className="font-bold mb-2 text-gray-800">Transcription (without tone)</h3>
-   <p className="text-gray-700">{removeNumbers(transcription)}</p>
- </div>
- )}
- </div>
- </div>
- );
+        {status && (
+          <div className={`mt-6 p-4 border text-left ${status.includes('❌') ? t.errorMsg : (status.includes('✅') ? t.successMsg : t.inputInfo)}`}>
+            {status}
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }
 
-function View5({ theme }) {
- const t = theme;
- const [checkpoints, setCheckpoints] = useState([]);
- const [checkpoint, setCheckpoint] = useState("");
- const [status, setStatus] = useState(null);
- const [loading, setLoading] = useState(false);
- const [recording, setRecording] = useState(false);
- const [audioUrl, setAudioUrl] = useState("");
- const mediaRecorder = useRef(null);
- const audioChunks = useRef([]);
- const [audioBlob, setAudioBlob] = useState(null);
+function View1({ theme }) {
+  const t = theme;
+  const [files, setFiles] = useState({ wav_files: [], folders: [] });
+  const [parentFolder, setParentFolder] = useState("");
+  const [groupedFiles, setGroupedFiles] = useState({});
+  const [selectedSubfolders, setSelectedSubfolders] = useState({});
+  const [form, setForm] = useState({ checkpoint: "charliemcvicker/asr-cherokee" });
+  const [status, setStatus] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [batchStats, setBatchStats] = useState(null);
+  const [isFetchingStats, setIsFetchingStats] = useState(false);
 
- useEffect(() => {
- fetch("http://localhost:8000/api/checkpoints")
- .then(res => res.json())
- .then(data => {
- setCheckpoints(data.checkpoints);
- if (data.checkpoints.length > 0) setCheckpoint(data.checkpoints[0]);
- }).catch(err => console.log("Failed to fetch checkpoints", err));
- }, []);
+  useEffect(() => {
+    fetch("http://localhost:8000/api/files")
+      .then(res => res.json())
+      .then(data => {
+        const allWavs = data.wav_files || [];
+        const folderSet = new Set();
+        allWavs.forEach(f => {
+          const parts = f.split('/');
+          if (parts.length > 1) {
+            folderSet.add(parts.slice(0, -1).join('/'));
+          }
+        });
+        setFiles({ wav_files: allWavs, folders: Array.from(folderSet).sort((a, b) => a.split('/').length - b.split('/').length || a.localeCompare(b)) });
+      }).catch(err => console.log("Failed to fetch files", err));
+  }, []);
 
- const startRecording = async () => {
- try {
- const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
- mediaRecorder.current = new MediaRecorder(stream);
- mediaRecorder.current.ondataavailable = e => {
- audioChunks.current.push(e.data);
- };
- mediaRecorder.current.onstop = () => {
- const blob = new Blob(audioChunks.current, { type: "audio/webm" });
- setAudioBlob(blob);
- setAudioUrl(URL.createObjectURL(blob));
- audioChunks.current = [];
- };
- mediaRecorder.current.start();
- setRecording(true);
- setStatus("🔴 Recording...");
- } catch (e) {
- setStatus(`❌ Error accessing microphone: ${e.message}`);
- }
- };
+  useEffect(() => {
+    if (!parentFolder) {
+      setGroupedFiles({});
+      setSelectedSubfolders({});
+      return;
+    }
+    
+    const wavsInParent = files.wav_files.filter(f => f.startsWith(parentFolder + '/'));
+    const groups = {};
+    
+    wavsInParent.forEach(f => {
+      const relPath = f.substring(parentFolder.length + 1);
+      const parts = relPath.split('/');
+      
+      let subfolder = "/ (root)";
+      let targetPath = parentFolder;
+      
+      if (parts.length > 1) {
+        subfolder = parts.slice(0, -1).join('/');
+        targetPath = parentFolder + '/' + subfolder;
+      }
+      
+      if (!groups[targetPath]) {
+        groups[targetPath] = { name: subfolder, files: [] };
+      }
+      groups[targetPath].files.push(f);
+    });
+    
+    setGroupedFiles(groups);
+    
+    const sel = {};
+    Object.keys(groups).forEach(g => sel[g] = true);
+    setSelectedSubfolders(sel);
+  }, [parentFolder, files.wav_files]);
 
- const stopRecording = () => {
- if (mediaRecorder.current) {
- mediaRecorder.current.stop();
- mediaRecorder.current.stream.getTracks().forEach(track => track.stop());
- setRecording(false);
- setStatus("Recording complete. Ready to transcribe.");
- }
- };
+  const toggleSubfolder = (sf) => {
+    setSelectedSubfolders(prev => ({...prev, [sf]: !prev[sf]}));
+  };
 
- const handleTranscribe = async () => {
- if (!audioBlob) return;
- setLoading(true);
- setStatus("Transcribing...");
- try {
- const formData = new FormData();
- formData.append("checkpoint", checkpoint);
- formData.append("audio", audioBlob, "recording.webm");
+  const toggleAll = (state) => {
+    const sel = {};
+    Object.keys(groupedFiles).forEach(c => sel[c] = state);
+    setSelectedSubfolders(sel);
+  };
 
- const res = await fetch("http://localhost:8000/api/transcribe_mic", {
- method: "POST",
- body: formData
- });
- const data = await res.json();
- if (res.ok) {
- setStatus(`✅ Transcription: ${data.transcription}`);
- } else {
- setStatus(`❌ Error: ${data.detail}`);
- }
- } catch (e) {
- setStatus(`❌ Error: ${e.message}`);
- }
- setLoading(false);
- };
+  const targetFolders = Object.keys(selectedSubfolders).filter(k => selectedSubfolders[k]);
 
- return (
- <div className="max-w-3xl mx-auto text-center ">
- <h2 className={`text-3xl font-bold mb-6 ${t.viewTitle}`}>5. Transcribe from Mic</h2>
- <p className={`${t.viewDesc} mb-8`}>Record your voice using the microphone and test the trained model.</p>
- 
- <div className={`${t.card} p-6 `}>
- <div className="mb-8">
- <label className={`block text-sm font-medium ${t.label} mb-2`}>Model Checkpoint</label>
- <select className={`w-full md:w-1/2 p-3 ${t.input}`} value={checkpoint} onChange={e => setCheckpoint(e.target.value)}>
- {checkpoints.length === 0 && <option>No checkpoints found</option>}
- {checkpoints.map(f => <option key={f} value={f}>{f}</option>)}
- </select>
- </div>
+  useEffect(() => {
+    if (targetFolders.length === 0) {
+      setBatchStats(null);
+      return;
+    }
+    const timeout = setTimeout(() => {
+        setIsFetchingStats(true);
+        fetch("http://localhost:8000/api/batch_stats", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ target_folders: targetFolders })
+        })
+        .then(res => res.json())
+        .then(data => {
+            setBatchStats(data);
+            setIsFetchingStats(false);
+        })
+        .catch(err => {
+            console.error("Failed to fetch stats", err);
+            setIsFetchingStats(false);
+        });
+    }, 500);
+    return () => clearTimeout(timeout);
+  }, [selectedSubfolders]);
 
- <div className="flex gap-4 items-center mb-8">
- <button 
- onClick={recording ? stopRecording : startRecording} 
- className={`px-6 py-3 font-bold active:scale-[0.99] flex items-center gap-2 ${recording ? 'bg-red-500 hover:bg-red-600 text-white' : 'bg-slate-200 hover:bg-slate-300 text-slate-800'}`}
- >
- {recording ? "⏹ Stop Recording" : "⏺ Start Recording"}
- </button>
- {audioUrl && !recording && (
- <audio src={audioUrl} controls className="h-10 outline-none"></audio>
- )}
- </div>
+  const handleInference = async () => {
+    if (targetFolders.length === 0) return;
+    
+    setLoading(true);
+    setStatus(`⏳ Running batch inference on ${targetFolders.length} folders... (This may take several minutes)`);
+    try {
+      const res = await fetch("http://localhost:8000/api/batch_inference", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          target_folders: targetFolders,
+          checkpoint: form.checkpoint
+        })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setStatus("✅ " + data.message + " Output saved to " + data.csv_path);
+      } else {
+        setStatus("❌ Error: " + data.detail);
+      }
+    } catch (e) {
+      setStatus("❌ Error: " + e.message);
+    }
+    setLoading(false);
+  };
 
- <button 
- onClick={handleTranscribe} 
- disabled={loading || !audioBlob || !checkpoint}
- className={`w-full py-4 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.99] ${t.buttonPrimary}`}
- >
- {loading ? "Transcribing..." : "Transcribe Recording"}
- </button>
+  const groupKeys = Object.keys(groupedFiles);
+  const selectedCount = Object.values(selectedSubfolders).filter(Boolean).length;
 
- {status && (
- <div className={`mt-6 p-4 border ${status.includes('❌') ? t.errorMsg : (status.includes('✅') ? t.successMsg : t.inputInfo)}`}>
- {status}
- </div>
- )}
- </div>
- </div>
- );
+  return (
+    <div className="max-w-3xl mx-auto text-center ">
+      <h2 className={`text-3xl font-bold mb-6 ${t.viewTitle}`}>1. Batch Inference</h2>
+      <p className={`${t.viewDesc} mb-8`}>Run speech-to-text inference on the segmented audio folders.</p>
+      
+      <div className={`${t.card} p-6 `}>
+        <div className="grid grid-cols-1 gap-6 mb-6 text-left">
+          <div>
+            <label className={`block text-sm font-medium ${t.label} mb-2`}>Target Parent Directory</label>
+            <select className={`w-full p-3 ${t.input}`} value={parentFolder} onChange={e => setParentFolder(e.target.value)}>
+              <option value="">-- Select Parent Folder --</option>
+              {files.folders.map(f => <option key={f} value={f}>{f}</option>)}
+            </select>
+          </div>
+
+          {groupKeys.length > 0 && (
+            <div className={`p-4 border ${t.inputInfo}`}>
+              <div className="flex justify-between items-center mb-2">
+                <label className={`block text-sm font-medium ${t.label}`}>Select Folders to Process ({selectedCount} / {groupKeys.length})</label>
+                <div>
+                  <button onClick={() => toggleAll(true)} className={`text-xs mr-2 ${t.buttonSecondary}`}>Select All</button>
+                  <button onClick={() => toggleAll(false)} className={`text-xs ${t.buttonSecondary}`}>Deselect All</button>
+                </div>
+              </div>
+              <div className="max-h-64 overflow-y-auto border border-gray-300 p-2 bg-white text-sm">
+                {groupKeys.map(k => (
+                  <div key={k} className="mb-2">
+                    <label className="flex items-center space-x-2 p-1 hover:bg-gray-100 cursor-pointer text-black font-bold border-b border-gray-200">
+                      <input type="checkbox" checked={!!selectedSubfolders[k]} onChange={() => toggleSubfolder(k)} />
+                      <span className="truncate" title={k}>{groupedFiles[k].name} ({groupedFiles[k].files.length} files)</span>
+                    </label>
+                    {groupedFiles[k].files.slice(0, 3).map(f => (
+                      <div key={f} className="text-xs text-gray-500 pl-6 py-1 truncate">{f.split('/').pop()}</div>
+                    ))}
+                    {groupedFiles[k].files.length > 3 && (
+                      <div className="text-xs text-gray-400 pl-6 italic">...and {groupedFiles[k].files.length - 3} more files</div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Stats Dashboard */}
+          {targetFolders.length > 0 && (
+            <div className={`p-5 rounded-xl border border-gray-200 shadow-sm overflow-hidden transition-all duration-300 ${t.card}`}>
+              <h3 className={`text-lg font-bold mb-4 flex items-center ${t.viewTitle}`}>
+                📊 Audio Statistics
+                {isFetchingStats && <span className="ml-3 text-sm font-normal text-blue-500 animate-pulse">Calculating...</span>}
+              </h3>
+              
+              {!isFetchingStats && batchStats && batchStats.count > 0 && (
+                <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                  {/* Summary Pills */}
+                  <div className="flex flex-wrap gap-3">
+                    <div className="flex-1 bg-gradient-to-br from-blue-50 to-blue-100 p-3 rounded-lg border border-blue-200">
+                      <div className="text-xs text-blue-500 font-bold uppercase tracking-wider">Total Files</div>
+                      <div className="text-2xl font-black text-blue-900">{batchStats.count.toLocaleString()}</div>
+                    </div>
+                    <div className="flex-1 bg-gradient-to-br from-indigo-50 to-indigo-100 p-3 rounded-lg border border-indigo-200">
+                      <div className="text-xs text-indigo-500 font-bold uppercase tracking-wider">Total Duration</div>
+                      <div className="text-2xl font-black text-indigo-900">
+                        {batchStats.total_duration > 3600 
+                          ? (batchStats.total_duration / 3600).toFixed(1) + " hrs" 
+                          : (batchStats.total_duration / 60).toFixed(1) + " mins"}
+                      </div>
+                    </div>
+                    <div className="flex-1 bg-gradient-to-br from-purple-50 to-purple-100 p-3 rounded-lg border border-purple-200">
+                      <div className="text-xs text-purple-500 font-bold uppercase tracking-wider">Length Range</div>
+                      <div className="text-xl font-black text-purple-900 mt-1">
+                        {batchStats.min.toFixed(1)}s - {batchStats.max.toFixed(1)}s
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Histogram Chart */}
+                  <div>
+                    <div className="text-xs text-gray-500 font-bold uppercase tracking-wider mb-2">Length Distribution (Seconds)</div>
+                    <div className="flex items-end h-32 gap-1 group">
+                      {batchStats.histogram.map((bin, i) => {
+                        const maxCount = Math.max(...batchStats.histogram.map(b => b.count));
+                        const heightPct = maxCount === 0 ? 0 : (bin.count / maxCount) * 100;
+                        return (
+                          <div key={i} className="relative flex-1 group/bar flex flex-col justify-end h-full">
+                            <div 
+                              className="w-full bg-gradient-to-t from-blue-600 to-blue-400 rounded-t-sm transition-all duration-300 group-hover:opacity-50 group-hover/bar:opacity-100 group-hover/bar:from-indigo-600 group-hover/bar:to-indigo-400 cursor-pointer"
+                              style={{ height: `${heightPct}%`, minHeight: bin.count > 0 ? '4px' : '0' }}
+                            ></div>
+                            {/* Tooltip */}
+                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 opacity-0 group-hover/bar:opacity-100 transition-opacity pointer-events-none z-10 w-max bg-gray-900 text-white text-xs rounded py-1 px-2 shadow-lg">
+                              <div className="font-bold">{bin.start.toFixed(1)}s - {bin.end.toFixed(1)}s</div>
+                              <div>{bin.count} files</div>
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                    <div className="flex justify-between text-xs text-gray-400 mt-1">
+                      <span>{batchStats.min.toFixed(1)}s</span>
+                      <span>{batchStats.max.toFixed(1)}s</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          <div>
+            <label className={`block text-sm font-medium ${t.label} mb-2`}>Model Checkpoint (HF Repo ID or Path)</label>
+            <input type="text" className={`w-full p-3 ${t.input}`} value={form.checkpoint} onChange={e => setForm({...form, checkpoint: e.target.value})} />
+          </div>
+        </div>
+
+        <button 
+          onClick={handleInference} 
+          disabled={loading || !form.checkpoint || selectedCount === 0}
+          className={`w-full py-4 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.99] ${t.buttonPrimary}`}
+        >
+          {loading ? "⏳ Running Inference..." : `Start Batch Inference on ${selectedCount} Folders`}
+        </button>
+
+        {status && (
+          <div className={`mt-6 p-4 border text-left ${status.includes('❌') ? t.errorMsg : (status.includes('✅') ? t.successMsg : t.inputInfo)}`}>
+            {status}
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }
 
-function View6({ theme }) {
+
+function View2({ theme }) {
  const t = theme;
  const [segments, setSegments] = useState([]);
  const [currentIndex, setCurrentIndex] = useState(-1);
@@ -925,10 +547,48 @@ function View6({ theme }) {
  const [selectedCsv, setSelectedCsv] = useState("");
  const [showTones, setShowTones] = useState(true);
 
- const formatText = (txt) => {
-   if (!txt) return txt;
-   return showTones ? txt : txt.replace(/[0-9]/g, '');
- };
+  const formatText = (txt) => {
+    if (!txt) return txt;
+    return showTones ? txt : txt.replace(/[0-9]/g, '');
+  };
+
+  const renderDetailedTranscription = (segment) => {
+    if (segment.word_confidences && segment.word_confidences.length > 0) {
+        return (
+            <div className="flex flex-wrap gap-2 items-center">
+                {segment.word_confidences.map((wordObj, i) => {
+                    const formattedWord = formatText(wordObj.word);
+                    if (!formattedWord) return null;
+                    return (
+                        <span 
+                            key={i} 
+                            className="group relative cursor-pointer border-b border-transparent hover:border-gray-400 pb-[1px]"
+                            title={`Word: ${wordObj.word}\nConfidence: ${wordObj.confidence.toFixed(4)}`}
+                        >
+                            {wordObj.chars.map((charObj, j) => {
+                                const formattedChar = formatText(charObj.char);
+                                if (!formattedChar) return null;
+                                return (
+                                    <span 
+                                        key={j}
+                                        className={`
+                                            ${charObj.confidence < 0.5 ? 'text-red-500' : charObj.confidence < 0.8 ? 'text-orange-400' : ''}
+                                            hover:bg-blue-500/30 px-[1px] rounded transition-colors duration-150
+                                        `}
+                                        title={`Char: '${charObj.char}'\nConf: ${charObj.confidence.toFixed(4)}${charObj.alternatives && charObj.alternatives.length > 0 ? '\nAlts: ' + charObj.alternatives.map(a => `'${a.char}': ${a.confidence.toFixed(4)}`).join(', ') : ''}`}
+                                    >
+                                        {formattedChar}
+                                    </span>
+                                );
+                            })}
+                        </span>
+                    );
+                })}
+            </div>
+        );
+    }
+    return formatText(segment.greedy_transcription) || <i className="text-gray-400">(Empty)</i>;
+  };
 
  useEffect(() => {
    fetch("http://localhost:8000/api/files")
@@ -1028,19 +688,21 @@ function View6({ theme }) {
    <div className="max-w-6xl mx-auto text-center flex flex-col md:flex-row gap-6 text-left">
      {/* Sidebar */}
      <div className={`md:w-1/3 flex flex-col ${t.card} p-4 h-[80vh]`}>
-       <h2 className={`text-xl font-bold mb-2`}>Active Labeler</h2>
+       <h2 className={`text-xl font-bold mb-2`}>Review</h2>
        
        <div className="mb-4">
          <label className={`block text-sm font-medium ${t.label} mb-1`}>Results CSV File</label>
-         <FileTreeSelector 
-           files={csvFiles} 
-           selectedFile={selectedCsv} 
-           onSelect={f => {
-             setSelectedCsv(f);
-             loadData(f);
-           }} 
-           theme={t} 
-         />
+          <select 
+            className={`w-full p-3 ${t.input}`} 
+            value={selectedCsv} 
+            onChange={e => {
+              setSelectedCsv(e.target.value);
+              loadData(e.target.value);
+            }}
+          >
+            <option value="">-- Select CSV File --</option>
+            {csvFiles.map(f => <option key={f} value={f}>{f}</option>)}
+          </select>
        </div>
 
        <p className={`text-sm mb-4 ${t.inputInfoSub}`}>Sorted by lowest confidence.</p>
@@ -1083,7 +745,7 @@ function View6({ theme }) {
                  <span className="truncate max-w-[150px] opacity-70" title={seg.filename}>{seg.filename}</span>
                </div>
                <div className="text-sm">
-                 {hasLabel ? <strong>[L] {formatText(seg.labeled_sentence)}</strong> : formatText(seg.greedy_transcription)}
+                 {hasLabel ? <strong>[L] {formatText(seg.labeled_sentence)}</strong> : renderDetailedTranscription(seg)}
                </div>
              </div>
            );
@@ -1114,9 +776,9 @@ function View6({ theme }) {
              <label className={`block text-sm font-medium ${t.label} mb-2 uppercase tracking-wide text-gray-500`}>
                Original Transcription (Confidence: {segments[currentIndex].greedy_confidence.toFixed(4)})
              </label>
-             <div className={`p-3 text-lg opacity-80 ${t.inputInfo}`}>
-               {formatText(segments[currentIndex].greedy_transcription) || <i className="text-gray-400">(Empty)</i>}
-             </div>
+              <div className={`p-3 text-lg opacity-80 ${t.inputInfo}`}>
+                {renderDetailedTranscription(segments[currentIndex])}
+              </div>
            </div>
 
            <div className="mb-8">
@@ -1150,13 +812,9 @@ function View6({ theme }) {
 }
 
 const TABS = [
- { id: 0, name: "VAD Segmentation", title: "Auto-segment Long Audio" },
- { id: 1, name: "Data Preparation", title: "ELAN to WAV and CSV" },
- { id: 2, name: "Partitioning", title: "Generate Train Files" },
- { id: 3, name: "Training", title: "Train Wav2Vec2 Model" },
- { id: 4, name: "Inference", title: "Transcribe Long Recording" },
- { id: 5, name: "Microphone", title: "Transcribe from Mic" },
- { id: 6, name: "Active Labeling", title: "Active Labeling Tool" },
+  { id: 0, name: "Batch Segmentation", title: "Batch Segmentation" },
+  { id: 1, name: "Batch Inference", title: "Batch Inference" },
+  { id: 2, name: "Review", title: "Review Tool" },
 ];
 
 export default function App() {
@@ -1231,14 +889,10 @@ export default function App() {
 
       {/* Main Content Centered */}
       <main className={`p-4 ${t.bgMain}`}>
-        <div key={baseFolder} className="mx-auto max-w-4xl text-center">
+<div key={baseFolder} className="mx-auto max-w-4xl text-center">
           {activeTab === 0 && <View0 theme={t} />}
           {activeTab === 1 && <View1 theme={t} />}
           {activeTab === 2 && <View2 theme={t} />}
-          {activeTab === 3 && <View3 theme={t} />}
-          {activeTab === 4 && <View4 theme={t} />}
-          {activeTab === 5 && <View5 theme={t} />}
-          {activeTab === 6 && <View6 theme={t} />}
         </div>
       </main>
     </div>

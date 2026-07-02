@@ -24,6 +24,7 @@ import numpy as np
 from transformers import Wav2Vec2Processor, Wav2Vec2ForCTC
 import time
 import multiprocessing
+from tqdm import tqdm
 
 TARGET_SAMPLE_RATE = 16000
 
@@ -42,7 +43,6 @@ def init_worker(processor_path, arpa_path, token, revision):
     torch.set_num_threads(1)
     
     from transformers import Wav2Vec2Processor
-    from pyctcdecode import build_ctcdecoder
     import os
 
     global_processor = Wav2Vec2Processor.from_pretrained(
@@ -50,6 +50,8 @@ def init_worker(processor_path, arpa_path, token, revision):
     )
 
     if arpa_path and os.path.exists(arpa_path):
+        from pyctcdecode import build_ctcdecoder
+        
         vocab_dict_sorted = global_processor.tokenizer.get_vocab()
         sorted_vocab = sorted(vocab_dict_sorted.items(), key=lambda kv: kv[1])
         labels = [t for t, _ in sorted_vocab]
@@ -92,6 +94,55 @@ def decode_worker(item_data):
     else:
         greedy_confidence = float(np.mean(token_probs))
 
+    # Calculate detailed character/word confidences
+    chars = []
+    char_probs = []
+    char_alts = []
+    
+    top_k = 5
+    top_k_indices = np.argsort(probs, axis=-1)[:, -top_k:][:, ::-1]
+    top_k_probs = np.take_along_axis(probs, top_k_indices, axis=-1)
+    
+    prev_id = -1
+    for i, token_id in enumerate(pred_ids):
+        if token_id != pad_id and token_id != prev_id:
+            token_str = global_processor.decode([token_id])
+            if token_str:
+                chars.append(token_str)
+                char_probs.append(float(token_probs[i]))
+                
+                alts = []
+                for k in range(top_k):
+                    alt_id = top_k_indices[i, k]
+                    alt_prob = float(top_k_probs[i, k])
+                    if alt_id != token_id:
+                        alt_str = global_processor.decode([alt_id])
+                        if alt_str:
+                            alts.append({"char": alt_str, "confidence": alt_prob})
+                char_alts.append(alts)
+                
+        prev_id = token_id
+
+    words_details = []
+    current_word = ""
+    current_chars = []
+    for char, prob, alts in zip(chars, char_probs, char_alts):
+        if char == " ":
+            if current_word:
+                word_conf = float(np.mean([c["confidence"] for c in current_chars]))
+                words_details.append({"word": current_word, "confidence": word_conf, "chars": current_chars})
+                current_word = ""
+                current_chars = []
+        else:
+            current_word += char
+            current_chars.append({"char": char, "confidence": prob, "alternatives": alts})
+    if current_word:
+        word_conf = float(np.mean([c["confidence"] for c in current_chars]))
+        words_details.append({"word": current_word, "confidence": word_conf, "chars": current_chars})
+
+    import json
+    word_confidences_json = json.dumps(words_details, ensure_ascii=False)
+
     # 2. KenLM Decode
     lm_raw = ""
     logit_score = 0.0
@@ -111,6 +162,7 @@ def decode_worker(item_data):
         "audio_path": audio_path,
         "greedy_raw": greedy_raw,
         "greedy_confidence": greedy_confidence,
+        "word_confidences": word_confidences_json,
         "lm_raw": lm_raw,
         "logit_score": logit_score,
         "combined_score": combined_score
@@ -118,6 +170,28 @@ def decode_worker(item_data):
 
 
 from transcription.utils.model_utils import get_best_model_config
+
+def load_audio(audio_path, target_sample_rate):
+    import soundfile as sf
+    import torch
+    import torchaudio
+    speech_array, sample_rate = sf.read(audio_path)
+    waveform = torch.tensor(speech_array, dtype=torch.float32)
+    if len(waveform.shape) == 1:
+        waveform = waveform.unsqueeze(0)
+    else:
+        waveform = waveform.transpose(0, 1)
+    
+    if waveform.shape[0] > 1:
+        waveform = torch.mean(waveform, dim=0, keepdim=True)
+    
+    if sample_rate != target_sample_rate:
+        resampler = torchaudio.transforms.Resample(
+            orig_freq=sample_rate, new_freq=target_sample_rate
+        )
+        waveform = resampler(waveform)
+    
+    return waveform.squeeze(0).numpy()
 
 
 def main():
@@ -236,39 +310,22 @@ def main():
     print(f"Using device: {device}", flush=True)
     model.to(device)
 
-    # Load and resample audio files (pre-load in memory for batching/sorting)
+    # Read audio metadata for sorting (lazy loading)
     # We sort by length to minimize padding overhead during batched inference.
     loaded_audios = []
-    print("Loading and preparing audio files in memory...", flush=True)
+    print("Reading audio metadata for sorting...", flush=True)
     audio_load_start = time.time()
     for audio_path in wav_files:
         filename = os.path.basename(audio_path)
         try:
-            speech_array, sample_rate = sf.read(audio_path)
-            waveform = torch.tensor(speech_array, dtype=torch.float32)
-            if len(waveform.shape) == 1:
-                waveform = waveform.unsqueeze(0)
-            else:
-                waveform = waveform.transpose(0, 1)
-            
-            if waveform.shape[0] > 1:
-                waveform = torch.mean(waveform, dim=0, keepdim=True)
-            
-            if sample_rate != TARGET_SAMPLE_RATE:
-                resampler = torchaudio.transforms.Resample(
-                    orig_freq=sample_rate, new_freq=TARGET_SAMPLE_RATE
-                )
-                waveform = resampler(waveform)
-            
-            speech = waveform.squeeze(0).numpy()
+            info = sf.info(audio_path)
             loaded_audios.append({
                 "audio_path": audio_path,
                 "filename": filename,
-                "speech": speech,
-                "length": len(speech)
+                "length": info.frames
             })
         except Exception as e:
-            print(f"Error loading {filename}: {e}", flush=True)
+            print(f"Error reading metadata for {filename}: {e}", flush=True)
 
     if not loaded_audios:
         print("No audio files successfully loaded. Exiting.", flush=True)
@@ -281,15 +338,64 @@ def main():
     # Create batches
     batches = [loaded_audios[i : i + args.batch_size] for i in range(0, len(loaded_audios), args.batch_size)]
     
-    # Store logits data for multiprocessing
-    # Items: (global_index, filename, audio_path, logits_np)
-    logits_data = []
+    # Initialize multiprocessing Pool for parallel decoding
+    num_workers = args.num_workers or multiprocessing.cpu_count()
+    print(f"Initializing multiprocessing pool with {num_workers} workers...", flush=True)
+    
+    pool = multiprocessing.Pool(
+        processes=num_workers,
+        initializer=init_worker,
+        initargs=(args.processor, args.arpa, token, args.revision)
+    )
+
+    # Initialize CSV headers
+    headers = ["file_path", "filename", "greedy_transcription", "greedy_confidence", "word_confidences"]
+    if args.arpa:
+        headers.append("kenlm_transcription")
+        headers.append("kenlm_logit_score")
+        headers.append("kenlm_combined_score")
+
+    with open(args.output, "w", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f)
+        writer.writerow(headers)
+
+    import threading
+    csv_lock = threading.Lock()
+    
+    # Bounded semaphore to prevent IPC queue explosion and system OOM/segfault
+    max_queue = threading.Semaphore(args.batch_size * 5) 
+    
+    def write_result_callback(res):
+        try:
+            with csv_lock:
+                with open(args.output, "a", newline="", encoding="utf-8") as f:
+                    writer = csv.writer(f)
+                    row = [res["audio_path"], res["filename"], res["greedy_raw"], f"{res['greedy_confidence']:.4f}", res.get("word_confidences", "[]")]
+                    if args.arpa:
+                        row.extend([res["lm_raw"], f"{res['logit_score']:.4f}", f"{res['combined_score']:.4f}"])
+                    writer.writerow(row)
+        finally:
+            max_queue.release()
+
     global_idx = 0
+    CHUNK_SIZE_BATCHES = 50
 
     gpu_start_time = time.time()
-    print(f"Running batched GPU inference (batch size: {args.batch_size}, total batches: {len(batches)})...", flush=True)
+    print(f"Running batched GPU inference and streaming decoding (batch size: {args.batch_size}, total batches: {len(batches)})...", flush=True)
+    
+    pbar = tqdm(total=len(loaded_audios), desc="Transcribing", unit="file")
     for batch_idx, batch in enumerate(batches, 1):
-        speech_list = [item["speech"] for item in batch]
+        speech_list = []
+        for item in batch:
+            try:
+                speech = load_audio(item["audio_path"], TARGET_SAMPLE_RATE)
+                item["speech"] = speech
+                speech_list.append(speech)
+            except Exception as e:
+                print(f"Error reading audio {item['filename']} during batching: {e}", flush=True)
+                speech = np.zeros(16000, dtype=np.float32)
+                item["speech"] = speech
+                speech_list.append(speech)
         
         inputs = processor(
             speech_list,
@@ -308,8 +414,71 @@ def main():
                     batch_logits = model(input_values, attention_mask=attention_mask).logits
                 else:
                     batch_logits = model(input_values).logits
-        except NotImplementedError as e:
-            if device == "mps":
+        except Exception as e:
+            err_str = str(e).lower()
+            is_oom = "out of memory" in err_str or (hasattr(torch.cuda, "OutOfMemoryError") and isinstance(e, torch.cuda.OutOfMemoryError))
+            is_cudnn_err = "unable to find an engine" in err_str or "cudnn" in err_str
+            
+            if is_oom or is_cudnn_err:
+                reason = "OOM" if is_oom else "cuDNN error"
+                print(f"  {reason} on batch {batch_idx}. Falling back to sequential inference for this batch...", flush=True)
+                
+                # Free large tensors to ensure empty_cache succeeds
+                if 'input_values' in locals():
+                    del input_values
+                if 'attention_mask' in locals():
+                    del attention_mask
+                    
+                if torch.cuda.is_available():
+                    torch.cuda.empty_cache()
+                for item_idx, item in enumerate(batch):
+                    single_inputs = processor(
+                        [item["speech"]],
+                        sampling_rate=TARGET_SAMPLE_RATE,
+                        padding=True,
+                        return_tensors="pt"
+                    )
+                    single_input_values = single_inputs.input_values.to(device)
+                    single_attention_mask = getattr(single_inputs, "attention_mask", None)
+                    if single_attention_mask is not None:
+                        single_attention_mask = single_attention_mask.to(device)
+                    
+                    try:
+                        with torch.no_grad():
+                            with torch.backends.cudnn.flags(enabled=False):
+                                if single_attention_mask is not None:
+                                    single_logits = model(single_input_values, attention_mask=single_attention_mask).logits
+                                else:
+                                    single_logits = model(single_input_values).logits
+                        
+                        input_len = len(item["speech"])
+                        logit_len = int(model._get_feat_extract_output_lengths(input_len))
+                        logits_np = single_logits[0, :logit_len].detach().cpu().numpy().copy()
+                        item_data = (global_idx, item["filename"], item["audio_path"], logits_np)
+                        max_queue.acquire()
+                        pool.apply_async(decode_worker, (item_data,), callback=write_result_callback)
+                        global_idx += 1
+                    except Exception as seq_e:
+                        print(f"  Fatal OOM on {item['filename']} even with batch_size=1. Skipping file...", flush=True)
+                        empty_np = np.zeros((1, 32), dtype=np.float32)
+                        item_data = (global_idx, item["filename"], item["audio_path"], empty_np)
+                        max_queue.acquire()
+                        pool.apply_async(decode_worker, (item_data,), callback=write_result_callback)
+                        global_idx += 1
+                    finally:
+                        if 'single_logits' in locals(): del single_logits
+                        if 'single_inputs' in locals(): del single_inputs
+                        if 'single_input_values' in locals(): del single_input_values
+                        if 'single_attention_mask' in locals(): del single_attention_mask
+                        if torch.cuda.is_available(): torch.cuda.empty_cache()
+                
+                # Free raw speech memory from batch dicts
+                for item in batch:
+                    item.pop("speech", None)
+                if 'speech_list' in locals(): del speech_list
+                
+                continue
+            elif isinstance(e, NotImplementedError) and device == "mps":
                 print("  MPS execution failed. Falling back to CPU backend for this batch...", flush=True)
                 device = "cpu"
                 model.to(device)
@@ -328,51 +497,52 @@ def main():
         for item_idx, item in enumerate(batch):
             input_len = len(item["speech"])
             logit_len = int(model._get_feat_extract_output_lengths(input_len))
-            logits_np = batch_logits[item_idx, :logit_len].cpu().numpy()
-            logits_data.append((global_idx, item["filename"], item["audio_path"], logits_np))
+            logits_np = batch_logits[item_idx, :logit_len].detach().cpu().numpy().copy()
+            item_data = (global_idx, item["filename"], item["audio_path"], logits_np)
+            max_queue.acquire()
+            pool.apply_async(decode_worker, (item_data,), callback=write_result_callback)
             global_idx += 1
+            
+        pbar.update(len(batch))
+        
+        # Free batch tensors to ensure we don't peak VRAM on next batch allocation
+        if 'batch_logits' in locals(): del batch_logits
+        if 'inputs' in locals(): del inputs
+        if 'input_values' in locals(): del input_values
+        if 'attention_mask' in locals(): del attention_mask
+        
+        # Free raw speech memory from batch dicts
+        for item in batch:
+            item.pop("speech", None)
+        if 'speech_list' in locals(): del speech_list
+        
+        # Keep VRAM heavily defragmented between every batch to accommodate long audio
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
 
-    print(f"GPU inference completed in {time.time() - gpu_start_time:.2f}s.", flush=True)
-
-    # Initialize multiprocessing Pool for parallel decoding
-    num_workers = args.num_workers or multiprocessing.cpu_count()
-    print(f"Initializing multiprocessing pool with {num_workers} workers...", flush=True)
-    
-    # Initialize child processes by loading processor and CTC decoder (ARPA) once per worker
-    pool = multiprocessing.Pool(
-        processes=num_workers,
-        initializer=init_worker,
-        initargs=(args.processor, args.arpa, token, args.revision)
-    )
-
-    print(f"Starting parallel decoding of {len(logits_data)} items...", flush=True)
-    decode_start_time = time.time()
-    
-    results = pool.map(decode_worker, logits_data)
+    pbar.close()
     pool.close()
     pool.join()
     
-    print(f"Decoding completed in {time.time() - decode_start_time:.2f}s.", flush=True)
+    print(f"Inference and decoding completed in {time.time() - gpu_start_time:.2f}s.", flush=True)
 
-    # Sort results back to original directory reading order
+    # Final sort of CSV back to original directory reading order
+    print("Sorting final CSV output...", flush=True)
     wav_order = {path: idx for idx, path in enumerate(wav_files)}
-    results.sort(key=lambda x: wav_order.get(x["audio_path"], 0))
-
-    # Write results to CSV
-    headers = ["file_path", "filename", "greedy_transcription", "greedy_confidence"]
-    if args.arpa:
-        headers.append("kenlm_transcription")
-        headers.append("kenlm_logit_score")
-        headers.append("kenlm_combined_score")
-
+    
+    final_rows = []
+    with open(args.output, "r", encoding="utf-8") as f:
+        reader = csv.reader(f)
+        headers = next(reader)
+        for row in reader:
+            final_rows.append(row)
+    
+    final_rows.sort(key=lambda x: wav_order.get(x[0], 0))
+    
     with open(args.output, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
         writer.writerow(headers)
-        for res in results:
-            row = [res["audio_path"], res["filename"], res["greedy_raw"], f"{res['greedy_confidence']:.4f}"]
-            if args.arpa:
-                row.extend([res["lm_raw"], f"{res['logit_score']:.4f}", f"{res['combined_score']:.4f}"])
-            writer.writerow(row)
+        writer.writerows(final_rows)
 
     total_time = time.time() - audio_load_start
     print(f"\nBatch processing complete in {total_time:.2f}s. Results saved to {args.output}", flush=True)
