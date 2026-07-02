@@ -487,15 +487,35 @@ def resolve_resume_checkpoint(args, folder_model_files):
     if args.resume_from_repo:
         print(f"Downloading checkpoint from repository: {args.resume_from_repo} (revision: {args.resume_from_revision or 'main'})")
         from huggingface_hub import snapshot_download
-        resume_checkpoint = snapshot_download(
+        downloaded_dir = snapshot_download(
             repo_id=args.resume_from_repo,
             revision=args.resume_from_revision,
             token=CONFIG["hub_token"],
         )
-        print(f"Checkpoint downloaded to: {resume_checkpoint}")
+        print(f"Checkpoint downloaded to: {downloaded_dir}")
+        if os.path.exists(os.path.join(downloaded_dir, "trainer_state.json")):
+            resume_checkpoint = downloaded_dir
+            print(f"Using downloaded repository root as checkpoint: {resume_checkpoint}")
+        else:
+            import glob
+            import re
+            ckpt_dirs = glob.glob(os.path.join(downloaded_dir, "checkpoint-*"))
+            if ckpt_dirs:
+                def _step(p):
+                    m = re.search(r"checkpoint-(\d+)", os.path.basename(p))
+                    return int(m.group(1)) if m else -1
+                resume_checkpoint = max(ckpt_dirs, key=_step)
+                print(f"Found latest checkpoint subdirectory in snapshot: {resume_checkpoint}")
+            else:
+                print(f"WARNING: No trainer_state.json or checkpoint-* directory found in downloaded snapshot {downloaded_dir}.")
+                print("Cannot resume training state (optimizers/scheduler). Setting resume_checkpoint to None.")
+                print(f"Updating base_checkpoint to load model weights from: {downloaded_dir}")
+                CONFIG["base_checkpoint"] = downloaded_dir
+                resume_checkpoint = None
     elif args.resume_from_checkpoint:
         if args.resume_from_checkpoint.lower() == "latest":
             import glob
+            import re
             ckpt_dirs = glob.glob(os.path.join(folder_model_files, "checkpoint-*"))
             if ckpt_dirs:
                 def _step(p):
@@ -645,10 +665,10 @@ def main():
     train_ds, valid_ds, test_ds_prepared = prepare_datasets(
         df_train, df_valid, df_test, audio_col, text_col, processor
     )
+    resume_checkpoint = resolve_resume_checkpoint(args, folder_model_files)
     trainer, data_collator = initialize_model_and_trainer(
         processor, train_ds, valid_ds, folder_model_files
     )
-    resume_checkpoint = resolve_resume_checkpoint(args, folder_model_files)
     train_model(trainer, resume_checkpoint, folder_model_files, processor)
 
     (
