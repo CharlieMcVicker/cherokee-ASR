@@ -158,9 +158,8 @@ class DataCollatorCTCWithPadding:
         return batch
 
 
-def main():
+def parse_args():
     import argparse
-
     parser = argparse.ArgumentParser(
         description="Train Wav2Vec2 on local or remote machine."
     )
@@ -283,7 +282,10 @@ def main():
             CONFIG["hub_model_id"] = f"{prefix}-{base_name}"
         print(f"Hugging Face Hub Model ID set to: {CONFIG['hub_model_id']}")
 
-    # Paths and folders
+    return args
+
+
+def setup_directories():
     os.makedirs(CONFIG["output_dir"], exist_ok=True)
     folder_log_files = os.path.join(CONFIG["output_dir"], "logs-wav2vec2-res")
     folder_model_files = os.path.join(CONFIG["output_dir"], "wav2vec2-large-xlsr")
@@ -292,8 +294,10 @@ def main():
 
     print(f"Logs folder: {folder_log_files}")
     print(f"Model folder: {folder_model_files}")
+    return folder_log_files, folder_model_files
 
-    # Load CSVs
+
+def load_and_prepare_csvs():
     print("Loading CSVs...")
     df_train = _try_read_csv(CONFIG["train_csv"])
     df_valid = _try_read_csv(CONFIG["valid_csv"])
@@ -305,7 +309,6 @@ def main():
     print(f"Using audio column: '{audio_col}' | text column: '{text_col}'")
     print(f"Sizes: Train={len(df_train)}, Valid={len(df_valid)}, Test={len(df_test)}")
 
-    # Resolve paths & normalize transcriptions
     for df in (df_train, df_valid, df_test):
         df[audio_col] = df[audio_col].apply(
             lambda p: _resolve_audio_path(p, CONFIG["audio_dir"])
@@ -313,14 +316,16 @@ def main():
         df[text_col] = df[text_col].apply(normalize_text)
         df.dropna(subset=[audio_col, text_col], inplace=True)
 
-    # Audio file checks
     missing = [p for p in df_train[audio_col].tolist()[:50] if not os.path.exists(p)]
     if missing:
         print("WARNING: some audio files not found, e.g.:", missing[:5])
     else:
         print("Audio path checks passed (sampled).")
 
-    # Vocab / Tokenizer
+    return df_train, df_valid, df_test, audio_col, text_col
+
+
+def build_vocabulary_and_processor(df_train, df_valid, df_test, text_col, folder_model_files):
     print("Building vocabulary...")
     all_text = " ".join(
         pd.concat([df_train[text_col], df_valid[text_col], df_test[text_col]]).tolist()
@@ -357,8 +362,10 @@ def main():
     )
     processor.save_pretrained(folder_model_files)
     print("Skipping KenLM language model building as requested.")
+    return processor
 
-    # Build HuggingFace datasets
+
+def prepare_datasets(df_train, df_valid, df_test, audio_col, text_col, processor):
     print("Preparing HuggingFace Datasets...")
     from datasets import Features, Value
 
@@ -367,8 +374,6 @@ def main():
     )
 
     def df_to_ds(df):
-        # HuggingFace Datasets Audio feature expects a list of paths or dicts.
-        # Let's build a dict and pass features.
         data_dict = {"audio": df[audio_col].tolist(), "sentence": df[text_col].tolist()}
         ds = Dataset.from_dict(data_dict, features=features)
         return ds
@@ -404,7 +409,10 @@ def main():
         lambda x: x < MAX_INPUT_LENGTH, input_columns=["input_length"]
     )
 
-    # Load Metrics
+    return train_ds, valid_ds, test_ds_prepared
+
+
+def initialize_model_and_trainer(processor, train_ds, valid_ds, folder_model_files):
     wer_metric = evaluate.load("wer")
     cer_metric = evaluate.load("cer")
 
@@ -418,7 +426,6 @@ def main():
         cer = cer_metric.compute(predictions=pred_str, references=label_str)
         return {"wer": wer, "cer": cer}
 
-    # Load Model
     print(f"Loading base checkpoint: {CONFIG['base_checkpoint']}")
     model = Wav2Vec2ForCTC.from_pretrained(
         CONFIG["base_checkpoint"],
@@ -433,7 +440,6 @@ def main():
     )
     model.freeze_feature_encoder()
 
-    # Fine-tune training config
     training_args = TrainingArguments(
         output_dir=folder_model_files,
         group_by_length=True,
@@ -458,7 +464,7 @@ def main():
         push_to_hub=CONFIG["push_to_hub"],
         hub_model_id=CONFIG["hub_model_id"],
         hub_token=CONFIG["hub_token"],
-        hub_private_repo=True,  # Keeps models private
+        hub_private_repo=True,
     )
 
     data_collator = DataCollatorCTCWithPadding(processor=processor, padding=True)
@@ -473,6 +479,10 @@ def main():
         tokenizer=processor.feature_extractor,
     )
 
+    return trainer, data_collator
+
+
+def resolve_resume_checkpoint(args, folder_model_files):
     resume_checkpoint = None
     if args.resume_from_repo:
         print(f"Downloading checkpoint from repository: {args.resume_from_repo} (revision: {args.resume_from_revision or 'main'})")
@@ -500,14 +510,18 @@ def main():
             resume_checkpoint = args.resume_from_checkpoint
             print(f"Resuming from local checkpoint: {resume_checkpoint}")
 
+    return resume_checkpoint
+
+
+def train_model(trainer, resume_checkpoint, folder_model_files, processor):
     print("Starting training...")
     trainer.train(resume_from_checkpoint=resume_checkpoint)
-
     trainer.save_model(folder_model_files)
     processor.save_pretrained(folder_model_files)
     print("Training complete. Base model saved.")
 
-    # Evaluate checkpoints with pyctcdecode
+
+def evaluate_checkpoints(folder_model_files, test_ds_prepared, data_collator, processor):
     print("Starting KenLM post-decoding evaluation of checkpoints...")
     if torch.backends.mps.is_available():
         device = "mps"
@@ -517,7 +531,6 @@ def main():
         device = "cpu"
 
     import glob
-
     ckpt_dirs = glob.glob(os.path.join(folder_model_files, "checkpoint-*"))
 
     def _step(p):
@@ -682,9 +695,21 @@ def main():
 
     best_ckpt_label = best_unmasked_ckpt
     best_ckpt_path = dict(checkpoints)[best_ckpt_label]
-    print(f"\nBest checkpoint identified (for promotion): {best_ckpt_label}")
 
-    # Copy best checkpoint files to final model output
+    return (
+        best_unmasked_ckpt,
+        best_unmasked_wer,
+        best_masked_ckpt,
+        best_masked_wer,
+        best_ckpt_label,
+        best_ckpt_path,
+        rows_by_ckpt,
+        ranking_df,
+    )
+
+
+def promote_best_checkpoint(best_ckpt_label, best_ckpt_path, folder_model_files, processor):
+    print(f"\nBest checkpoint identified (for promotion): {best_ckpt_label}")
     for fname in os.listdir(best_ckpt_path):
         if fname in (
             "optimizer.pt",
@@ -699,11 +724,20 @@ def main():
         if os.path.isfile(src):
             shutil.copy2(src, os.path.join(folder_model_files, fname))
 
-    # Save final processor configuration
     processor.save_pretrained(folder_model_files)
     print(f"Promoted {best_ckpt_label} to final model directory.")
 
-    # Save results summary
+
+def save_results_summary(
+    rows_by_ckpt,
+    ranking_df,
+    best_unmasked_ckpt,
+    best_unmasked_wer,
+    best_masked_ckpt,
+    best_masked_wer,
+    best_ckpt_label,
+    folder_log_files,
+):
     all_rows = []
     for ckpt_label, rows in rows_by_ckpt.items():
         all_rows.extend(rows)
@@ -715,7 +749,6 @@ def main():
     )
     results_df.to_csv(per_sentence_csv, index=False, encoding="utf-8")
 
-    # Generate summary.txt
     summary_txt = os.path.join(
         folder_log_files, f"{output_prefix}-run{CONFIG['run_id']}-summary.txt"
     )
@@ -726,6 +759,47 @@ def main():
         f.write(f"Promoted checkpoint: {best_ckpt_label}\n")
         f.write(f"Ranking:\n{ranking_df.to_string()}\n")
     print(f"Summary written to {summary_txt}")
+
+
+def main():
+    args = parse_args()
+    folder_log_files, folder_model_files = setup_directories()
+    df_train, df_valid, df_test, audio_col, text_col = load_and_prepare_csvs()
+    processor = build_vocabulary_and_processor(
+        df_train, df_valid, df_test, text_col, folder_model_files
+    )
+    train_ds, valid_ds, test_ds_prepared = prepare_datasets(
+        df_train, df_valid, df_test, audio_col, text_col, processor
+    )
+    trainer, data_collator = initialize_model_and_trainer(
+        processor, train_ds, valid_ds, folder_model_files
+    )
+    resume_checkpoint = resolve_resume_checkpoint(args, folder_model_files)
+    train_model(trainer, resume_checkpoint, folder_model_files, processor)
+
+    (
+        best_unmasked_ckpt,
+        best_unmasked_wer,
+        best_masked_ckpt,
+        best_masked_wer,
+        best_ckpt_label,
+        best_ckpt_path,
+        rows_by_ckpt,
+        ranking_df,
+    ) = evaluate_checkpoints(folder_model_files, test_ds_prepared, data_collator, processor)
+
+    promote_best_checkpoint(best_ckpt_label, best_ckpt_path, folder_model_files, processor)
+
+    save_results_summary(
+        rows_by_ckpt,
+        ranking_df,
+        best_unmasked_ckpt,
+        best_unmasked_wer,
+        best_masked_ckpt,
+        best_masked_wer,
+        best_ckpt_label,
+        folder_log_files,
+    )
 
 
 if __name__ == "__main__":
