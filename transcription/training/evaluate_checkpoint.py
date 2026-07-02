@@ -81,30 +81,8 @@ def main():
     
     print(f"Number of test items: {len(df_test)}")
     
-    # Load processor and model
-    if os.path.exists(processor_path):
-        print(f"Loading processor from local path: {processor_path}...")
-    else:
-        print(f"Loading processor from Hugging Face Hub: {processor_path} (revision: {args.revision})...")
-    processor = Wav2Vec2Processor.from_pretrained(processor_path, token=token, revision=args.revision)
-    
-    if os.path.exists(checkpoint_path):
-        print(f"Loading model from local path: {checkpoint_path}...")
-    else:
-        print(f"Loading model from Hugging Face Hub: {checkpoint_path} (revision: {args.revision})...")
-    model = Wav2Vec2ForCTC.from_pretrained(checkpoint_path, token=token, revision=args.revision)
-    model.eval()
-    
-    # Device selection
-    if torch.backends.mps.is_available():
-        device = "mps"
-    elif torch.cuda.is_available():
-        device = "cuda"
-    else:
-        device = "cpu"
-    print(f"Using device: {device}")
-    model.to(device)
-    
+    from transcription.utils.evaluation import yield_single_checkpoint, run_evaluation
+
     # Prepare Dataset
     print("Preparing HuggingFace dataset...")
     data_dict = {
@@ -125,68 +103,39 @@ def main():
         return batch
         
     test_ds_prepared = test_ds.map(prepare_batch, remove_columns=[c for c in test_ds.column_names if c != "sentence"], num_proc=1)
-    
-    # Run Inference
-    print("Running batch inference...")
-    results = []
-    
-    for idx, ex in enumerate(tqdm(test_ds_prepared)):
-        input_values = torch.tensor([ex["input_values"]]).to(device)
-        with torch.no_grad():
-            logits = model(input_values=input_values).logits
-        
-        sliced_logits = logits[0]
-        res = greedy_inference(sliced_logits, processor)
-        hyp_greedy = res["text"]
-        
-        gold = ex["sentence"]
-        
-        def safe(s):
-            return s if s.strip() else " "
-            
-        wer_g = jiwer_wer(safe(gold), safe(hyp_greedy))
-        cer_g = jiwer_cer(safe(gold), safe(hyp_greedy))
-        
-        row_res = {
-            "idx": idx,
-            "gold": gold,
-            "greedy": hyp_greedy,
-            "wer_greedy": wer_g,
-            "cer_greedy": cer_g,
-        }
-            
-        results.append(row_res)
-        
-    results_df = pd.DataFrame(results)
-    
-    # Calculate overall metrics
-    golds = results_df["gold"].tolist()
-    greedies = results_df["greedy"].tolist()
-    
-    overall_wer_greedy = jiwer_wer(golds, greedies)
-    overall_cer_greedy = jiwer_cer(golds, greedies)
-    
-    print("\n" + "="*50)
-    print("OVERALL RAW METRICS ON TEST SET (WITH TONES & ORIGINAL TRANSC):")
-    print(f"Greedy: WER = {overall_wer_greedy:.4f} | CER = {overall_cer_greedy:.4f}")
-    print("="*50 + "\n")
-    
-    # Calculate tone-masked metrics
-    golds_masked = [strip_tones(g) for g in golds]
-    greedies_masked = [strip_tones(g) for g in greedies]
-    
-    overall_wer_greedy_masked = jiwer_wer(golds_masked, greedies_masked)
-    overall_cer_greedy_masked = jiwer_cer(golds_masked, greedies_masked)
-    
-    print("="*50)
-    print("OVERALL METRICS ON TEST SET WITH TONES MASKED (REMOVED):")
-    print(f"Greedy (Masked): WER = {overall_wer_greedy_masked:.4f} | CER = {overall_cer_greedy_masked:.4f}")
-    print("="*50 + "\n")
-    
-    # Save output to a file
-    os.makedirs("data/results", exist_ok=True)
-    results_df.to_csv("data/results/test_inference_results.csv", index=False)
-    print("Saved test results to data/results/test_inference_results.csv")
+
+    # Run Inference using unified helper
+    generator = yield_single_checkpoint(checkpoint_path, processor_path=processor_path, revision=args.revision, token=token)
+    rows_by_ckpt, ranking_df = run_evaluation(generator, test_ds_prepared)
+
+    if not ranking_df.empty:
+        # Convert rows_by_ckpt["checkpoint"] into the expected results_df format
+        rows = rows_by_ckpt["checkpoint"]
+        results_df = pd.DataFrame(rows).rename(columns={
+            "index": "idx",
+            "hyp_greedy": "greedy"
+        })
+
+        row = ranking_df.iloc[0]
+        overall_wer_greedy = row["agg_wer_greedy"]
+        overall_cer_greedy = row["agg_cer_greedy"]
+        overall_wer_greedy_masked = row["agg_wer_tone_masked"]
+        overall_cer_greedy_masked = row["agg_cer_tone_masked"]
+
+        print("\n" + "="*50)
+        print("OVERALL RAW METRICS ON TEST SET (WITH TONES & ORIGINAL TRANSC):")
+        print(f"Greedy: WER = {overall_wer_greedy:.4f} | CER = {overall_cer_greedy:.4f}")
+        print("="*50 + "\n")
+
+        print("="*50)
+        print("OVERALL METRICS ON TEST SET WITH TONES MASKED (REMOVED):")
+        print(f"Greedy (Masked): WER = {overall_wer_greedy_masked:.4f} | CER = {overall_cer_greedy_masked:.4f}")
+        print("="*50 + "\n")
+
+        # Save output to a file
+        os.makedirs("data/results", exist_ok=True)
+        results_df.to_csv("data/results/test_inference_results.csv", index=False)
+        print("Saved test results to data/results/test_inference_results.csv")
     
     # Display first few comparisons
     print("\nSample Comparisons:")

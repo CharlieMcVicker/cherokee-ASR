@@ -91,54 +91,7 @@ def main():
     df_test.dropna(subset=[audio_col, text_col], inplace=True)
     print(f"Number of test items: {len(df_test)}")
 
-    # Device selection
-    if torch.backends.mps.is_available():
-        device = "mps"
-    elif torch.cuda.is_available():
-        device = "cuda"
-    else:
-        device = "cpu"
-    print(f"Using device: {device}")
-
-    # Find checkpoints
-    ckpt_dirs = glob.glob(os.path.join(args.checkpoints_dir, "checkpoint-*"))
-    def _step(p):
-        m = re.search(r"checkpoint-(\d+)", os.path.basename(p))
-        return int(m.group(1)) if m else -1
-    ckpt_dirs = sorted(ckpt_dirs, key=_step)
-    
-    # Also evaluate the final promote model in checkpoints-dir itself if config exists
-    checkpoints = []
-    for d in ckpt_dirs:
-        if os.path.exists(os.path.join(d, "config.json")):
-            checkpoints.append((os.path.basename(d), d))
-            
-    if os.path.exists(os.path.join(args.checkpoints_dir, "config.json")):
-        checkpoints.append(("final", args.checkpoints_dir))
-
-    if not checkpoints:
-        print(f"No valid checkpoints found in {args.checkpoints_dir}")
-        return
-
-    print(f"Found {len(checkpoints)} checkpoints/models to evaluate.")
-
-    # Load processor
-    processor_path = args.processor
-    if not processor_path:
-        candidates = [
-            args.checkpoints_dir,
-            os.path.join(args.checkpoints_dir, "wav2vec2-large-xlsr"),
-            checkpoints[0][1]
-        ]
-        for cand in candidates:
-            if os.path.exists(os.path.join(cand, "vocab.json")):
-                processor_path = cand
-                break
-        if not processor_path:
-            processor_path = args.checkpoints_dir
-    
-    print(f"Loading processor from {processor_path}...")
-    processor = Wav2Vec2Processor.from_pretrained(processor_path)
+    from transcription.utils.evaluation import yield_local_checkpoints, run_evaluation
 
     # Prepare Dataset
     print("Preparing HuggingFace dataset...")
@@ -152,6 +105,26 @@ def main():
     })
     test_ds = Dataset.from_dict(data_dict, features=features)
 
+    processor_path = args.processor
+    if not processor_path:
+        ckpt_dirs = glob.glob(os.path.join(args.checkpoints_dir, "checkpoint-*"))
+        def _step(p):
+            m = re.search(r"checkpoint-(\d+)", os.path.basename(p))
+            return int(m.group(1)) if m else -1
+        ckpt_dirs = sorted(ckpt_dirs, key=_step)
+        candidates = [args.checkpoints_dir]
+        if ckpt_dirs:
+            candidates.append(ckpt_dirs[0])
+        for cand in candidates:
+            if os.path.exists(os.path.join(cand, "vocab.json")):
+                processor_path = cand
+                break
+        if not processor_path:
+            processor_path = args.checkpoints_dir
+
+    print(f"Loading processor for preparing dataset from {processor_path}...")
+    processor = Wav2Vec2Processor.from_pretrained(processor_path)
+
     def prepare_batch(batch):
         audio = batch["audio"]
         batch["input_values"] = processor(
@@ -161,103 +134,32 @@ def main():
         
     test_ds_prepared = test_ds.map(prepare_batch, remove_columns=[c for c in test_ds.column_names if c != "sentence"], num_proc=1)
 
-    scores = []
+    # Yield checkpoints and evaluate
+    generator = yield_local_checkpoints(args.checkpoints_dir, args.processor)
+    if not generator:
+        print(f"No valid checkpoints found in {args.checkpoints_dir}")
+        return
 
-    # Loop over all checkpoints
-    for idx, (name, ckpt_path) in enumerate(checkpoints):
-        print(f"\n[{idx+1}/{len(checkpoints)}] Evaluating checkpoint: {name} (path: {ckpt_path})")
-        
-        try:
-            # Load model
-            model = Wav2Vec2ForCTC.from_pretrained(ckpt_path)
-            model.eval()
-            model.to(device)
+    _, ranking_df = run_evaluation(generator, test_ds_prepared)
 
-            results = []
-            
-            for ex in test_ds_prepared:
-                input_values = torch.tensor([ex["input_values"]]).to(device)
-                with torch.no_grad():
-                    logits = model(input_values=input_values).logits
-                
-                sliced_logits = logits[0]
-                res = greedy_inference(sliced_logits, processor)
-                hyp_greedy = res["text"]
-                
-                gold = ex["sentence"]
-                
-                row_res = {
-                    "gold": gold,
-                    "greedy": hyp_greedy,
-                }
-                
-                results.append(row_res)
-            
-            # Calculate overall metrics
-            golds = [r["gold"] for r in results]
-            greedies = [r["greedy"] for r in results]
-            
-            def safe(s):
-                return s if s.strip() else " "
-
-            golds_safe = [safe(g) for g in golds]
-            greedies_safe = [safe(g) for g in greedies]
-
-            wer_greedy = jiwer_wer(golds_safe, greedies_safe)
-            cer_greedy = jiwer_cer(golds_safe, greedies_safe)
-            
-            # Vowel-length masked
-            golds_vowel_masked = [safe(strip_length(g)) for g in golds]
-            greedies_vowel_masked = [safe(strip_length(g)) for g in greedies]
-            wer_greedy_vowel_masked = jiwer_wer(golds_vowel_masked, greedies_vowel_masked)
-            cer_greedy_vowel_masked = jiwer_cer(golds_vowel_masked, greedies_vowel_masked)
-
-            # Tone masked
-            golds_tone_masked = [safe(strip_tones(g)) for g in golds]
-            greedies_tone_masked = [safe(strip_tones(g)) for g in greedies]
-            wer_greedy_tone_masked = jiwer_wer(golds_tone_masked, greedies_tone_masked)
-            cer_greedy_tone_masked = jiwer_cer(golds_tone_masked, greedies_tone_masked)
-
-            # Both masked
-            golds_both_masked = [safe(strip_both(g)) for g in golds]
-            greedies_both_masked = [safe(strip_both(g)) for g in greedies]
-            wer_greedy_both_masked = jiwer_wer(golds_both_masked, greedies_both_masked)
-            cer_greedy_both_masked = jiwer_cer(golds_both_masked, greedies_both_masked)
-            
-            score_entry = {
-                "checkpoint": name,
-                "path": ckpt_path,
-                "greedy_wer": wer_greedy,
-                "greedy_cer": cer_greedy,
-                "greedy_vowel_masked_wer": wer_greedy_vowel_masked,
-                "greedy_vowel_masked_cer": cer_greedy_vowel_masked,
-                "greedy_tone_masked_wer": wer_greedy_tone_masked,
-                "greedy_tone_masked_cer": cer_greedy_tone_masked,
-                "greedy_both_masked_wer": wer_greedy_both_masked,
-                "greedy_both_masked_cer": cer_greedy_both_masked,
-            }
-            
-            print(f"  Greedy: Raw WER = {wer_greedy:.4f} (CER = {cer_greedy:.4f}) | Vowel-Masked WER = {wer_greedy_vowel_masked:.4f} (CER = {cer_greedy_vowel_masked:.4f})")
-            scores.append(score_entry)
-            
-        except Exception as e:
-            print(f"Error evaluating checkpoint {name}: {e}")
-            
-        # Clean up memory
-        if 'model' in locals():
-            del model
-        if device == "cuda":
-            torch.cuda.empty_cache()
-        elif device == "mps":
-            torch.mps.empty_cache()
-            
-    if not scores:
+    if ranking_df.empty:
         print("\nNo checkpoints were successfully evaluated.")
         return
 
+    # Map the output ranking columns to match evaluate_local_checkpoints expected output
+    scores_df = ranking_df.rename(columns={
+        "agg_wer_greedy": "greedy_wer",
+        "agg_cer_greedy": "greedy_cer",
+        "agg_wer_greedy_masked": "greedy_vowel_masked_wer",
+        "agg_cer_greedy_masked": "greedy_vowel_masked_cer",
+        "agg_wer_tone_masked": "greedy_tone_masked_wer",
+        "agg_cer_tone_masked": "greedy_tone_masked_cer",
+        "agg_wer_both_masked": "greedy_both_masked_wer",
+        "agg_cer_both_masked": "greedy_both_masked_cer",
+    })
+
     # Save scores to CSV
     os.makedirs(os.path.dirname(args.output_csv), exist_ok=True)
-    scores_df = pd.DataFrame(scores)
     scores_df.to_csv(args.output_csv, index=False)
     print(f"\nSuccessfully saved scoring results to {args.output_csv}")
     print("\nRanking table (ordered by greedy_wer):")

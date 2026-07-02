@@ -76,13 +76,7 @@ def main():
     df_test.dropna(subset=[audio_col, text_col], inplace=True)
     print(f"Number of test items: {len(df_test)}")
 
-    if torch.backends.mps.is_available():
-        device = "mps"
-    elif torch.cuda.is_available():
-        device = "cuda"
-    else:
-        device = "cpu"
-    print(f"Using device: {device}")
+    from transcription.utils.evaluation import yield_hf_revisions, run_evaluation
 
     print("Preparing HuggingFace dataset...")
     data_dict = {
@@ -107,73 +101,29 @@ def main():
         
     test_ds_prepared = test_ds.map(prepare_batch, remove_columns=[c for c in test_ds.column_names if c != "sentence"], num_proc=1)
 
+    # Convert revisions_list to format expected by generator: [(name, rev_hash), ...]
+    generator_revs = [(name, rev_hash) for name, rev_hash, _ in revisions_list]
+
+    generator = yield_hf_revisions(args.checkpoint, generator_revs, token=token)
+
+    _, ranking_df = run_evaluation(generator, test_ds_prepared)
+
+    if ranking_df.empty:
+        print("\nNo revisions were successfully evaluated.")
+        return
+
     scores = []
+    for idx, row in ranking_df.iterrows():
+        name, rev_hash, _ = revisions_list[idx]
+        scores.append({
+            "name": name,
+            "revision": rev_hash,
+            "greedy_wer": row["agg_wer_greedy"],
+            "greedy_cer": row["agg_cer_greedy"],
+            "greedy_masked_wer": row["agg_wer_greedy_masked"],
+            "greedy_masked_cer": row["agg_cer_greedy_masked"],
+        })
 
-    for idx, (name, rev_hash, orig_rev_str) in enumerate(revisions_list):
-        print(f"\n[{idx+1}/{len(revisions_list)}] Evaluating revision: {rev_hash} ({name})")
-        
-        try:
-            model = Wav2Vec2ForCTC.from_pretrained(args.checkpoint, token=token, revision=rev_hash)
-            model.eval()
-            model.to(device)
-            
-            try:
-                current_processor = Wav2Vec2Processor.from_pretrained(args.checkpoint, token=token, revision=rev_hash)
-            except Exception:
-                current_processor = processor
-
-            results = []
-            
-            for ex in test_ds_prepared:
-                input_values = torch.tensor([ex["input_values"]]).to(device)
-                with torch.no_grad():
-                    logits = model(input_values=input_values).logits
-                
-                sliced_logits = logits[0]
-                res = greedy_inference(sliced_logits, current_processor)
-                hyp_greedy = res["text"]
-                
-                gold = ex["sentence"]
-                
-                row_res = {
-                    "gold": gold,
-                    "greedy": hyp_greedy,
-                }
-                results.append(row_res)
-            
-            # Calculate overall metrics
-            golds = [r["gold"] for r in results]
-            greedies = [r["greedy"] for r in results]
-            
-            wer_greedy = jiwer_wer(golds, greedies)
-            cer_greedy = jiwer_cer(golds, greedies)
-            
-            golds_masked = [strip_length(g) for g in golds]
-            greedies_masked = [strip_length(g) for g in greedies]
-            
-            wer_greedy_masked = jiwer_wer(golds_masked, greedies_masked)
-            cer_greedy_masked = jiwer_cer(golds_masked, greedies_masked)
-            
-            score_entry = {
-                "name": name,
-                "revision": rev_hash,
-                "greedy_wer": wer_greedy,
-                "greedy_cer": cer_greedy,
-                "greedy_masked_wer": wer_greedy_masked,
-                "greedy_masked_cer": cer_greedy_masked,
-            }
-            
-            print(f"  Greedy: Standard WER = {wer_greedy:.4f} (CER = {cer_greedy:.4f}) | Masked WER = {wer_greedy_masked:.4f} (CER = {cer_greedy_masked:.4f})")
-            scores.append(score_entry)
-            
-        except Exception as e:
-            print(f"Error evaluating revision {rev_hash}: {e}")
-            
-        if 'model' in locals():
-            del model
-        if torch.cuda.is_available():
-            torch.cuda.empty_cache()
-            
     scores_df = pd.DataFrame(scores)
     scores_df.to_csv(args.output_csv, index=False)
     print(f"\nSuccessfully saved scoring results to {args.output_csv}")

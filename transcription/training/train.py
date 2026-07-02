@@ -522,145 +522,18 @@ def train_model(trainer, resume_checkpoint, folder_model_files, processor):
 
 
 def evaluate_checkpoints(folder_model_files, test_ds_prepared, data_collator, processor):
-    print("Starting KenLM post-decoding evaluation of checkpoints...")
-    if torch.backends.mps.is_available():
-        device = "mps"
-    elif torch.cuda.is_available():
-        device = "cuda"
-    else:
-        device = "cpu"
-
-    import glob
-    ckpt_dirs = glob.glob(os.path.join(folder_model_files, "checkpoint-*"))
-
-    def _step(p):
-        m = re.search(r"checkpoint-(\d+)", os.path.basename(p))
-        return int(m.group(1)) if m else -1
-
-    ckpt_dirs = sorted(ckpt_dirs, key=_step)
-    checkpoints = [
-        (os.path.basename(d), d)
-        for d in ckpt_dirs
-        if os.path.exists(os.path.join(d, "config.json"))
-    ]
-
-    if not checkpoints:
-        print("No checkpoints found. Running evaluation on final model.")
-        checkpoints = [("final", folder_model_files)]
-
-    def safe(s):
-        return s if s.strip() else " "
-
-    from torch.utils.data import DataLoader
-    from tqdm import tqdm
-
-    rows_by_ckpt = {}
-    for ckpt_label, ckpt_path in checkpoints:
-        print(f"Evaluating checkpoint: {ckpt_label}")
-        ckpt_model = Wav2Vec2ForCTC.from_pretrained(ckpt_path)
-        ckpt_model.eval()
-        ckpt_model.to(device)
-
-        test_loader = DataLoader(
-            test_ds_prepared,
-            batch_size=CONFIG.get("eval_batch_size", 16),
-            collate_fn=data_collator,
-            shuffle=False,
-        )
-
-        all_logits = []
-        all_greedy_hypotheses = []
-
-        print("  Running GPU batch inference...")
-        for batch in tqdm(test_loader, desc=f"Inference ({ckpt_label})"):
-            input_values = batch["input_values"].to(device)
-            attention_mask = (
-                batch["attention_mask"].to(device)
-                if "attention_mask" in batch
-                else None
-            )
-
-            with torch.no_grad():
-                outputs = ckpt_model(
-                    input_values=input_values, attention_mask=attention_mask
-                )
-                logits = outputs.logits
-
-            if attention_mask is not None:
-                input_lengths = attention_mask.sum(dim=-1)
-                output_lengths = ckpt_model._get_feat_extract_output_lengths(
-                    input_lengths
-                )
-                output_lengths = output_lengths.cpu().numpy()
-            else:
-                output_lengths = [logits.shape[1]] * logits.shape[0]
-
-            logits_np = logits.cpu().numpy()
-            for i in range(len(logits_np)):
-                actual_len = int(output_lengths[i])
-                sliced = logits_np[i, :actual_len, :]
-                all_logits.append(sliced)
-
-                res = greedy_inference(sliced, processor)
-                hyp_greedy = res["text"]
-                all_greedy_hypotheses.append(hyp_greedy)
-
-        all_gold_sentences = [ex["sentence"] for ex in test_ds_prepared]
-        num_logits = len(all_logits)
-
-        ckpt_rows = []
-        for idx in range(num_logits):
-            reference = all_gold_sentences[idx]
-            hyp_greedy = all_greedy_hypotheses[idx]
-
-            ref_m = safe(reference)
-            hyp_g = safe(hyp_greedy)
-            ref_masked = safe(strip_length(reference))
-            hyp_masked = safe(strip_length(hyp_greedy))
-
-            ckpt_rows.append(
-                {
-                    "checkpoint": ckpt_label,
-                    "index": idx,
-                    "gold": reference,
-                    "hyp_greedy": hyp_greedy,
-                    "wer_greedy": jiwer_wer(ref_m, hyp_g),
-                    "cer_greedy": jiwer_cer(ref_m, hyp_g),
-                    "wer_greedy_masked": jiwer_wer(ref_masked, hyp_masked),
-                    "cer_greedy_masked": jiwer_cer(ref_masked, hyp_masked),
-                }
-            )
-        rows_by_ckpt[ckpt_label] = ckpt_rows
-        del ckpt_model
-        if device == "cuda":
-            torch.cuda.empty_cache()
-        elif device == "mps":
-            torch.mps.empty_cache()
-
-    ranking = []
-    for ckpt_label, rows in rows_by_ckpt.items():
-        df = pd.DataFrame(rows)
-        golds = list(df["gold"])
-        greedies = list(df["hyp_greedy"])
-        golds_masked = [safe(strip_length(g)) for g in golds]
-        greedies_masked = [safe(strip_length(g)) for g in greedies]
-
-        ranking.append(
-            {
-                "checkpoint": ckpt_label,
-                "median_wer_greedy": float(np.median(df["wer_greedy"])),
-                "median_cer_greedy": float(np.median(df["cer_greedy"])),
-                "agg_wer_greedy": jiwer_wer(golds, greedies),
-                "agg_cer_greedy": jiwer_cer(golds, greedies),
-                "median_wer_greedy_masked": float(np.median(df["wer_greedy_masked"])),
-                "median_cer_greedy_masked": float(np.median(df["cer_greedy_masked"])),
-                "agg_wer_greedy_masked": jiwer_wer(golds_masked, greedies_masked),
-                "agg_cer_greedy_masked": jiwer_cer(golds_masked, greedies_masked),
-            }
-        )
-
-    ranking_df = pd.DataFrame(ranking)
-
+    print("Starting post-training evaluation of checkpoints...")
+    from transcription.utils.evaluation import yield_local_checkpoints, run_evaluation
+    
+    generator = yield_local_checkpoints(folder_model_files, processor_path=folder_model_files)
+    
+    rows_by_ckpt, ranking_df = run_evaluation(
+        generator,
+        test_ds_prepared,
+        data_collator,
+        batch_size=CONFIG.get("eval_batch_size", 16)
+    )
+    
     # Find the best unmasked checkpoint
     ranking_unmasked = ranking_df.sort_values(
         by=[
@@ -694,7 +567,7 @@ def evaluate_checkpoints(folder_model_files, test_ds_prepared, data_collator, pr
     print(f"==========================================\n")
 
     best_ckpt_label = best_unmasked_ckpt
-    best_ckpt_path = dict(checkpoints)[best_ckpt_label]
+    best_ckpt_path = ranking_df[ranking_df["checkpoint"] == best_ckpt_label].iloc[0]["path"]
 
     return (
         best_unmasked_ckpt,
@@ -706,6 +579,7 @@ def evaluate_checkpoints(folder_model_files, test_ds_prepared, data_collator, pr
         rows_by_ckpt,
         ranking_df,
     )
+
 
 
 def promote_best_checkpoint(best_ckpt_label, best_ckpt_path, folder_model_files, processor):
