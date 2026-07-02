@@ -30,7 +30,7 @@ from transformers import (
 )
 from datasets import Dataset, Audio
 from jiwer import wer as jiwer_wer, cer as jiwer_cer
-from transcription.inference.infer import greedy_inference
+from transcription.inference.infer import greedy_inference, strip_length
 
 TARGET_SAMPLE_RATE = 16000
 apostrophe_variants = r"[’‘ʼʻ`´‛]"  # curly, modifier letter, grave/acute, etc.
@@ -601,14 +601,20 @@ def main():
             hyp_greedy = all_greedy_hypotheses[idx]
 
             ref_m = safe(reference)
+            hyp_g = safe(hyp_greedy)
+            ref_masked = safe(strip_length(reference))
+            hyp_masked = safe(strip_length(hyp_greedy))
+
             ckpt_rows.append(
                 {
                     "checkpoint": ckpt_label,
                     "index": idx,
                     "gold": reference,
                     "hyp_greedy": hyp_greedy,
-                    "wer_greedy": jiwer_wer(ref_m, safe(hyp_greedy)),
-                    "cer_greedy": jiwer_cer(ref_m, safe(hyp_greedy)),
+                    "wer_greedy": jiwer_wer(ref_m, hyp_g),
+                    "cer_greedy": jiwer_cer(ref_m, hyp_g),
+                    "wer_greedy_masked": jiwer_wer(ref_masked, hyp_masked),
+                    "cer_greedy_masked": jiwer_cer(ref_masked, hyp_masked),
                 }
             )
         rows_by_ckpt[ckpt_label] = ckpt_rows
@@ -621,33 +627,62 @@ def main():
     ranking = []
     for ckpt_label, rows in rows_by_ckpt.items():
         df = pd.DataFrame(rows)
+        golds = list(df["gold"])
+        greedies = list(df["hyp_greedy"])
+        golds_masked = [safe(strip_length(g)) for g in golds]
+        greedies_masked = [safe(strip_length(g)) for g in greedies]
+
         ranking.append(
             {
                 "checkpoint": ckpt_label,
                 "median_wer_greedy": float(np.median(df["wer_greedy"])),
                 "median_cer_greedy": float(np.median(df["cer_greedy"])),
-                "agg_wer_greedy": jiwer_wer(list(df["gold"]), list(df["hyp_greedy"])),
-                "agg_cer_greedy": jiwer_cer(list(df["gold"]), list(df["hyp_greedy"])),
+                "agg_wer_greedy": jiwer_wer(golds, greedies),
+                "agg_cer_greedy": jiwer_cer(golds, greedies),
+                "median_wer_greedy_masked": float(np.median(df["wer_greedy_masked"])),
+                "median_cer_greedy_masked": float(np.median(df["cer_greedy_masked"])),
+                "agg_wer_greedy_masked": jiwer_wer(golds_masked, greedies_masked),
+                "agg_cer_greedy_masked": jiwer_cer(golds_masked, greedies_masked),
             }
         )
 
-    ranking_df = (
-        pd.DataFrame(ranking)
-        .sort_values(
-            by=[
-                "median_wer_greedy",
-                "median_cer_greedy",
-                "agg_wer_greedy",
-                "agg_cer_greedy",
-            ],
-            ascending=True,
-        )
-        .reset_index(drop=True)
-    )
+    ranking_df = pd.DataFrame(ranking)
 
-    best_ckpt_label = ranking_df.iloc[0]["checkpoint"]
+    # Find the best unmasked checkpoint
+    ranking_unmasked = ranking_df.sort_values(
+        by=[
+            "median_wer_greedy",
+            "median_cer_greedy",
+            "agg_wer_greedy",
+            "agg_cer_greedy",
+        ],
+        ascending=True,
+    ).reset_index(drop=True)
+    best_unmasked_ckpt = ranking_unmasked.iloc[0]["checkpoint"]
+    best_unmasked_wer = ranking_unmasked.iloc[0]["agg_wer_greedy"]
+
+    # Find the best masked checkpoint
+    ranking_masked = ranking_df.sort_values(
+        by=[
+            "median_wer_greedy_masked",
+            "median_cer_greedy_masked",
+            "agg_wer_greedy_masked",
+            "agg_cer_greedy_masked",
+        ],
+        ascending=True,
+    ).reset_index(drop=True)
+    best_masked_ckpt = ranking_masked.iloc[0]["checkpoint"]
+    best_masked_wer = ranking_masked.iloc[0]["agg_wer_greedy_masked"]
+
+    print(f"\n==========================================")
+    print(f"EVALUATION SUMMARY:")
+    print(f"Best Unmasked Checkpoint: {best_unmasked_ckpt} (WER: {best_unmasked_wer:.4f})")
+    print(f"Best Masked Checkpoint:   {best_masked_ckpt} (WER: {best_masked_wer:.4f})")
+    print(f"==========================================\n")
+
+    best_ckpt_label = best_unmasked_ckpt
     best_ckpt_path = dict(checkpoints)[best_ckpt_label]
-    print(f"\nBest checkpoint identified: {best_ckpt_label}")
+    print(f"\nBest checkpoint identified (for promotion): {best_ckpt_label}")
 
     # Copy best checkpoint files to final model output
     for fname in os.listdir(best_ckpt_path):
@@ -686,6 +721,8 @@ def main():
     )
     with open(summary_txt, "w", encoding="utf-8") as f:
         f.write(f"ASR Language: {CONFIG['asr_lang']}\nRun ID: {CONFIG['run_id']}\n")
+        f.write(f"Best Unmasked Checkpoint: {best_unmasked_ckpt} (WER: {best_unmasked_wer:.4f})\n")
+        f.write(f"Best Masked Checkpoint:   {best_masked_ckpt} (WER: {best_masked_wer:.4f})\n")
         f.write(f"Promoted checkpoint: {best_ckpt_label}\n")
         f.write(f"Ranking:\n{ranking_df.to_string()}\n")
     print(f"Summary written to {summary_txt}")
