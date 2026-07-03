@@ -158,7 +158,9 @@ def main():
         # 2. Reformat transcription
         raw_text = row[args.text_col]
         if isinstance(raw_text, str):
-            raw_text = raw_text.replace("*", "")
+            raw_text = raw_text.lower().replace("*", "").replace("ʔ", "'")
+            for char in ["ʼ", "‚"]:
+                raw_text = raw_text.replace(char, "")
         norm_text, should_drop = remove_tones_and_double_vowels(raw_text)
         if should_drop:
             dropped_tone_count += 1
