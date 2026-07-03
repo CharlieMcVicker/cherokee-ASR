@@ -35,7 +35,7 @@ RUN python3 -c "from transformers import Wav2Vec2ForCTC; Wav2Vec2ForCTC.from_pre
 
 # Copy the package source and data directories directly into the container
 COPY transcription /workspace/transcription
-COPY data /workspace/data
+COPY training_data /workspace/training_data
 
 # Ensure Python knows where to find the transcription package modules
 ENV PYTHONPATH="/workspace:${PYTHONPATH}"

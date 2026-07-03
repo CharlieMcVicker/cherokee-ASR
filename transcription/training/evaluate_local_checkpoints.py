@@ -75,8 +75,8 @@ def _resolve_audio_path(p, dataset_path):
 def main():
     parser = argparse.ArgumentParser(description="Evaluate all local Wav2Vec2 checkpoints on a test dataset.")
     parser.add_argument("--checkpoints-dir", type=str, default="output_w2v2/wav2vec2-large-xlsr", help="Directory containing checkpoint directories.")
-    parser.add_argument("--test-csv", type=str, default="data/processed/cim-wav2vec2-test.csv", help="Path to the test CSV file.")
-    parser.add_argument("--audio-dir", type=str, default="data/processed/sentence_audio", help="Directory containing audio files.")
+    parser.add_argument("--test-csv", type=str, default="training_data/processed/cim-wav2vec2-test.csv", help="Path to the test CSV file.")
+    parser.add_argument("--audio-dir", type=str, default="training_data/processed/sentence_audio", help="Directory containing audio files.")
     parser.add_argument("--output-csv", type=str, default="data/results/local_checkpoint_scores.csv", help="Output path for the scoring CSV.")
     parser.add_argument("--processor", type=str, default=None, help="Path or HF repo ID to the processor (defaults to checkpoints-dir).")
     args = parser.parse_args()

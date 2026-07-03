@@ -36,8 +36,8 @@ def safe(s):
 def main():
     parser = argparse.ArgumentParser(description="Evaluate multiple model revisions on a test dataset.")
     parser.add_argument("--revisions-csv", type=str, default="data/results/revisions_to_test.tsv", help="Path to TSV or CSV listing revisions.")
-    parser.add_argument("--test-csv", type=str, default="data/processed/cim-wav2vec2-test.csv", help="Path to the test CSV file.")
-    parser.add_argument("--audio-dir", type=str, default="data/processed/sentence_audio", help="Directory containing audio files.")
+    parser.add_argument("--test-csv", type=str, default="training_data/processed/cim-wav2vec2-test.csv", help="Path to the test CSV file.")
+    parser.add_argument("--audio-dir", type=str, default="training_data/processed/sentence_audio", help="Directory containing audio files.")
     parser.add_argument("--checkpoint", type=str, default="charliemcvicker/length-only-20260702-173608-asr-cherokee", help="Hugging Face repo ID to the model checkpoint.")
     parser.add_argument("--output-csv", type=str, default="data/results/revision_scores.csv", help="Output path for the scoring CSV.")
     parser.add_argument("--hf-token", type=str, default=None, help="Hugging Face Hub authentication token.")

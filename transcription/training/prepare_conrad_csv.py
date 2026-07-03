@@ -12,8 +12,8 @@ from transcription.training.prepare_csv import clean_transcription
 
 
 def main():
-    conrad_csv = "data/processed/conrad-wavs-all.csv"
-    train_csv = "data/processed/cim-wav2vec2-train.csv"
+    conrad_csv = "training_data/processed/conrad-wavs-all.csv"
+    train_csv = "training_data/processed/cim-wav2vec2-train.csv"
 
     if not os.path.exists(conrad_csv):
         print(f"Error: Conrad CSV '{conrad_csv}' not found.")

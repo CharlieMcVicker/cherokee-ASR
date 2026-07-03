@@ -38,10 +38,10 @@ chars_to_remove_regex = r"[\,\?\.\!\-\;\:\"\“\%\”\\(\)\[\]\{\}«»…]"
 
 # CONFIGURATION DICTIONARY
 CONFIG = {
-    "train_csv": "data/processed/cim-wav2vec2-train.csv",
-    "valid_csv": "data/processed/cim-wav2vec2-valid.csv",
-    "test_csv": "data/processed/cim-wav2vec2-test.csv",
-    "audio_dir": "data/processed/sentence_audio",
+    "train_csv": "training_data/processed/cim-wav2vec2-train.csv",
+    "valid_csv": "training_data/processed/cim-wav2vec2-valid.csv",
+    "test_csv": "training_data/processed/cim-wav2vec2-test.csv",
+    "audio_dir": "training_data/processed/sentence_audio",
     "output_dir": "output_w2v2",
     "base_checkpoint": "facebook/wav2vec2-large-xlsr-53",
     "asr_lang": "cim",
