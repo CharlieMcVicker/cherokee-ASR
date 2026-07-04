@@ -140,6 +140,8 @@ def main():
     empty_transcripts = 0
     duration_filtered = 0
     dropped_tone_count = 0
+    dropped_f_count = 0
+    dropped_b_count = 0
 
     for row in samples:
         filename = row['audio']
@@ -158,6 +160,14 @@ def main():
         # 2. Reformat transcription
         raw_text = row[args.text_col]
         if isinstance(raw_text, str):
+            # First step: drop wordfinal ';' and replace word medial ';' with ':'
+            words = raw_text.split()
+            processed_words = []
+            for w in words:
+                stripped = w.rstrip(';')
+                processed_words.append(stripped.replace(';', ':'))
+            raw_text = " ".join(processed_words)
+
             raw_text = raw_text.lower().replace("*", "").replace("ʔ", "'")
             for char in ["ʼ", "‚"]:
                 raw_text = raw_text.replace(char, "")
@@ -166,10 +176,23 @@ def main():
             dropped_tone_count += 1
             continue
             
+        # Final step: remove all colons (those that weren't placed by vowels, remaining after tone normalizer)
+        norm_text = norm_text.replace(":", "")
+        # Replace doubled vowels VV with V: for long vowels
+        for v in ["a", "e", "i", "o", "u", "v"]:
+            norm_text = norm_text.replace(v + v, v + ":")
         cleaned_text = clean_transcription(norm_text)
         
         if cleaned_text == "":
             empty_transcripts += 1
+            continue
+
+        # Drop rows containing 'f' or 'b'
+        if "f" in cleaned_text:
+            dropped_f_count += 1
+            continue
+        if "b" in cleaned_text:
+            dropped_b_count += 1
             continue
 
         # 3. Filter by duration
@@ -188,6 +211,10 @@ def main():
         print(f"Note: {dropped_tone_count} samples dropped due to rare tone/diacritic marks.")
     if empty_transcripts > 0:
         print(f"Note: {empty_transcripts} empty transcripts removed.")
+    if dropped_f_count > 0:
+        print(f"Note: {dropped_f_count} samples dropped due to containing 'f'.")
+    if dropped_b_count > 0:
+        print(f"Note: {dropped_b_count} samples dropped due to containing 'b'.")
     if duration_filtered > 0:
         print(f"Note: {duration_filtered} samples dropped for exceeding maximum duration of {args.max_duration}s.")
 
