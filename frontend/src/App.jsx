@@ -1,6 +1,22 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import WaveSurfer from 'wavesurfer.js';
 import RegionsPlugin from 'wavesurfer.js/dist/plugins/regions.esm.js';
+import { openDB } from 'idb';
+
+const initDB = async () => {
+  return await openDB('cherokee-search-db', 1, {
+    upgrade(db) {
+      if (!db.objectStoreNames.contains('segments')) {
+        const segStore = db.createObjectStore('segments', { keyPath: 'id' });
+        segStore.createIndex('by-file', 'file_path');
+      }
+      if (!db.objectStoreNames.contains('file_words')) {
+        const fwStore = db.createObjectStore('file_words', { keyPath: 'id' });
+        fwStore.createIndex('by-file', 'file_path');
+      }
+    }
+  });
+};
 
 const THEMES = {
   minimalLight: {
@@ -757,7 +773,7 @@ function View2({ theme }) {
 
   const formatText = (txt) => {
     if (!txt) return txt;
-    return showTones ? txt : txt.replace(/[0-9]/g, '');
+    return showTones ? txt : txt.replace(/[0-9]/g, '').replace(/([aeiouvAEIOUV])\1+/g, '$1');
   };
 
   const getProcessedWordConfidences = (segment) => {
@@ -1106,40 +1122,14 @@ function View2({ theme }) {
  );
 }
 
-// A simple Levenshtein distance function
-function levenshtein(s, t) {
-  if (s === t) return 0;
-  if (s.length === 0) return t.length;
-  if (t.length === 0) return s.length;
-
-  const v0 = new Array(t.length + 1);
-  const v1 = new Array(t.length + 1);
-
-  for (let i = 0; i <= t.length; i++) {
-    v0[i] = i;
-  }
-
-  for (let i = 0; i < s.length; i++) {
-    v1[0] = i + 1;
-    for (let j = 0; j < t.length; j++) {
-      const cost = s[i] === t[j] ? 0 : 1;
-      v1[j + 1] = Math.min(v1[j] + 1, v0[j + 1] + 1, v0[j] + cost);
-    }
-    for (let j = 0; j <= t.length; j++) {
-      v0[j] = v1[j];
-    }
-  }
-
-  return v0[t.length];
-}
 
 function View3({ theme }) {
   const t = theme;
   const [csvFiles, setCsvFiles] = useState([]);
   const [selectedCsv, setSelectedCsv] = useState("");
-  const [segments, setSegments] = useState([]);
   const [status, setStatus] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [syncing, setSyncing] = useState(false);
+  const [isSynced, setIsSynced] = useState(false);
 
   const [searchVal, setSearchVal] = useState("");
   const [debouncedSearchVal, setDebouncedSearchVal] = useState("");
@@ -1180,35 +1170,9 @@ function View3({ theme }) {
       .catch(err => console.log("Failed to fetch files", err));
   }, []);
 
-  const loadData = async (file) => {
-    if (!file) return;
-    setLoading(true);
-    setStatus("Loading data...");
-    try {
-      const res = await fetch(`http://localhost:8000/api/labeler/data?file=${encodeURIComponent(file)}`);
-      const result = await res.json();
-      if (res.ok && result.status === 'success') {
-        setSegments(result.data);
-        setStatus(null);
-      } else {
-        setStatus(`❌ Error: ${result.detail || result.message}`);
-      }
-    } catch (err) {
-      setStatus(`❌ Error fetching data: ${err.message}`);
-    }
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearchVal(searchVal);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [searchVal]);
-
   const formatText = (txt) => {
     if (!txt) return txt;
-    return txt.replace(/[0-9]/g, '');
+    return txt.replace(/[0-9]/g, '').replace(/([aeiouvAEIOUV])\1+/g, '$1');
   };
 
   const getProcessedWordConfidences = (segment) => {
@@ -1241,66 +1205,196 @@ function View3({ theme }) {
   };
 
   useEffect(() => {
-    if (!debouncedSearchVal.trim() || segments.length === 0) {
+    const checkIfSynced = async (file) => {
+      if (!file) { setIsSynced(false); setStatus(null); return; }
+      try {
+        const db = await initDB();
+        const count = await db.transaction('segments').store.index('by-file').count(file);
+        setIsSynced(count > 0);
+        if (count > 0) setStatus(`Ready to search in ${file} (locally cached)`);
+        else setStatus(`Please sync data for ${file} before searching`);
+      } catch (e) {
+        console.error(e);
+        setIsSynced(false);
+      }
+    };
+    checkIfSynced(selectedCsv);
+  }, [selectedCsv]);
+
+  const syncData = async () => {
+    const file = selectedCsv;
+    if (!file) return;
+    setSyncing(true);
+    setStatus("Syncing data to local database...");
+    try {
+      const res = await fetch(`http://localhost:8000/api/labeler/data?file=${encodeURIComponent(file)}`);
+      const result = await res.json();
+      if (res.ok && result.status === 'success') {
+        const db = await initDB();
+        const tx = db.transaction(['segments', 'file_words'], 'readwrite');
+        const segStore = tx.objectStore('segments');
+        const wordStore = tx.objectStore('file_words');
+        
+        const oldSegKeys = await segStore.index('by-file').getAllKeys(file);
+        for(const k of oldSegKeys) segStore.delete(k);
+        const oldWordKeys = await wordStore.index('by-file').getAllKeys(file);
+        for(const k of oldWordKeys) wordStore.delete(k);
+
+        const segmentsData = result.data;
+        const fileWordsMap = new Map();
+        
+        const getWordAlternatives = (wordObj) => {
+          if (!wordObj.chars || wordObj.chars.length === 0) return [{ word: wordObj.word, confidence: wordObj.confidence }];
+          let beams = [{ text: "", confProd: 1 }];
+          for (const charObj of wordObj.chars) {
+            const options = [{ char: charObj.char, conf: charObj.confidence }];
+            if (charObj.alternatives) {
+              charObj.alternatives.forEach(alt => options.push({ char: alt.char, conf: alt.confidence }));
+            }
+            options.sort((a, b) => b.conf - a.conf);
+            const topOptions = options.slice(0, 5);
+            
+            const newBeams = [];
+            for (const beam of beams) {
+              for (const opt of topOptions) {
+                // normalize by the max confidence character so the greedy path has confProd=1
+                const normalizedConf = opt.conf / options[0].conf;
+                newBeams.push({ text: beam.text + opt.char, confProd: beam.confProd * normalizedConf });
+              }
+            }
+            newBeams.sort((a, b) => b.confProd - a.confProd);
+            beams = newBeams.slice(0, 5);
+          }
+          return beams.map(b => ({ word: b.text, confidence: wordObj.confidence * b.confProd }));
+        };
+
+        for (let idx = 0; idx < segmentsData.length; idx++) {
+           const seg = segmentsData[idx];
+           seg.id = `${file}_${idx}`;
+           seg.file_path = file;
+           segStore.put(seg);
+           
+           const wordsInfo = getProcessedWordConfidences(seg);
+           wordsInfo.forEach(wObj => {
+              const top5Words = getWordAlternatives(wObj);
+              top5Words.forEach((altWordObj, rank) => {
+                  const wordClean = formatText(altWordObj.word).toLowerCase();
+                  if (!wordClean) return;
+                  const wordKey = `${file}_${wordClean}_${rank}`; // ensure unique key for alternatives
+                  if (!fileWordsMap.has(wordClean)) {
+                      fileWordsMap.set(wordClean, {
+                          id: wordKey,
+                          file_path: file,
+                          word: wordClean,
+                          segments: []
+                      });
+                  }
+                  fileWordsMap.get(wordClean).segments.push({
+                      segmentIndex: idx,
+                      wordInfo: wObj,
+                      altWordInfo: altWordObj,
+                      rank: rank
+                  });
+              });
+           });
+        }
+        
+        for (const val of fileWordsMap.values()) {
+            wordStore.put(val);
+        }
+        
+        await tx.done;
+        setStatus(`✅ Sync complete! ${segmentsData.length} segments indexed.`);
+        setIsSynced(true);
+      } else {
+        setStatus(`❌ Error: ${result.detail || result.message}`);
+      }
+    } catch (err) {
+      setStatus(`❌ Error syncing data: ${err.message}`);
+    }
+    setSyncing(false);
+  };
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchVal(searchVal);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchVal]);
+
+  useEffect(() => {
+    if (!debouncedSearchVal.trim() || !isSynced || !selectedCsv) {
       setResults([]);
       return;
     }
 
-    const query = formatText(debouncedSearchVal.trim()).toLowerCase();
-    const matched = [];
+    const searchAsync = async () => {
+      const query = formatText(debouncedSearchVal.trim()).toLowerCase();
+      const db = await initDB();
+      const wordsForFile = await db.getAllFromIndex('file_words', 'by-file', selectedCsv);
+      
+      const bestMatchPerSegment = new Map();
 
-    segments.forEach((seg, idx) => {
-      const words = getProcessedWordConfidences(seg);
-      let bestDist = Infinity;
-      let matchedWordInfo = null;
-
-      words.forEach(wObj => {
-        const wordClean = formatText(wObj.word).toLowerCase();
-        if (!wordClean) return;
+      wordsForFile.forEach(fwObj => {
+        const wordClean = fwObj.word;
+        let baseDist = Infinity;
         
-        let matchTypeDist = Infinity;
-        const levDist = levenshtein(query, wordClean);
-        
-        if (levDist === 0) {
-          matchTypeDist = 0; // Exact match
+        if (wordClean === query) {
+          baseDist = 0;
         } else if (wordClean.startsWith(query)) {
-          matchTypeDist = 1; // Starts With
+          baseDist = 1;
         } else if (wordClean.includes(query)) {
-          matchTypeDist = 2; // Includes
-        } else if (levDist === 1) {
-          matchTypeDist = 3; // 1-Letter Off
+          baseDist = 2;
         }
 
-        if (matchTypeDist < bestDist) {
-          bestDist = matchTypeDist;
-          matchedWordInfo = wObj;
-        } else if (matchTypeDist === bestDist && matchedWordInfo && wObj.confidence > matchedWordInfo.confidence) {
-          // If same match type, pick the one with higher confidence
-          matchedWordInfo = wObj;
+        if (baseDist < Infinity) {
+          fwObj.segments.forEach(segInfo => {
+             const isAlt = (segInfo.rank > 0);
+             const matchTypeDist = baseDist * 2 + (isAlt ? 1 : 0);
+             
+             const confidence = segInfo.altWordInfo ? segInfo.altWordInfo.confidence : segInfo.wordInfo.confidence;
+
+             const existing = bestMatchPerSegment.get(segInfo.segmentIndex);
+             if (!existing || matchTypeDist < existing.distance || (matchTypeDist === existing.distance && confidence > existing.confidence)) {
+                 bestMatchPerSegment.set(segInfo.segmentIndex, {
+                     segmentIndex: segInfo.segmentIndex,
+                     matchWordInfo: segInfo.wordInfo,
+                     altWordInfo: segInfo.altWordInfo,
+                     rank: segInfo.rank,
+                     distance: matchTypeDist,
+                     confidence: confidence
+                 });
+             }
+          });
         }
       });
+      
+      const matched = Array.from(bestMatchPerSegment.values());
 
-      if (matchedWordInfo) {
-        matched.push({
-          segmentIndex: idx,
-          segment: seg,
-          matchWordInfo: matchedWordInfo,
-          distance: bestDist,
-          confidence: matchedWordInfo.confidence
-        });
+      matched.sort((a, b) => {
+        if (a.distance !== b.distance) {
+          return a.distance - b.distance;
+        }
+        return b.confidence - a.confidence;
+      });
+
+      const tx = db.transaction('segments');
+      const resultsWithSegments = [];
+      for (const m of matched) {
+         const seg = await tx.store.get(`${selectedCsv}_${m.segmentIndex}`);
+         if (seg) {
+             resultsWithSegments.push({
+                 ...m,
+                 segment: seg
+             });
+         }
       }
-    });
+      
+      setResults(resultsWithSegments);
+    };
 
-    // Sort: dist 0 first, then dist 1. For same dist, highest confidence first.
-    matched.sort((a, b) => {
-      if (a.distance !== b.distance) {
-        return a.distance - b.distance;
-      }
-      return b.confidence - a.confidence;
-    });
-
-    setResults(matched);
-  }, [debouncedSearchVal, segments]);
+    searchAsync();
+  }, [debouncedSearchVal, isSynced, selectedCsv]);
 
   const renderTranscriptionWithHighlight = (segment, matchedWordInfo) => {
     const wordConfs = getProcessedWordConfidences(segment);
@@ -1413,19 +1507,25 @@ function View3({ theme }) {
       
       <div className={`${t.card} p-6 mb-6`}>
         <div className="flex flex-col md:flex-row gap-4 mb-4">
-          <div className="flex-1">
-            <label className={`block text-sm font-medium ${t.label} mb-1`}>Results CSV File</label>
-            <select 
-              className={`w-full p-3 ${t.input}`} 
-              value={selectedCsv} 
-              onChange={e => {
-                setSelectedCsv(e.target.value);
-                loadData(e.target.value);
-              }}
+          <div className="flex gap-2 items-end">
+            <div className="flex-1">
+              <label className={`block text-sm font-medium ${t.label} mb-1`}>Results CSV File</label>
+              <select 
+                className={`w-full p-3 ${t.input} mb-0`} 
+                value={selectedCsv} 
+                onChange={e => setSelectedCsv(e.target.value)}
+              >
+                <option value="">-- Select CSV File --</option>
+                {csvFiles.map(f => <option key={f} value={f}>{f}</option>)}
+              </select>
+            </div>
+            <button
+              className={`${t.buttonPrimary} py-3 mb-[8px]`}
+              onClick={syncData}
+              disabled={!selectedCsv || syncing}
             >
-              <option value="">-- Select CSV File --</option>
-              {csvFiles.map(f => <option key={f} value={f}>{f}</option>)}
-            </select>
+              {syncing ? "Syncing..." : "Sync Data"}
+            </button>
           </div>
           <div className="flex-1">
             <label className={`block text-sm font-medium ${t.label} mb-1`}>Search Term</label>
@@ -1435,29 +1535,21 @@ function View3({ theme }) {
               placeholder="Type a word..." 
               value={searchVal}
               onChange={e => setSearchVal(e.target.value)}
-              disabled={!selectedCsv || loading}
+              disabled={!selectedCsv || !isSynced || syncing}
             />
           </div>
         </div>
         {status && <div className={`p-2 ${status.includes('❌') ? t.errorMsg : t.inputInfo}`}>{status}</div>}
       </div>
 
-      {debouncedSearchVal && results.length > 0 && (
-        <div className="mb-4 font-bold opacity-80 text-center">
-          Found {results.length} matches for "{debouncedSearchVal}"
-        </div>
-      )}
+      {(() => {
+        const LOW_CONFIDENCE_THRESHOLD = 0.30;
+        const highConfResults = results.filter(r => r.confidence >= LOW_CONFIDENCE_THRESHOLD);
+        const lowConfResults = results.filter(r => r.confidence < LOW_CONFIDENCE_THRESHOLD);
 
-      {debouncedSearchVal && results.length === 0 && segments.length > 0 && (
-        <div className={`p-6 text-center border ${t.inputInfo}`}>
-          No matches found for "{debouncedSearchVal}".
-        </div>
-      )}
-
-      <div className="space-y-8">
-        {results.map((res, index) => {
+        const renderResultItem = (res, index, isLowConf) => {
           const mainIdx = res.segmentIndex;
-          const mainSeg = segments[mainIdx];
+          const mainSeg = res.segment;
           
           let manifestInfo = null;
           for (const key in manifestMap) {
@@ -1468,30 +1560,46 @@ function View3({ theme }) {
           }
 
           return (
-            <div key={`${mainIdx}-${index}`} className={`border ${t.card} p-4 rounded shadow`}>
+            <div key={`${mainIdx}-${index}`} className={`border ${t.card} p-4 rounded shadow ${isLowConf ? 'opacity-60 grayscale' : ''}`}>
               <div className="flex justify-between items-center mb-4 pb-2 border-b border-gray-300 dark:border-gray-700">
                 <div>
                   <span className="font-bold mr-4 text-lg">Match {index + 1}</span>
+                  {isLowConf && (
+                    <span className="text-sm mr-4 px-2 py-0.5 rounded bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-300 border border-gray-400 dark:border-gray-500 font-bold uppercase tracking-wider">
+                      Low Confidence Result
+                    </span>
+                  )}
                   {res.distance === 0 && (
                     <span className="text-sm mr-4 px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 border border-blue-300 dark:border-blue-700 font-bold">
                       Exact Match
                     </span>
                   )}
                   {res.distance === 1 && (
+                    <span className="text-sm mr-4 px-2 py-0.5 rounded bg-cyan-100 dark:bg-cyan-900 text-cyan-800 dark:text-cyan-200 border border-cyan-300 dark:border-cyan-700 font-bold">
+                      Alternative Exact Match
+                    </span>
+                  )}
+                  {res.distance === 2 && (
                     <span className="text-sm mr-4 px-2 py-0.5 rounded bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 border border-purple-300 dark:border-purple-700 font-bold">
                       Starts With
                     </span>
                   )}
-                  {res.distance === 2 && (
+                  {res.distance === 3 && (
+                    <span className="text-sm mr-4 px-2 py-0.5 rounded bg-fuchsia-100 dark:bg-fuchsia-900 text-fuchsia-800 dark:text-fuchsia-200 border border-fuchsia-300 dark:border-fuchsia-700 font-bold">
+                      Alternative Starts With
+                    </span>
+                  )}
+                  {res.distance === 4 && (
                     <span className="text-sm mr-4 px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300 border border-gray-300 dark:border-gray-600 font-bold">
                       Contains
                     </span>
                   )}
-                  {res.distance === 3 && (
-                    <span className="text-sm mr-4 px-2 py-0.5 rounded bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200 border border-orange-300 dark:border-orange-700 font-bold">
-                      1-Letter Off
+                  {res.distance === 5 && (
+                    <span className="text-sm mr-4 px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-300 border border-slate-300 dark:border-slate-600 font-bold">
+                      Alternative Contains
                     </span>
                   )}
+
                   <span className="text-sm opacity-80">Confidence: </span>
                   <span className={`text-sm ${getConfidenceClass(res.confidence)}`}>{(res.confidence * 100).toFixed(1)}%</span>
                 </div>
@@ -1522,8 +1630,277 @@ function View3({ theme }) {
               </div>
             </div>
           );
-        })}
+        };
+
+        return (
+          <>
+            {debouncedSearchVal && results.length === 0 && isSynced && (
+              <div className={`p-6 text-center border ${t.inputInfo}`}>
+                No matches found for "{debouncedSearchVal}".
+              </div>
+            )}
+            
+            {debouncedSearchVal && results.length > 0 && (
+              <div className="mb-4 font-bold opacity-80 text-center">
+                Found {highConfResults.length} matches for "{debouncedSearchVal}"
+                {lowConfResults.length > 0 && ` (and ${lowConfResults.length} low confidence results hidden below)`}
+              </div>
+            )}
+            
+            <div className="space-y-8">
+              {highConfResults.map((res, index) => renderResultItem(res, index, false))}
+              
+              {lowConfResults.length > 0 && (
+                <div className="mt-12 mb-6">
+                  <div className="flex items-center justify-center space-x-4">
+                    <div className="flex-1 h-px bg-gray-300 dark:bg-gray-700"></div>
+                    <div className="text-gray-500 font-bold uppercase tracking-wider text-sm">Low Confidence Results</div>
+                    <div className="flex-1 h-px bg-gray-300 dark:bg-gray-700"></div>
+                  </div>
+                </div>
+              )}
+              
+              {lowConfResults.map((res, index) => renderResultItem(res, highConfResults.length + index, true))}
+            </div>
+          </>
+        );
+      })()}
+    </div>
+  );
+}
+
+function View4({ theme }) {
+  const t = theme;
+  const [csvFiles, setCsvFiles] = useState([]);
+  const [selectedCsv, setSelectedCsv] = useState("");
+  const [manifestMap, setManifestMap] = useState({});
+  const [audioFiles, setAudioFiles] = useState([]);
+  const [selectedAudio, setSelectedAudio] = useState("");
+  const [lyricsData, setLyricsData] = useState([]);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const wavesurferRef = useRef(null);
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    fetch("http://localhost:8000/api/audio/audiofiles-to-transcribe/segmentation_manifest.csv")
+      .then(res => {
+        if (!res.ok) throw new Error("No manifest");
+        return res.text();
+      })
+      .then(text => {
+        const map = {};
+        const lines = text.split('\n');
+        for (let i = 1; i < lines.length; i++) {
+          const cols = lines[i].split(',');
+          if (cols.length >= 4) {
+            const segmentedPath = cols[1].trim();
+            map[segmentedPath] = {
+              original: cols[0].trim(),
+              start: parseInt(cols[2]),
+              end: parseInt(cols[3])
+            };
+          }
+        }
+        setManifestMap(map);
+      })
+      .catch(() => setManifestMap({}));
+
+    fetch("http://localhost:8000/api/files")
+      .then(res => res.json())
+      .then(data => setCsvFiles(data.csv_files || []))
+      .catch(console.error);
+  }, []);
+
+  useEffect(() => {
+    if (!selectedCsv) return;
+    fetch(`http://localhost:8000/api/labeler/data?file=${encodeURIComponent(selectedCsv)}`)
+      .then(res => res.json())
+      .then(data => {
+        const segmentsByAudio = {};
+        data.forEach(row => {
+           let manifest = null;
+           for (const key in manifestMap) {
+              if (row.file_path.endsWith(key)) {
+                 manifest = manifestMap[key];
+                 break;
+              }
+           }
+           
+           if (manifest) {
+              const orig = manifest.original;
+              if (!segmentsByAudio[orig]) segmentsByAudio[orig] = { url: `wav/${orig}`, segments: [] };
+              segmentsByAudio[orig].segments.push({ ...row, manifest });
+           } else {
+              const orig = row.file_path;
+              if (!segmentsByAudio[orig]) segmentsByAudio[orig] = { url: orig, segments: [] };
+              segmentsByAudio[orig].segments.push({ ...row, manifest: { original: orig, start: 0, end: 1000000 } });
+           }
+        });
+        
+        const files = Object.keys(segmentsByAudio).sort();
+        setAudioFiles(files.map(f => ({ name: f, url: segmentsByAudio[f].url, segments: segmentsByAudio[f].segments })));
+        setSelectedAudio("");
+        setLyricsData([]);
+      })
+      .catch(console.error);
+  }, [selectedCsv, manifestMap]);
+
+  useEffect(() => {
+    if (!selectedAudio || audioFiles.length === 0) return;
+    const fileData = audioFiles.find(f => f.name === selectedAudio);
+    if (!fileData) return;
+
+    const sortedSegments = [...fileData.segments].sort((a, b) => a.manifest.start - b.manifest.start);
+    
+    let words = [];
+    sortedSegments.forEach(seg => {
+       const startSec = seg.manifest.start / 1000;
+       const endSec = seg.manifest.end / 1000;
+       const duration = endSec - startSec;
+       
+       if (seg.word_confidences && seg.word_confidences.length > 0) {
+           const totalChars = seg.word_confidences.reduce((sum, w) => sum + w.word.length, 0);
+           let currentLen = 0;
+           seg.word_confidences.forEach(w => {
+               let wStart = startSec;
+               let wEnd = endSec;
+               
+               if (w.start_time !== undefined && w.end_time !== undefined) {
+                   wStart = startSec + w.start_time;
+                   wEnd = startSec + w.end_time;
+               } else {
+                   wStart = startSec + (currentLen / Math.max(1, totalChars)) * duration;
+                   wEnd = startSec + ((currentLen + w.word.length) / Math.max(1, totalChars)) * duration;
+                   currentLen += w.word.length;
+               }
+               
+               words.push({
+                   word: w.word,
+                   start_time: wStart,
+                   end_time: wEnd,
+                   confidence: w.confidence
+               });
+           });
+       }
+    });
+    
+    setLyricsData(words);
+  }, [selectedAudio, audioFiles]);
+
+  useEffect(() => {
+    if (!selectedAudio || audioFiles.length === 0) return;
+    const fileData = audioFiles.find(f => f.name === selectedAudio);
+    if (!fileData) return;
+    
+    const ws = WaveSurfer.create({
+      container: containerRef.current,
+      waveColor: 'rgba(59, 130, 246, 0.5)',
+      progressColor: 'rgba(37, 99, 235, 0.8)',
+      cursorColor: 'rgb(37, 99, 235)',
+      barWidth: 2,
+      barGap: 1,
+      barRadius: 2,
+      height: 80,
+      normalize: true
+    });
+    
+    ws.load(`http://localhost:8000/api/audio/${fileData.url}`);
+    
+    ws.on('timeupdate', (time) => setCurrentTime(time));
+    ws.on('seek', (progress) => setCurrentTime(progress * ws.getDuration()));
+    ws.on('play', () => setIsPlaying(true));
+    ws.on('pause', () => setIsPlaying(false));
+    
+    wavesurferRef.current = ws;
+    
+    return () => {
+       ws.destroy();
+    };
+  }, [selectedAudio]);
+
+  const togglePlay = () => wavesurferRef.current?.playPause();
+  const skip = (s) => wavesurferRef.current?.setTime(Math.max(0, Math.min(wavesurferRef.current.getCurrentTime() + s, wavesurferRef.current.getDuration())));
+  const jumpToTime = (time) => {
+      if (wavesurferRef.current) {
+          wavesurferRef.current.setTime(time);
+          wavesurferRef.current.play();
+      }
+  };
+
+  return (
+    <div className="max-w-4xl mx-auto text-center">
+      <h2 className={`text-3xl font-bold mb-6 ${t.viewTitle}`}>4. Listen</h2>
+      <p className={`${t.viewDesc} mb-8`}>Listen to full audio files with synced lyrics highlighting.</p>
+
+      <div className={`${t.card} p-6 mb-6`}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
+            <div>
+              <label className={`block text-sm font-medium ${t.label} mb-2`}>1. Select Results CSV</label>
+              <select className={`w-full p-2 ${t.input}`} value={selectedCsv} onChange={e => setSelectedCsv(e.target.value)}>
+                <option value="">-- Choose CSV --</option>
+                {csvFiles.map(f => <option key={f} value={f}>{f}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className={`block text-sm font-medium ${t.label} mb-2`}>2. Select Original Audio</label>
+              <select className={`w-full p-2 ${t.input}`} value={selectedAudio} onChange={e => setSelectedAudio(e.target.value)} disabled={!selectedCsv || audioFiles.length === 0}>
+                <option value="">-- Choose Audio File --</option>
+                {audioFiles.map(f => <option key={f.name} value={f.name}>{f.name} ({f.segments.length} segments)</option>)}
+              </select>
+            </div>
+        </div>
       </div>
+
+      {selectedAudio && (
+        <div className={`border rounded shadow-lg overflow-hidden ${t.card} p-0`}>
+          <div className="p-4 bg-gray-900 text-white flex flex-col items-center border-b border-gray-700">
+             <div ref={containerRef} className="w-full mb-4"></div>
+             <div className="flex items-center space-x-6">
+                <button onClick={() => skip(-10)} className="hover:text-blue-400 transition-colors">
+                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 17l-5-5 5-5M18 17l-5-5 5-5"/></svg>
+                </button>
+                <button onClick={togglePlay} className="p-3 bg-blue-600 rounded-full hover:bg-blue-500 transition-colors">
+                   {isPlaying ? (
+                       <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+                   ) : (
+                       <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M5 3l14 9-14 9V3z"/></svg>
+                   )}
+                </button>
+                <button onClick={() => skip(10)} className="hover:text-blue-400 transition-colors">
+                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M13 17l5-5-5-5M6 17l5-5-5-5"/></svg>
+                </button>
+             </div>
+          </div>
+          <div className="p-8 max-h-[60vh] overflow-y-auto bg-black text-center scroll-smooth">
+             <div className="max-w-2xl mx-auto space-x-2 space-y-4 leading-loose">
+                 {lyricsData.length === 0 ? (
+                    <div className="text-gray-500 italic">No lyrics found for this audio.</div>
+                 ) : (
+                    lyricsData.map((item, idx) => {
+                        const isActive = currentTime >= item.start_time && currentTime <= item.end_time;
+                        const isPast = currentTime > item.end_time;
+                        
+                        let colorClass = "text-gray-500 hover:text-gray-300"; // future
+                        if (isActive) colorClass = "text-white font-bold scale-110 drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]";
+                        else if (isPast) colorClass = "text-gray-300 hover:text-white";
+                        
+                        return (
+                           <span 
+                              key={idx} 
+                              onClick={() => jumpToTime(item.start_time)}
+                              className={`inline-block text-2xl transition-all duration-200 cursor-pointer ${colorClass}`}
+                              title={`Confidence: ${(item.confidence * 100).toFixed(1)}%`}
+                           >
+                              {item.word}
+                           </span>
+                        );
+                    })
+                 )}
+             </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -1533,6 +1910,7 @@ const TABS = [
   { id: 1, name: "Batch Inference", title: "Batch Inference" },
   { id: 2, name: "Review", title: "Review Tool" },
   { id: 3, name: "Search", title: "Search" },
+  { id: 4, name: "Listen", title: "Listen" },
 ];
 
 export default function App() {
@@ -1612,6 +1990,7 @@ export default function App() {
           {activeTab === 1 && <View1 theme={t} />}
           {activeTab === 2 && <View2 theme={t} />}
           {activeTab === 3 && <View3 theme={t} />}
+          {activeTab === 4 && <View4 theme={t} />}
         </div>
       </main>
     </div>

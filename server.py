@@ -1088,19 +1088,27 @@ def get_labeler_data(file: str = "data/results/batch_inference_results.csv"):
                                         char_idx += 1
                                 if w_chars:
                                     avg_c = float(np.mean([c.get("confidence", 0.0) for c in w_chars])) if w_chars else 0.0
-                                    new_word_confs.append({
+                                    new_word = {
                                         "word": tw,
                                         "confidence": avg_c,
                                         "chars": w_chars
-                                    })
+                                    }
+                                    if "start_time" in w_chars[0]:
+                                        new_word["start_time"] = w_chars[0]["start_time"]
+                                        new_word["end_time"] = round(w_chars[-1].get("start_time", 0) + 0.02, 3)
+                                    new_word_confs.append(new_word)
                             if char_idx < len(all_chars):
                                 rem = all_chars[char_idx:]
                                 avg_c = float(np.mean([c.get("confidence", 0.0) for c in rem])) if rem else 0.0
-                                new_word_confs.append({
+                                new_word = {
                                     "word": "".join([c.get("char", "") for c in rem]),
                                     "confidence": avg_c,
                                     "chars": rem
-                                })
+                                }
+                                if "start_time" in rem[0]:
+                                    new_word["start_time"] = rem[0]["start_time"]
+                                    new_word["end_time"] = round(rem[-1].get("start_time", 0) + 0.02, 3)
+                                new_word_confs.append(new_word)
                             word_confs = new_word_confs
                     except:
                         pass

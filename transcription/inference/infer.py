@@ -82,6 +82,7 @@ def calculate_word_confidences(probs, pred_ids, processor):
     chars = []
     char_probs = []
     char_alts = []
+    char_times = []
     
     top_k = 5
     top_k_indices = np.argsort(probs, axis=-1)[:, -top_k:][:, ::-1]
@@ -100,6 +101,7 @@ def calculate_word_confidences(probs, pred_ids, processor):
             if token_str:
                 chars.append(token_str)
                 char_probs.append(float(token_probs[i]))
+                char_times.append(round(i * 0.02, 3))
                 
                 alts = []
                 for k in range(top_k):
@@ -119,19 +121,31 @@ def calculate_word_confidences(probs, pred_ids, processor):
     words_details = []
     current_word = ""
     current_chars = []
-    for char, prob, alts in zip(chars, char_probs, char_alts):
+    for char, prob, alts, time in zip(chars, char_probs, char_alts, char_times):
         if char == " ":
             if current_word:
                 word_conf = float(np.mean([c["confidence"] for c in current_chars]))
-                words_details.append({"word": current_word, "confidence": word_conf, "chars": current_chars})
+                words_details.append({
+                    "word": current_word,
+                    "confidence": word_conf,
+                    "start_time": current_chars[0]["start_time"],
+                    "end_time": round(current_chars[-1]["start_time"] + 0.02, 3),
+                    "chars": current_chars
+                })
                 current_word = ""
                 current_chars = []
         else:
             current_word += char
-            current_chars.append({"char": char, "confidence": prob, "alternatives": alts})
+            current_chars.append({"char": char, "confidence": prob, "start_time": time, "alternatives": alts})
     if current_word:
         word_conf = float(np.mean([c["confidence"] for c in current_chars]))
-        words_details.append({"word": current_word, "confidence": word_conf, "chars": current_chars})
+        words_details.append({
+            "word": current_word,
+            "confidence": word_conf,
+            "start_time": current_chars[0]["start_time"],
+            "end_time": round(current_chars[-1]["start_time"] + 0.02, 3),
+            "chars": current_chars
+        })
         
     return words_details
 
