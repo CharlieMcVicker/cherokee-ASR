@@ -87,14 +87,29 @@ def segment_audio_from_profile(dbfs_profile, total_duration_ms, step_ms=10, min_
     if last_end < len(is_silent):
         nonsilent_ranges.append((last_end, len(is_silent)))
         
-    # Map steps back to milliseconds and apply keep_silence padding
+    # Map steps back to milliseconds and apply keep_silence padding without causing adjacent segment overlap
     segments = []
-    for start_step, end_step in nonsilent_ranges:
+    num_ranges = len(nonsilent_ranges)
+    for idx, (start_step, end_step) in enumerate(nonsilent_ranges):
         start_ms = start_step * step_ms
         end_ms = end_step * step_ms
         
-        pad_start = max(0, start_ms - keep_silence)
-        pad_end = min(total_duration_ms, end_ms + keep_silence)
+        # Calculate start padding
+        if idx == 0:
+            pad_start = max(0, start_ms - keep_silence)
+        else:
+            prev_end_ms = nonsilent_ranges[idx - 1][1] * step_ms
+            gap_before = max(0, start_ms - prev_end_ms)
+            pad_start = start_ms - min(keep_silence, gap_before // 2)
+            
+        # Calculate end padding
+        if idx == num_ranges - 1:
+            pad_end = min(total_duration_ms, end_ms + keep_silence)
+        else:
+            next_start_ms = nonsilent_ranges[idx + 1][0] * step_ms
+            gap_after = max(0, next_start_ms - end_ms)
+            pad_end = end_ms + min(keep_silence, gap_after // 2)
+            
         segments.append({
             'start': pad_start,
             'end': pad_end,

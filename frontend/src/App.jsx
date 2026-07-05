@@ -4,14 +4,28 @@ import RegionsPlugin from 'wavesurfer.js/dist/plugins/regions.esm.js';
 import { openDB } from 'idb';
 
 const initDB = async () => {
-  return await openDB('cherokee-search-db', 1, {
-    upgrade(db) {
+  return await openDB('cherokee-search-db', 2, {
+    upgrade(db, oldVersion, newVersion, transaction) {
+      let segStore;
       if (!db.objectStoreNames.contains('segments')) {
-        const segStore = db.createObjectStore('segments', { keyPath: 'id' });
-        segStore.createIndex('by-file', 'file_path');
+        segStore = db.createObjectStore('segments', { keyPath: 'id' });
+      } else {
+        segStore = transaction.objectStore('segments');
       }
+      if (!segStore.indexNames.contains('by-csv')) {
+        segStore.createIndex('by-csv', 'csv_file');
+      }
+      if (segStore.indexNames.contains('by-file')) {
+        segStore.deleteIndex('by-file');
+      }
+      
+      let fwStore;
       if (!db.objectStoreNames.contains('file_words')) {
-        const fwStore = db.createObjectStore('file_words', { keyPath: 'id' });
+        fwStore = db.createObjectStore('file_words', { keyPath: 'id' });
+      } else {
+        fwStore = transaction.objectStore('file_words');
+      }
+      if (!fwStore.indexNames.contains('by-file')) {
         fwStore.createIndex('by-file', 'file_path');
       }
     }
@@ -122,10 +136,30 @@ function SegmentHistogram({ preview, theme }) {
   );
 }
 
-function FileSegmentCard({ preview, theme, onSettingChange, onResetSetting }) {
+function FileSegmentCard({ preview, theme, onSettingChange, onResetSetting, onSmartSettingsChange }) {
   const t = theme;
   const [showSettings, setShowSettings] = useState(false);
+  const [isSmartLoading, setIsSmartLoading] = useState(false);
   const settings = preview.settings || { silence_thresh: -40, min_silence_len: 500, keep_silence: 100 };
+
+  const handleSmartSeg = async () => {
+    setIsSmartLoading(true);
+    try {
+      const res = await fetch("http://localhost:8000/api/smart_segment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ file_path: preview.file })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        onSmartSettingsChange(preview.file, data);
+        setShowSettings(true);
+      }
+    } catch (e) {
+      console.error("Smart Segment Error:", e);
+    }
+    setIsSmartLoading(false);
+  };
 
   return (
     <div className={`p-4 border ${t.card} text-left mb-4 rounded shadow-sm relative`}>
@@ -134,13 +168,23 @@ function FileSegmentCard({ preview, theme, onSettingChange, onResetSetting }) {
           <h4 className="font-bold text-base break-all">{preview.filename}</h4>
           <span className="text-xs opacity-75 font-mono">{preview.file} ({formatDuration(preview.total_duration)})</span>
         </div>
-        <button 
-          type="button"
-          onClick={() => setShowSettings(!showSettings)}
-          className={`text-xs px-3 py-1 border ${t.buttonSecondary} flex items-center gap-1`}
-        >
-          ⚙️ {showSettings ? "Hide Sliders" : "Custom Sliders"}
-        </button>
+        <div className="flex gap-2">
+          <button 
+            type="button"
+            onClick={handleSmartSeg}
+            disabled={isSmartLoading}
+            className={`text-xs px-3 py-1 border ${t.buttonPrimary} flex items-center gap-1 bg-indigo-100 hover:bg-indigo-200 text-indigo-900 border-indigo-300 dark:bg-indigo-900 dark:text-indigo-100 dark:border-indigo-700 disabled:opacity-50`}
+          >
+            {isSmartLoading ? "⏳ Computing..." : "✨ Smart Seg"}
+          </button>
+          <button 
+            type="button"
+            onClick={() => setShowSettings(!showSettings)}
+            className={`text-xs px-3 py-1 border ${t.buttonSecondary} flex items-center gap-1`}
+          >
+            ⚙️ {showSettings ? "Hide Sliders" : "Custom Sliders"}
+          </button>
+        </div>
       </div>
 
       <div className="flex flex-wrap gap-3 mb-4 mt-2">
@@ -282,6 +326,16 @@ function View0({ theme }) {
       [filePath]: {
         ...(prev[filePath] || globalSettings),
         [key]: value
+      }
+    }));
+  };
+
+  const handleSmartSettingsChange = (filePath, newSettings) => {
+    setFileSettings(prev => ({
+      ...prev,
+      [filePath]: {
+        ...(prev[filePath] || globalSettings),
+        ...newSettings
       }
     }));
   };
@@ -449,6 +503,7 @@ function View0({ theme }) {
                 theme={t} 
                 onSettingChange={handlePerFileSettingChange}
                 onResetSetting={handleResetFileSetting}
+                onSmartSettingsChange={handleSmartSettingsChange}
               />
             ))}
 
@@ -786,6 +841,11 @@ function View2({ theme }) {
  const [csvFiles, setCsvFiles] = useState([]);
  const [selectedCsv, setSelectedCsv] = useState("");
  const [showTones, setShowTones] = useState(true);
+ const [visibleCount, setVisibleCount] = useState(200);
+
+ useEffect(() => {
+   setVisibleCount(200);
+ }, [searchVal, selectedCsv]);
 
   const formatText = (txt) => {
     if (!txt) return txt;
@@ -1225,7 +1285,7 @@ function View3({ theme }) {
       if (!file) { setIsSynced(false); setStatus(null); return; }
       try {
         const db = await initDB();
-        const count = await db.transaction('segments').store.index('by-file').count(file);
+        const count = await db.transaction('segments').store.index('by-csv').count(file);
         setIsSynced(count > 0);
         if (count > 0) setStatus(`Ready to search in ${file} (locally cached)`);
         else setStatus(`Please sync data for ${file} before searching`);
@@ -1251,7 +1311,7 @@ function View3({ theme }) {
         const segStore = tx.objectStore('segments');
         const wordStore = tx.objectStore('file_words');
         
-        const oldSegKeys = await segStore.index('by-file').getAllKeys(file);
+        const oldSegKeys = await segStore.index('by-csv').getAllKeys(file);
         for(const k of oldSegKeys) segStore.delete(k);
         const oldWordKeys = await wordStore.index('by-file').getAllKeys(file);
         for(const k of oldWordKeys) wordStore.delete(k);
@@ -1287,7 +1347,7 @@ function View3({ theme }) {
         for (let idx = 0; idx < segmentsData.length; idx++) {
            const seg = segmentsData[idx];
            seg.id = `${file}_${idx}`;
-           seg.file_path = file;
+           seg.csv_file = file;
            segStore.put(seg);
            
            const wordsInfo = getProcessedWordConfidences(seg);
@@ -1698,6 +1758,32 @@ function View4({ theme }) {
   const wavesurferRef = useRef(null);
   const containerRef = useRef(null);
 
+  const { activeItem, activeSegmentIdx } = useMemo(() => {
+      if (activeTab !== 4) return { activeItem: null, activeSegmentIdx: -1 };
+      let actItem = null;
+      let actSeg = -1;
+      lyricsData.forEach((segment, segIdx) => {
+          segment.forEach(item => {
+              if (currentTime >= item.start_time && currentTime < item.end_time) {
+                  if (!actItem || item.start_time >= actItem.start_time) {
+                      actItem = item;
+                      actSeg = segIdx;
+                  }
+              }
+          });
+      });
+      return { activeItem: actItem, activeSegmentIdx: actSeg };
+  }, [currentTime, lyricsData, activeTab]);
+
+  useEffect(() => {
+      if (activeTab === 4 && activeSegmentIdx >= 0) {
+          const el = document.getElementById(`segment-${activeSegmentIdx}`);
+          if (el) {
+              el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+      }
+  }, [activeSegmentIdx, activeTab]);
+
   useEffect(() => {
     fetch("http://localhost:8000/api/audio/audiofiles-to-transcribe/segmentation_manifest.csv")
       .then(res => {
@@ -1732,12 +1818,13 @@ function View4({ theme }) {
     if (!selectedCsv) return;
     fetch(`http://localhost:8000/api/labeler/data?file=${encodeURIComponent(selectedCsv)}`)
       .then(res => res.json())
-      .then(data => {
+      .then(result => {
+        const rows = result.data || (Array.isArray(result) ? result : []);
         const segmentsByAudio = {};
-        data.forEach(row => {
+        rows.forEach(row => {
            let manifest = null;
            for (const key in manifestMap) {
-              if (row.file_path.endsWith(key)) {
+              if (row.file_path && row.file_path.endsWith(key)) {
                  manifest = manifestMap[key];
                  break;
               }
@@ -1745,7 +1832,7 @@ function View4({ theme }) {
            
            if (manifest) {
               const orig = manifest.original;
-              if (!segmentsByAudio[orig]) segmentsByAudio[orig] = { url: `wav/${orig}`, segments: [] };
+              if (!segmentsByAudio[orig]) segmentsByAudio[orig] = { url: `audiofiles-to-transcribe/${orig}`, segments: [] };
               segmentsByAudio[orig].segments.push({ ...row, manifest });
            } else {
               const orig = row.file_path;
@@ -1755,8 +1842,13 @@ function View4({ theme }) {
         });
         
         const files = Object.keys(segmentsByAudio).sort();
-        setAudioFiles(files.map(f => ({ name: f, url: segmentsByAudio[f].url, segments: segmentsByAudio[f].segments })));
-        setSelectedAudio("");
+        const parsedAudioFiles = files.map(f => ({ name: f, url: segmentsByAudio[f].url, segments: segmentsByAudio[f].segments }));
+        setAudioFiles(parsedAudioFiles);
+        if (parsedAudioFiles.length > 0) {
+          setSelectedAudio(parsedAudioFiles[0].name);
+        } else {
+          setSelectedAudio("");
+        }
         setLyricsData([]);
       })
       .catch(console.error);
@@ -1769,7 +1861,7 @@ function View4({ theme }) {
 
     const sortedSegments = [...fileData.segments].sort((a, b) => a.manifest.start - b.manifest.start);
     
-    let words = [];
+    let segmentsData = [];
     sortedSegments.forEach(seg => {
        const startSec = seg.manifest.start / 1000;
        const endSec = seg.manifest.end / 1000;
@@ -1778,6 +1870,7 @@ function View4({ theme }) {
        if (seg.word_confidences && seg.word_confidences.length > 0) {
            const totalChars = seg.word_confidences.reduce((sum, w) => sum + w.word.length, 0);
            let currentLen = 0;
+           let segmentWords = [];
            seg.word_confidences.forEach(w => {
                let wStart = startSec;
                let wEnd = endSec;
@@ -1791,17 +1884,18 @@ function View4({ theme }) {
                    currentLen += w.word.length;
                }
                
-               words.push({
+               segmentWords.push({
                    word: w.word,
                    start_time: wStart,
                    end_time: wEnd,
                    confidence: w.confidence
                });
            });
+           segmentsData.push(segmentWords);
        }
     });
     
-    setLyricsData(words);
+    setLyricsData(segmentsData);
   }, [selectedAudio, audioFiles]);
 
   useEffect(() => {
@@ -1850,27 +1944,28 @@ function View4({ theme }) {
       <p className={`${t.viewDesc} mb-8`}>Listen to full audio files with synced lyrics highlighting.</p>
 
       <div className={`${t.card} p-6 mb-6`}>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
-            <div>
-              <label className={`block text-sm font-medium ${t.label} mb-2`}>1. Select Results CSV</label>
-              <select className={`w-full p-2 ${t.input}`} value={selectedCsv} onChange={e => setSelectedCsv(e.target.value)}>
-                <option value="">-- Choose CSV --</option>
-                {csvFiles.map(f => <option key={f} value={f}>{f}</option>)}
-              </select>
-            </div>
-            <div>
-              <label className={`block text-sm font-medium ${t.label} mb-2`}>2. Select Original Audio</label>
-              <select className={`w-full p-2 ${t.input}`} value={selectedAudio} onChange={e => setSelectedAudio(e.target.value)} disabled={!selectedCsv || audioFiles.length === 0}>
-                <option value="">-- Choose Audio File --</option>
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-left">
+          <div className="flex-1 w-full">
+            <label className={`block text-sm font-medium ${t.label} mb-2`}>Select Results CSV</label>
+            <select className={`w-full p-3 ${t.input}`} value={selectedCsv} onChange={e => setSelectedCsv(e.target.value)}>
+              <option value="">-- Choose CSV File --</option>
+              {csvFiles.map(f => <option key={f} value={f}>{f}</option>)}
+            </select>
+          </div>
+          {audioFiles.length > 1 && (
+            <div className="flex-1 w-full">
+              <label className={`block text-sm font-medium ${t.label} mb-2`}>Source Audio File</label>
+              <select className={`w-full p-3 ${t.input}`} value={selectedAudio} onChange={e => setSelectedAudio(e.target.value)}>
                 {audioFiles.map(f => <option key={f.name} value={f.name}>{f.name} ({f.segments.length} segments)</option>)}
               </select>
             </div>
+          )}
         </div>
       </div>
 
       {selectedAudio && (
         <div className={`border rounded shadow-lg overflow-hidden ${t.card} p-0`}>
-          <div className="p-4 bg-gray-900 text-white flex flex-col items-center border-b border-gray-700">
+          <div className="p-4 flex flex-col items-center border-b border-gray-500" style={{ backgroundColor: 'rgba(128,128,128,0.1)' }}>
              <div ref={containerRef} className="w-full mb-4"></div>
              <div className="flex items-center space-x-6">
                 <button onClick={() => skip(-10)} className="hover:text-blue-400 transition-colors">
@@ -1888,30 +1983,34 @@ function View4({ theme }) {
                 </button>
              </div>
           </div>
-          <div className="p-8 max-h-[60vh] overflow-y-auto bg-black text-center scroll-smooth">
-             <div className="max-w-2xl mx-auto space-x-2 space-y-4 leading-loose">
+          <div className="p-8 max-h-[60vh] overflow-y-auto text-left scroll-smooth">
+             <div className="max-w-3xl mx-auto space-y-6 leading-loose">
                  {lyricsData.length === 0 ? (
-                    <div className="text-gray-500 italic">No lyrics found for this audio.</div>
+                    <div className="text-gray-500 italic text-center">No lyrics found for this audio.</div>
                  ) : (
-                    lyricsData.map((item, idx) => {
-                        const isActive = currentTime >= item.start_time && currentTime <= item.end_time;
-                        const isPast = currentTime > item.end_time;
-                        
-                        let colorClass = "text-gray-500 hover:text-gray-300"; // future
-                        if (isActive) colorClass = "text-white font-bold scale-110 drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]";
-                        else if (isPast) colorClass = "text-gray-300 hover:text-white";
-                        
-                        return (
-                           <span 
-                              key={idx} 
-                              onClick={() => jumpToTime(item.start_time)}
-                              className={`inline-block text-2xl transition-all duration-200 cursor-pointer ${colorClass}`}
-                              title={`Confidence: ${(item.confidence * 100).toFixed(1)}%`}
-                           >
-                              {item.word}
-                           </span>
-                        );
-                    })
+                    lyricsData.map((segment, segIdx) => (
+                        <div key={segIdx} id={`segment-${segIdx}`} className="mb-2">
+                            {segment.map((item, idx) => {
+                                const isActive = item === activeItem;
+                                const isPast = currentTime >= item.end_time;
+                                
+                                let colorClass = "opacity-40 hover:opacity-70"; // future
+                                if (isActive) colorClass = "bg-yellow-200 dark:bg-amber-900/50 rounded px-1 opacity-100";
+                                else if (isPast) colorClass = "opacity-100 hover:opacity-80"; // past
+                                
+                                return (
+                                   <span 
+                                      key={idx} 
+                                      onClick={() => jumpToTime(item.start_time)}
+                                      className={`inline-block mx-1 text-2xl transition-colors duration-200 cursor-pointer ${colorClass}`}
+                                      title={`Confidence: ${(item.confidence * 100).toFixed(1)}%`}
+                                   >
+                                      {item.word}
+                                   </span>
+                                );
+                            })}
+                        </div>
+                    ))
                  )}
              </div>
           </div>

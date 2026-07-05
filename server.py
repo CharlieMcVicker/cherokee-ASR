@@ -394,6 +394,103 @@ def preview_segments(req: PreviewSegmentRequest):
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
 
+class SmartSegmentRequest(BaseModel):
+    file_path: str
+
+@app.post("/api/smart_segment")
+def smart_segment(req: SmartSegmentRequest):
+    try:
+        from transcription.audio.segment import get_energy_profile, segment_audio_from_profile, compute_metrics
+        from pydub import AudioSegment
+        import os
+
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        full_audio_path = os.path.normpath(os.path.join(base_dir, req.file_path))
+
+        if not os.path.exists(full_audio_path):
+            raise HTTPException(status_code=404, detail="Audio file not found")
+
+        audio = AudioSegment.from_file(full_audio_path)
+        total_len = len(audio)
+        dbfs_profile = get_energy_profile(audio, step_ms=10)
+
+        thresholds = [-55, -50, -45, -40, -35, -30, -25, -20]
+        min_silence_lens = [100, 200, 300, 500, 800, 1000]
+        keep_silences = [0, 50, 100, 150, 200]
+
+        results = []
+        for thresh in thresholds:
+            for min_sil in min_silence_lens:
+                for keep_sil in keep_silences:
+                    segments = segment_audio_from_profile(
+                        dbfs_profile,
+                        total_len,
+                        step_ms=10,
+                        min_silence_len=min_sil,
+                        silence_thresh=thresh,
+                        keep_silence=keep_sil
+                    )
+                    metrics = compute_metrics(segments, total_len)
+
+                    # Compute overlap ms
+                    sorted_segs = sorted(segments, key=lambda s: s['start'])
+                    overlap_ms = 0
+                    for i in range(len(sorted_segs) - 1):
+                        cur_end = sorted_segs[i]['end']
+                        nxt_start = sorted_segs[i+1]['start']
+                        if nxt_start < cur_end:
+                            overlap_ms += min(cur_end, sorted_segs[i+1]['end']) - nxt_start
+
+                    overlap_percent = (overlap_ms / total_len * 100.0) if total_len > 0 else 0.0
+
+                    results.append({
+                        'silence_thresh': thresh,
+                        'min_silence_len': min_sil,
+                        'keep_silence': keep_sil,
+                        'percent_segmented': metrics['percent_segmented'],
+                        'overlap_percent': overlap_percent,
+                        'max_len': metrics['max_len'],
+                        'avg_len': metrics['avg_len'],
+                        'count': metrics['count']
+                    })
+        
+        if not results:
+            return {"silence_thresh": -40, "min_silence_len": 500, "keep_silence": 100}
+
+        def score_config(r):
+            # Net coverage = percent_segmented - overlap_percent
+            net_coverage = r['percent_segmented'] - r['overlap_percent']
+            # Small penalty for excessive keep_silence when net_coverage is equal
+            silence_penalty = (r['keep_silence'] / 100.0) * 0.5
+            # Penalty for micro-fragmented segments
+            fragment_penalty = 5.0 if (r['avg_len'] < 1.0 and r['count'] > 5) else 0.0
+
+            return net_coverage - silence_penalty - fragment_penalty
+
+        # Filter for max_len <= 25.0 and at least 1 segment
+        valid_results = [r for r in results if r['max_len'] <= 25.0 and r['count'] > 0]
+
+        if valid_results:
+            best = max(valid_results, key=score_config)
+        else:
+            # Fallback: pick the one with min max_len among those with > 0 coverage
+            with_segments = [r for r in results if r['count'] > 0]
+            if with_segments:
+                best = min(with_segments, key=lambda x: x['max_len'])
+            else:
+                best = {"silence_thresh": -40, "min_silence_len": 500, "keep_silence": 100}
+
+        return {
+            "silence_thresh": best.get('silence_thresh', -40),
+            "min_silence_len": best.get('min_silence_len', 500),
+            "keep_silence": best.get('keep_silence', 100)
+        }
+
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+
 class BatchSegmentRequest(BaseModel):
     target_path: str
     silence_thresh: int = -40
