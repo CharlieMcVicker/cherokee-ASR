@@ -58,8 +58,8 @@ def _resolve_audio_path(p, dataset_path):
 
 def main():
     parser = argparse.ArgumentParser(description="Evaluate a Wav2Vec2 checkpoint on a test dataset.")
-    parser.add_argument("--test-csv", type=str, default="data/processed/cim-wav2vec2-test.csv", help="Path to the test CSV file.")
-    parser.add_argument("--audio-dir", type=str, default="data/processed/sentence_audio", help="Directory containing audio files.")
+    parser.add_argument("--test-csv", type=str, default="training_data/processed/cim-wav2vec2-test.csv", help="Path to the test CSV file.")
+    parser.add_argument("--audio-dir", type=str, default="training_data/processed/sentence_audio", help="Directory containing audio files.")
     parser.add_argument("--checkpoint", type=str, default="remote_output_w2v2/checkpoint-800", help="Path or HF repo ID to the model checkpoint.")
     parser.add_argument("--processor", type=str, default=None, help="Path or HF repo ID to the processor (defaults to checkpoint).")
     parser.add_argument("--hf-token", type=str, default=None, help="Hugging Face Hub authentication token.")
@@ -95,6 +95,8 @@ def main():
     })
     test_ds = Dataset.from_dict(data_dict, features=features)
     
+    processor = Wav2Vec2Processor.from_pretrained(processor_path, token=token)
+
     def prepare_batch(batch):
         audio = batch["audio"]
         batch["input_values"] = processor(
@@ -119,8 +121,8 @@ def main():
         row = ranking_df.iloc[0]
         overall_wer_greedy = row["agg_wer_greedy"]
         overall_cer_greedy = row["agg_cer_greedy"]
-        overall_wer_greedy_masked = row["agg_wer_tone_masked"]
-        overall_cer_greedy_masked = row["agg_cer_tone_masked"]
+        overall_wer_greedy_masked = row["agg_wer_greedy_masked"]
+        overall_cer_greedy_masked = row["agg_cer_greedy_masked"]
 
         print("\n" + "="*50)
         print("OVERALL RAW METRICS ON TEST SET (WITH TONES & ORIGINAL TRANSC):")
@@ -128,8 +130,8 @@ def main():
         print("="*50 + "\n")
 
         print("="*50)
-        print("OVERALL METRICS ON TEST SET WITH TONES MASKED (REMOVED):")
-        print(f"Greedy (Masked): WER = {overall_wer_greedy_masked:.4f} | CER = {overall_cer_greedy_masked:.4f}")
+        print("OVERALL METRICS ON TEST SET WITH VOWEL LENGTHS MASKED (COLLAPSED):")
+        print(f"Greedy (Vowel-Length Masked): WER = {overall_wer_greedy_masked:.4f} | CER = {overall_cer_greedy_masked:.4f}")
         print("="*50 + "\n")
 
         # Save output to a file
