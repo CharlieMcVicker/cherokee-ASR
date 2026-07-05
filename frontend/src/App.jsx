@@ -87,29 +87,36 @@ function formatDuration(seconds) {
   return `${seconds.toFixed(1)}s`;
 }
 
-function SegmentHistogram({ histogram, theme }) {
+function SegmentHistogram({ preview, theme }) {
   const t = theme || {};
-  if (!histogram) return null;
-  const bins = Object.entries(histogram);
-  const maxCount = Math.max(...bins.map(([_, count]) => count), 1);
+  const histogram = preview.histogram;
+  if (!histogram || !Array.isArray(histogram) || histogram.length === 0) return null;
+  const maxCount = Math.max(...histogram.map((b) => b.count), 0);
 
   return (
-    <div className="mt-3 pt-3 border-t border-gray-300 dark:border-gray-700">
-      <div className="text-xs font-semibold mb-2 text-left opacity-90">Segment Length Distribution</div>
-      <div className={`grid grid-cols-6 gap-1 items-end h-24 p-2 rounded border ${t.inputInfo || 'bg-gray-100 border-gray-300'}`}>
-        {bins.map(([label, count]) => {
-          const heightPct = count > 0 ? Math.max(14, Math.round((count / maxCount) * 100)) : 0;
+    <div className="mt-4 pt-4 border-t border-gray-300 dark:border-gray-700">
+      <div className="text-xs text-gray-500 font-bold uppercase tracking-wider mb-2 text-left">Length Distribution (Seconds)</div>
+      <div className="flex items-end h-32 gap-1 group">
+        {histogram.map((bin, i) => {
+          const heightPct = maxCount === 0 ? 0 : (bin.count / maxCount) * 100;
           return (
-            <div key={label} className="flex flex-col items-center h-full justify-end group relative">
-              <div className="text-[10px] font-bold opacity-90 mb-1">{count}</div>
+            <div key={i} className="relative flex-1 group/bar flex flex-col justify-end h-full">
               <div 
-                style={{ height: `${heightPct}%` }} 
-                className={`w-full max-w-[28px] rounded-t transition-all duration-300 ${count > 0 ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700 opacity-50'}`}
-              />
-              <div className="text-[9px] opacity-80 mt-1 font-mono">{label}</div>
+                className="w-full bg-gradient-to-t from-blue-600 to-blue-400 rounded-t-sm transition-all duration-300 group-hover:opacity-50 group-hover/bar:opacity-100 group-hover/bar:from-indigo-600 group-hover/bar:to-indigo-400 cursor-pointer"
+                style={{ height: `${heightPct}%`, minHeight: bin.count > 0 ? '4px' : '0' }}
+              ></div>
+              {/* Tooltip */}
+              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 opacity-0 group-hover/bar:opacity-100 transition-opacity pointer-events-none z-10 w-max bg-gray-900 text-white text-xs rounded py-1 px-2 shadow-lg">
+                <div className="font-bold">{bin.start.toFixed(1)}s - {bin.end.toFixed(1)}s</div>
+                <div>{bin.count} segments</div>
+              </div>
             </div>
-          );
+          )
         })}
+      </div>
+      <div className="flex justify-between text-xs text-gray-400 mt-1">
+        <span>{preview.min !== undefined ? preview.min.toFixed(1) : (histogram[0]?.start || 0).toFixed(1)}s</span>
+        <span>{preview.max !== undefined ? preview.max.toFixed(1) : (histogram[histogram.length-1]?.end || 0).toFixed(1)}s</span>
       </div>
     </div>
   );
@@ -136,26 +143,26 @@ function FileSegmentCard({ preview, theme, onSettingChange, onResetSetting }) {
         </button>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-center mb-3">
-        <div className={`p-2.5 rounded border ${t.inputInfo}`}>
-          <div className="text-xs font-semibold opacity-75 mb-1">Segments</div>
-          <div className="text-lg font-bold">{preview.segment_count}</div>
+      <div className="flex flex-wrap gap-3 mb-4 mt-2">
+        <div className="flex-1 bg-gradient-to-br from-blue-50 to-blue-100 p-3 rounded-lg border border-blue-200 text-center min-w-[120px]">
+          <div className="text-xs text-blue-500 font-bold uppercase tracking-wider">Segments</div>
+          <div className="text-2xl font-black text-blue-900">{preview.segment_count}</div>
         </div>
-        <div className={`p-2.5 rounded border ${t.inputInfo}`}>
-          <div className="text-xs font-semibold opacity-75 mb-1">Result Audio</div>
-          <div className="text-lg font-bold">{formatDuration(preview.result_duration)}</div>
+        <div className="flex-1 bg-gradient-to-br from-indigo-50 to-indigo-100 p-3 rounded-lg border border-indigo-200 text-center min-w-[120px]">
+          <div className="text-xs text-indigo-500 font-bold uppercase tracking-wider">Result Audio</div>
+          <div className="text-2xl font-black text-indigo-900">{formatDuration(preview.result_duration)}</div>
         </div>
-        <div className={`p-2.5 rounded border ${t.inputInfo}`}>
-          <div className="text-xs font-semibold opacity-75 mb-1">Coverage</div>
-          <div className="text-lg font-bold text-green-700 dark:text-green-400">{preview.coverage_percent}%</div>
+        <div className="flex-1 bg-gradient-to-br from-green-50 to-green-100 p-3 rounded-lg border border-green-200 text-center min-w-[120px]">
+          <div className="text-xs text-green-600 font-bold uppercase tracking-wider">Coverage</div>
+          <div className="text-2xl font-black text-green-900">{preview.coverage_percent}%</div>
         </div>
-        <div className={`p-2.5 rounded border ${t.inputInfo}`}>
-          <div className="text-xs font-semibold opacity-75 mb-1">Overlap</div>
-          <div className="text-lg font-bold text-amber-700 dark:text-amber-400">{preview.overlap_duration}s ({preview.overlap_percent}%)</div>
+        <div className="flex-1 bg-gradient-to-br from-amber-50 to-amber-100 p-3 rounded-lg border border-amber-200 text-center min-w-[120px]">
+          <div className="text-xs text-amber-600 font-bold uppercase tracking-wider">Overlap</div>
+          <div className="text-2xl font-black text-amber-900">{preview.overlap_duration}s <span className="text-sm font-bold opacity-75">({preview.overlap_percent}%)</span></div>
         </div>
       </div>
 
-      <SegmentHistogram histogram={preview.histogram} theme={t} />
+      <SegmentHistogram preview={preview} theme={t} />
 
       {showSettings && (
         <div className={`mt-4 p-3 border rounded ${t.inputInfo} text-xs`}>
@@ -496,13 +503,22 @@ function View1({ theme }) {
   const [groupedFiles, setGroupedFiles] = useState({});
   const [selectedSubfolders, setSelectedSubfolders] = useState({});
   const [form, setForm] = useState({ 
-    checkpoint: "charliemcvicker/asr-cherokee",
+    checkpoint: "",
     output_csv_name: "batch_inference_results.csv"
   });
   const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(false);
   const [batchStats, setBatchStats] = useState(null);
   const [isFetchingStats, setIsFetchingStats] = useState(false);
+  const [defaultCheckpoint, setDefaultCheckpoint] = useState("charliemcvicker/asr-cherokee");
+
+  useEffect(() => {
+    fetch("http://localhost:8000/api/config/best_model")
+      .then(res => res.json())
+      .then(data => {
+        if (data.repo) setDefaultCheckpoint(data.repo);
+      }).catch(err => console.log("Failed to fetch best model config", err));
+  }, []);
 
   useEffect(() => {
     fetch("http://localhost:8000/api/files")
@@ -730,8 +746,8 @@ function View1({ theme }) {
           )}
 
           <div>
-            <label className={`block text-sm font-medium ${t.label} mb-2`}>Model Checkpoint (HF Repo ID or Path)</label>
-            <input type="text" className={`w-full p-3 ${t.input}`} value={form.checkpoint} onChange={e => setForm({...form, checkpoint: e.target.value})} />
+            <label className={`block text-sm font-medium ${t.label} mb-2`}>Model Checkpoint (Leave empty to use best_model.json: {defaultCheckpoint})</label>
+            <input type="text" className={`w-full p-3 ${t.input}`} value={form.checkpoint} onChange={e => setForm({...form, checkpoint: e.target.value})} placeholder={defaultCheckpoint} />
           </div>
 
           <div>
@@ -742,7 +758,7 @@ function View1({ theme }) {
 
         <button 
           onClick={handleInference} 
-          disabled={loading || !form.checkpoint || selectedCount === 0}
+          disabled={loading || selectedCount === 0}
           className={`w-full py-4 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.99] ${t.buttonPrimary}`}
         >
           {loading ? "⏳ Running Inference..." : `Start Batch Inference on ${selectedCount} Folders`}

@@ -293,22 +293,40 @@ def process_file_preview(rel_path, default_thresh, default_min_silence, default_
     overlap_duration = round(overlap_ms / 1000.0, 2)
     overlap_percent = round((overlap_duration / total_duration * 100.0), 1) if total_duration > 0 else 0.0
 
-    # Duration Histogram bins: <1s, 1-2s, 2-4s, 4-7s, 7-10s, >10s
-    histogram = {"<1s": 0, "1-2s": 0, "2-4s": 0, "4-7s": 0, "7-10s": 0, ">10s": 0}
-    for s in sorted_segs:
-        dur_s = s['duration'] / 1000.0
-        if dur_s < 1.0:
-            histogram["<1s"] += 1
-        elif dur_s < 2.0:
-            histogram["1-2s"] += 1
-        elif dur_s < 4.0:
-            histogram["2-4s"] += 1
-        elif dur_s < 7.0:
-            histogram["4-7s"] += 1
-        elif dur_s < 10.0:
-            histogram["7-10s"] += 1
+    # Duration Histogram bins: 20 bins between min and max duration
+    all_lengths = [s['duration'] / 1000.0 for s in sorted_segs]
+    if not all_lengths:
+        histogram = []
+        min_val = 0
+        max_val = 0
+    else:
+        all_lengths.sort()
+        min_val = all_lengths[0]
+        max_val = all_lengths[-1]
+        count = len(all_lengths)
+        
+        bins = 20
+        histogram = []
+        if max_val > min_val:
+            bin_size = (max_val - min_val) / bins
+            bin_counts = [0] * bins
+            
+            for length in all_lengths:
+                idx = int((length - min_val) / bin_size)
+                if idx >= bins:
+                    idx = bins - 1
+                bin_counts[idx] += 1
+                
+            for i in range(bins):
+                start = min_val + (i * bin_size)
+                end = start + bin_size
+                histogram.append({
+                    "start": start,
+                    "end": end,
+                    "count": bin_counts[i]
+                })
         else:
-            histogram[">10s"] += 1
+            histogram = [{"start": min_val, "end": max_val, "count": count}]
 
     return {
         "file": rel_path,
@@ -319,6 +337,8 @@ def process_file_preview(rel_path, default_thresh, default_min_silence, default_
         "coverage_percent": coverage_percent,
         "overlap_duration": overlap_duration,
         "overlap_percent": overlap_percent,
+        "min": min_val,
+        "max": max_val,
         "histogram": histogram,
         "settings": {
             "silence_thresh": thresh,
@@ -538,7 +558,7 @@ def get_batch_stats(req: BatchStatsRequest):
 
 class BatchInferenceRequest(BaseModel):
     target_folders: list[str]
-    checkpoint: str = "charliemcvicker/asr-cherokee"
+    checkpoint: str = ""
     output_csv_name: str = "batch_inference_results.csv"
 
 @app.post("/api/batch_inference")
@@ -599,10 +619,13 @@ def run_batch_inference(req: BatchInferenceRequest):
                 python_exe,
                 "-m", "transcription.inference.batch",
                 temp_batch_dir,
-                "--checkpoint", req.checkpoint,
-                "--processor", req.checkpoint,
                 "--output", temp_csv
             ]
+            if req.checkpoint:
+                cmd.extend([
+                    "--checkpoint", req.checkpoint,
+                    "--processor", req.checkpoint
+                ])
             print(f"Running batched inference on {len(mapping)} files...", flush=True)
             result = subprocess.run(cmd, cwd=AppConfig.SANDBOX_DIR)
             if result.returncode != 0:
@@ -625,6 +648,15 @@ def run_batch_inference(req: BatchInferenceRequest):
 
 
 
+@app.get("/api/config/best_model")
+def get_best_model():
+    try:
+        from transcription.utils.model_utils import get_best_model_config
+        return get_best_model_config()
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/api/files")
 def get_files():
