@@ -31,20 +31,24 @@ current_word_probs = []
 for char, prob in zip(chars, char_probs):
     if char == " ":
         if current_word:
-            words.append({"word": current_word, "confidence": float(np.mean(current_word_probs))})
+            words.append(
+                {"word": current_word, "confidence": float(np.mean(current_word_probs))}
+            )
             current_word = ""
             current_word_probs = []
     else:
         current_word += char
         current_word_probs.append(prob)
 if current_word:
-    words.append({"word": current_word, "confidence": float(np.mean(current_word_probs))})
+    words.append(
+        {"word": current_word, "confidence": float(np.mean(current_word_probs))}
+    )
 
 out = {
     "chars": chars,
     "char_probs": char_probs,
     "words": words,
-    "vocab": {k: v for k, v in list(processor.tokenizer.get_vocab().items())[:10]}
+    "vocab": {k: v for k, v in list(processor.tokenizer.get_vocab().items())[:10]},
 }
 
 with open("test_vocab_out.json", "w", encoding="utf-8") as f:

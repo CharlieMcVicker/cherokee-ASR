@@ -1,0 +1,6 @@
+repos:
+  - repo: https://github.com/psf/black-pre-commit-mirror
+    rev: 26.5.1
+    hooks:
+      - id: black
+        exclude: ^(data/|colab-script-rips/|archive/|scripts/from_elan_to_wav_and_gsheet\.py|transcription/audio/extract_from_elan\.py|transcription/inference/long_recording\.py|test_topk\.py)

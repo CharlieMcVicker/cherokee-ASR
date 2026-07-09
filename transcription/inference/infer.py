@@ -17,6 +17,7 @@ from transformers import Wav2Vec2Processor, Wav2Vec2ForCTC
 
 TARGET_SAMPLE_RATE = 16000
 
+
 def normalize_text(text):
     """Normalize transcriptions consistently."""
     text = str(text)
@@ -29,11 +30,13 @@ def normalize_text(text):
     text = re.sub(r"\s+", " ", text).strip()
     return text
 
+
 def strip_tones(text):
     """Remove tone numbers (0-9)."""
     text = re.sub(r"\d", "", text)
     text = re.sub(r"\s+", " ", text).strip()
     return text
+
 
 def strip_length(text):
     """Collapse any sequence of 2 or more of the same vowel into a single vowel."""
@@ -41,31 +44,36 @@ def strip_length(text):
         return ""
     return re.sub(r"([aeiouv])\1+", r"\1", text)
 
+
 def strip_both(text):
     """Remove both tones and collapse vowel lengths."""
     return strip_length(strip_tones(text))
+
 
 def load_and_preprocess_audio(audio_path, target_sr=TARGET_SAMPLE_RATE):
     """Load an audio file, resample to 16kHz, convert to mono, and return as 1D numpy array."""
     if not os.path.exists(audio_path):
         raise FileNotFoundError(f"Audio file '{audio_path}' not found.")
-        
+
     speech_array, sample_rate = sf.read(audio_path)
     waveform = torch.tensor(speech_array, dtype=torch.float32)
-    
+
     if len(waveform.shape) == 1:
         waveform = waveform.unsqueeze(0)
     else:
         waveform = waveform.transpose(0, 1)
-        
+
     if waveform.shape[0] > 1:
         waveform = torch.mean(waveform, dim=0, keepdim=True)
-        
+
     if sample_rate != target_sr:
-        resampler = torchaudio.transforms.Resample(orig_freq=sample_rate, new_freq=target_sr)
+        resampler = torchaudio.transforms.Resample(
+            orig_freq=sample_rate, new_freq=target_sr
+        )
         waveform = resampler(waveform)
-        
+
     return waveform.squeeze(0).numpy()
+
 
 def calculate_word_confidences(probs, pred_ids, processor):
     """Calculate character and word level confidences and alternative predictions."""
@@ -73,23 +81,25 @@ def calculate_word_confidences(probs, pred_ids, processor):
         probs = probs.cpu().numpy()
     if isinstance(pred_ids, torch.Tensor):
         pred_ids = pred_ids.cpu().numpy()
-        
+
     token_probs = probs[np.arange(len(pred_ids)), pred_ids]
     pad_id = getattr(processor.tokenizer, "pad_token_id", None)
     if pad_id is None:
         pad_id = processor.tokenizer.vocab.get("[PAD]", 0)
-    
+
     chars = []
     char_probs = []
     char_alts = []
     char_times = []
-    
+
     top_k = 5
     top_k_indices = np.argsort(probs, axis=-1)[:, -top_k:][:, ::-1]
     top_k_probs = np.take_along_axis(probs, top_k_indices, axis=-1)
-    
-    word_delimiter_token_id = getattr(processor.tokenizer, "word_delimiter_token_id", None)
-    
+
+    word_delimiter_token_id = getattr(
+        processor.tokenizer, "word_delimiter_token_id", None
+    )
+
     prev_id = -1
     for i, token_id in enumerate(pred_ids):
         if token_id != pad_id and token_id != prev_id:
@@ -97,12 +107,12 @@ def calculate_word_confidences(probs, pred_ids, processor):
                 token_str = " "
             else:
                 token_str = processor.decode([token_id])
-                
+
             if token_str:
                 chars.append(token_str)
                 char_probs.append(float(token_probs[i]))
                 char_times.append(round(i * 0.02, 3))
-                
+
                 alts = []
                 for k in range(top_k):
                     alt_id = top_k_indices[i, k]
@@ -115,7 +125,7 @@ def calculate_word_confidences(probs, pred_ids, processor):
                         if alt_str:
                             alts.append({"char": alt_str, "confidence": alt_prob})
                 char_alts.append(alts)
-                
+
         prev_id = token_id
 
     words_details = []
@@ -125,29 +135,41 @@ def calculate_word_confidences(probs, pred_ids, processor):
         if char == " ":
             if current_word:
                 word_conf = float(np.mean([c["confidence"] for c in current_chars]))
-                words_details.append({
-                    "word": current_word,
-                    "confidence": word_conf,
-                    "start_time": current_chars[0]["start_time"],
-                    "end_time": round(current_chars[-1]["start_time"] + 0.02, 3),
-                    "chars": current_chars
-                })
+                words_details.append(
+                    {
+                        "word": current_word,
+                        "confidence": word_conf,
+                        "start_time": current_chars[0]["start_time"],
+                        "end_time": round(current_chars[-1]["start_time"] + 0.02, 3),
+                        "chars": current_chars,
+                    }
+                )
                 current_word = ""
                 current_chars = []
         else:
             current_word += char
-            current_chars.append({"char": char, "confidence": prob, "start_time": time, "alternatives": alts})
+            current_chars.append(
+                {
+                    "char": char,
+                    "confidence": prob,
+                    "start_time": time,
+                    "alternatives": alts,
+                }
+            )
     if current_word:
         word_conf = float(np.mean([c["confidence"] for c in current_chars]))
-        words_details.append({
-            "word": current_word,
-            "confidence": word_conf,
-            "start_time": current_chars[0]["start_time"],
-            "end_time": round(current_chars[-1]["start_time"] + 0.02, 3),
-            "chars": current_chars
-        })
-        
+        words_details.append(
+            {
+                "word": current_word,
+                "confidence": word_conf,
+                "start_time": current_chars[0]["start_time"],
+                "end_time": round(current_chars[-1]["start_time"] + 0.02, 3),
+                "chars": current_chars,
+            }
+        )
+
     return words_details
+
 
 def greedy_inference(logits, processor):
     """
@@ -156,49 +178,51 @@ def greedy_inference(logits, processor):
     """
     if isinstance(logits, np.ndarray):
         logits = torch.tensor(logits)
-        
+
     is_batched = len(logits.shape) == 3
     if not is_batched:
         logits = logits.unsqueeze(0)
-        
+
     probs = torch.nn.functional.softmax(logits, dim=-1)
     pred_ids = torch.argmax(probs, dim=-1)
-    
+
     decoded_texts = processor.batch_decode(pred_ids)
-    
+
     pad_id = getattr(processor.tokenizer, "pad_token_id", None)
     if pad_id is None:
         pad_id = processor.tokenizer.vocab.get("[PAD]", 0)
-        
+
     results = []
     for i in range(logits.shape[0]):
         seq_probs = probs[i].cpu().numpy()
         seq_ids = pred_ids[i].cpu().numpy()
         text = decoded_texts[i].strip()
-        
+
         token_probs = seq_probs[np.arange(len(seq_ids)), seq_ids]
         non_pad_mask = seq_ids != pad_id
         if non_pad_mask.any():
             confidence = float(np.mean(token_probs[non_pad_mask]))
         else:
             confidence = float(np.mean(token_probs))
-            
-        results.append({
-            "text": text,
-            "confidence": confidence
-        })
-        
+
+        results.append({"text": text, "confidence": confidence})
+
     return results if is_batched else results[0]
+
 
 def infer_single_audio(model, processor, audio_path, device=None):
     """Transcribe a single audio file."""
     if device is None:
-        device = "cuda" if torch.cuda.is_available() else ("mps" if torch.backends.mps.is_available() else "cpu")
-        
+        device = (
+            "cuda"
+            if torch.cuda.is_available()
+            else ("mps" if torch.backends.mps.is_available() else "cpu")
+        )
+
     speech = load_and_preprocess_audio(audio_path)
     input_values = processor(speech, sampling_rate=TARGET_SAMPLE_RATE).input_values[0]
     input_tensor = torch.tensor([input_values]).to(device)
-    
+
     try:
         with torch.no_grad():
             logits = model(input_tensor).logits
@@ -212,17 +236,22 @@ def infer_single_audio(model, processor, audio_path, device=None):
                 logits = model(input_tensor).logits
         else:
             raise e
-            
+
     return greedy_inference(logits, processor)
+
 
 def transcribe_audio_batch(model, processor, audio_paths, device=None, batch_size=16):
     """Transcribe a list of audio files using batching, proper padding, and OOM fallbacks."""
     if device is None:
-        device = "cuda" if torch.cuda.is_available() else ("mps" if torch.backends.mps.is_available() else "cpu")
-        
+        device = (
+            "cuda"
+            if torch.cuda.is_available()
+            else ("mps" if torch.backends.mps.is_available() else "cpu")
+        )
+
     results = []
     for i in range(0, len(audio_paths), batch_size):
-        batch_paths = audio_paths[i:i + batch_size]
+        batch_paths = audio_paths[i : i + batch_size]
         batch_speech = []
         for path in batch_paths:
             try:
@@ -231,80 +260,122 @@ def transcribe_audio_batch(model, processor, audio_paths, device=None, batch_siz
             except Exception as e:
                 print(f"Error loading audio file {path}: {e}")
                 batch_speech.append(np.zeros((TARGET_SAMPLE_RATE,), dtype=np.float32))
-                
+
         # Pad and build inputs
-        inputs = processor(batch_speech, sampling_rate=TARGET_SAMPLE_RATE, padding=True, return_tensors="pt")
+        inputs = processor(
+            batch_speech,
+            sampling_rate=TARGET_SAMPLE_RATE,
+            padding=True,
+            return_tensors="pt",
+        )
         input_values = inputs.input_values.to(device)
-        attention_mask = inputs.attention_mask.to(device) if "attention_mask" in inputs else None
-        
+        attention_mask = (
+            inputs.attention_mask.to(device) if "attention_mask" in inputs else None
+        )
+
         try:
             with torch.no_grad():
-                outputs = model(input_values=input_values, attention_mask=attention_mask)
+                outputs = model(
+                    input_values=input_values, attention_mask=attention_mask
+                )
                 logits = outputs.logits
         except Exception as e:
             err_str = str(e).lower()
-            is_oom = "out of memory" in err_str or (hasattr(torch.cuda, "OutOfMemoryError") and isinstance(e, torch.cuda.OutOfMemoryError))
+            is_oom = "out of memory" in err_str or (
+                hasattr(torch.cuda, "OutOfMemoryError")
+                and isinstance(e, torch.cuda.OutOfMemoryError)
+            )
             is_cudnn_err = "unable to find an engine" in err_str or "cudnn" in err_str
-            
+
             if is_oom or is_cudnn_err:
                 reason = "OOM" if is_oom else "cuDNN error"
-                print(f"  {reason} on batch. Falling back to sequential inference for this batch...", flush=True)
-                
+                print(
+                    f"  {reason} on batch. Falling back to sequential inference for this batch...",
+                    flush=True,
+                )
+
                 # Free large tensors to ensure empty_cache succeeds
-                if 'input_values' in locals():
+                if "input_values" in locals():
                     del input_values
-                if 'attention_mask' in locals():
+                if "attention_mask" in locals():
                     del attention_mask
-                    
+
                 if torch.cuda.is_available():
                     torch.cuda.empty_cache()
                 elif torch.backends.mps.is_available():
                     torch.mps.empty_cache()
-                    
+
                 # Sequential fallback
                 for speech_item in batch_speech:
-                    single_inputs = processor([speech_item], sampling_rate=TARGET_SAMPLE_RATE, padding=True, return_tensors="pt")
+                    single_inputs = processor(
+                        [speech_item],
+                        sampling_rate=TARGET_SAMPLE_RATE,
+                        padding=True,
+                        return_tensors="pt",
+                    )
                     single_input_values = single_inputs.input_values.to(device)
-                    single_attention_mask = single_inputs.attention_mask.to(device) if "attention_mask" in single_inputs else None
-                    
+                    single_attention_mask = (
+                        single_inputs.attention_mask.to(device)
+                        if "attention_mask" in single_inputs
+                        else None
+                    )
+
                     try:
                         with torch.no_grad():
                             with torch.backends.cudnn.flags(enabled=False):
-                                single_outputs = model(input_values=single_input_values, attention_mask=single_attention_mask)
+                                single_outputs = model(
+                                    input_values=single_input_values,
+                                    attention_mask=single_attention_mask,
+                                )
                                 single_logits = single_outputs.logits
-                                
+
                         input_len = len(speech_item)
-                        logit_len = int(model._get_feat_extract_output_lengths(input_len))
+                        logit_len = int(
+                            model._get_feat_extract_output_lengths(input_len)
+                        )
                         sliced_logits = single_logits[0, :logit_len, :]
                         res = greedy_inference(sliced_logits, processor)
                         results.append(res)
                     except Exception as seq_e:
-                        print(f"  Fatal OOM even with batch_size=1. Skipping item...", flush=True)
+                        print(
+                            f"  Fatal OOM even with batch_size=1. Skipping item...",
+                            flush=True,
+                        )
                         results.append({"text": "", "confidence": 0.0})
                     finally:
-                        if 'single_logits' in locals(): del single_logits
-                        if 'single_outputs' in locals(): del single_outputs
-                        if 'single_inputs' in locals(): del single_inputs
-                        if 'single_input_values' in locals(): del single_input_values
-                        if 'single_attention_mask' in locals(): del single_attention_mask
+                        if "single_logits" in locals():
+                            del single_logits
+                        if "single_outputs" in locals():
+                            del single_outputs
+                        if "single_inputs" in locals():
+                            del single_inputs
+                        if "single_input_values" in locals():
+                            del single_input_values
+                        if "single_attention_mask" in locals():
+                            del single_attention_mask
                         if torch.cuda.is_available():
                             torch.cuda.empty_cache()
                         elif torch.backends.mps.is_available():
                             torch.mps.empty_cache()
                 continue
             elif isinstance(e, NotImplementedError) and device == "mps":
-                print("  MPS execution failed. Falling back to CPU backend for this batch...", flush=True)
+                print(
+                    "  MPS execution failed. Falling back to CPU backend for this batch...",
+                    flush=True,
+                )
                 device = "cpu"
                 model.to(device)
                 input_values = input_values.to(device)
                 if attention_mask is not None:
                     attention_mask = attention_mask.to(device)
                 with torch.no_grad():
-                    outputs = model(input_values=input_values, attention_mask=attention_mask)
+                    outputs = model(
+                        input_values=input_values, attention_mask=attention_mask
+                    )
                     logits = outputs.logits
             else:
                 raise e
-            
+
         # Squeeze/slice logits by attention mask lengths to avoid decoding padding
         if attention_mask is not None:
             input_lengths = attention_mask.sum(dim=-1)
@@ -312,23 +383,28 @@ def transcribe_audio_batch(model, processor, audio_paths, device=None, batch_siz
             output_lengths = output_lengths.cpu().numpy()
         else:
             output_lengths = [logits.shape[1]] * logits.shape[0]
-            
+
         for idx in range(logits.shape[0]):
             actual_len = int(output_lengths[idx])
             sliced_logits = logits[idx, :actual_len, :]
             res = greedy_inference(sliced_logits, processor)
             results.append(res)
-            
+
         # Free batch tensors to ensure we don't peak VRAM on next batch allocation
-        if 'logits' in locals(): del logits
-        if 'outputs' in locals(): del outputs
-        if 'inputs' in locals(): del inputs
-        if 'input_values' in locals(): del input_values
-        if 'attention_mask' in locals(): del attention_mask
-        
+        if "logits" in locals():
+            del logits
+        if "outputs" in locals():
+            del outputs
+        if "inputs" in locals():
+            del inputs
+        if "input_values" in locals():
+            del input_values
+        if "attention_mask" in locals():
+            del attention_mask
+
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
         elif torch.backends.mps.is_available():
             torch.mps.empty_cache()
-            
+
     return results

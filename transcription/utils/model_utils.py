@@ -1,6 +1,7 @@
 import os
 import json
 
+
 def get_best_model_config():
     """
     Finds and loads the best_model.json configuration file.
@@ -9,11 +10,8 @@ def get_best_model_config():
     If not found, returns the default fallback.
     """
     # Start traversing up from the current file's directory
-    start_dirs = [
-        os.path.dirname(os.path.abspath(__file__)),
-        os.getcwd()
-    ]
-    
+    start_dirs = [os.path.dirname(os.path.abspath(__file__)), os.getcwd()]
+
     for start_dir in start_dirs:
         current_dir = start_dir
         while current_dir and current_dir != os.path.dirname(current_dir):
@@ -25,11 +23,10 @@ def get_best_model_config():
                         if "repo" in config and "revision" in config:
                             return config
                 except Exception as e:
-                    print(f"Warning: Failed to load best_model.json from {config_path}: {e}")
+                    print(
+                        f"Warning: Failed to load best_model.json from {config_path}: {e}"
+                    )
             current_dir = os.path.dirname(current_dir)
-            
+
     # Fallback default values
-    return {
-        "repo": "charliemcvicker/asr-cherokee",
-        "revision": "5464d15"
-    }
+    return {"repo": "charliemcvicker/asr-cherokee", "revision": "5464d15"}

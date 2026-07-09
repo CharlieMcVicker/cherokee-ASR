@@ -20,40 +20,78 @@ from tqdm import tqdm
 from transcription.training.evaluate_checkpoint import (
     _try_read_csv,
     _detect_columns,
-    _resolve_audio_path
+    _resolve_audio_path,
 )
 from transcription.inference.infer import (
     greedy_inference,
     normalize_text,
     strip_tones,
     strip_length,
-    TARGET_SAMPLE_RATE
+    TARGET_SAMPLE_RATE,
 )
+
 
 def safe(s):
     return s if s.strip() else " "
 
+
 def main():
-    parser = argparse.ArgumentParser(description="Evaluate multiple model revisions on a test dataset.")
-    parser.add_argument("--revisions-csv", type=str, default="data/results/revisions_to_test.tsv", help="Path to TSV or CSV listing revisions.")
-    parser.add_argument("--test-csv", type=str, default="training_data/processed/cim-wav2vec2-test.csv", help="Path to the test CSV file.")
-    parser.add_argument("--audio-dir", type=str, default="training_data/processed/sentence_audio", help="Directory containing audio files.")
-    parser.add_argument("--checkpoint", type=str, default="charliemcvicker/length-only-20260702-173608-asr-cherokee", help="Hugging Face repo ID to the model checkpoint.")
-    parser.add_argument("--output-csv", type=str, default="data/results/revision_scores.csv", help="Output path for the scoring CSV.")
-    parser.add_argument("--hf-token", type=str, default=None, help="Hugging Face Hub authentication token.")
+    parser = argparse.ArgumentParser(
+        description="Evaluate multiple model revisions on a test dataset."
+    )
+    parser.add_argument(
+        "--revisions-csv",
+        type=str,
+        default="data/results/revisions_to_test.tsv",
+        help="Path to TSV or CSV listing revisions.",
+    )
+    parser.add_argument(
+        "--test-csv",
+        type=str,
+        default="training_data/processed/cim-wav2vec2-test.csv",
+        help="Path to the test CSV file.",
+    )
+    parser.add_argument(
+        "--audio-dir",
+        type=str,
+        default="training_data/processed/sentence_audio",
+        help="Directory containing audio files.",
+    )
+    parser.add_argument(
+        "--checkpoint",
+        type=str,
+        default="charliemcvicker/length-only-20260702-173608-asr-cherokee",
+        help="Hugging Face repo ID to the model checkpoint.",
+    )
+    parser.add_argument(
+        "--output-csv",
+        type=str,
+        default="data/results/revision_scores.csv",
+        help="Output path for the scoring CSV.",
+    )
+    parser.add_argument(
+        "--hf-token",
+        type=str,
+        default=None,
+        help="Hugging Face Hub authentication token.",
+    )
     args = parser.parse_args()
 
-    token = args.hf_token or os.environ.get("HF_TOKEN") or os.environ.get("HUGGING_FACE_HUB_TOKEN")
+    token = (
+        args.hf_token
+        or os.environ.get("HF_TOKEN")
+        or os.environ.get("HUGGING_FACE_HUB_TOKEN")
+    )
 
     print(f"Loading revisions file: {args.revisions_csv}")
     revisions_list = []
     with open(args.revisions_csv, "r", encoding="utf-8") as f:
         lines = [line.strip() for line in f if line.strip()]
-        
+
     start_idx = 0
     if lines and ("name" in lines[0].lower() or "revision" in lines[0].lower()):
         start_idx = 1
-        
+
     for line in lines[start_idx:]:
         parts = line.rsplit(None, 1)
         if len(parts) == 2:
@@ -70,9 +108,11 @@ def main():
     df_test = _try_read_csv(args.test_csv)
     audio_col, text_col = _detect_columns(df_test)
     print(f"Using audio column: '{audio_col}' | text column: '{text_col}'")
-    
-    df_test[audio_col] = df_test[audio_col].apply(lambda p: _resolve_audio_path(p, args.audio_dir))
-    df_test[text_col]  = df_test[text_col].apply(normalize_text)
+
+    df_test[audio_col] = df_test[audio_col].apply(
+        lambda p: _resolve_audio_path(p, args.audio_dir)
+    )
+    df_test[text_col] = df_test[text_col].apply(normalize_text)
     df_test.dropna(subset=[audio_col, text_col], inplace=True)
     print(f"Number of test items: {len(df_test)}")
 
@@ -81,12 +121,11 @@ def main():
     print("Preparing HuggingFace dataset...")
     data_dict = {
         "audio": df_test[audio_col].tolist(),
-        "sentence": df_test[text_col].tolist()
+        "sentence": df_test[text_col].tolist(),
     }
-    features = Features({
-        "audio": Audio(sampling_rate=TARGET_SAMPLE_RATE),
-        "sentence": Value("string")
-    })
+    features = Features(
+        {"audio": Audio(sampling_rate=TARGET_SAMPLE_RATE), "sentence": Value("string")}
+    )
     test_ds = Dataset.from_dict(data_dict, features=features)
 
     print(f"Loading initial processor from {args.checkpoint}...")
@@ -98,8 +137,12 @@ def main():
             audio["array"], sampling_rate=audio["sampling_rate"]
         ).input_values[0]
         return batch
-        
-    test_ds_prepared = test_ds.map(prepare_batch, remove_columns=[c for c in test_ds.column_names if c != "sentence"], num_proc=1)
+
+    test_ds_prepared = test_ds.map(
+        prepare_batch,
+        remove_columns=[c for c in test_ds.column_names if c != "sentence"],
+        num_proc=1,
+    )
 
     # Convert revisions_list to format expected by generator: [(name, rev_hash), ...]
     generator_revs = [(name, rev_hash) for name, rev_hash, _ in revisions_list]
@@ -115,18 +158,21 @@ def main():
     scores = []
     for idx, row in ranking_df.iterrows():
         name, rev_hash, _ = revisions_list[idx]
-        scores.append({
-            "name": name,
-            "revision": rev_hash,
-            "greedy_wer": row["agg_wer_greedy"],
-            "greedy_cer": row["agg_cer_greedy"],
-            "greedy_masked_wer": row["agg_wer_greedy_masked"],
-            "greedy_masked_cer": row["agg_cer_greedy_masked"],
-        })
+        scores.append(
+            {
+                "name": name,
+                "revision": rev_hash,
+                "greedy_wer": row["agg_wer_greedy"],
+                "greedy_cer": row["agg_cer_greedy"],
+                "greedy_masked_wer": row["agg_wer_greedy_masked"],
+                "greedy_masked_cer": row["agg_cer_greedy_masked"],
+            }
+        )
 
     scores_df = pd.DataFrame(scores)
     scores_df.to_csv(args.output_csv, index=False)
     print(f"\nSuccessfully saved scoring results to {args.output_csv}")
+
 
 if __name__ == "__main__":
     main()

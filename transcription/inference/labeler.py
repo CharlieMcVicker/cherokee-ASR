@@ -12,14 +12,17 @@ PORT = 8000
 CSV_FILE = "data/results/batch_inference_results.csv"
 TRAIN_FILE = "data/processed/train_labeled.csv"
 
+
 # Custom HTTP request handler
 class LabelingToolHandler(http.server.SimpleHTTPRequestHandler):
     def end_headers(self):
         # Enable CORS and disable caching for API/assets
-        self.send_header('Access-Control-Allow-Origin', '*')
-        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-        self.send_header('Access-Control-Allow-Headers', 'Content-Type')
-        self.send_header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.send_header(
+            "Cache-Control", "no-store, no-cache, must-revalidate, max-age=0"
+        )
         super().end_headers()
 
     def do_OPTIONS(self):
@@ -38,23 +41,31 @@ class LabelingToolHandler(http.server.SimpleHTTPRequestHandler):
 
             try:
                 data = []
-                with open(CSV_FILE, mode='r', encoding='utf-8') as f:
+                with open(CSV_FILE, mode="r", encoding="utf-8") as f:
                     reader = csv.DictReader(f)
                     for row in reader:
-                        data.append({
-                            "file_path": row.get("file_path", ""),
-                            "filename": row.get("filename", ""),
-                            "greedy_transcription": row.get("greedy_transcription", ""),
-                            "greedy_confidence": float(row.get("greedy_confidence", 0.0)) if row.get("greedy_confidence") else 0.0
-                        })
-                
+                        data.append(
+                            {
+                                "file_path": row.get("file_path", ""),
+                                "filename": row.get("filename", ""),
+                                "greedy_transcription": row.get(
+                                    "greedy_transcription", ""
+                                ),
+                                "greedy_confidence": (
+                                    float(row.get("greedy_confidence", 0.0))
+                                    if row.get("greedy_confidence")
+                                    else 0.0
+                                ),
+                            }
+                        )
+
                 # Sort segments by confidence ascending (lowest confidence first)
                 data.sort(key=lambda x: x["greedy_confidence"])
 
                 # Load existing labels if train_labeled.csv exists to preserve state
                 labeled_map = {}
                 if os.path.exists(TRAIN_FILE):
-                    with open(TRAIN_FILE, mode='r', encoding='utf-8') as f:
+                    with open(TRAIN_FILE, mode="r", encoding="utf-8") as f:
                         reader = csv.DictReader(f)
                         for row in reader:
                             # Map path to sentence
@@ -64,7 +75,9 @@ class LabelingToolHandler(http.server.SimpleHTTPRequestHandler):
                 for row in data:
                     row["labeled_sentence"] = labeled_map.get(row["file_path"], "")
 
-                response_bytes = json.dumps({"status": "success", "data": data}).encode('utf-8')
+                response_bytes = json.dumps({"status": "success", "data": data}).encode(
+                    "utf-8"
+                )
                 self.send_response(200)
                 self.send_header("Content-Type", "application/json")
                 self.send_header("Content-Length", str(len(response_bytes)))
@@ -79,7 +92,7 @@ class LabelingToolHandler(http.server.SimpleHTTPRequestHandler):
             self.send_response(200)
             self.send_header("Content-Type", "text/html; charset=utf-8")
             self.end_headers()
-            self.wfile.write(UI_HTML.encode('utf-8'))
+            self.wfile.write(UI_HTML.encode("utf-8"))
             return
 
         # Serve static audio files and other assets
@@ -90,20 +103,25 @@ class LabelingToolHandler(http.server.SimpleHTTPRequestHandler):
         path = parsed_url.path
 
         if path == "/api/save":
-            content_length = int(self.headers['Content-Length'])
+            content_length = int(self.headers["Content-Length"])
             post_data = self.rfile.read(content_length)
             try:
-                payload = json.loads(post_data.decode('utf-8'))
+                payload = json.loads(post_data.decode("utf-8"))
                 labels = payload.get("labels", [])  # List of {path: ..., sentence: ...}
 
                 # Save to train_labeled.csv
-                with open(TRAIN_FILE, mode='w', encoding='utf-8', newline='') as f:
+                with open(TRAIN_FILE, mode="w", encoding="utf-8", newline="") as f:
                     writer = csv.writer(f)
                     writer.writerow(["path", "sentence"])
                     for label in labels:
                         writer.writerow([label.get("path"), label.get("sentence")])
 
-                response_bytes = json.dumps({"status": "success", "message": f"Successfully saved {len(labels)} labels to {TRAIN_FILE}"}).encode('utf-8')
+                response_bytes = json.dumps(
+                    {
+                        "status": "success",
+                        "message": f"Successfully saved {len(labels)} labels to {TRAIN_FILE}",
+                    }
+                ).encode("utf-8")
                 self.send_response(200)
                 self.send_header("Content-Type", "application/json")
                 self.send_header("Content-Length", str(len(response_bytes)))
@@ -118,10 +136,11 @@ class LabelingToolHandler(http.server.SimpleHTTPRequestHandler):
     def send_error_json(self, code, message):
         self.send_response(code)
         self.send_header("Content-Type", "application/json")
-        err_bytes = json.dumps({"status": "error", "message": message}).encode('utf-8')
+        err_bytes = json.dumps({"status": "error", "message": message}).encode("utf-8")
         self.send_header("Content-Length", str(len(err_bytes)))
         self.end_headers()
         self.wfile.write(err_bytes)
+
 
 # SPA interface html
 UI_HTML = """<!DOCTYPE html>
@@ -687,13 +706,16 @@ UI_HTML = """<!DOCTYPE html>
 </html>
 """
 
+
 def main():
     parser = argparse.ArgumentParser(description="Active Labeler Server")
     parser.add_argument("--port", type=int, default=PORT, help="Port to listen on")
     args = parser.parse_args()
 
     # Change to repo root directory so that relative paths resolve correctly
-    repo_root = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", ".."))
+    repo_root = os.path.abspath(
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..")
+    )
     os.chdir(repo_root)
 
     # Start server
@@ -705,6 +727,7 @@ def main():
         except KeyboardInterrupt:
             print("\nShutting down server...")
             sys.exit(0)
+
 
 if __name__ == "__main__":
     main()

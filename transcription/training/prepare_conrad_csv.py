@@ -30,17 +30,17 @@ def main():
     dropped_f_count = 0
     dropped_b_count = 0
 
-    with open(conrad_csv, mode='r', encoding='utf-8') as f:
+    with open(conrad_csv, mode="r", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         for row in reader:
-            raw_text = row['sentence']
+            raw_text = row["sentence"]
             if isinstance(raw_text, str):
                 # First step: drop wordfinal ';' and replace word medial ';' with ':'
                 words = raw_text.split()
                 processed_words = []
                 for w in words:
-                    stripped = w.rstrip(';')
-                    processed_words.append(stripped.replace(';', ':'))
+                    stripped = w.rstrip(";")
+                    processed_words.append(stripped.replace(";", ":"))
                 raw_text = " ".join(processed_words)
 
                 raw_text = raw_text.lower()
@@ -54,7 +54,7 @@ def main():
             if should_drop:
                 dropped_count += 1
                 continue
-            
+
             # Final step: remove all colons (those that weren't placed by vowels, remaining after tone normalizer)
             norm_text = norm_text.replace(":", "")
             # Replace doubled vowels VV with V: for long vowels
@@ -73,12 +73,14 @@ def main():
                 dropped_b_count += 1
                 continue
 
-            processed_rows.append([row['path'], cleaned_text])
+            processed_rows.append([row["path"], cleaned_text])
 
-    print(f"Processed {len(processed_rows)} rows. (Dropped due to rare marks: {dropped_count}, Empty: {empty_count}, Containing 'f': {dropped_f_count}, Containing 'b': {dropped_b_count})")
+    print(
+        f"Processed {len(processed_rows)} rows. (Dropped due to rare marks: {dropped_count}, Empty: {empty_count}, Containing 'f': {dropped_f_count}, Containing 'b': {dropped_b_count})"
+    )
 
     print(f"Appending {len(processed_rows)} rows to '{train_csv}'...")
-    with open(train_csv, mode='a', encoding='utf-8', newline='') as f:
+    with open(train_csv, mode="a", encoding="utf-8", newline="") as f:
         writer = csv.writer(f)
         writer.writerows(processed_rows)
 

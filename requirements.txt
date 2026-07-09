@@ -18,3 +18,5 @@ uvicorn
 python-multipart
 ffmpeg-python
 torchcodec
+black
+pre-commit

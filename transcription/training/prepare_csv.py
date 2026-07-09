@@ -15,7 +15,6 @@ import csv
 from transcription.utils.tone_normalization import remove_tones_and_double_vowels
 
 
-
 def clean_transcription(text):
     """
     Cleans up transcription text by removing punctuation/formatting,
@@ -25,12 +24,30 @@ def clean_transcription(text):
         return ""
     # Characters to clean up (including asterisks used for formatting/bolding words in sentences_audio.csv)
     punctuation = [
-        "[", "]", "\"", "(", ")", ".", "\u0f7b", "_", "|", "》", "?", "!",
-        "/", ",", "-", "?", "<", "…", ">", "*"
+        "[",
+        "]",
+        '"',
+        "(",
+        ")",
+        ".",
+        "\u0f7b",
+        "_",
+        "|",
+        "》",
+        "?",
+        "!",
+        "/",
+        ",",
+        "-",
+        "?",
+        "<",
+        "…",
+        ">",
+        "*",
     ]
     for p in punctuation:
         text = text.replace(p, " ")
-    
+
     # Collapse multiple spaces and lowercase the result
     return " ".join(text.split()).lower()
 
@@ -41,7 +58,7 @@ def get_audio_metadata(filepath):
     """
     try:
         filesize = os.path.getsize(filepath)
-        with contextlib.closing(wave.open(filepath, 'r')) as f:
+        with contextlib.closing(wave.open(filepath, "r")) as f:
             frames = f.getnframes()
             rate = f.getframerate()
             duration = frames / float(rate)
@@ -59,44 +76,44 @@ def main():
         "--csv",
         type=str,
         default="training_data/processed/sentence_audio.csv",
-        help="Path to the input CSV file containing metadata (default: training_data/processed/sentence_audio.csv)"
+        help="Path to the input CSV file containing metadata (default: training_data/processed/sentence_audio.csv)",
     )
     parser.add_argument(
         "--audio-dir",
         type=str,
         default="training_data/processed/sentence_audio",
-        help="Path to the directory containing audio files (default: training_data/processed/sentence_audio)"
+        help="Path to the directory containing audio files (default: training_data/processed/sentence_audio)",
     )
     parser.add_argument(
         "--text-col",
         type=str,
         default="phonetic",
-        help="Column name in the CSV to use for transcription text (default: phonetic)"
+        help="Column name in the CSV to use for transcription text (default: phonetic)",
     )
     parser.add_argument(
         "--output-prefix",
         type=str,
         default="training_data/processed/cim-wav2vec2",
-        help="Prefix for the generated train/valid/test split CSV files (default: training_data/processed/cim-wav2vec2)"
+        help="Prefix for the generated train/valid/test split CSV files (default: training_data/processed/cim-wav2vec2)",
     )
     parser.add_argument(
         "--max-duration",
         type=float,
         default=15.0,
-        help="Maximum audio duration (seconds) to include in the splits (default: 15.0)"
+        help="Maximum audio duration (seconds) to include in the splits (default: 15.0)",
     )
     parser.add_argument(
         "--split",
         type=float,
         nargs=3,
         default=[80.0, 10.0, 10.0],
-        help="Train, Validation, and Test split percentages summing to 100 (default: 80 10 10)"
+        help="Train, Validation, and Test split percentages summing to 100 (default: 80 10 10)",
     )
     parser.add_argument(
         "--seed",
         type=int,
         default=42,
-        help="Random seed for reproducibility when shuffling dataset (default: 42)"
+        help="Random seed for reproducibility when shuffling dataset (default: 42)",
     )
 
     args = parser.parse_args()
@@ -117,18 +134,22 @@ def main():
         return
 
     print(f"Reading metadata from '{args.csv}'...")
-    
+
     samples = []
-    
-    with open(args.csv, mode='r', encoding='utf-8') as f:
+
+    with open(args.csv, mode="r", encoding="utf-8") as f:
         reader = csv.DictReader(f)
-        
+
         # Check column headers
         if "audio" not in reader.fieldnames:
-            print("Error: Input CSV must contain an 'audio' column specifying filename.")
+            print(
+                "Error: Input CSV must contain an 'audio' column specifying filename."
+            )
             return
         if args.text_col not in reader.fieldnames:
-            print(f"Error: Transcription column '{args.text_col}' not found in CSV headers: {reader.fieldnames}")
+            print(
+                f"Error: Transcription column '{args.text_col}' not found in CSV headers: {reader.fieldnames}"
+            )
             return
 
         for row in reader:
@@ -144,16 +165,16 @@ def main():
     dropped_b_count = 0
 
     for row in samples:
-        filename = row['audio']
+        filename = row["audio"]
         filepath = os.path.join(args.audio_dir, filename)
-        
+
         # 1. Check audio file exists
         if not os.path.isfile(filepath):
             missing_count += 1
             continue
 
         size, dur = get_audio_metadata(filepath)
-        
+
         if size is None or dur is None:
             continue
 
@@ -164,8 +185,8 @@ def main():
             words = raw_text.split()
             processed_words = []
             for w in words:
-                stripped = w.rstrip(';')
-                processed_words.append(stripped.replace(';', ':'))
+                stripped = w.rstrip(";")
+                processed_words.append(stripped.replace(";", ":"))
             raw_text = " ".join(processed_words)
 
             raw_text = raw_text.lower().replace("*", "").replace("ʔ", "'")
@@ -175,14 +196,14 @@ def main():
         if should_drop:
             dropped_tone_count += 1
             continue
-            
+
         # Final step: remove all colons (those that weren't placed by vowels, remaining after tone normalizer)
         norm_text = norm_text.replace(":", "")
         # Replace doubled vowels VV with V: for long vowels
         for v in ["a", "e", "i", "o", "u", "v"]:
             norm_text = norm_text.replace(v + v, v + ":")
         cleaned_text = clean_transcription(norm_text)
-        
+
         if cleaned_text == "":
             empty_transcripts += 1
             continue
@@ -200,15 +221,16 @@ def main():
             duration_filtered += 1
             continue
 
-        valid_samples.append({
-            'path': filepath,
-            'sentence': cleaned_text
-        })
+        valid_samples.append({"path": filepath, "sentence": cleaned_text})
 
     if missing_count > 0:
-        print(f"Note: {missing_count} audio files referenced in CSV were not found in '{args.audio_dir}'.")
+        print(
+            f"Note: {missing_count} audio files referenced in CSV were not found in '{args.audio_dir}'."
+        )
     if dropped_tone_count > 0:
-        print(f"Note: {dropped_tone_count} samples dropped due to rare tone/diacritic marks.")
+        print(
+            f"Note: {dropped_tone_count} samples dropped due to rare tone/diacritic marks."
+        )
     if empty_transcripts > 0:
         print(f"Note: {empty_transcripts} empty transcripts removed.")
     if dropped_f_count > 0:
@@ -216,8 +238,9 @@ def main():
     if dropped_b_count > 0:
         print(f"Note: {dropped_b_count} samples dropped due to containing 'b'.")
     if duration_filtered > 0:
-        print(f"Note: {duration_filtered} samples dropped for exceeding maximum duration of {args.max_duration}s.")
-
+        print(
+            f"Note: {duration_filtered} samples dropped for exceeding maximum duration of {args.max_duration}s."
+        )
 
     # Shuffle the dataset
     print(f"Shuffling dataset with seed {args.seed}...")
@@ -249,11 +272,11 @@ def main():
     test_csv = f"{args.output_prefix}-test.csv"
 
     def write_csv(data, filename):
-        with open(filename, mode='w', encoding='utf-8', newline='') as out_f:
+        with open(filename, mode="w", encoding="utf-8", newline="") as out_f:
             writer = csv.writer(out_f)
-            writer.writerow(['path', 'sentence'])
+            writer.writerow(["path", "sentence"])
             for item in data:
-                writer.writerow([item['path'], item['sentence']])
+                writer.writerow([item["path"], item["sentence"]])
 
     print(f"\nWriting output CSV files...")
     write_csv(train_data, train_csv)

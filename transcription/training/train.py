@@ -160,6 +160,7 @@ class DataCollatorCTCWithPadding:
 
 def parse_args():
     import argparse
+
     parser = argparse.ArgumentParser(
         description="Train Wav2Vec2 on local or remote machine."
     )
@@ -325,7 +326,9 @@ def load_and_prepare_csvs():
     return df_train, df_valid, df_test, audio_col, text_col
 
 
-def build_vocabulary_and_processor(df_train, df_valid, df_test, text_col, folder_model_files):
+def build_vocabulary_and_processor(
+    df_train, df_valid, df_test, text_col, folder_model_files
+):
     print("Building vocabulary...")
     all_text = " ".join(
         pd.concat([df_train[text_col], df_valid[text_col], df_test[text_col]]).tolist()
@@ -485,8 +488,11 @@ def initialize_model_and_trainer(processor, train_ds, valid_ds, folder_model_fil
 def resolve_resume_checkpoint(args, folder_model_files):
     resume_checkpoint = None
     if args.resume_from_repo:
-        print(f"Downloading checkpoint from repository: {args.resume_from_repo} (revision: {args.resume_from_revision or 'main'})")
+        print(
+            f"Downloading checkpoint from repository: {args.resume_from_repo} (revision: {args.resume_from_revision or 'main'})"
+        )
         from huggingface_hub import snapshot_download
+
         downloaded_dir = snapshot_download(
             repo_id=args.resume_from_repo,
             revision=args.resume_from_revision,
@@ -495,36 +501,54 @@ def resolve_resume_checkpoint(args, folder_model_files):
         print(f"Checkpoint downloaded to: {downloaded_dir}")
         if os.path.exists(os.path.join(downloaded_dir, "trainer_state.json")):
             resume_checkpoint = downloaded_dir
-            print(f"Using downloaded repository root as checkpoint: {resume_checkpoint}")
+            print(
+                f"Using downloaded repository root as checkpoint: {resume_checkpoint}"
+            )
         else:
             import glob
             import re
+
             ckpt_dirs = glob.glob(os.path.join(downloaded_dir, "checkpoint-*"))
             if ckpt_dirs:
+
                 def _step(p):
                     m = re.search(r"checkpoint-(\d+)", os.path.basename(p))
                     return int(m.group(1)) if m else -1
+
                 resume_checkpoint = max(ckpt_dirs, key=_step)
-                print(f"Found latest checkpoint subdirectory in snapshot: {resume_checkpoint}")
+                print(
+                    f"Found latest checkpoint subdirectory in snapshot: {resume_checkpoint}"
+                )
             else:
-                print(f"WARNING: No trainer_state.json or checkpoint-* directory found in downloaded snapshot {downloaded_dir}.")
-                print("Cannot resume training state (optimizers/scheduler). Setting resume_checkpoint to None.")
-                print(f"Updating base_checkpoint to load model weights from: {downloaded_dir}")
+                print(
+                    f"WARNING: No trainer_state.json or checkpoint-* directory found in downloaded snapshot {downloaded_dir}."
+                )
+                print(
+                    "Cannot resume training state (optimizers/scheduler). Setting resume_checkpoint to None."
+                )
+                print(
+                    f"Updating base_checkpoint to load model weights from: {downloaded_dir}"
+                )
                 CONFIG["base_checkpoint"] = downloaded_dir
                 resume_checkpoint = None
     elif args.resume_from_checkpoint:
         if args.resume_from_checkpoint.lower() == "latest":
             import glob
             import re
+
             ckpt_dirs = glob.glob(os.path.join(folder_model_files, "checkpoint-*"))
             if ckpt_dirs:
+
                 def _step(p):
                     m = re.search(r"checkpoint-(\d+)", os.path.basename(p))
                     return int(m.group(1)) if m else -1
+
                 resume_checkpoint = max(ckpt_dirs, key=_step)
                 print(f"Found latest local checkpoint: {resume_checkpoint}")
             else:
-                print("No local checkpoints found under the output directory. Starting from scratch.")
+                print(
+                    "No local checkpoints found under the output directory. Starting from scratch."
+                )
                 resume_checkpoint = None
         else:
             resume_checkpoint = args.resume_from_checkpoint
@@ -541,19 +565,23 @@ def train_model(trainer, resume_checkpoint, folder_model_files, processor):
     print("Training complete. Base model saved.")
 
 
-def evaluate_checkpoints(folder_model_files, test_ds_prepared, data_collator, processor):
+def evaluate_checkpoints(
+    folder_model_files, test_ds_prepared, data_collator, processor
+):
     print("Starting post-training evaluation of checkpoints...")
     from transcription.utils.evaluation import yield_local_checkpoints, run_evaluation
-    
-    generator = yield_local_checkpoints(folder_model_files, processor_path=folder_model_files)
-    
+
+    generator = yield_local_checkpoints(
+        folder_model_files, processor_path=folder_model_files
+    )
+
     rows_by_ckpt, ranking_df = run_evaluation(
         generator,
         test_ds_prepared,
         data_collator,
-        batch_size=CONFIG.get("eval_batch_size", 16)
+        batch_size=CONFIG.get("eval_batch_size", 16),
     )
-    
+
     # Find the best unmasked checkpoint
     ranking_unmasked = ranking_df.sort_values(
         by=[
@@ -582,12 +610,16 @@ def evaluate_checkpoints(folder_model_files, test_ds_prepared, data_collator, pr
 
     print(f"\n==========================================")
     print(f"EVALUATION SUMMARY:")
-    print(f"Best Unmasked Checkpoint: {best_unmasked_ckpt} (WER: {best_unmasked_wer:.4f})")
+    print(
+        f"Best Unmasked Checkpoint: {best_unmasked_ckpt} (WER: {best_unmasked_wer:.4f})"
+    )
     print(f"Best Masked Checkpoint:   {best_masked_ckpt} (WER: {best_masked_wer:.4f})")
     print(f"==========================================\n")
 
     best_ckpt_label = best_unmasked_ckpt
-    best_ckpt_path = ranking_df[ranking_df["checkpoint"] == best_ckpt_label].iloc[0]["path"]
+    best_ckpt_path = ranking_df[ranking_df["checkpoint"] == best_ckpt_label].iloc[0][
+        "path"
+    ]
 
     return (
         best_unmasked_ckpt,
@@ -601,8 +633,9 @@ def evaluate_checkpoints(folder_model_files, test_ds_prepared, data_collator, pr
     )
 
 
-
-def promote_best_checkpoint(best_ckpt_label, best_ckpt_path, folder_model_files, processor):
+def promote_best_checkpoint(
+    best_ckpt_label, best_ckpt_path, folder_model_files, processor
+):
     print(f"\nBest checkpoint identified (for promotion): {best_ckpt_label}")
     for fname in os.listdir(best_ckpt_path):
         if fname in (
@@ -648,8 +681,12 @@ def save_results_summary(
     )
     with open(summary_txt, "w", encoding="utf-8") as f:
         f.write(f"ASR Language: {CONFIG['asr_lang']}\nRun ID: {CONFIG['run_id']}\n")
-        f.write(f"Best Unmasked Checkpoint: {best_unmasked_ckpt} (WER: {best_unmasked_wer:.4f})\n")
-        f.write(f"Best Masked Checkpoint:   {best_masked_ckpt} (WER: {best_masked_wer:.4f})\n")
+        f.write(
+            f"Best Unmasked Checkpoint: {best_unmasked_ckpt} (WER: {best_unmasked_wer:.4f})\n"
+        )
+        f.write(
+            f"Best Masked Checkpoint:   {best_masked_ckpt} (WER: {best_masked_wer:.4f})\n"
+        )
         f.write(f"Promoted checkpoint: {best_ckpt_label}\n")
         f.write(f"Ranking:\n{ranking_df.to_string()}\n")
     print(f"Summary written to {summary_txt}")
@@ -680,9 +717,13 @@ def main():
         best_ckpt_path,
         rows_by_ckpt,
         ranking_df,
-    ) = evaluate_checkpoints(folder_model_files, test_ds_prepared, data_collator, processor)
+    ) = evaluate_checkpoints(
+        folder_model_files, test_ds_prepared, data_collator, processor
+    )
 
-    promote_best_checkpoint(best_ckpt_label, best_ckpt_path, folder_model_files, processor)
+    promote_best_checkpoint(
+        best_ckpt_label, best_ckpt_path, folder_model_files, processor
+    )
 
     save_results_summary(
         rows_by_ckpt,

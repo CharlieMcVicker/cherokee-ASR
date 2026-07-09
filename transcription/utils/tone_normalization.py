@@ -199,9 +199,6 @@ def remove_tones_and_double_vowels(text):
     return " ".join(new_words), False
 
 
-
-
-
 def main():
     if len(sys.argv) < 3:
         print("Usage: python tone_normalize.py <input_csv> <output_csv> [text_column]")

@@ -29,7 +29,7 @@ from transcription.inference.infer import (
     TARGET_SAMPLE_RATE,
     load_and_preprocess_audio,
     calculate_word_confidences,
-    greedy_inference
+    greedy_inference,
 )
 
 # Global variables in the worker processes to avoid serializing the processor objects
@@ -44,7 +44,7 @@ def init_worker(processor_path, token, revision):
     global global_processor
     # Restrict internal Torch threading in workers to prevent CPU oversubscription
     torch.set_num_threads(1)
-    
+
     from transformers import Wav2Vec2Processor
 
     global_processor = Wav2Vec2Processor.from_pretrained(
@@ -61,10 +61,13 @@ def decode_worker(item_data):
     import numpy as np
     import torch
     import json
-    from transcription.inference.infer import calculate_word_confidences, greedy_inference
-    
+    from transcription.inference.infer import (
+        calculate_word_confidences,
+        greedy_inference,
+    )
+
     idx, filename, audio_path, logits_np = item_data
-    
+
     logits_tensor = torch.tensor(logits_np)
     res = greedy_inference(logits_tensor, global_processor)
     greedy_raw = res["text"]
@@ -82,7 +85,7 @@ def decode_worker(item_data):
         "audio_path": audio_path,
         "greedy_raw": greedy_raw,
         "greedy_confidence": greedy_confidence,
-        "word_confidences": word_confidences_json
+        "word_confidences": word_confidences_json,
     }
 
 
@@ -151,7 +154,7 @@ def main():
     wav_files = []
     for ext in ("*.wav", "*.WAV"):
         wav_files.extend(glob.glob(os.path.join(args.dir_path, ext)))
-    
+
     wav_files = sorted(list(set(wav_files)))
     if not wav_files:
         print(f"No WAV files found in '{args.dir_path}'.", flush=True)
@@ -170,7 +173,7 @@ def main():
     else:
         print(
             f"Loading processor from Hugging Face Hub: {args.processor} (revision: {args.revision})...",
-            flush=True
+            flush=True,
         )
     processor = Wav2Vec2Processor.from_pretrained(
         args.processor, token=token, revision=args.revision
@@ -181,7 +184,7 @@ def main():
     else:
         print(
             f"Loading model from Hugging Face Hub: {args.checkpoint} (revision: {args.revision})...",
-            flush=True
+            flush=True,
         )
     model = Wav2Vec2ForCTC.from_pretrained(
         args.checkpoint, token=token, revision=args.revision
@@ -204,11 +207,9 @@ def main():
         filename = os.path.basename(audio_path)
         try:
             info = sf.info(audio_path)
-            loaded_audios.append({
-                "audio_path": audio_path,
-                "filename": filename,
-                "length": info.frames
-            })
+            loaded_audios.append(
+                {"audio_path": audio_path, "filename": filename, "length": info.frames}
+            )
         except Exception as e:
             print(f"Error reading metadata for {filename}: {e}", flush=True)
 
@@ -218,23 +219,37 @@ def main():
 
     # Sort by length
     loaded_audios.sort(key=lambda x: x["length"])
-    print(f"Successfully loaded {len(loaded_audios)} files in {time.time() - audio_load_start:.2f}s.", flush=True)
+    print(
+        f"Successfully loaded {len(loaded_audios)} files in {time.time() - audio_load_start:.2f}s.",
+        flush=True,
+    )
 
     # Create batches
-    batches = [loaded_audios[i : i + args.batch_size] for i in range(0, len(loaded_audios), args.batch_size)]
-    
+    batches = [
+        loaded_audios[i : i + args.batch_size]
+        for i in range(0, len(loaded_audios), args.batch_size)
+    ]
+
     # Initialize multiprocessing Pool for parallel decoding
     num_workers = args.num_workers or multiprocessing.cpu_count()
-    print(f"Initializing multiprocessing pool with {num_workers} workers...", flush=True)
-    
+    print(
+        f"Initializing multiprocessing pool with {num_workers} workers...", flush=True
+    )
+
     pool = multiprocessing.Pool(
         processes=num_workers,
         initializer=init_worker,
-        initargs=(args.processor, token, args.revision)
+        initargs=(args.processor, token, args.revision),
     )
 
     # Initialize CSV headers
-    headers = ["file_path", "filename", "greedy_transcription", "greedy_confidence", "word_confidences"]
+    headers = [
+        "file_path",
+        "filename",
+        "greedy_transcription",
+        "greedy_confidence",
+        "word_confidences",
+    ]
 
     os.makedirs(os.path.dirname(args.output), exist_ok=True)
     with open(args.output, "w", newline="", encoding="utf-8") as f:
@@ -242,17 +257,24 @@ def main():
         writer.writerow(headers)
 
     import threading
+
     csv_lock = threading.Lock()
-    
+
     # Bounded semaphore to prevent IPC queue explosion and system OOM/segfault
-    max_queue = threading.Semaphore(args.batch_size * 5) 
-    
+    max_queue = threading.Semaphore(args.batch_size * 5)
+
     def write_result_callback(res):
         try:
             with csv_lock:
                 with open(args.output, "a", newline="", encoding="utf-8") as f:
                     writer = csv.writer(f)
-                    row = [res["audio_path"], res["filename"], res["greedy_raw"], f"{res['greedy_confidence']:.4f}", res.get("word_confidences", "[]")]
+                    row = [
+                        res["audio_path"],
+                        res["filename"],
+                        res["greedy_raw"],
+                        f"{res['greedy_confidence']:.4f}",
+                        res.get("word_confidences", "[]"),
+                    ]
                     writer.writerow(row)
         finally:
             max_queue.release()
@@ -260,27 +282,35 @@ def main():
     global_idx = 0
 
     gpu_start_time = time.time()
-    print(f"Running batched GPU inference and streaming decoding (batch size: {args.batch_size}, total batches: {len(batches)})...", flush=True)
-    
+    print(
+        f"Running batched GPU inference and streaming decoding (batch size: {args.batch_size}, total batches: {len(batches)})...",
+        flush=True,
+    )
+
     pbar = tqdm(total=len(loaded_audios), desc="Transcribing", unit="file")
     for batch_idx, batch in enumerate(batches, 1):
         speech_list = []
         for item in batch:
             try:
-                speech = load_and_preprocess_audio(item["audio_path"], TARGET_SAMPLE_RATE)
+                speech = load_and_preprocess_audio(
+                    item["audio_path"], TARGET_SAMPLE_RATE
+                )
                 item["speech"] = speech
                 speech_list.append(speech)
             except Exception as e:
-                print(f"Error reading audio {item['filename']} during batching: {e}", flush=True)
+                print(
+                    f"Error reading audio {item['filename']} during batching: {e}",
+                    flush=True,
+                )
                 speech = np.zeros(16000, dtype=np.float32)
                 item["speech"] = speech
                 speech_list.append(speech)
-        
+
         inputs = processor(
             speech_list,
             sampling_rate=TARGET_SAMPLE_RATE,
             padding=True,
-            return_tensors="pt"
+            return_tensors="pt",
         )
         input_values = inputs.input_values.to(device)
         attention_mask = getattr(inputs, "attention_mask", None)
@@ -290,24 +320,32 @@ def main():
         try:
             with torch.no_grad():
                 if attention_mask is not None:
-                    batch_logits = model(input_values, attention_mask=attention_mask).logits
+                    batch_logits = model(
+                        input_values, attention_mask=attention_mask
+                    ).logits
                 else:
                     batch_logits = model(input_values).logits
         except Exception as e:
             err_str = str(e).lower()
-            is_oom = "out of memory" in err_str or (hasattr(torch.cuda, "OutOfMemoryError") and isinstance(e, torch.cuda.OutOfMemoryError))
+            is_oom = "out of memory" in err_str or (
+                hasattr(torch.cuda, "OutOfMemoryError")
+                and isinstance(e, torch.cuda.OutOfMemoryError)
+            )
             is_cudnn_err = "unable to find an engine" in err_str or "cudnn" in err_str
-            
+
             if is_oom or is_cudnn_err:
                 reason = "OOM" if is_oom else "cuDNN error"
-                print(f"  {reason} on batch {batch_idx}. Falling back to sequential inference for this batch...", flush=True)
-                
+                print(
+                    f"  {reason} on batch {batch_idx}. Falling back to sequential inference for this batch...",
+                    flush=True,
+                )
+
                 # Free large tensors to ensure empty_cache succeeds
-                if 'input_values' in locals():
+                if "input_values" in locals():
                     del input_values
-                if 'attention_mask' in locals():
+                if "attention_mask" in locals():
                     del attention_mask
-                    
+
                 if torch.cuda.is_available():
                     torch.cuda.empty_cache()
                 for item_idx, item in enumerate(batch):
@@ -315,50 +353,85 @@ def main():
                         [item["speech"]],
                         sampling_rate=TARGET_SAMPLE_RATE,
                         padding=True,
-                        return_tensors="pt"
+                        return_tensors="pt",
                     )
                     single_input_values = single_inputs.input_values.to(device)
-                    single_attention_mask = getattr(single_inputs, "attention_mask", None)
+                    single_attention_mask = getattr(
+                        single_inputs, "attention_mask", None
+                    )
                     if single_attention_mask is not None:
                         single_attention_mask = single_attention_mask.to(device)
-                    
+
                     try:
                         with torch.no_grad():
                             with torch.backends.cudnn.flags(enabled=False):
                                 if single_attention_mask is not None:
-                                    single_logits = model(single_input_values, attention_mask=single_attention_mask).logits
+                                    single_logits = model(
+                                        single_input_values,
+                                        attention_mask=single_attention_mask,
+                                    ).logits
                                 else:
                                     single_logits = model(single_input_values).logits
-                        
+
                         input_len = len(item["speech"])
-                        logit_len = int(model._get_feat_extract_output_lengths(input_len))
-                        logits_np = single_logits[0, :logit_len].detach().cpu().numpy().copy()
-                        item_data = (global_idx, item["filename"], item["audio_path"], logits_np)
+                        logit_len = int(
+                            model._get_feat_extract_output_lengths(input_len)
+                        )
+                        logits_np = (
+                            single_logits[0, :logit_len].detach().cpu().numpy().copy()
+                        )
+                        item_data = (
+                            global_idx,
+                            item["filename"],
+                            item["audio_path"],
+                            logits_np,
+                        )
                         max_queue.acquire()
-                        pool.apply_async(decode_worker, (item_data,), callback=write_result_callback)
+                        pool.apply_async(
+                            decode_worker, (item_data,), callback=write_result_callback
+                        )
                         global_idx += 1
                     except Exception as seq_e:
-                        print(f"  Fatal OOM on {item['filename']} even with batch_size=1. Skipping file...", flush=True)
+                        print(
+                            f"  Fatal OOM on {item['filename']} even with batch_size=1. Skipping file...",
+                            flush=True,
+                        )
                         empty_np = np.zeros((1, 32), dtype=np.float32)
-                        item_data = (global_idx, item["filename"], item["audio_path"], empty_np)
+                        item_data = (
+                            global_idx,
+                            item["filename"],
+                            item["audio_path"],
+                            empty_np,
+                        )
                         max_queue.acquire()
-                        pool.apply_async(decode_worker, (item_data,), callback=write_result_callback)
+                        pool.apply_async(
+                            decode_worker, (item_data,), callback=write_result_callback
+                        )
                         global_idx += 1
                     finally:
-                        if 'single_logits' in locals(): del single_logits
-                        if 'single_inputs' in locals(): del single_inputs
-                        if 'single_input_values' in locals(): del single_input_values
-                        if 'single_attention_mask' in locals(): del single_attention_mask
-                        if torch.cuda.is_available(): torch.cuda.empty_cache()
-                
+                        if "single_logits" in locals():
+                            del single_logits
+                        if "single_inputs" in locals():
+                            del single_inputs
+                        if "single_input_values" in locals():
+                            del single_input_values
+                        if "single_attention_mask" in locals():
+                            del single_attention_mask
+                        if torch.cuda.is_available():
+                            torch.cuda.empty_cache()
+
                 # Free raw speech memory from batch dicts
                 for item in batch:
                     item.pop("speech", None)
-                if 'speech_list' in locals(): del speech_list
-                
+                if "speech_list" in locals():
+                    del speech_list
+
                 continue
             elif isinstance(e, NotImplementedError) and device == "mps":
-                print("  MPS execution failed. Falling back to CPU backend for this batch...", flush=True)
+                print(
+                    "  MPS execution failed. Falling back to CPU backend for this batch...",
+                    flush=True,
+                )
                 device = "cpu"
                 model.to(device)
                 input_values = input_values.to(device)
@@ -366,7 +439,9 @@ def main():
                     attention_mask = attention_mask.to(device)
                 with torch.no_grad():
                     if attention_mask is not None:
-                        batch_logits = model(input_values, attention_mask=attention_mask).logits
+                        batch_logits = model(
+                            input_values, attention_mask=attention_mask
+                        ).logits
                     else:
                         batch_logits = model(input_values).logits
             else:
@@ -379,22 +454,29 @@ def main():
             logits_np = batch_logits[item_idx, :logit_len].detach().cpu().numpy().copy()
             item_data = (global_idx, item["filename"], item["audio_path"], logits_np)
             max_queue.acquire()
-            pool.apply_async(decode_worker, (item_data,), callback=write_result_callback)
+            pool.apply_async(
+                decode_worker, (item_data,), callback=write_result_callback
+            )
             global_idx += 1
-            
+
         pbar.update(len(batch))
-        
+
         # Free batch tensors to ensure we don't peak VRAM on next batch allocation
-        if 'batch_logits' in locals(): del batch_logits
-        if 'inputs' in locals(): del inputs
-        if 'input_values' in locals(): del input_values
-        if 'attention_mask' in locals(): del attention_mask
-        
+        if "batch_logits" in locals():
+            del batch_logits
+        if "inputs" in locals():
+            del inputs
+        if "input_values" in locals():
+            del input_values
+        if "attention_mask" in locals():
+            del attention_mask
+
         # Free raw speech memory from batch dicts
         for item in batch:
             item.pop("speech", None)
-        if 'speech_list' in locals(): del speech_list
-        
+        if "speech_list" in locals():
+            del speech_list
+
         # Keep VRAM heavily defragmented between every batch to accommodate long audio
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
@@ -402,29 +484,35 @@ def main():
     pbar.close()
     pool.close()
     pool.join()
-    
-    print(f"Inference and decoding completed in {time.time() - gpu_start_time:.2f}s.", flush=True)
+
+    print(
+        f"Inference and decoding completed in {time.time() - gpu_start_time:.2f}s.",
+        flush=True,
+    )
 
     # Final sort of CSV back to original directory reading order
     print("Sorting final CSV output...", flush=True)
     wav_order = {path: idx for idx, path in enumerate(wav_files)}
-    
+
     final_rows = []
     with open(args.output, "r", encoding="utf-8") as f:
         reader = csv.reader(f)
         headers = next(reader)
         for row in reader:
             final_rows.append(row)
-    
+
     final_rows.sort(key=lambda x: wav_order.get(x[0], 0))
-    
+
     with open(args.output, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
         writer.writerow(headers)
         writer.writerows(final_rows)
 
     total_time = time.time() - audio_load_start
-    print(f"\nBatch processing complete in {total_time:.2f}s. Results saved to {args.output}", flush=True)
+    print(
+        f"\nBatch processing complete in {total_time:.2f}s. Results saved to {args.output}",
+        flush=True,
+    )
 
 
 if __name__ == "__main__":

@@ -1,0 +1,27 @@
+[tool.black]
+line-length = 88
+target-version = ['py312']
+include = '\.pyi?$'
+exclude = '''
+(
+  /(
+      \.eggs
+    | \.git
+    | \.hg
+    | \.mypy_cache
+    | \.tox
+    | \.venv
+    | _build
+    | buck-out
+    | build
+    | dist
+    | data
+    | colab-script-rips
+    | archive
+  )/
+  | scripts/from_elan_to_wav_and_gsheet\.py
+  | transcription/audio/extract_from_elan\.py
+  | transcription/inference/long_recording\.py
+  | test_topk\.py
+)
+'''
