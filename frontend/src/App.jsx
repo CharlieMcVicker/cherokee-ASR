@@ -4,7 +4,7 @@ import RegionsPlugin from 'wavesurfer.js/dist/plugins/regions.esm.js';
 import { openDB } from 'idb';
 
 const initDB = async () => {
-  return await openDB('cherokee-search-db', 2, {
+  return await openDB('cherokee-search-db', 3, {
     upgrade(db, oldVersion, newVersion, transaction) {
       let segStore;
       if (!db.objectStoreNames.contains('segments')) {
@@ -27,6 +27,9 @@ const initDB = async () => {
       }
       if (!fwStore.indexNames.contains('by-file')) {
         fwStore.createIndex('by-file', 'file_path');
+      }
+      if (!fwStore.indexNames.contains('by-file-and-word')) {
+        fwStore.createIndex('by-file-and-word', ['file_path', 'word']);
       }
     }
   });
@@ -1367,8 +1370,8 @@ function View3({ theme }) {
                   }
                   fileWordsMap.get(wordClean).segments.push({
                       segmentIndex: idx,
-                      wordInfo: wObj,
-                      altWordInfo: altWordObj,
+                      word: wObj.word,
+                      confidence: altWordObj.confidence,
                       rank: rank
                   });
               });
@@ -1405,68 +1408,159 @@ function View3({ theme }) {
     }
 
     const searchAsync = async () => {
-      const query = formatText(debouncedSearchVal.trim()).toLowerCase();
-      const db = await initDB();
-      const wordsForFile = await db.getAllFromIndex('file_words', 'by-file', selectedCsv);
-      
-      const bestMatchPerSegment = new Map();
-
-      wordsForFile.forEach(fwObj => {
-        const wordClean = fwObj.word;
-        let baseDist = Infinity;
-        
-        if (wordClean === query) {
-          baseDist = 0;
-        } else if (wordClean.startsWith(query)) {
-          baseDist = 1;
-        } else if (wordClean.includes(query)) {
-          baseDist = 2;
-        }
-
-        if (baseDist < Infinity) {
-          fwObj.segments.forEach(segInfo => {
-             const isAlt = (segInfo.rank > 0);
-             const matchTypeDist = baseDist * 2 + (isAlt ? 1 : 0);
-             
-             const confidence = segInfo.altWordInfo ? segInfo.altWordInfo.confidence : segInfo.wordInfo.confidence;
-
-             const existing = bestMatchPerSegment.get(segInfo.segmentIndex);
-             if (!existing || matchTypeDist < existing.distance || (matchTypeDist === existing.distance && confidence > existing.confidence)) {
-                 bestMatchPerSegment.set(segInfo.segmentIndex, {
-                     segmentIndex: segInfo.segmentIndex,
-                     matchWordInfo: segInfo.wordInfo,
-                     altWordInfo: segInfo.altWordInfo,
-                     rank: segInfo.rank,
-                     distance: matchTypeDist,
-                     confidence: confidence
-                 });
-             }
-          });
-        }
-      });
-      
-      const matched = Array.from(bestMatchPerSegment.values());
-
-      matched.sort((a, b) => {
-        if (a.distance !== b.distance) {
-          return a.distance - b.distance;
-        }
-        return b.confidence - a.confidence;
-      });
-
-      const tx = db.transaction('segments');
-      const resultsWithSegments = [];
-      for (const m of matched) {
-         const seg = await tx.store.get(`${selectedCsv}_${m.segmentIndex}`);
-         if (seg) {
-             resultsWithSegments.push({
-                 ...m,
-                 segment: seg
-             });
-         }
+      const rawSearch = debouncedSearchVal.trim().toLowerCase();
+      const terms = rawSearch.split(/\s+/).filter(Boolean).map(t => formatText(t).toLowerCase()).filter(Boolean);
+      if (terms.length === 0) {
+        setResults([]);
+        return;
       }
-      
-      setResults(resultsWithSegments);
+      const db = await initDB();
+      try {
+        const bestMatchPerSegment = new Map();
+        const txWords = db.transaction('file_words', 'readonly');
+        const store = txWords.objectStore('file_words');
+        const index = store.index('by-file');
+        const termMatches = terms.map(() => []);
+
+        let indexExists = false;
+        try {
+          indexExists = store.indexNames.contains('by-file-and-word');
+        } catch(e) {}
+
+        if (indexExists) {
+          for (let termIdx = 0; termIdx < terms.length; termIdx++) {
+            const term = terms[termIdx];
+            const range = IDBKeyRange.bound([selectedCsv, term], [selectedCsv, term + '\uffff']);
+            const matches = await store.index('by-file-and-word').getAll(range);
+            for (const fwObj of matches) {
+              const wordClean = fwObj.word;
+              let baseDist = Infinity;
+              if (wordClean === term) {
+                baseDist = 0;
+              } else if (wordClean.startsWith(term)) {
+                baseDist = 1;
+              } else if (wordClean.includes(term)) {
+                baseDist = 2;
+              }
+              if (baseDist < Infinity) {
+                termMatches[termIdx].push({ fwObj, baseDist });
+              }
+            }
+          }
+        }
+
+        if (!indexExists || termMatches.every(arr => arr.length === 0)) {
+          let cursor = await index.openKeyCursor(IDBKeyRange.only(selectedCsv));
+          while (cursor) {
+            const primaryKey = cursor.primaryKey;
+            const wordPartWithRank = primaryKey.substring(selectedCsv.length + 1);
+            const lastUnderscore = wordPartWithRank.lastIndexOf('_');
+            if (lastUnderscore !== -1) {
+              const wordClean = wordPartWithRank.substring(0, lastUnderscore);
+              
+              terms.forEach((term, termIdx) => {
+                let baseDist = Infinity;
+                if (wordClean === term) {
+                  baseDist = 0;
+                } else if (wordClean.startsWith(term)) {
+                  baseDist = 1;
+                } else if (wordClean.includes(term)) {
+                  baseDist = 2;
+                }
+
+                if (baseDist < Infinity) {
+                  termMatches[termIdx].push({ primaryKey, baseDist });
+                }
+              });
+            }
+            cursor = await cursor.continue();
+          }
+        }
+
+        const termSegmentSets = [];
+        for (let termIdx = 0; termIdx < terms.length; termIdx++) {
+          const segmentSetForTerm = new Set();
+          
+          for (const matchInfo of termMatches[termIdx]) {
+            const fwObj = matchInfo.fwObj 
+              ? matchInfo.fwObj 
+              : (await store.get(matchInfo.primaryKey));
+            if (!fwObj) continue;
+
+            fwObj.segments.forEach(segInfo => {
+              segmentSetForTerm.add(segInfo.segmentIndex);
+              
+              const isAlt = (segInfo.rank > 0);
+              const matchTypeDist = matchInfo.baseDist * 2 + (isAlt ? 1 : 0);
+              
+              const confidence = segInfo.confidence !== undefined 
+                ? segInfo.confidence 
+                : (segInfo.altWordInfo ? segInfo.altWordInfo.confidence : segInfo.wordInfo.confidence);
+
+              const wordInfoVal = segInfo.wordInfo 
+                ? segInfo.wordInfo 
+                : { word: segInfo.word };
+
+              const existing = bestMatchPerSegment.get(segInfo.segmentIndex);
+              if (!existing || matchTypeDist < existing.distance || (matchTypeDist === existing.distance && confidence > existing.confidence)) {
+                  bestMatchPerSegment.set(segInfo.segmentIndex, {
+                      segmentIndex: segInfo.segmentIndex,
+                      matchWordInfo: wordInfoVal,
+                      rank: segInfo.rank,
+                      distance: matchTypeDist,
+                      confidence: confidence
+                  });
+              }
+            });
+          }
+          
+          termSegmentSets.push(segmentSetForTerm);
+        }
+
+        let candidateSegmentIndices = [];
+        if (termSegmentSets.length > 0) {
+          candidateSegmentIndices = Array.from(termSegmentSets[0]);
+          for (let i = 1; i < termSegmentSets.length; i++) {
+            candidateSegmentIndices = candidateSegmentIndices.filter(idx => termSegmentSets[i].has(idx));
+          }
+        }
+
+        const sortedCandidates = candidateSegmentIndices.map(idx => bestMatchPerSegment.get(idx)).filter(Boolean);
+        sortedCandidates.sort((a, b) => {
+          if (a.distance !== b.distance) {
+            return a.distance - b.distance;
+          }
+          return b.confidence - a.confidence;
+        });
+
+        const tx = db.transaction('segments');
+        const resultsWithSegments = [];
+        for (const m of sortedCandidates) {
+           if (resultsWithSegments.length >= 10) {
+             break;
+           }
+           const seg = await tx.store.get(`${selectedCsv}_${m.segmentIndex}`);
+           if (seg) {
+               const cleanTranscript = (seg.greedy_transcription || '').toLowerCase();
+               const formattedTranscript = formatText(cleanTranscript).toLowerCase();
+               const formattedRawQuery = formatText(rawSearch).toLowerCase();
+               
+               const isMultiWord = terms.length > 1;
+               const matchesLiteral = formattedTranscript.includes(formattedRawQuery) || cleanTranscript.includes(rawSearch);
+
+               if (!isMultiWord || matchesLiteral) {
+                   resultsWithSegments.push({
+                       ...m,
+                       segment: seg
+                   });
+               }
+           }
+        }
+        
+        setResults(resultsWithSegments);
+      } catch (err) {
+        console.error("Error searching IndexedDB: ", err);
+      }
     };
 
     searchAsync();
@@ -1629,11 +1723,14 @@ function View3({ theme }) {
           
           let manifestInfo = null;
           for (const key in manifestMap) {
-            if (mainSeg.file_path.endsWith(key)) {
+            const cleanKey = key.replace(/^\.\.\//, '').replace(/^\.\//, '').trim();
+            const cleanPath = mainSeg.file_path ? mainSeg.file_path.replace(/^\.\.\//, '').replace(/^\.\//, '').trim() : '';
+            if (cleanPath && (cleanPath.endsWith(cleanKey) || cleanKey.endsWith(cleanPath))) {
               manifestInfo = manifestMap[key];
               break;
             }
           }
+
 
           return (
             <div key={`${mainIdx}-${index}`} className={`border ${t.card} p-4 rounded shadow ${isLowConf ? 'opacity-60 grayscale' : ''}`}>
@@ -1812,9 +1909,12 @@ function View4({ theme, activeTab }) {
   const [manifestMap, setManifestMap] = useState({});
   const [audioFiles, setAudioFiles] = useState([]);
   const [selectedAudio, setSelectedAudio] = useState("");
+  const [selectedSegmentIdx, setSelectedSegmentIdx] = useState(0);
   const [lyricsData, setLyricsData] = useState([]);
   const [currentTime, setCurrentTime] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [loadingStatus, setLoadingStatus] = useState("");
   const wavesurferRef = useRef(null);
   const containerRef = useRef(null);
 
@@ -1866,63 +1966,146 @@ function View4({ theme, activeTab }) {
         }
         setManifestMap(map);
       })
-      .catch(() => setManifestMap({}));
-
-    fetch("http://localhost:8000/api/files")
-      .then(res => res.json())
-      .then(data => setCsvFiles(data.csv_files || []))
       .catch(console.error);
   }, []);
 
   useEffect(() => {
-    if (!selectedCsv) return;
-    fetch(`http://localhost:8000/api/labeler/data?file=${encodeURIComponent(selectedCsv)}`)
+    fetch("http://localhost:8000/api/files")
       .then(res => res.json())
+      .then(data => {
+        setCsvFiles(data.csv_files || []);
+      })
+      .catch(err => console.log("Failed to fetch files", err));
+  }, []);
+
+  useEffect(() => {
+    if (!selectedCsv) {
+      setAudioFiles([]);
+      setSelectedAudio("");
+      setLyricsData([]);
+      setLoading(false);
+      setLoadingStatus("");
+      return;
+    }
+
+    setLoading(true);
+    setLoadingStatus("Scanning CSV for unique interviews...");
+    setAudioFiles([]);
+    setSelectedAudio("");
+    setLyricsData([]);
+
+    fetch(`http://localhost:8000/api/labeler/audio-files?file=${encodeURIComponent(selectedCsv)}`)
+      .then(res => {
+        if (!res.ok) throw new Error(`Server returned status ${res.status}`);
+        return res.json();
+      })
       .then(result => {
-        const rows = result.data || (Array.isArray(result) ? result : []);
-        const segmentsByAudio = {};
-        rows.forEach(row => {
+        const fileNames = result.audio_files || [];
+        const parsedAudioFiles = fileNames.map(name => {
            let manifest = null;
            for (const key in manifestMap) {
-              if (row.file_path && row.file_path.endsWith(key)) {
+              const cleanKey = key.replace(/^\.\.\//, '').replace(/^\.\//, '').trim();
+              if (cleanKey.endsWith(name) || name.endsWith(cleanKey)) {
                  manifest = manifestMap[key];
                  break;
               }
            }
-           
-           if (manifest) {
-              const orig = manifest.original;
-              if (!segmentsByAudio[orig]) segmentsByAudio[orig] = { url: `audiofiles-to-transcribe/${orig}`, segments: [] };
-              segmentsByAudio[orig].segments.push({ ...row, manifest });
-           } else {
-              const orig = row.file_path;
-              if (!segmentsByAudio[orig]) segmentsByAudio[orig] = { url: orig, segments: [] };
-              segmentsByAudio[orig].segments.push({ ...row, manifest: { original: orig, start: 0, end: 1000000 } });
-           }
+           const url = manifest ? `audiofiles-to-transcribe/${manifest.original}` : "";
+           return {
+              name: name,
+              url: url,
+              isSegmented: !manifest,
+              segments: []
+           };
         });
-        
-        const files = Object.keys(segmentsByAudio).sort();
-        const parsedAudioFiles = files.map(f => ({ name: f, url: segmentsByAudio[f].url, segments: segmentsByAudio[f].segments }));
+
         setAudioFiles(parsedAudioFiles);
+        setSelectedSegmentIdx(0);
         if (parsedAudioFiles.length > 0) {
           setSelectedAudio(parsedAudioFiles[0].name);
         } else {
           setSelectedAudio("");
         }
-        setLyricsData([]);
+        setLoading(false);
+        setLoadingStatus("");
       })
-      .catch(console.error);
+      .catch(err => {
+        console.error(err);
+        setLoading(false);
+        setLoadingStatus(`Error scanning CSV: ${err.message}`);
+      });
   }, [selectedCsv, manifestMap]);
+
+  useEffect(() => {
+    if (!selectedCsv || !selectedAudio || audioFiles.length === 0) return;
+    
+    const fileData = audioFiles.find(f => f.name === selectedAudio);
+    if (!fileData) return;
+    
+    if (fileData.segments && fileData.segments.length > 0) return;
+
+    setLoading(true);
+    setLoadingStatus(`Loading transcription segments for ${selectedAudio}...`);
+
+    fetch(`http://localhost:8000/api/labeler/data?file=${encodeURIComponent(selectedCsv)}&audio_file=${encodeURIComponent(selectedAudio)}`)
+      .then(res => {
+        if (!res.ok) throw new Error(`Server returned status ${res.status}`);
+        return res.json();
+      })
+      .then(result => {
+        const rows = result.data || (Array.isArray(result) ? result : []);
+        
+        let resolvedUrl = "";
+        let isSegmented = true;
+
+        const segments = rows.map(row => {
+           let rowManifest = null;
+           for (const key in manifestMap) {
+              const cleanKey = key.replace(/^\.\.\//, '').replace(/^\.\//, '').trim();
+              const cleanPath = row.file_path ? row.file_path.replace(/^\.\.\//, '').replace(/^\.\//, '').trim() : '';
+              if (cleanPath && (cleanPath.endsWith(cleanKey) || cleanKey.endsWith(cleanPath))) {
+                 rowManifest = manifestMap[key];
+                 break;
+              }
+           }
+           if (rowManifest) {
+              resolvedUrl = `audiofiles-to-transcribe/${rowManifest.original}`;
+              isSegmented = false;
+           }
+           return {
+              ...row,
+              manifest: rowManifest || { original: selectedAudio, start: 0, end: 1000000 }
+           };
+        });
+
+        if (!resolvedUrl && rows.length > 0) {
+           resolvedUrl = rows[0].file_path;
+        }
+
+        setAudioFiles(prev => prev.map(f => f.name === selectedAudio ? { ...f, url: f.url || resolvedUrl, isSegmented: isSegmented, segments: segments } : f));
+        setLoading(false);
+        setLoadingStatus("");
+      })
+      .catch(err => {
+         console.error(err);
+         setLoading(false);
+         setLoadingStatus(`Error loading segments: ${err.message}`);
+      });
+  }, [selectedCsv, selectedAudio, audioFiles, manifestMap]);
 
   useEffect(() => {
     if (!selectedAudio || audioFiles.length === 0) return;
     const fileData = audioFiles.find(f => f.name === selectedAudio);
-    if (!fileData) return;
+    if (!fileData || !fileData.segments || fileData.segments.length === 0) {
+      setLyricsData([]);
+      return;
+    }
 
     const sortedSegments = [...fileData.segments].sort((a, b) => a.manifest.start - b.manifest.start);
+    const segmentsToProcess = sortedSegments;
     
     let segmentsData = [];
-    sortedSegments.forEach(seg => {
+    segmentsToProcess.forEach(seg => {
        const startSec = seg.manifest.start / 1000;
        const endSec = seg.manifest.end / 1000;
        const duration = endSec - startSec;
@@ -1967,6 +2150,10 @@ function View4({ theme, activeTab }) {
     const fileData = audioFiles.find(f => f.name === selectedAudio);
     if (!fileData) return;
     
+    const audioUrl = fileData.url;
+      
+    if (!audioUrl) return;
+    
     const ws = WaveSurfer.create({
       container: containerRef.current,
       waveColor: 'rgba(59, 130, 246, 0.5)',
@@ -1979,7 +2166,7 @@ function View4({ theme, activeTab }) {
       normalize: true
     });
     
-    ws.load(`http://localhost:8000/api/audio/${fileData.url}`);
+    ws.load(`http://localhost:8000/api/audio/${audioUrl}`);
     
     ws.on('timeupdate', (time) => setCurrentTime(time));
     ws.on('seek', (progress) => setCurrentTime(progress * ws.getDuration()));
@@ -1990,8 +2177,8 @@ function View4({ theme, activeTab }) {
     
     return () => {
        ws.destroy();
-    };
-  }, [selectedAudio]);
+     };
+  }, [selectedAudio, audioFiles]);
 
   const togglePlay = () => wavesurferRef.current?.playPause();
   const skip = (s) => wavesurferRef.current?.setTime(Math.max(0, Math.min(wavesurferRef.current.getCurrentTime() + s, wavesurferRef.current.getDuration())));
@@ -2016,16 +2203,27 @@ function View4({ theme, activeTab }) {
               {csvFiles.map(f => <option key={f} value={f}>{f}</option>)}
             </select>
           </div>
-          {audioFiles.length > 1 && (
+          {audioFiles.length > 0 && (
             <div className="flex-1 w-full">
               <label className={`block text-sm font-medium ${t.label} mb-2`}>Source Audio File</label>
-              <select className={`w-full p-3 ${t.input}`} value={selectedAudio} onChange={e => setSelectedAudio(e.target.value)}>
-                {audioFiles.map(f => <option key={f.name} value={f.name}>{f.name} ({f.segments.length} segments)</option>)}
+              <select className={`w-full p-3 ${t.input}`} value={selectedAudio} onChange={e => { setSelectedAudio(e.target.value); setSelectedSegmentIdx(0); }}>
+                {audioFiles.map(f => <option key={f.name} value={f.name}>{f.name}{f.segments.length > 0 ? ` (${f.segments.length} segments)` : ''}</option>)}
               </select>
             </div>
           )}
         </div>
       </div>
+
+      {loadingStatus && (
+        <div className={`${t.card} p-8 mb-6 flex flex-col items-center justify-center space-y-4`}>
+          {loading && (
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500"></div>
+          )}
+          <p className={loadingStatus.startsWith("Error") ? "text-red-500 font-medium" : "text-gray-400 italic"}>
+            {loadingStatus}
+          </p>
+        </div>
+      )}
 
       {selectedAudio && (
         <div className={`border rounded shadow-lg overflow-hidden ${t.card} p-0`}>

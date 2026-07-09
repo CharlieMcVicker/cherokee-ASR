@@ -1399,8 +1399,41 @@ def select_folder():
     return {"folder": AppConfig.SANDBOX_DIR}
 
 
+@app.get("/api/labeler/audio-files")
+def get_labeler_audio_files(file: str = "data/results/batch_inference_results.csv"):
+    csv_file = os.path.join(AppConfig.SANDBOX_DIR, file)
+    if not os.path.exists(csv_file):
+        raise HTTPException(status_code=404, detail=f"File not found: {file}")
+    try:
+        groups = set()
+        with open(csv_file, mode="r", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            path_col = (
+                "file_path"
+                if "file_path" in reader.fieldnames
+                else "path" if "path" in reader.fieldnames else None
+            )
+            if not path_col:
+                return {"status": "success", "audio_files": []}
+            for row in reader:
+                path = row.get(path_col, "")
+                if path:
+                    filename = os.path.basename(path)
+                    if "_segment_" in filename:
+                        group_name = filename.split("_segment_")[0]
+                    else:
+                        parts = path.split("/")
+                        group_name = parts[-2] if len(parts) >= 2 else "Default"
+                    groups.add(group_name)
+        return {"status": "success", "audio_files": sorted(list(groups))}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.get("/api/labeler/data")
-def get_labeler_data(file: str = "data/results/batch_inference_results.csv"):
+def get_labeler_data(
+    file: str = "data/results/batch_inference_results.csv", audio_file: str = None
+):
     csv_file = os.path.join(AppConfig.SANDBOX_DIR, file)
     train_file = os.path.join(
         AppConfig.SANDBOX_DIR, "data", "processed", "train_labeled.csv"
@@ -1430,6 +1463,16 @@ def get_labeler_data(file: str = "data/results/batch_inference_results.csv"):
                 # If path is relative like 'sentence_audio/...', fix it so get_audio can find it
                 if audio_rel_path.startswith("sentence_audio/"):
                     audio_rel_path = f"data/processed/{audio_rel_path}"
+
+                filename = os.path.basename(audio_rel_path)
+                if "_segment_" in filename:
+                    row_group = filename.split("_segment_")[0]
+                else:
+                    parts = audio_rel_path.split("/")
+                    row_group = parts[-2] if len(parts) >= 2 else "Default"
+
+                if audio_file and row_group != audio_file:
+                    continue
 
                 greedy_txt = row.get(txt_col, "")
                 import json
