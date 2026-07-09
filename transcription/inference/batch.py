@@ -206,7 +206,16 @@ def main():
     for audio_path in wav_files:
         filename = os.path.basename(audio_path)
         try:
+            if os.path.getsize(audio_path) == 0:
+                print(f"Skipping 0-length file: {filename}", flush=True)
+                continue
             info = sf.info(audio_path)
+            if info.frames < 400:
+                print(
+                    f"Skipping file that is too short ({info.frames} frames): {filename}",
+                    flush=True,
+                )
+                continue
             loaded_audios.append(
                 {"audio_path": audio_path, "filename": filename, "length": info.frames}
             )

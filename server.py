@@ -829,6 +829,29 @@ def run_batch_inference(req: BatchInferenceRequest):
                     if orig_path.lower().endswith(
                         (".wav", ".mp3", ".m4a", ".flac", ".ogg")
                     ):
+                        if os.path.exists(orig_path):
+                            if os.path.getsize(orig_path) == 0:
+                                print(
+                                    f"Skipping 0-length audio file: {orig_path}",
+                                    flush=True,
+                                )
+                                continue
+                            try:
+                                import soundfile as sf
+
+                                info = sf.info(orig_path)
+                                if info.frames < 400:
+                                    print(
+                                        f"Skipping too short audio file ({info.frames} frames): {orig_path}",
+                                        flush=True,
+                                    )
+                                    continue
+                            except Exception as e:
+                                print(
+                                    f"Skipping unreadable/corrupt audio file {orig_path}: {e}",
+                                    flush=True,
+                                )
+                                continue
                         rel_orig_path = os.path.relpath(
                             orig_path, AppConfig.SANDBOX_DIR
                         ).replace("\\", "/")
