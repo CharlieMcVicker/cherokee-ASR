@@ -60,15 +60,30 @@ def main():
     parser = argparse.ArgumentParser(description="Evaluate a Wav2Vec2 checkpoint on a test dataset.")
     parser.add_argument("--test-csv", type=str, default="training_data/processed/cim-wav2vec2-test.csv", help="Path to the test CSV file.")
     parser.add_argument("--audio-dir", type=str, default="training_data/processed/sentence_audio", help="Directory containing audio files.")
-    parser.add_argument("--checkpoint", type=str, default="remote_output_w2v2/checkpoint-800", help="Path or HF repo ID to the model checkpoint.")
+    parser.add_argument("--checkpoint", type=str, default=None, help="Path or HF repo ID to the model checkpoint.")
     parser.add_argument("--processor", type=str, default=None, help="Path or HF repo ID to the processor (defaults to checkpoint).")
     parser.add_argument("--hf-token", type=str, default=None, help="Hugging Face Hub authentication token.")
     parser.add_argument("--revision", type=str, default=None, help="Specific HF commit hash/branch/tag.")
     args = parser.parse_args()
 
     token = args.hf_token or os.environ.get("HF_TOKEN") or os.environ.get("HUGGING_FACE_HUB_TOKEN")
-    processor_path = args.processor or args.checkpoint
     checkpoint_path = args.checkpoint
+    revision = args.revision
+
+    if not checkpoint_path:
+        best_model_path = "best_model.json"
+        if os.path.exists(best_model_path):
+            import json
+            with open(best_model_path, "r") as f:
+                best_model = json.load(f)
+            checkpoint_path = best_model["repo"]
+            if not revision:
+                revision = best_model.get("revision")
+            print(f"Loaded best model settings from {best_model_path}: {checkpoint_path} @ {revision}")
+        else:
+            checkpoint_path = "remote_output_w2v2/checkpoint-800"
+
+    processor_path = args.processor or checkpoint_path
     
     print(f"Loading test CSV: {args.test_csv}")
     df_test = _try_read_csv(args.test_csv)
@@ -95,7 +110,7 @@ def main():
     })
     test_ds = Dataset.from_dict(data_dict, features=features)
     
-    processor = Wav2Vec2Processor.from_pretrained(processor_path, token=token)
+    processor = Wav2Vec2Processor.from_pretrained(processor_path, token=token, revision=revision)
 
     def prepare_batch(batch):
         audio = batch["audio"]
@@ -107,7 +122,7 @@ def main():
     test_ds_prepared = test_ds.map(prepare_batch, remove_columns=[c for c in test_ds.column_names if c != "sentence"], num_proc=1)
 
     # Run Inference using unified helper
-    generator = yield_single_checkpoint(checkpoint_path, processor_path=processor_path, revision=args.revision, token=token)
+    generator = yield_single_checkpoint(checkpoint_path, processor_path=processor_path, revision=revision, token=token)
     rows_by_ckpt, ranking_df = run_evaluation(generator, test_ds_prepared)
 
     if not ranking_df.empty:

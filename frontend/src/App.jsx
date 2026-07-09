@@ -1745,7 +1745,7 @@ function View3({ theme }) {
   );
 }
 
-function View4({ theme }) {
+function View4({ theme, activeTab }) {
   const t = theme;
   const [csvFiles, setCsvFiles] = useState([]);
   const [selectedCsv, setSelectedCsv] = useState("");
@@ -2105,7 +2105,7 @@ export default function App() {
           {activeTab === 1 && <View1 theme={t} />}
           {activeTab === 2 && <View2 theme={t} />}
           {activeTab === 3 && <View3 theme={t} />}
-          {activeTab === 4 && <View4 theme={t} />}
+          {activeTab === 4 && <View4 theme={t} activeTab={activeTab} />}
         </div>
       </main>
     </div>
