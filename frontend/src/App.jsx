@@ -1745,6 +1745,66 @@ function View3({ theme }) {
   );
 }
 
+function invertRespellConsonants(s) {
+  if (!s) return s;
+  // 1. ([^ht])hs -> \1s
+  s = s.replace(/([^hHtT])hs/g, '$1s');
+  s = s.replace(/([^hHtT])HS/g, '$1S');
+  
+  // 2. slh(?=[aeiouv]) -> sl
+  s = s.replace(/slh(?=[aeiouv])/g, 'sl');
+  s = s.replace(/SLH(?=[AEIOUV])/g, 'SL');
+  
+  // 3. tsh -> ch
+  s = s.replace(/tsh/g, 'ch');
+  s = s.replace(/TSH/g, 'CH');
+  s = s.replace(/Tsh/g, 'Ch');
+  
+  // 4. ts -> j
+  s = s.replace(/ts/g, 'j');
+  s = s.replace(/TS/g, 'J');
+  s = s.replace(/Ts/g, 'J');
+  
+  // 5. t(?!h) -> d
+  s = s.replace(/t(?!h)/g, 'd');
+  s = s.replace(/T(?!h|H)/g, 'D');
+  
+  // 6. th -> t
+  s = s.replace(/th/g, 't');
+  s = s.replace(/TH/g, 'T');
+  s = s.replace(/Th/g, 'T');
+  
+  // 7. k(?!h) -> g, kh -> k
+  s = s.replace(/k(?!h)/g, 'g');
+  s = s.replace(/K(?!h|H)/g, 'G');
+  s = s.replace(/kh/g, 'k');
+  s = s.replace(/KH/g, 'K');
+  s = s.replace(/Kh/g, 'K');
+  
+  // 8. nh -> hn, lh -> hl, yh -> hy, wh -> hw
+  s = s.replace(/nh/g, 'hn');
+  s = s.replace(/NH/g, 'HN');
+  s = s.replace(/Nh/g, 'Hn');
+  
+  s = s.replace(/lh/g, 'hl');
+  s = s.replace(/LH/g, 'HL');
+  s = s.replace(/Lh/g, 'Hl');
+  
+  s = s.replace(/yh/g, 'hy');
+  s = s.replace(/YH/g, 'HY');
+  s = s.replace(/Yh/g, 'Hy');
+  
+  s = s.replace(/wh/g, 'hw');
+  s = s.replace(/WH/g, 'HW');
+  s = s.replace(/Wh/g, 'Hw');
+  
+  // 9. ' / ’ -> ?
+  // s = s.replace(/'/g, '?');
+  // s = s.replace(/’/g, '?');
+  
+  return s;
+}
+
 function View4({ theme, activeTab }) {
   const t = theme;
   const [csvFiles, setCsvFiles] = useState([]);
@@ -1793,8 +1853,8 @@ function View4({ theme, activeTab }) {
       .then(text => {
         const map = {};
         const lines = text.split('\n');
-        for (let i = 1; i < lines.length; i++) {
-          const cols = lines[i].split(',');
+        for (const line of lines) {
+          const cols = line.split(',');
           if (cols.length >= 4) {
             const segmentedPath = cols[1].trim();
             map[segmentedPath] = {
@@ -1868,10 +1928,14 @@ function View4({ theme, activeTab }) {
        const duration = endSec - startSec;
        
        if (seg.word_confidences && seg.word_confidences.length > 0) {
-           const totalChars = seg.word_confidences.reduce((sum, w) => sum + w.word.length, 0);
+           const invertedWords = seg.word_confidences.map(w => ({
+               ...w,
+               word: invertRespellConsonants(w.word)
+           }));
+           const totalChars = invertedWords.reduce((sum, w) => sum + w.word.length, 0);
            let currentLen = 0;
            let segmentWords = [];
-           seg.word_confidences.forEach(w => {
+           invertedWords.forEach(w => {
                let wStart = startSec;
                let wEnd = endSec;
                
