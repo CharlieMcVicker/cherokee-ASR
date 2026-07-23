@@ -31,12 +31,27 @@ class VerseInterval:
     start_sec: float
     end_sec: float
     words: List[WordInterval] = field(default_factory=list)
+    cer: float = 1.0
+    emitted_text: str = ""
+
+
+@dataclass
+class AlignmentMetrics:
+    total_verses: int
+    matched_verses: int
+    matched_verse_ratio: float
+    overall_cer: float
+    mean_verse_cer: float
+    total_ground_truth_chars: int
+    total_emitted_chars: int
 
 
 @dataclass
 class AlignmentResult:
     audio_source: str
     verses: List[VerseInterval]
+    metrics: Optional[AlignmentMetrics] = None
+    raw_tokens: List[Dict[str, Any]] = field(default_factory=list)
 
 
 def compute_trigram_edit_cost(emissions_str: str, ground_truth_str: str) -> float:
@@ -49,103 +64,174 @@ def compute_trigram_edit_cost(emissions_str: str, ground_truth_str: str) -> floa
         return 1.0
 
 
+def compute_alignment_metrics(alignment_result: AlignmentResult) -> AlignmentMetrics:
+    """
+    Computes segment alignment quality metrics exclusively across matched verses.
+    """
+    verses = alignment_result.verses
+    total_verses = len(verses)
+    if total_verses == 0:
+        return AlignmentMetrics(
+            total_verses=0,
+            matched_verses=0,
+            matched_verse_ratio=0.0,
+            overall_cer=1.0,
+            mean_verse_cer=1.0,
+            total_ground_truth_chars=0,
+            total_emitted_chars=0,
+        )
+
+    matched_verse_list = [v for v in verses if v.words and (v.end_sec > v.start_sec)]
+    matched_verses_count = len(matched_verse_list)
+    matched_ratio = round(matched_verses_count / total_verses, 4)
+
+    verse_cers = [v.cer for v in matched_verse_list]
+    mean_verse_cer = round(float(np.mean(verse_cers)), 4) if verse_cers else 1.0
+
+    # CER exclusively across matched verses
+    matched_gt = []
+    matched_emitted = []
+    for v in matched_verse_list:
+        gt_norm = normalize_text_for_alignment(v.raw_phonetic)
+        em_norm = normalize_text_for_alignment(v.emitted_text)
+        if gt_norm:
+            matched_gt.append(gt_norm)
+            matched_emitted.append(em_norm)
+
+    concat_gt = " ".join(matched_gt)
+    concat_emitted = " ".join(matched_emitted)
+
+    overall_cer = (
+        compute_trigram_edit_cost(concat_emitted, concat_gt) if concat_gt else 1.0
+    )
+
+    metrics = AlignmentMetrics(
+        total_verses=total_verses,
+        matched_verses=matched_verses_count,
+        matched_verse_ratio=matched_ratio,
+        overall_cer=round(overall_cer, 4),
+        mean_verse_cer=mean_verse_cer,
+        total_ground_truth_chars=len(concat_gt),
+        total_emitted_chars=len(concat_emitted),
+    )
+    alignment_result.metrics = metrics
+    return metrics
+
+
 def _align_words_char_range(
     raw_words: List[str],
     matched_tokens: List[Dict[str, Any]],
 ) -> List[WordInterval]:
     """
-    Maps ground-truth words to matched tokens using character-range overlap and
-    fuses adjacent ground-truth words if they map to the exact same emission token span.
+    Aligns ground-truth words to matched emission tokens using Needleman-Wunsch DP string edit distance.
+    Evaluates GT word fusion (1 token mapping to N GT words) as valid DP transitions.
+    Preserves exact ASR emission token start_time and end_time boundaries for matched tokens.
     """
     if not raw_words or not matched_tokens:
         return []
 
-    num_words = len(raw_words)
-    num_tokens = len(matched_tokens)
+    N = len(raw_words)
+    M = len(matched_tokens)
 
-    # Calculate normalized character lengths for ground truth words
-    word_norm_lens = [len(normalize_text_for_alignment(w)) or 1 for w in raw_words]
-    total_word_chars = sum(word_norm_lens)
+    # Pre-normalize raw words and tokens
+    norm_words = [normalize_text_for_alignment(w) for w in raw_words]
+    norm_tokens = [normalize_text_for_alignment(t["word"]) for t in matched_tokens]
 
-    # Calculate normalized character lengths for matched tokens
-    token_norm_lens = [
-        len(normalize_text_for_alignment(t["word"])) or 1 for t in matched_tokens
-    ]
-    total_token_chars = sum(token_norm_lens)
+    # DP state: dp[i, j] = (min_cost, parent_i, parent_j)
+    GAP_COST = 0.8
+    MAX_FUSE_GT = 4  # maximum consecutive GT words allowed to fuse onto 1 ASR token
 
-    # Determine token index assignment for each word based on character range position
-    word_token_spans = []
-    curr_char_accum = 0.0
+    dp = np.full((N + 1, M + 1), fill_value=1e9, dtype=np.float32)
+    parent = [[None for _ in range(M + 1)] for _ in range(N + 1)]
 
-    for w_i, raw_w in enumerate(raw_words):
-        w_len = word_norm_lens[w_i]
-        # Char ratio mid point or range for this word
-        w_start_ratio = curr_char_accum / total_word_chars
-        curr_char_accum += w_len
-        w_end_ratio = curr_char_accum / total_word_chars
+    dp[0, 0] = 0.0
 
-        # Map ratio to token indices
-        t_start_idx = min(int(w_start_ratio * num_tokens), num_tokens - 1)
-        t_end_idx = min(int(np.ceil(w_end_ratio * num_tokens)), num_tokens)
-        if t_end_idx <= t_start_idx:
-            t_end_idx = t_start_idx + 1
+    for i in range(N + 1):
+        for j in range(M + 1):
+            if dp[i, j] >= 1e8:
+                continue
 
-        word_token_spans.append((t_start_idx, t_end_idx))
+            current_cost = dp[i, j]
 
-    # Group / Fuse ground truth words that map to identical single token bounds
+            # Option 1: Unaligned GT word (Deletion gap)
+            if i + 1 <= N:
+                cost = current_cost + GAP_COST
+                if cost < dp[i + 1, j]:
+                    dp[i + 1, j] = cost
+                    parent[i + 1][j] = (i, j, "gap_gt")
+
+            # Option 2: Unaligned ASR token (Insertion gap)
+            if j + 1 <= M:
+                cost = current_cost + GAP_COST
+                if cost < dp[i, j + 1]:
+                    dp[i, j + 1] = cost
+                    parent[i][j + 1] = (i, j, "gap_token")
+
+            # Option 3: Match 1 token against K GT words (K = 1..MAX_FUSE_GT)
+            if j + 1 <= M:
+                t_str = norm_tokens[j]
+                for k in range(1, MAX_FUSE_GT + 1):
+                    if i + k <= N:
+                        gt_concat = " ".join(norm_words[i : i + k])
+                        edit_cost = compute_trigram_edit_cost(t_str, gt_concat)
+                        # Add slight penalty per fused word to prefer 1-to-1 matches when cost is equal
+                        cost = current_cost + edit_cost + (0.05 * (k - 1))
+
+                        if cost < dp[i + k, j + 1]:
+                            dp[i + k][j + 1] = cost
+                            parent[i + k][j + 1] = (i, j, f"match_fuse_{k}")
+
+    # Backtrack optimal DP path
+    i, j = N, M
+    actions = []
+
+    while i > 0 or j > 0:
+        p = parent[i][j]
+        if p is None:
+            break
+        pi, pj, action_type = p
+        actions.append((pi, pj, i, j, action_type))
+        i, j = pi, pj
+
+    actions.reverse()
+
+    # Convert DP actions into WordInterval list
     fused_intervals: List[WordInterval] = []
-    curr_fused_words: List[str] = []
-    curr_span: Optional[tuple] = None
-    curr_confs: List[float] = []
 
-    for w_i, raw_w in enumerate(raw_words):
-        span = word_token_spans[w_i]
-
-        if curr_span is None:
-            curr_span = span
-            curr_fused_words = [raw_w]
-            sub_tokens = matched_tokens[span[0] : span[1]]
-            curr_confs = [t.get("confidence", 1.0) for t in sub_tokens]
-        elif span == curr_span and (span[1] - span[0] == 1):
-            # Same single token covers multiple consecutive words -> Fuse them
-            curr_fused_words.append(raw_w)
-        else:
-            # Output previous fused word interval
-            sub_tokens = matched_tokens[curr_span[0] : curr_span[1]]
-            w_start = sub_tokens[0]["start_time"]
-            w_end = sub_tokens[-1]["end_time"]
-            avg_conf = float(np.mean(curr_confs)) if curr_confs else 1.0
+    for pi, pj, i, j, action_type in actions:
+        if action_type == "gap_gt":
+            # Unaligned GT word: Interpolate timestamp
+            raw_w = raw_words[pi]
+            prev_end = (
+                fused_intervals[-1].end_sec
+                if fused_intervals
+                else matched_tokens[0]["start_time"]
+            )
+            fused_intervals.append(
+                WordInterval(
+                    word=raw_w,
+                    start_sec=prev_end,
+                    end_sec=prev_end,
+                    confidence=0.0,
+                    flagged=True,
+                )
+            )
+        elif action_type == "gap_token":
+            continue
+        elif action_type.startswith("match_fuse_"):
+            k = int(action_type.split("_")[-1])
+            fused_gt_text = " ".join(raw_words[pi : pi + k])
+            matched_tok = matched_tokens[pj]
 
             fused_intervals.append(
                 WordInterval(
-                    word=" ".join(curr_fused_words),
-                    start_sec=w_start,
-                    end_sec=w_end,
-                    confidence=avg_conf,
-                    flagged=avg_conf < 0.5,
+                    word=fused_gt_text,
+                    start_sec=matched_tok["start_time"],
+                    end_sec=matched_tok["end_time"],
+                    confidence=matched_tok.get("confidence", 1.0),
+                    flagged=matched_tok.get("confidence", 1.0) < 0.5,
                 )
             )
-
-            curr_span = span
-            curr_fused_words = [raw_w]
-            sub_tokens = matched_tokens[span[0] : span[1]]
-            curr_confs = [t.get("confidence", 1.0) for t in sub_tokens]
-
-    if curr_span and curr_fused_words:
-        sub_tokens = matched_tokens[curr_span[0] : curr_span[1]]
-        w_start = sub_tokens[0]["start_time"]
-        w_end = sub_tokens[-1]["end_time"]
-        avg_conf = float(np.mean(curr_confs)) if curr_confs else 1.0
-
-        fused_intervals.append(
-            WordInterval(
-                word=" ".join(curr_fused_words),
-                start_sec=w_start,
-                end_sec=w_end,
-                confidence=avg_conf,
-                flagged=avg_conf < 0.5,
-            )
-        )
 
     return fused_intervals
 
@@ -164,7 +250,7 @@ def align_tokens_to_verses(
         verses: List of parsed ground-truth verse dicts from prepare_ground_truth.
 
     Returns:
-        AlignmentResult data structure with populated verse & word interval timestamps.
+        AlignmentResult data structure with populated verse & word interval timestamps and CER metrics.
     """
     aligned_verses = []
 
@@ -179,9 +265,13 @@ def align_tokens_to_verses(
                     start_sec=0.0,
                     end_sec=0.0,
                     words=[],
+                    cer=1.0,
+                    emitted_text="",
                 )
             )
-        return AlignmentResult(audio_source=audio_source, verses=aligned_verses)
+        res = AlignmentResult(audio_source=audio_source, verses=aligned_verses)
+        compute_alignment_metrics(res)
+        return res
 
     num_tokens = len(token_emissions)
 
@@ -212,7 +302,6 @@ def align_tokens_to_verses(
         norm_txt = v["norm_text"]
         raw_words = v["raw_words"]
         num_words = len(raw_words)
-        char_len = len(norm_txt)
 
         if not norm_txt or num_words == 0:
             aligned_verses.append(
@@ -224,6 +313,8 @@ def align_tokens_to_verses(
                     start_sec=0.0,
                     end_sec=0.0,
                     words=[],
+                    cer=1.0,
+                    emitted_text="",
                 )
             )
             continue
@@ -262,6 +353,9 @@ def align_tokens_to_verses(
         if matched_tokens:
             verse_start = matched_tokens[0]["start_time"]
             verse_end = matched_tokens[-1]["end_time"]
+            emitted_text = " ".join([t["word"] for t in matched_tokens])
+            emitted_norm = normalize_text_for_alignment(emitted_text)
+            verse_cer = compute_trigram_edit_cost(emitted_norm, norm_txt)
 
             # Map words using character-range alignment and fuse words mapping to single tokens
             word_intervals = _align_words_char_range(raw_words, matched_tokens)
@@ -272,6 +366,8 @@ def align_tokens_to_verses(
             verse_start = prev_end
             verse_end = prev_end
             word_intervals = []
+            emitted_text = ""
+            verse_cer = 1.0
 
         aligned_verses.append(
             VerseInterval(
@@ -282,7 +378,13 @@ def align_tokens_to_verses(
                 start_sec=verse_start,
                 end_sec=verse_end,
                 words=word_intervals,
+                cer=round(verse_cer, 4),
+                emitted_text=emitted_text,
             )
         )
 
-    return AlignmentResult(audio_source=audio_source, verses=aligned_verses)
+    res = AlignmentResult(
+        audio_source=audio_source, verses=aligned_verses, raw_tokens=token_emissions
+    )
+    compute_alignment_metrics(res)
+    return res

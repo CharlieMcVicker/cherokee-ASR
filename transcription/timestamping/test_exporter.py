@@ -47,6 +47,7 @@ class TestExporter(unittest.TestCase):
             self.assertIn("ooTextFile", content)
             self.assertIn("Verses", content)
             self.assertIn("Words", content)
+            self.assertIn("Raw ASR Emissions", content)
 
     def test_export_alignment_manifest(self):
         with tempfile.TemporaryDirectory() as tmpdir:

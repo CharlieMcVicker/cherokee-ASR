@@ -114,6 +114,20 @@ def run_alignment_pipeline(
         export_praat_textgrid(alignment, textgrid_path)
         print(f"      Saved Praat TextGrid: {textgrid_path}")
 
+    if alignment.metrics:
+        m = alignment.metrics
+        print("\n--- Alignment Metrics Summary ---")
+        print(
+            f"  Matched GT Verses    : {m.matched_verses} / {m.total_verses} ({m.matched_verse_ratio*100:.1f}%)"
+        )
+        print(
+            f"  Matched-Verse CER    : {m.overall_cer:.4f} ({m.overall_cer*100:.2f}%)"
+        )
+        print(f"  Mean Verse CER       : {m.mean_verse_cer:.4f}")
+        print(
+            f"  Matched GT vs Emitted: {m.total_ground_truth_chars} vs {m.total_emitted_chars} chars"
+        )
+
     print("\nAlignment pipeline complete!")
 
 

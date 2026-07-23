@@ -97,6 +97,62 @@ class TestAligner(unittest.TestCase):
         self.assertEqual(v0.words[0].start_sec, 1.0)
         self.assertEqual(v0.words[0].end_sec, 2.5)
 
+    def test_non_overlapping_word_timestamps(self):
+        # Distinct tokens mapping 1-to-1 to GT words preserve exact token start and end times
+        tokens = [
+            {
+                "word": "ataleniskv",
+                "start_time": 1.0,
+                "end_time": 1.9,
+                "confidence": 0.9,
+            },
+            {"word": "yisdv", "start_time": 2.0, "end_time": 2.9, "confidence": 0.9},
+            {"word": "gesv", "start_time": 3.0, "end_time": 3.9, "confidence": 0.9},
+        ]
+        verses = [
+            {
+                "line_id": "020101",
+                "cherokee_syllabary": "ᎠᏓᎴᏂᏍᎬ ᏱᏍᏛ ᎨᏒ",
+                "raw_phonetic": "A-da-le-ni-s-gv yi-s-dv ge-sv",
+                "normalized_text": "ataleniskv yisdv gesv",
+                "english": "The beginning of the gospel",
+            }
+        ]
+        result = align_tokens_to_verses(tokens, verses, audio_source="mark_01.wav")
+        words = result.verses[0].words
+        self.assertEqual(len(words), 3)
+        self.assertEqual(words[0].start_sec, 1.0)
+        self.assertEqual(words[0].end_sec, 1.9)
+        self.assertEqual(words[1].start_sec, 2.0)
+        self.assertEqual(words[1].end_sec, 2.9)
+        self.assertEqual(words[2].start_sec, 3.0)
+        self.assertEqual(words[2].end_sec, 3.9)
+
+    def test_alignment_metrics(self):
+        tokens = [
+            {
+                "word": "ataleniskv",
+                "start_time": 1.0,
+                "end_time": 2.0,
+                "confidence": 0.95,
+            },
+            {"word": "yisthv", "start_time": 2.1, "end_time": 3.0, "confidence": 0.90},
+        ]
+        verses = [
+            {
+                "line_id": "020101",
+                "cherokee_syllabary": "ᎠᏓᎴᏂᏍᎬ ᏱᏍᏛ",
+                "raw_phonetic": "A-da-le-ni-s-gv yi-s-dv",
+                "normalized_text": "ataleniskv yisthv",
+                "english": "The beginning of the gospel",
+            }
+        ]
+        result = align_tokens_to_verses(tokens, verses, audio_source="test.wav")
+        self.assertIsNotNone(result.metrics)
+        self.assertEqual(result.metrics.matched_verses, 1)
+        self.assertLessEqual(result.metrics.overall_cer, 0.10)
+        self.assertLessEqual(result.verses[0].cer, 0.10)
+
 
 if __name__ == "__main__":
     unittest.main()
