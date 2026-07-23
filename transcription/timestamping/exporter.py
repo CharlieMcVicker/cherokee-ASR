@@ -49,12 +49,58 @@ def _build_contiguous_intervals(raw_intervals, total_end: float):
     return contiguous
 
 
+def _build_padded_word_intervals(word_raw, total_end: float, pad_sec: float = 0.10):
+    """
+    Pads word boundaries by adding pad_sec (10ms) to end times.
+    If padded end overlaps with subsequent word start time, fuses groundtruth words
+    and emits a single combined segment in the grid.
+    """
+    valid_words = [w for w in word_raw if w["end_sec"] > w["start_sec"]]
+    valid_words.sort(key=lambda x: (x["start_sec"], x["end_sec"]))
+
+    if not valid_words:
+        return _build_contiguous_intervals([], total_end)
+
+    fused = []
+    curr_start = valid_words[0]["start_sec"]
+    curr_end = valid_words[0]["end_sec"] + pad_sec
+    curr_texts = [valid_words[0]["text"]]
+
+    for w in valid_words[1:]:
+        next_start = w["start_sec"]
+        next_end = w["end_sec"] + pad_sec
+        next_text = w["text"]
+
+        if curr_end > next_start:
+            # Overlap occurs, fuse words and extend end time if needed
+            curr_end = max(curr_end, next_end)
+            curr_texts.append(next_text)
+        else:
+            fused.append(
+                {
+                    "start_sec": curr_start,
+                    "end_sec": curr_end,
+                    "text": " ".join(curr_texts),
+                }
+            )
+            curr_start = next_start
+            curr_end = next_end
+            curr_texts = [next_text]
+
+    fused.append(
+        {"start_sec": curr_start, "end_sec": curr_end, "text": " ".join(curr_texts)}
+    )
+
+    return _build_contiguous_intervals(fused, total_end)
+
+
 def export_praat_textgrid(alignment: AlignmentResult, output_path: str) -> None:
     """
-    Generates a valid 3-tier Praat .TextGrid file:
+    Generates a valid 4-tier Praat .TextGrid file:
     - Tier 1: Verses (IntervalTier)
     - Tier 2: Words (IntervalTier - Ground Truth aligned words)
-    - Tier 3: Raw ASR Emissions (IntervalTier - Original model word tokens)
+    - Tier 3: Padded Words (IntervalTier - Ground Truth aligned words + 10ms padding / fusion)
+    - Tier 4: Raw ASR Emissions (IntervalTier - Original model word tokens)
     Fills gaps with unannotated empty intervals to meet Praat's strict contiguous IntervalTier specification.
     """
     os.makedirs(os.path.dirname(os.path.abspath(output_path)), exist_ok=True)
@@ -90,7 +136,12 @@ def export_praat_textgrid(alignment: AlignmentResult, output_path: str) -> None:
             )
     word_intervals = _build_contiguous_intervals(word_raw, total_end)
 
-    # Build Tier 3: Raw ASR Emissions (Original model output tokens)
+    # Build Tier 3: Padded Words (GT mapped + 10ms pad + fused overlaps)
+    padded_word_intervals = _build_padded_word_intervals(
+        word_raw, total_end, pad_sec=0.10
+    )
+
+    # Build Tier 4: Raw ASR Emissions (Original model output tokens)
     raw_token_items = [
         {
             "start_sec": t.get("start_time", 0.0),
@@ -108,7 +159,7 @@ def export_praat_textgrid(alignment: AlignmentResult, output_path: str) -> None:
         "xmin = 0",
         f"xmax = {total_end:.3f}",
         "tiers? <exists>",
-        "size = 3",
+        "size = 4",
         "item []:",
         "    item [1]:",
         '        class = "IntervalTier"',
@@ -152,6 +203,27 @@ def export_praat_textgrid(alignment: AlignmentResult, output_path: str) -> None:
     lines.extend(
         [
             "    item [3]:",
+            '        class = "IntervalTier"',
+            '        name = "Padded Words"',
+            "        xmin = 0",
+            f"        xmax = {total_end:.3f}",
+            f"        intervals: size = {len(padded_word_intervals)}",
+        ]
+    )
+
+    for idx, (xmin, xmax, label) in enumerate(padded_word_intervals, 1):
+        lines.extend(
+            [
+                f"        intervals [{idx}]:",
+                f"            xmin = {xmin:.3f}",
+                f"            xmax = {xmax:.3f}",
+                f'            text = "{label}"',
+            ]
+        )
+
+    lines.extend(
+        [
+            "    item [4]:",
             '        class = "IntervalTier"',
             '        name = "Raw ASR Emissions"',
             "        xmin = 0",
