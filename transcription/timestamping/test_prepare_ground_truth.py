@@ -27,6 +27,36 @@ class TestPrepareGroundTruth(unittest.TestCase):
         # d -> t, g -> k respelling verified
         self.assertIn("ataleniskv", normalized)
 
+    def test_parse_chunk_list(self):
+        import tempfile
+        import json
+        from transcription.timestamping.prepare_ground_truth import parse_chunk_list
+
+        chunk_data = [
+            {
+                "line_id": "seg_01",
+                "raw_phonetic": "Na-s-gi-ya hi-a",
+                "cherokee_syllabary": "ᎾᏍᎩᏯ ᎯᎠ",
+                "english": "as it is",
+            }
+        ]
+
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as f:
+            json.dump(chunk_data, f)
+            tmp_path = f.name
+
+        try:
+            segments = parse_chunk_list(tmp_path)
+            self.assertEqual(len(segments), 1)
+            self.assertEqual(segments[0]["line_id"], "seg_01")
+            self.assertEqual(segments[0]["raw_phonetic"], "Na-s-gi-ya hi-a")
+            self.assertEqual(segments[0]["normalized_text"], "naskiya ia")
+        finally:
+            import os
+
+            if os.path.exists(tmp_path):
+                os.remove(tmp_path)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -1,0 +1,2434 @@
+{
+  "audio_source": "timestamping_test_data/Cherokee Story-Our Fishing Trip.wav",
+  "metrics": {
+    "total_verses": 9,
+    "matched_verses": 9,
+    "matched_verse_ratio": 1.0,
+    "overall_cer": 0.1631,
+    "mean_verse_cer": 0.1605,
+    "total_ground_truth_chars": 2796,
+    "total_emitted_chars": 2595
+  },
+  "lines": [
+    {
+      "line_id": "1",
+      "cherokee_syllabary": "ᏌᏊᎦ ᎢᎦ ᏅᎩ ᏲᏥᎢ ᏙᎫᎪᏔᏅ ᏧᏪᏴ ᎣᎩᏅᏍᏗ ᎠᏲᎷᎲᏍᎩ ᎣᎦᎩᎸᏙᏗ ᎾᎿ ᎠᏥᏍᎬᎾᎨᏍᏛ ᎤᏪᏴᎢ, ᎤᏔᎾ ᎠᏲᎷᎲᏍᎩ ᎣᎦᏙᎵᏒᎢ, ᏫᎵ, ᎼᏏ, Bobby, ᎠᎴ ᎠᏯ. ᏦᎦᏑᏙᏗ ᏙᎩᏅᏒ ᎣᏣᏑᎲᎦ ᎣᎨᎵᏒᎢ.",
+      "text": "sagwuga iga nvgi yotsii dogugotanv tsuweyv oginvsdi ayoluhvsgi ogagilvdodi nahna atsisgvnagesdv uweyvi utana ayoluhvsgi ogadolisvi wili mosi Bobby ale aya tsogasudodi doginvsv otsasuhvga ogelisvi",
+      "english": "",
+      "start": 5.18,
+      "end": 31.61,
+      "cer": 0.1414,
+      "emitted_text": "sakwu ika nvhkyowitsi'i tokukhthanv tsuweyv okenvhs sti ayoluhvhski okakhilvtolti nvnhv atihskvnakehsti ukweyv'i uthana ayoluhvhski okhtholhsv'i wili mohsi mawi hale aya tsokhsuhtohti tokinvhsv tsotsahsuhvk okelihsv'i",
+      "words": [
+        {
+          "word": "sagwuga",
+          "start": 5.18,
+          "end": 5.62,
+          "confidence": 0.9997469544410705,
+          "flagged": false,
+          "syllabary_word": "ᏌᏊᎦ"
+        },
+        {
+          "word": "iga",
+          "start": 5.76,
+          "end": 6.04,
+          "confidence": 0.9999568462371826,
+          "flagged": false,
+          "syllabary_word": "ᎢᎦ"
+        },
+        {
+          "word": "nvgi yotsii",
+          "start": 6.76,
+          "end": 7.78,
+          "confidence": 0.9084839224815369,
+          "flagged": false,
+          "syllabary_word": "ᏅᎩ ᏲᏥᎢ"
+        },
+        {
+          "word": "dogugotanv",
+          "start": 8.45,
+          "end": 9.23,
+          "confidence": 0.9942139658060941,
+          "flagged": false,
+          "syllabary_word": "ᏙᎫᎪᏔᏅ"
+        },
+        {
+          "word": "tsuweyv",
+          "start": 9.5,
+          "end": 10.1,
+          "confidence": 0.9533783367701939,
+          "flagged": false,
+          "syllabary_word": "ᏧᏪᏴ"
+        },
+        {
+          "word": "oginvsdi",
+          "start": 10.75,
+          "end": 11.62,
+          "confidence": 0.9649510568096524,
+          "flagged": false,
+          "syllabary_word": "ᎣᎩᏅᏍᏗ"
+        },
+        {
+          "word": "ayoluhvsgi",
+          "start": 12.49,
+          "end": 13.53,
+          "confidence": 0.9999481385404413,
+          "flagged": false,
+          "syllabary_word": "ᎠᏲᎷᎲᏍᎩ"
+        },
+        {
+          "word": "ogagilvdodi",
+          "start": 14.23,
+          "end": 15.45,
+          "confidence": 0.92937833070755,
+          "flagged": false,
+          "syllabary_word": "ᎣᎦᎩᎸᏙᏗ"
+        },
+        {
+          "word": "nahna atsisgvnagesdv",
+          "start": 15.725,
+          "end": 17.66,
+          "confidence": 0.9625601967175802,
+          "flagged": false,
+          "syllabary_word": "ᎾᎿ ᎠᏥᏍᎬᎾᎨᏍᏛ"
+        },
+        {
+          "word": "uweyvi",
+          "start": 17.76,
+          "end": 18.38,
+          "confidence": 0.9621750637888908,
+          "flagged": false,
+          "syllabary_word": "ᎤᏪᏴᎢ,"
+        },
+        {
+          "word": "utana",
+          "start": 19.0,
+          "end": 19.44,
+          "confidence": 0.9996060033639272,
+          "flagged": false,
+          "syllabary_word": "ᎤᏔᎾ"
+        },
+        {
+          "word": "ayoluhvsgi",
+          "start": 19.93,
+          "end": 20.93,
+          "confidence": 0.9501073143698953,
+          "flagged": false,
+          "syllabary_word": "ᎠᏲᎷᎲᏍᎩ"
+        },
+        {
+          "word": "ogadolisvi",
+          "start": 21.465,
+          "end": 22.445,
+          "confidence": 0.9864493012428284,
+          "flagged": false,
+          "syllabary_word": "ᎣᎦᏙᎵᏒᎢ,"
+        },
+        {
+          "word": "wili",
+          "start": 22.93,
+          "end": 23.39,
+          "confidence": 0.9550856053829193,
+          "flagged": false,
+          "syllabary_word": "ᏫᎵ,"
+        },
+        {
+          "word": "mosi Bobby",
+          "start": 23.7,
+          "end": 25.1,
+          "confidence": 0.9504376262426376,
+          "flagged": false,
+          "syllabary_word": "ᎼᏏ, Bobby,"
+        },
+        {
+          "word": "ale",
+          "start": 25.29,
+          "end": 25.53,
+          "confidence": 0.9537591487169266,
+          "flagged": false,
+          "syllabary_word": "ᎠᎴ"
+        },
+        {
+          "word": "aya",
+          "start": 25.79,
+          "end": 26.05,
+          "confidence": 0.9999318520228068,
+          "flagged": false,
+          "syllabary_word": "ᎠᏯ."
+        },
+        {
+          "word": "tsogasudodi",
+          "start": 26.45,
+          "end": 27.45,
+          "confidence": 0.9832972242281988,
+          "flagged": false,
+          "syllabary_word": "ᏦᎦᏑᏙᏗ"
+        },
+        {
+          "word": "doginvsv",
+          "start": 27.76,
+          "end": 28.72,
+          "confidence": 0.9566895167032877,
+          "flagged": false,
+          "syllabary_word": "ᏙᎩᏅᏒ"
+        },
+        {
+          "word": "otsasuhvga",
+          "start": 29.125,
+          "end": 30.185,
+          "confidence": 0.9989744474490484,
+          "flagged": false,
+          "syllabary_word": "ᎣᏣᏑᎲᎦ"
+        },
+        {
+          "word": "ogelisvi",
+          "start": 30.63,
+          "end": 31.61,
+          "confidence": 0.998277622461319,
+          "flagged": false,
+          "syllabary_word": "ᎣᎨᎵᏒᎢ."
+        }
+      ]
+    },
+    {
+      "line_id": "2",
+      "cherokee_syllabary": "ᎦᏥᏃᎯᏎᎸ ᎠᏂᏐᎢ, “hey ᎤᏃᏍᏗ ᎢᏗᎬᏩᏢᎦ, ᎤᏓᏠᏒ ᎾᏍᎩ ᎢᎬᏱ ᎤᏂᏴᏓ ᎠᏣᏗ.” ᏃᎴ ᏫᎵ ᎤᏁᏨ ᎯᎠ ᏄᏪᏒ “ᏝᏅ ᏱᏗᎬᏩᏢᏍᎩ ᎾᏍᏊ ᏭᏔᏅ ᎠᏣᏓ ᎤᏂᏴᏓ?” ᎠᎴ Bobby ᎤᏁᏨ, “ᎰᏩ ᏂᎦᏓ ᎢᏗᎬᏩᏢᎦ ᎤᏃᏍᏗ ᎾᎿ ᏭᎪᏛ ᎠᏣᏗ ᏧᏂᏴᏓ?” ᏂᎦᏓ ᎣᏏ ᎣᎩᏰᎸᏅ ᎠᎴ ᎣᎦᏂᎩᏒ ᎣᎩᏲᎷᏅᎢ ᎤᏪᏴᎢ.",
+      "text": "gatsinohiselv anisoi hey unosdi idigvwatlvga udatlosv nasgi igvyi uniyvda atsadi nole wili unetsv hia nuwesv tlanv yidigvwatlvsgi nasgwu wutanv atsada uniyvda ale Bobby unetsv howa nigada idigvwatlvga unosdi nahna wugodv atsadi tsuniyvda nigada osi ogiyelvnv ale oganigisv ogiyolunvi uweyvi",
+      "english": "",
+      "start": 32.15,
+      "end": 66.17,
+      "cer": 0.1193,
+      "emitted_text": "witsinohihselv anihso'i he unhohsti itikv walhvka utatlohsvnahsi ikvyi uniyvta atsati nola wili unhetsa yhvni wehse sanho yitikvwalhvhski nahskwu uthana tsatuniyvta ale wawi unhetsa howa nikata itikvwalhvka unhohstinanhv wukotv tsati tsuniyvta nikata ohsi okiyelvnhv hale okanhikihsv okiyolunhv'i uweyv'i",
+      "words": [
+        {
+          "word": "gatsinohiselv",
+          "start": 32.15,
+          "end": 33.23,
+          "confidence": 0.9963969758578709,
+          "flagged": false,
+          "syllabary_word": "ᎦᏥᏃᎯᏎᎸ"
+        },
+        {
+          "word": "anisoi",
+          "start": 33.74,
+          "end": 34.38,
+          "confidence": 0.9602727293968201,
+          "flagged": false,
+          "syllabary_word": "ᎠᏂᏐᎢ,"
+        },
+        {
+          "word": "hey",
+          "start": 34.84,
+          "end": 34.96,
+          "confidence": 0.9107739627361298,
+          "flagged": false,
+          "syllabary_word": "“hey"
+        },
+        {
+          "word": "unosdi",
+          "start": 35.77,
+          "end": 36.37,
+          "confidence": 0.997087799012661,
+          "flagged": false,
+          "syllabary_word": "ᎤᏃᏍᏗ"
+        },
+        {
+          "word": "idigvwatlvga",
+          "start": 36.57,
+          "end": 37.65,
+          "confidence": 0.9976866066455841,
+          "flagged": false,
+          "syllabary_word": "ᎢᏗᎬᏩᏢᎦ,"
+        },
+        {
+          "word": "udatlosv nasgi",
+          "start": 38.26,
+          "end": 39.48,
+          "confidence": 0.9637334133897509,
+          "flagged": false,
+          "syllabary_word": "ᎤᏓᏠᏒ ᎾᏍᎩ"
+        },
+        {
+          "word": "igvyi",
+          "start": 39.58,
+          "end": 40.0,
+          "confidence": 0.9999119400978088,
+          "flagged": false,
+          "syllabary_word": "ᎢᎬᏱ"
+        },
+        {
+          "word": "uniyvda",
+          "start": 40.54,
+          "end": 41.1,
+          "confidence": 0.9999330639839172,
+          "flagged": false,
+          "syllabary_word": "ᎤᏂᏴᏓ"
+        },
+        {
+          "word": "atsadi",
+          "start": 41.2,
+          "end": 41.62,
+          "confidence": 0.9999253650506338,
+          "flagged": false,
+          "syllabary_word": "ᎠᏣᏗ.”"
+        },
+        {
+          "word": "nole",
+          "start": 42.18,
+          "end": 42.46,
+          "confidence": 0.9974211901426315,
+          "flagged": false,
+          "syllabary_word": "ᏃᎴ"
+        },
+        {
+          "word": "wili",
+          "start": 42.54,
+          "end": 42.86,
+          "confidence": 0.9772182554006577,
+          "flagged": false,
+          "syllabary_word": "ᏫᎵ"
+        },
+        {
+          "word": "unetsv",
+          "start": 43.0,
+          "end": 43.42,
+          "confidence": 0.9673870801925659,
+          "flagged": false,
+          "syllabary_word": "ᎤᏁᏨ"
+        },
+        {
+          "word": "hia nuwesv tlanv",
+          "start": 43.5,
+          "end": 45.08,
+          "confidence": 0.9553750475247701,
+          "flagged": false,
+          "syllabary_word": "ᎯᎠ ᏄᏪᏒ “ᏝᏅ"
+        },
+        {
+          "word": "yidigvwatlvsgi",
+          "start": 45.47,
+          "end": 46.57,
+          "confidence": 0.9513552864392598,
+          "flagged": false,
+          "syllabary_word": "ᏱᏗᎬᏩᏢᏍᎩ"
+        },
+        {
+          "word": "nasgwu",
+          "start": 47.13,
+          "end": 47.67,
+          "confidence": 0.9999357376779828,
+          "flagged": false,
+          "syllabary_word": "ᎾᏍᏊ"
+        },
+        {
+          "word": "wutanv atsada uniyvda",
+          "start": 48.26,
+          "end": 49.7,
+          "confidence": 0.9673249807321664,
+          "flagged": false,
+          "syllabary_word": "ᏭᏔᏅ ᎠᏣᏓ ᎤᏂᏴᏓ?”"
+        },
+        {
+          "word": "ale",
+          "start": 50.24,
+          "end": 50.38,
+          "confidence": 0.9352750380833944,
+          "flagged": false,
+          "syllabary_word": "ᎠᎴ"
+        },
+        {
+          "word": "Bobby unetsv",
+          "start": 50.46,
+          "end": 51.46,
+          "confidence": 0.930034872676645,
+          "flagged": false,
+          "syllabary_word": "Bobby ᎤᏁᏨ,"
+        },
+        {
+          "word": "howa",
+          "start": 51.97,
+          "end": 52.39,
+          "confidence": 0.8804819881916046,
+          "flagged": false,
+          "syllabary_word": "“ᎰᏩ"
+        },
+        {
+          "word": "nigada",
+          "start": 52.82,
+          "end": 53.32,
+          "confidence": 0.9998556474844614,
+          "flagged": false,
+          "syllabary_word": "ᏂᎦᏓ"
+        },
+        {
+          "word": "idigvwatlvga",
+          "start": 53.46,
+          "end": 54.4,
+          "confidence": 0.9987625728050867,
+          "flagged": false,
+          "syllabary_word": "ᎢᏗᎬᏩᏢᎦ"
+        },
+        {
+          "word": "unosdi nahna",
+          "start": 54.99,
+          "end": 55.99,
+          "confidence": 0.9303133350152236,
+          "flagged": false,
+          "syllabary_word": "ᎤᏃᏍᏗ ᎾᎿ"
+        },
+        {
+          "word": "wugodv",
+          "start": 56.41,
+          "end": 56.95,
+          "confidence": 0.9457084536552429,
+          "flagged": false,
+          "syllabary_word": "ᏭᎪᏛ"
+        },
+        {
+          "word": "atsadi",
+          "start": 57.09,
+          "end": 57.43,
+          "confidence": 0.93273446559906,
+          "flagged": false,
+          "syllabary_word": "ᎠᏣᏗ"
+        },
+        {
+          "word": "tsuniyvda",
+          "start": 57.615,
+          "end": 58.215,
+          "confidence": 0.9993947744369507,
+          "flagged": false,
+          "syllabary_word": "ᏧᏂᏴᏓ?”"
+        },
+        {
+          "word": "nigada",
+          "start": 58.75,
+          "end": 59.23,
+          "confidence": 0.9389729201793671,
+          "flagged": false,
+          "syllabary_word": "ᏂᎦᏓ"
+        },
+        {
+          "word": "osi",
+          "start": 59.65,
+          "end": 59.97,
+          "confidence": 0.9994240999221802,
+          "flagged": false,
+          "syllabary_word": "ᎣᏏ"
+        },
+        {
+          "word": "ogiyelvnv",
+          "start": 60.54,
+          "end": 61.38,
+          "confidence": 0.9717760443687439,
+          "flagged": false,
+          "syllabary_word": "ᎣᎩᏰᎸᏅ"
+        },
+        {
+          "word": "ale",
+          "start": 61.83,
+          "end": 62.07,
+          "confidence": 0.9335606545209885,
+          "flagged": false,
+          "syllabary_word": "ᎠᎴ"
+        },
+        {
+          "word": "oganigisv",
+          "start": 62.59,
+          "end": 63.53,
+          "confidence": 0.9688699570569125,
+          "flagged": false,
+          "syllabary_word": "ᎣᎦᏂᎩᏒ"
+        },
+        {
+          "word": "ogiyolunvi",
+          "start": 64.05,
+          "end": 65.21,
+          "confidence": 0.9991516371568044,
+          "flagged": false,
+          "syllabary_word": "ᎣᎩᏲᎷᏅᎢ"
+        },
+        {
+          "word": "uweyvi",
+          "start": 65.49,
+          "end": 66.17,
+          "confidence": 0.9974128348486764,
+          "flagged": false,
+          "syllabary_word": "ᎤᏪᏴᎢ."
+        }
+      ]
+    },
+    {
+      "line_id": "3",
+      "cherokee_syllabary": "ᏥᎾᏌᏁᏍᎬ ᏑᏗ ᎠᏏᎳᏛ ᏙᎢ ᏄᎵᏍᏔᏅ,ᎠᏆᏓᏅᏖᎸ ᎾᎿ ᎠᏆᏤᎵ ᏑᏗ ᏙᎢ ᏄᎵᏍᏔᏅᎢ, ᎠᏎᏃ Ꮟ ᎾᏍᎩ ᎤᏟᏂᎩᏓ ᎨᏒ. ᎠᏆᎴᏅᎲ ᏙᎢ ᏥᎾᏌᏁᏍᎬ ᎠᏏᎳᏛ ᎠᎴ ᎾᎠᏂᎩᏍᏗ ᎤᎷᏣ ᎤᎴᏅᎲ ᎠᏓᏅᏍᎬ ᎠᏍᏆᎨᎾᏗᏢ, ᎦᏓᏅᏖᏍᎬ ᎡᏁᏊᎴ ᎤᏍᏗ ᎠᏓ ᏳᏪᏏ ᎾᏍᎩᏃ ᏱᎦᏂᏏᏁᎦ ᎨᎵᏍᎬ. ᏃᎴ ᎠᏏᎳᏛ ᎤᎴᏅᎲ, \"ᎠᏓᏅᏌᏁᏍᎬ ᎠᎴ ᎠᏆᏓᏅᏖᎸ,\" ᎠᏣᏗᏍ ᎦᏓᎠ ᏑᏗ ᎨᎵᏍᎬ?\" ᏙᎯᏳᏃ ᏥᏂᏴᎲ ᎠᏣᏗ ᎠᎴ ᎠᏇᎷᏅ ᎠᏂᏐᎢ ᎤᎾᏛᎪᏗ \"hey ᏥᏂᏯ ᎠᏣᏓ!\" ᏂᎦᏓ ᏫᏚᎾᎧᎾᏅ ᏑᏗ ᎠᏏᎳᏛ ᎠᏆᏤᎵᎢ ᎠᎴ ᏫᎵ ᎯᎠ ᏄᏪᏒ, \"ᎯᎾᏌᎾᎩ.\" ᎾᏍᎩᏃ ᎾᏆᏛᏁᎸ ᎠᎴ ᏥᏂᏴᎲ ᏧᎵᏍᏓᎾᎵ ᎦᏛᎢ ᏑᏗᎢ.",
+      "text": "tsinasanesgv sudi asiladv doi nulistanvagwadanvtelv nahna agwatseli sudi doi nulistanvi aseno si nasgi utlinigida gesv agwalenvhv doi tsinasanesgv asiladv ale naanigisdi ulutsa ulenvhv adanvsgv asgwagenaditlv gadanvtesgv enegwule usdi ada yuwesi nasgino yiganisinega gelisgv nole asiladv ulenvhv adanvsanesgv ale agwadanvtelv atsadis gadaa sudi gelisgv dohiyuno tsiniyvhv atsadi ale agwelunv anisoi unadvgodi hey tsiniya atsada nigada widunakananv sudi asiladv agwatselii ale wili hia nuwesv hinasanagi nasgino nagwadvnelv ale tsiniyvhv tsulisdanali gadvi sudii",
+      "english": "",
+      "start": 66.93,
+      "end": 137.19,
+      "cer": 0.0926,
+      "emitted_text": "tsinahsanehskv hsuh ti ahsilatv thowi nulhsthanv akwatanhthelhv nanhv' akwatseli hsuh ti thoyi nulhsthanv'i hahsenhv hsinahski ulhinikita kehsv akwalenvhv thowi tsinahsanehskv ahsilatv ale na'anhikehsti uluhtsa ulenvhv atanvhskv ahskwakeni tila katanathehskv elikwule uhsti ata yuwehsi nahskinho yhikanhtshanaka kelihskv nole ahsilatv ulenvhv atanhsanehskvale akwatanhthelhv atsatihskito' suhti kelihskv tohiyinu tsiniyvhv atsati ale akwelhanv atihso'i unathv koti he'i tsiniya tsati nikata witsunakhanhanv suhti ahsilatv akwitsili ale wili yh'anuwehse hinahsanaki nohskinho nakwatvnelv ale tsiniyvhe tsulihstanalikatv suh ti'i",
+      "words": [
+        {
+          "word": "tsinasanesgv",
+          "start": 66.93,
+          "end": 68.01,
+          "confidence": 0.994211597102029,
+          "flagged": false,
+          "syllabary_word": "ᏥᎾᏌᏁᏍᎬ"
+        },
+        {
+          "word": "sudi",
+          "start": 68.15,
+          "end": 68.63,
+          "confidence": 0.9469619765877724,
+          "flagged": false,
+          "syllabary_word": "ᏑᏗ"
+        },
+        {
+          "word": "asiladv",
+          "start": 69.56,
+          "end": 70.24,
+          "confidence": 0.9993556216359138,
+          "flagged": false,
+          "syllabary_word": "ᎠᏏᎳᏛ"
+        },
+        {
+          "word": "doi",
+          "start": 70.59,
+          "end": 71.09,
+          "confidence": 0.9997572660446167,
+          "flagged": false,
+          "syllabary_word": "ᏙᎢ"
+        },
+        {
+          "word": "nulistanvagwadanvtelv",
+          "start": 71.25,
+          "end": 73.28,
+          "confidence": 0.9990778837885175,
+          "flagged": false,
+          "syllabary_word": "ᏄᎵᏍᏔᏅ,ᎠᏆᏓᏅᏖᎸ"
+        },
+        {
+          "word": "nahna",
+          "start": 73.8,
+          "end": 74.4,
+          "confidence": 0.8584342102209727,
+          "flagged": false,
+          "syllabary_word": "ᎾᎿ"
+        },
+        {
+          "word": "agwatseli",
+          "start": 74.565,
+          "end": 75.225,
+          "confidence": 0.9751174516148038,
+          "flagged": false,
+          "syllabary_word": "ᎠᏆᏤᎵ"
+        },
+        {
+          "word": "sudi",
+          "start": 75.405,
+          "end": 75.855,
+          "confidence": 0.9935029596090317,
+          "flagged": false,
+          "syllabary_word": "ᏑᏗ"
+        },
+        {
+          "word": "doi",
+          "start": 76.54,
+          "end": 76.88,
+          "confidence": 0.9432873725891113,
+          "flagged": false,
+          "syllabary_word": "ᏙᎢ"
+        },
+        {
+          "word": "nulistanvi",
+          "start": 76.94,
+          "end": 77.66,
+          "confidence": 0.9558354516824087,
+          "flagged": false,
+          "syllabary_word": "ᏄᎵᏍᏔᏅᎢ,"
+        },
+        {
+          "word": "aseno",
+          "start": 78.37,
+          "end": 78.87,
+          "confidence": 0.9951303452253342,
+          "flagged": false,
+          "syllabary_word": "ᎠᏎᏃ"
+        },
+        {
+          "word": "si nasgi",
+          "start": 78.93,
+          "end": 79.65,
+          "confidence": 0.9938789208730062,
+          "flagged": false,
+          "syllabary_word": "Ꮟ ᎾᏍᎩ"
+        },
+        {
+          "word": "utlinigida",
+          "start": 80.25,
+          "end": 80.85,
+          "confidence": 0.9476356625556945,
+          "flagged": false,
+          "syllabary_word": "ᎤᏟᏂᎩᏓ"
+        },
+        {
+          "word": "gesv",
+          "start": 80.93,
+          "end": 81.31,
+          "confidence": 0.9868869185447693,
+          "flagged": false,
+          "syllabary_word": "ᎨᏒ."
+        },
+        {
+          "word": "agwalenvhv",
+          "start": 82.19,
+          "end": 82.91,
+          "confidence": 0.9644619166851044,
+          "flagged": false,
+          "syllabary_word": "ᎠᏆᎴᏅᎲ"
+        },
+        {
+          "word": "doi",
+          "start": 83.05,
+          "end": 83.51,
+          "confidence": 0.9206834435462952,
+          "flagged": false,
+          "syllabary_word": "ᏙᎢ"
+        },
+        {
+          "word": "tsinasanesgv",
+          "start": 83.925,
+          "end": 84.905,
+          "confidence": 0.9696370320660728,
+          "flagged": false,
+          "syllabary_word": "ᏥᎾᏌᏁᏍᎬ"
+        },
+        {
+          "word": "asiladv",
+          "start": 85.47,
+          "end": 86.11,
+          "confidence": 0.9974968060851097,
+          "flagged": false,
+          "syllabary_word": "ᎠᏏᎳᏛ"
+        },
+        {
+          "word": "ale",
+          "start": 86.555,
+          "end": 86.755,
+          "confidence": 0.9999283154805502,
+          "flagged": false,
+          "syllabary_word": "ᎠᎴ"
+        },
+        {
+          "word": "naanigisdi",
+          "start": 87.46,
+          "end": 88.38,
+          "confidence": 0.956773423231565,
+          "flagged": false,
+          "syllabary_word": "ᎾᎠᏂᎩᏍᏗ"
+        },
+        {
+          "word": "ulutsa",
+          "start": 88.8,
+          "end": 89.36,
+          "confidence": 0.9963311212403434,
+          "flagged": false,
+          "syllabary_word": "ᎤᎷᏣ"
+        },
+        {
+          "word": "ulenvhv",
+          "start": 89.97,
+          "end": 90.65,
+          "confidence": 0.9630646450178963,
+          "flagged": false,
+          "syllabary_word": "ᎤᎴᏅᎲ"
+        },
+        {
+          "word": "adanvsgv",
+          "start": 91.09,
+          "end": 91.95,
+          "confidence": 0.9999571773740981,
+          "flagged": false,
+          "syllabary_word": "ᎠᏓᏅᏍᎬ"
+        },
+        {
+          "word": "asgwagenaditlv",
+          "start": 92.72,
+          "end": 93.8,
+          "confidence": 0.9882900536060333,
+          "flagged": false,
+          "syllabary_word": "ᎠᏍᏆᎨᎾᏗᏢ,"
+        },
+        {
+          "word": "gadanvtesgv",
+          "start": 94.5,
+          "end": 95.62,
+          "confidence": 0.9961254917658292,
+          "flagged": false,
+          "syllabary_word": "ᎦᏓᏅᏖᏍᎬ"
+        },
+        {
+          "word": "enegwule",
+          "start": 96.46,
+          "end": 97.26,
+          "confidence": 0.9735242128372192,
+          "flagged": false,
+          "syllabary_word": "ᎡᏁᏊᎴ"
+        },
+        {
+          "word": "usdi",
+          "start": 97.84,
+          "end": 98.16,
+          "confidence": 0.9999629020690918,
+          "flagged": false,
+          "syllabary_word": "ᎤᏍᏗ"
+        },
+        {
+          "word": "ada",
+          "start": 98.3,
+          "end": 98.52,
+          "confidence": 0.9455963770548502,
+          "flagged": false,
+          "syllabary_word": "ᎠᏓ"
+        },
+        {
+          "word": "yuwesi",
+          "start": 99.075,
+          "end": 99.775,
+          "confidence": 0.9583408151354108,
+          "flagged": false,
+          "syllabary_word": "ᏳᏪᏏ"
+        },
+        {
+          "word": "nasgino",
+          "start": 100.58,
+          "end": 101.22,
+          "confidence": 0.9689430461989509,
+          "flagged": false,
+          "syllabary_word": "ᎾᏍᎩᏃ"
+        },
+        {
+          "word": "yiganisinega",
+          "start": 101.32,
+          "end": 102.14,
+          "confidence": 0.925726306438446,
+          "flagged": false,
+          "syllabary_word": "ᏱᎦᏂᏏᏁᎦ"
+        },
+        {
+          "word": "gelisgv",
+          "start": 102.615,
+          "end": 103.255,
+          "confidence": 0.9997710064053535,
+          "flagged": false,
+          "syllabary_word": "ᎨᎵᏍᎬ."
+        },
+        {
+          "word": "nole",
+          "start": 103.88,
+          "end": 104.2,
+          "confidence": 0.9974739998579025,
+          "flagged": false,
+          "syllabary_word": "ᏃᎴ"
+        },
+        {
+          "word": "asiladv",
+          "start": 104.36,
+          "end": 104.94,
+          "confidence": 0.9988967776298523,
+          "flagged": false,
+          "syllabary_word": "ᎠᏏᎳᏛ"
+        },
+        {
+          "word": "ulenvhv",
+          "start": 105.33,
+          "end": 105.95,
+          "confidence": 0.9911760006632123,
+          "flagged": false,
+          "syllabary_word": "ᎤᎴᏅᎲ,"
+        },
+        {
+          "word": "adanvsanesgv ale",
+          "start": 106.43,
+          "end": 107.65,
+          "confidence": 0.9850632734596729,
+          "flagged": false,
+          "syllabary_word": "\"ᎠᏓᏅᏌᏁᏍᎬ ᎠᎴ"
+        },
+        {
+          "word": "agwadanvtelv",
+          "start": 108.4,
+          "end": 109.3,
+          "confidence": 0.9945422453539712,
+          "flagged": false,
+          "syllabary_word": "ᎠᏆᏓᏅᏖᎸ,\""
+        },
+        {
+          "word": "atsadis gadaa",
+          "start": 109.87,
+          "end": 110.83,
+          "confidence": 0.9514832634192246,
+          "flagged": false,
+          "syllabary_word": "ᎠᏣᏗᏍ ᎦᏓᎠ"
+        },
+        {
+          "word": "sudi",
+          "start": 111.27,
+          "end": 111.63,
+          "confidence": 0.9982811689376831,
+          "flagged": false,
+          "syllabary_word": "ᏑᏗ"
+        },
+        {
+          "word": "gelisgv",
+          "start": 111.71,
+          "end": 112.37,
+          "confidence": 0.998707614839077,
+          "flagged": false,
+          "syllabary_word": "ᎨᎵᏍᎬ?\""
+        },
+        {
+          "word": "dohiyuno",
+          "start": 112.94,
+          "end": 113.5,
+          "confidence": 0.9279099330306053,
+          "flagged": false,
+          "syllabary_word": "ᏙᎯᏳᏃ"
+        },
+        {
+          "word": "tsiniyvhv",
+          "start": 113.73,
+          "end": 114.41,
+          "confidence": 0.9639356732368469,
+          "flagged": false,
+          "syllabary_word": "ᏥᏂᏴᎲ"
+        },
+        {
+          "word": "atsadi",
+          "start": 114.57,
+          "end": 114.97,
+          "confidence": 0.9748265941937765,
+          "flagged": false,
+          "syllabary_word": "ᎠᏣᏗ"
+        },
+        {
+          "word": "ale",
+          "start": 115.19,
+          "end": 115.37,
+          "confidence": 0.9959131479263306,
+          "flagged": false,
+          "syllabary_word": "ᎠᎴ"
+        },
+        {
+          "word": "agwelunv",
+          "start": 116.01,
+          "end": 116.75,
+          "confidence": 0.9989678528573778,
+          "flagged": false,
+          "syllabary_word": "ᎠᏇᎷᏅ"
+        },
+        {
+          "word": "anisoi",
+          "start": 117.035,
+          "end": 117.595,
+          "confidence": 0.9859460070729256,
+          "flagged": false,
+          "syllabary_word": "ᎠᏂᏐᎢ"
+        },
+        {
+          "word": "unadvgodi hey",
+          "start": 118.035,
+          "end": 119.495,
+          "confidence": 0.9835564742485682,
+          "flagged": false,
+          "syllabary_word": "ᎤᎾᏛᎪᏗ \"hey"
+        },
+        {
+          "word": "tsiniya",
+          "start": 120.21,
+          "end": 120.71,
+          "confidence": 0.9767248545374189,
+          "flagged": false,
+          "syllabary_word": "ᏥᏂᏯ"
+        },
+        {
+          "word": "atsada",
+          "start": 120.83,
+          "end": 121.19,
+          "confidence": 0.9998873233795166,
+          "flagged": false,
+          "syllabary_word": "ᎠᏣᏓ!\""
+        },
+        {
+          "word": "nigada",
+          "start": 122.03,
+          "end": 122.59,
+          "confidence": 0.988040546576182,
+          "flagged": false,
+          "syllabary_word": "ᏂᎦᏓ"
+        },
+        {
+          "word": "widunakananv",
+          "start": 123.34,
+          "end": 124.28,
+          "confidence": 0.9975116570790609,
+          "flagged": false,
+          "syllabary_word": "ᏫᏚᎾᎧᎾᏅ"
+        },
+        {
+          "word": "sudi",
+          "start": 124.96,
+          "end": 125.3,
+          "confidence": 0.9995687127113342,
+          "flagged": false,
+          "syllabary_word": "ᏑᏗ"
+        },
+        {
+          "word": "asiladv",
+          "start": 125.36,
+          "end": 126.02,
+          "confidence": 0.9955700635910034,
+          "flagged": false,
+          "syllabary_word": "ᎠᏏᎳᏛ"
+        },
+        {
+          "word": "agwatselii",
+          "start": 126.73,
+          "end": 127.27,
+          "confidence": 0.9281396865844727,
+          "flagged": false,
+          "syllabary_word": "ᎠᏆᏤᎵᎢ"
+        },
+        {
+          "word": "ale",
+          "start": 127.35,
+          "end": 127.53,
+          "confidence": 0.9987510442733765,
+          "flagged": false,
+          "syllabary_word": "ᎠᎴ"
+        },
+        {
+          "word": "wili",
+          "start": 127.71,
+          "end": 128.13,
+          "confidence": 0.9989635795354843,
+          "flagged": false,
+          "syllabary_word": "ᏫᎵ"
+        },
+        {
+          "word": "hia nuwesv",
+          "start": 128.33,
+          "end": 129.11,
+          "confidence": 0.9693876992572438,
+          "flagged": false,
+          "syllabary_word": "ᎯᎠ ᏄᏪᏒ,"
+        },
+        {
+          "word": "hinasanagi",
+          "start": 129.92,
+          "end": 130.84,
+          "confidence": 0.9993386431173845,
+          "flagged": false,
+          "syllabary_word": "\"ᎯᎾᏌᎾᎩ.\""
+        },
+        {
+          "word": "nasgino",
+          "start": 131.43,
+          "end": 131.95,
+          "confidence": 0.9452363716231452,
+          "flagged": false,
+          "syllabary_word": "ᎾᏍᎩᏃ"
+        },
+        {
+          "word": "nagwadvnelv",
+          "start": 132.01,
+          "end": 132.81,
+          "confidence": 0.9974154179746454,
+          "flagged": false,
+          "syllabary_word": "ᎾᏆᏛᏁᎸ"
+        },
+        {
+          "word": "ale",
+          "start": 132.91,
+          "end": 133.07,
+          "confidence": 0.9878182212511698,
+          "flagged": false,
+          "syllabary_word": "ᎠᎴ"
+        },
+        {
+          "word": "tsiniyvhv",
+          "start": 133.76,
+          "end": 134.5,
+          "confidence": 0.9996754924456278,
+          "flagged": false,
+          "syllabary_word": "ᏥᏂᏴᎲ"
+        },
+        {
+          "word": "tsulisdanali gadvi",
+          "start": 134.85,
+          "end": 136.07,
+          "confidence": 0.9785816599341,
+          "flagged": false,
+          "syllabary_word": "ᏧᎵᏍᏓᎾᎵ ᎦᏛᎢ"
+        },
+        {
+          "word": "sudii",
+          "start": 136.525,
+          "end": 137.19,
+          "confidence": 0.975791369875272,
+          "flagged": false,
+          "syllabary_word": "ᏑᏗᎢ."
+        }
+      ]
+    },
+    {
+      "line_id": "4",
+      "cherokee_syllabary": "ᎦᏥᏃᎯᏎᎸ ᎠᏂᏧᏣ, “ᏃᏊ ᎢᏣᏈᏯ, ᎠᏯ ᎢᎬᏱ ᏥᏂᏯ ᎠᏣᏗ!” ᏃᏊᏃ Bobby ᎤᎾᎸᏨ ᏅᏗᎦᎵᏍᏙᏗ ᎾᏍᎩ ᎤᏚᎵᏍᎬ ᎢᎬᏱ ᎤᏂᏴᏗ ᎠᏣᏗ. ᎠᏆᏛᏅᏃ ᏥᏂᏴᏓ ᏧᎵᏍᏓᎾᎵ ᎾᎿ ᎠᏣᏗ ᏗᎦᏛᏙᏗᎢ ᎠᎴ ᎠᏆᏛᏅ ᎤᎳᏗᏢ ᎾᎿ ᎠᏲᎷᎲᏍᎩ ᎣᎦᎩᎸᎢ, ᎠᎴ ᎠᏣᏗ ᏥᏛᏅ ᎠᎹᏱ ᏩᏆᏙᏅᏔᏅᎢ, ᎾᎿ ᎤᎦᏦᏛ ᎤᎳᏗᏢᎢ.",
+      "text": "gatsinohiselv anitsutsa nogwu itsagwiya aya igvyi tsiniya atsadi nogwuno Bobby unalvtsv nvdigalisdodi nasgi udulisgv igvyi uniyvdi atsadi agwadvnvno tsiniyvda tsulisdanali nahna atsadi digadvdodii ale agwadvnv uladitlv nahna ayoluhvsgi ogagilvi ale atsadi tsidvnv amayi wagwadonvtanvi nahna ugatsodv uladitlvi",
+      "english": "",
+      "start": 137.88,
+      "end": 173.51,
+      "cer": 0.1447,
+      "emitted_text": "katsinohvhselv nitshutsa nokwu tsakwhiya aya kvyi tsiniyvtsati nokwunha wati unhalvtsv tatsikalhstoyhti nahski utulihskv kvyunihthiyvtsati akwatvnvnhv tsiniyvta tsulihstanali nvnha atsa'ta tikvtohti ale akwatvne ulhtilhananha ayoluhvhskv okakhilv'i ale atsati tsitvna amayi wakwatonhthanv'i nvnhv okatsotv ulhtilhv'i",
+      "words": [
+        {
+          "word": "gatsinohiselv",
+          "start": 137.88,
+          "end": 138.92,
+          "confidence": 0.9894294440746307,
+          "flagged": false,
+          "syllabary_word": "ᎦᏥᏃᎯᏎᎸ"
+        },
+        {
+          "word": "anitsutsa",
+          "start": 139.02,
+          "end": 139.64,
+          "confidence": 0.9998608628908793,
+          "flagged": false,
+          "syllabary_word": "ᎠᏂᏧᏣ,"
+        },
+        {
+          "word": "nogwu",
+          "start": 140.26,
+          "end": 140.64,
+          "confidence": 0.9948231339454651,
+          "flagged": false,
+          "syllabary_word": "“ᏃᏊ"
+        },
+        {
+          "word": "itsagwiya",
+          "start": 140.82,
+          "end": 141.34,
+          "confidence": 0.9988394843207465,
+          "flagged": false,
+          "syllabary_word": "ᎢᏣᏈᏯ,"
+        },
+        {
+          "word": "aya",
+          "start": 142.14,
+          "end": 142.34,
+          "confidence": 0.9973857204119364,
+          "flagged": false,
+          "syllabary_word": "ᎠᏯ"
+        },
+        {
+          "word": "igvyi",
+          "start": 142.48,
+          "end": 142.76,
+          "confidence": 0.9999609589576721,
+          "flagged": false,
+          "syllabary_word": "ᎢᎬᏱ"
+        },
+        {
+          "word": "tsiniya atsadi nogwuno Bobby",
+          "start": 142.86,
+          "end": 145.67,
+          "confidence": 0.9771682454480065,
+          "flagged": false,
+          "syllabary_word": "ᏥᏂᏯ ᎠᏣᏗ!” ᏃᏊᏃ Bobby"
+        },
+        {
+          "word": "unalvtsv",
+          "start": 146.28,
+          "end": 147.2,
+          "confidence": 0.9530094928211637,
+          "flagged": false,
+          "syllabary_word": "ᎤᎾᎸᏨ"
+        },
+        {
+          "word": "nvdigalisdodi",
+          "start": 147.68,
+          "end": 148.64,
+          "confidence": 0.953570794314146,
+          "flagged": false,
+          "syllabary_word": "ᏅᏗᎦᎵᏍᏙᏗ"
+        },
+        {
+          "word": "nasgi",
+          "start": 148.8,
+          "end": 149.24,
+          "confidence": 0.9581758578618368,
+          "flagged": false,
+          "syllabary_word": "ᎾᏍᎩ"
+        },
+        {
+          "word": "udulisgv",
+          "start": 149.8,
+          "end": 150.46,
+          "confidence": 0.9334419369697571,
+          "flagged": false,
+          "syllabary_word": "ᎤᏚᎵᏍᎬ"
+        },
+        {
+          "word": "igvyi uniyvdi atsadi",
+          "start": 150.6,
+          "end": 151.8,
+          "confidence": 0.9297136839698342,
+          "flagged": false,
+          "syllabary_word": "ᎢᎬᏱ ᎤᏂᏴᏗ ᎠᏣᏗ."
+        },
+        {
+          "word": "agwadvnvno",
+          "start": 152.74,
+          "end": 153.74,
+          "confidence": 0.9880534627220847,
+          "flagged": false,
+          "syllabary_word": "ᎠᏆᏛᏅᏃ"
+        },
+        {
+          "word": "tsiniyvda",
+          "start": 154.28,
+          "end": 154.98,
+          "confidence": 0.9977519710858663,
+          "flagged": false,
+          "syllabary_word": "ᏥᏂᏴᏓ"
+        },
+        {
+          "word": "tsulisdanali",
+          "start": 155.375,
+          "end": 156.295,
+          "confidence": 0.9838209473169767,
+          "flagged": false,
+          "syllabary_word": "ᏧᎵᏍᏓᎾᎵ"
+        },
+        {
+          "word": "nahna",
+          "start": 156.87,
+          "end": 157.15,
+          "confidence": 0.9094395399093628,
+          "flagged": false,
+          "syllabary_word": "ᎾᎿ"
+        },
+        {
+          "word": "atsadi",
+          "start": 157.25,
+          "end": 157.65,
+          "confidence": 0.9087415848459516,
+          "flagged": false,
+          "syllabary_word": "ᎠᏣᏗ"
+        },
+        {
+          "word": "digadvdodii",
+          "start": 157.81,
+          "end": 158.57,
+          "confidence": 0.9924028714497884,
+          "flagged": false,
+          "syllabary_word": "ᏗᎦᏛᏙᏗᎢ"
+        },
+        {
+          "word": "ale",
+          "start": 159.13,
+          "end": 159.33,
+          "confidence": 0.9803131421407064,
+          "flagged": false,
+          "syllabary_word": "ᎠᎴ"
+        },
+        {
+          "word": "agwadvnv",
+          "start": 160.13,
+          "end": 160.79,
+          "confidence": 0.9978139027953148,
+          "flagged": false,
+          "syllabary_word": "ᎠᏆᏛᏅ"
+        },
+        {
+          "word": "uladitlv nahna",
+          "start": 161.43,
+          "end": 162.43,
+          "confidence": 0.987538782449869,
+          "flagged": false,
+          "syllabary_word": "ᎤᎳᏗᏢ ᎾᎿ"
+        },
+        {
+          "word": "ayoluhvsgi",
+          "start": 162.845,
+          "end": 163.865,
+          "confidence": 0.9999254833568226,
+          "flagged": false,
+          "syllabary_word": "ᎠᏲᎷᎲᏍᎩ"
+        },
+        {
+          "word": "ogagilvi",
+          "start": 164.39,
+          "end": 165.21,
+          "confidence": 0.9595692992210388,
+          "flagged": false,
+          "syllabary_word": "ᎣᎦᎩᎸᎢ,"
+        },
+        {
+          "word": "ale",
+          "start": 166.0,
+          "end": 166.18,
+          "confidence": 0.9999736547470093,
+          "flagged": false,
+          "syllabary_word": "ᎠᎴ"
+        },
+        {
+          "word": "atsadi",
+          "start": 166.28,
+          "end": 166.76,
+          "confidence": 0.997298945983251,
+          "flagged": false,
+          "syllabary_word": "ᎠᏣᏗ"
+        },
+        {
+          "word": "tsidvnv",
+          "start": 167.12,
+          "end": 167.72,
+          "confidence": 0.9997138040406364,
+          "flagged": false,
+          "syllabary_word": "ᏥᏛᏅ"
+        },
+        {
+          "word": "amayi",
+          "start": 168.145,
+          "end": 168.645,
+          "confidence": 0.999824059009552,
+          "flagged": false,
+          "syllabary_word": "ᎠᎹᏱ"
+        },
+        {
+          "word": "wagwadonvtanvi nahna",
+          "start": 169.035,
+          "end": 170.945,
+          "confidence": 0.9376302506774664,
+          "flagged": false,
+          "syllabary_word": "ᏩᏆᏙᏅᏔᏅᎢ, ᎾᎿ"
+        },
+        {
+          "word": "ugatsodv",
+          "start": 171.365,
+          "end": 172.025,
+          "confidence": 0.9999487698078156,
+          "flagged": false,
+          "syllabary_word": "ᎤᎦᏦᏛ"
+        },
+        {
+          "word": "uladitlvi",
+          "start": 172.67,
+          "end": 173.51,
+          "confidence": 0.9909146189689636,
+          "flagged": false,
+          "syllabary_word": "ᎤᎳᏗᏢᎢ."
+        }
+      ]
+    },
+    {
+      "line_id": "5",
+      "cherokee_syllabary": "ᏂᎦᏲᏣᎢᏒ ᎣᎩᏲᎷᎲ ᎤᏪᏴ ᎠᎴ ᏏᏊ ᎣᎦᎴᏫᏍᏔᏅ ᎾᎿ ᎦᏁᎲᏊ ᎠᎹ ᎣᎦᎴᏅᎲ ᎣᏣᏑᎲᏍᎬᎢ. ᎨᎳᏊ ᎢᏴ Bobby ᏓᏳᏪᎷᏅ ᎠᎴ ᎯᎠ ᏄᏪᏒ! \"ᎠᏣᏗ ᏥᏂᏯ!\" Bobby ᎤᏂᏴᎲ ᎣᏍᏓ ᎢᎩᏓ ᎠᏣᏘ ᎤᏃᎦ, ᎤᏔᏅᏃ ᎾᏃ  ᏧᎵᏍᏓᎾᎵ, ᏃᏊ ᎣᏍᏓ ᎤᏰᎸᏒ ᏄᏗᎦᎵᏍᏙᏗᏍᎬ",
+      "text": "nigayotsaisv ogiyoluhv uweyv ale sigwu ogalewistanv nahna ganehvgwu ama ogalenvhv otsasuhvsgvi gelagwu iyv Bobby dayuwelunv ale hia nuwesv atsadi tsiniya Bobby uniyvhv osda igida atsati unoga utanvno nano  tsulisdanali nogwu osda uyelvsv nudigalisdodisgv",
+      "english": "",
+      "start": 174.29,
+      "end": 203.65,
+      "cer": 0.1585,
+      "emitted_text": "nikayotsa'ihsv okiyoluhv uweyalehsikwu okalewhihsthanv nanha'i kanehvkwu ama ukalenvhv otshuhvhskv'i khilakwu iyv tati tayawelhunhv yhanuwehsv atsatsiniya watuniyvhv ohsta ikhita atsati unhohka uthanvnhv nanhu tsulihstanali noku ohsta uyelvhse tvntsikahstohtihskv",
+      "words": [
+        {
+          "word": "nigayotsaisv",
+          "start": 174.29,
+          "end": 175.49,
+          "confidence": 0.9634615906647274,
+          "flagged": false,
+          "syllabary_word": "ᏂᎦᏲᏣᎢᏒ"
+        },
+        {
+          "word": "ogiyoluhv",
+          "start": 176.09,
+          "end": 176.99,
+          "confidence": 0.9976614448759291,
+          "flagged": false,
+          "syllabary_word": "ᎣᎩᏲᎷᎲ"
+        },
+        {
+          "word": "uweyv ale sigwu",
+          "start": 177.71,
+          "end": 179.01,
+          "confidence": 0.9728668882296636,
+          "flagged": false,
+          "syllabary_word": "ᎤᏪᏴ ᎠᎴ ᏏᏊ"
+        },
+        {
+          "word": "ogalewistanv",
+          "start": 179.71,
+          "end": 180.53,
+          "confidence": 0.9342419703801473,
+          "flagged": false,
+          "syllabary_word": "ᎣᎦᎴᏫᏍᏔᏅ"
+        },
+        {
+          "word": "nahna",
+          "start": 180.61,
+          "end": 181.09,
+          "confidence": 0.9909383824893406,
+          "flagged": false,
+          "syllabary_word": "ᎾᎿ"
+        },
+        {
+          "word": "ganehvgwu",
+          "start": 181.66,
+          "end": 182.48,
+          "confidence": 0.9999433557192484,
+          "flagged": false,
+          "syllabary_word": "ᎦᏁᎲᏊ"
+        },
+        {
+          "word": "ama",
+          "start": 182.66,
+          "end": 182.92,
+          "confidence": 0.9999017715454102,
+          "flagged": false,
+          "syllabary_word": "ᎠᎹ"
+        },
+        {
+          "word": "ogalenvhv",
+          "start": 183.6,
+          "end": 184.3,
+          "confidence": 0.9872553878360324,
+          "flagged": false,
+          "syllabary_word": "ᎣᎦᎴᏅᎲ"
+        },
+        {
+          "word": "otsasuhvsgvi",
+          "start": 184.625,
+          "end": 185.645,
+          "confidence": 0.9758120958621685,
+          "flagged": false,
+          "syllabary_word": "ᎣᏣᏑᎲᏍᎬᎢ."
+        },
+        {
+          "word": "gelagwu",
+          "start": 186.29,
+          "end": 186.85,
+          "confidence": 0.9754943624138832,
+          "flagged": false,
+          "syllabary_word": "ᎨᎳᏊ"
+        },
+        {
+          "word": "iyv",
+          "start": 186.97,
+          "end": 187.17,
+          "confidence": 0.8952132264773051,
+          "flagged": false,
+          "syllabary_word": "ᎢᏴ"
+        },
+        {
+          "word": "Bobby dayuwelunv ale",
+          "start": 187.31,
+          "end": 188.715,
+          "confidence": 0.960246982673804,
+          "flagged": false,
+          "syllabary_word": "Bobby ᏓᏳᏪᎷᏅ ᎠᎴ"
+        },
+        {
+          "word": "hia nuwesv",
+          "start": 188.875,
+          "end": 189.715,
+          "confidence": 0.9635075211524964,
+          "flagged": false,
+          "syllabary_word": "ᎯᎠ ᏄᏪᏒ!"
+        },
+        {
+          "word": "atsadi tsiniya Bobby uniyvhv",
+          "start": 190.41,
+          "end": 193.02,
+          "confidence": 0.9781599042090503,
+          "flagged": false,
+          "syllabary_word": "\"ᎠᏣᏗ ᏥᏂᏯ!\" Bobby ᎤᏂᏴᎲ"
+        },
+        {
+          "word": "osda",
+          "start": 193.24,
+          "end": 193.56,
+          "confidence": 0.985788083076477,
+          "flagged": false,
+          "syllabary_word": "ᎣᏍᏓ"
+        },
+        {
+          "word": "igida",
+          "start": 193.72,
+          "end": 194.04,
+          "confidence": 0.9958139657974243,
+          "flagged": false,
+          "syllabary_word": "ᎢᎩᏓ"
+        },
+        {
+          "word": "atsati",
+          "start": 194.22,
+          "end": 194.68,
+          "confidence": 0.9978189369042715,
+          "flagged": false,
+          "syllabary_word": "ᎠᏣᏘ"
+        },
+        {
+          "word": "unoga",
+          "start": 195.25,
+          "end": 195.93,
+          "confidence": 0.9600705589566912,
+          "flagged": false,
+          "syllabary_word": "ᎤᏃᎦ,"
+        },
+        {
+          "word": "utanvno",
+          "start": 196.64,
+          "end": 197.38,
+          "confidence": 0.9976213971773783,
+          "flagged": false,
+          "syllabary_word": "ᎤᏔᏅᏃ"
+        },
+        {
+          "word": "nano",
+          "start": 197.62,
+          "end": 197.96,
+          "confidence": 0.9987457275390625,
+          "flagged": false,
+          "syllabary_word": "ᎾᏃ"
+        },
+        {
+          "word": "tsulisdanali",
+          "start": 198.6,
+          "end": 199.56,
+          "confidence": 0.9874444420521076,
+          "flagged": false,
+          "syllabary_word": "ᏧᎵᏍᏓᎾᎵ,"
+        },
+        {
+          "word": "nogwu",
+          "start": 200.24,
+          "end": 200.56,
+          "confidence": 0.9990686923265457,
+          "flagged": false,
+          "syllabary_word": "ᏃᏊ"
+        },
+        {
+          "word": "osda",
+          "start": 200.74,
+          "end": 201.1,
+          "confidence": 0.9998417258262634,
+          "flagged": false,
+          "syllabary_word": "ᎣᏍᏓ"
+        },
+        {
+          "word": "uyelvsv",
+          "start": 201.2,
+          "end": 201.96,
+          "confidence": 0.9966414719820023,
+          "flagged": false,
+          "syllabary_word": "ᎤᏰᎸᏒ"
+        },
+        {
+          "word": "nudigalisdodisgv",
+          "start": 202.47,
+          "end": 203.65,
+          "confidence": 0.9584367087012843,
+          "flagged": false,
+          "syllabary_word": "ᏄᏗᎦᎵᏍᏙᏗᏍᎬ"
+        }
+      ]
+    },
+    {
+      "line_id": "6",
+      "cherokee_syllabary": "ᏭᏔᏅ ᎠᏣᏗ ᎤᏂᏴᎲᎢ, ᏃᏊ ᎤᏃᏍᏗᎭ ᏙᏥᏅᏁᎸ, ᏭᏁᏒ ᎠᏣᏗ ᏗᎦᏛᏙᏗᎢ ᎤᏛᏅ ᏕᎦᏛᏛ ᎠᏣᏗ ᎠᎴ ᎠᎹᎢ ᏭᏓᎢᏅᏒᎢ ᎤᎳᏗᏢ ᎣᎦᎩᎸᏛᎢ.",
+      "text": "wutanv atsadi uniyvhvi nogwu unosdiha dotsinvnelv wunesv atsadi digadvdodii udvnv degadvdv atsadi ale amai wudainvsvi uladitlv ogagilvdvi",
+      "english": "",
+      "start": 204.2,
+      "end": 221.105,
+      "cer": 0.2,
+      "emitted_text": "wuthana tsatuniyvhv'i nokwu unohstihv totsinelv wunehsv atsati tikatvtoti utvnv unhohka ale amayi uta'invhsv ulhtilhv okakhilvtv'i",
+      "words": [
+        {
+          "word": "wutanv",
+          "start": 204.2,
+          "end": 204.72,
+          "confidence": 0.9608444656644549,
+          "flagged": false,
+          "syllabary_word": "ᏭᏔᏅ"
+        },
+        {
+          "word": "atsadi uniyvhvi",
+          "start": 204.86,
+          "end": 206.0,
+          "confidence": 0.9990971317658057,
+          "flagged": false,
+          "syllabary_word": "ᎠᏣᏗ ᎤᏂᏴᎲᎢ,"
+        },
+        {
+          "word": "nogwu",
+          "start": 206.82,
+          "end": 207.18,
+          "confidence": 0.991722583770752,
+          "flagged": false,
+          "syllabary_word": "ᏃᏊ"
+        },
+        {
+          "word": "unosdiha",
+          "start": 207.38,
+          "end": 208.18,
+          "confidence": 0.9968172510464987,
+          "flagged": false,
+          "syllabary_word": "ᎤᏃᏍᏗᎭ"
+        },
+        {
+          "word": "dotsinvnelv",
+          "start": 208.77,
+          "end": 209.59,
+          "confidence": 0.999691817495558,
+          "flagged": false,
+          "syllabary_word": "ᏙᏥᏅᏁᎸ,"
+        },
+        {
+          "word": "wunesv",
+          "start": 210.31,
+          "end": 210.93,
+          "confidence": 0.9178439549037388,
+          "flagged": false,
+          "syllabary_word": "ᏭᏁᏒ"
+        },
+        {
+          "word": "atsadi",
+          "start": 211.05,
+          "end": 211.45,
+          "confidence": 0.9994068841139475,
+          "flagged": false,
+          "syllabary_word": "ᎠᏣᏗ"
+        },
+        {
+          "word": "digadvdodii",
+          "start": 212.07,
+          "end": 212.97,
+          "confidence": 0.9917370736598968,
+          "flagged": false,
+          "syllabary_word": "ᏗᎦᏛᏙᏗᎢ"
+        },
+        {
+          "word": "udvnv",
+          "start": 213.63,
+          "end": 214.17,
+          "confidence": 0.9490993857383728,
+          "flagged": false,
+          "syllabary_word": "ᎤᏛᏅ"
+        },
+        {
+          "word": "degadvdv atsadi",
+          "start": 214.5,
+          "end": 215.08,
+          "confidence": 0.9828838876315525,
+          "flagged": false,
+          "syllabary_word": "ᏕᎦᏛᏛ ᎠᏣᏗ"
+        },
+        {
+          "word": "ale",
+          "start": 215.83,
+          "end": 216.03,
+          "confidence": 0.999968965848287,
+          "flagged": false,
+          "syllabary_word": "ᎠᎴ"
+        },
+        {
+          "word": "amai",
+          "start": 216.395,
+          "end": 216.955,
+          "confidence": 0.9998951196670532,
+          "flagged": false,
+          "syllabary_word": "ᎠᎹᎢ"
+        },
+        {
+          "word": "wudainvsvi",
+          "start": 217.415,
+          "end": 218.435,
+          "confidence": 0.9618234455585479,
+          "flagged": false,
+          "syllabary_word": "ᏭᏓᎢᏅᏒᎢ"
+        },
+        {
+          "word": "uladitlv",
+          "start": 219.02,
+          "end": 219.66,
+          "confidence": 0.9997603073716164,
+          "flagged": false,
+          "syllabary_word": "ᎤᎳᏗᏢ"
+        },
+        {
+          "word": "ogagilvdvi",
+          "start": 220.125,
+          "end": 221.105,
+          "confidence": 0.9465160717566808,
+          "flagged": false,
+          "syllabary_word": "ᎣᎦᎩᎸᏛᎢ."
+        }
+      ]
+    },
+    {
+      "line_id": "7",
+      "cherokee_syllabary": "Bobby ᏃᏊ ᎣᏍᏓ ᎤᏓᏅᏛ, ᎤᏃᏍᏗᎭ ᏙᏥᏅᏁᎸ ᏭᏔᏅ ᎠᏣᏗ ᎤᏂᏴᎲᎢ. ᎣᎦᏂᎩᏒ ᎣᎩᏲᎷᏐ, ᎪᎯᎢᏴ ᎣᎩᎷᏨ ᏍᏓᏯ ᎡᎬ ᎤᏪᏴ ᎠᎴ ᎤᏝᏅᏛ ᎢᎵᏊ ᎾᏯᏛᎥ ᎣᎦᎩᎸᏛᎢ ᏭᎦᏛᎴᎯᏍᏗᎢ, ᎾᎿ ᎤᏔᎾ ᎠᏏᏛ ᎠᎹᏯ ᎤᎦᏌᏛᎢ. ᎢᎦᏃ ᏍᏓᏯ ᎡᎬ ᎠᎹ ᎠᎴ ᎣᎦᏛᎦᏅ ᏫᎵ ᏓᏳᏪᎷᏅ, Bobby ᏘᏂᏯ ᎠᏣᏗ ᏕᎦᏛᏛᎢ, ᎠᎴ ᏫᏚᏂᏌᏁᏒ ᎠᏣᏗ Ꮟ ᏂᏚᎾᏛᏨᎾᏊ Ot ᎤᏔᎾ ᎠᏏᏛᎢ!”",
+      "text": "Bobby nogwu osda udanvdv unosdiha dotsinvnelv wutanv atsadi uniyvhvi oganigisv ogiyoluso gohiiyv ogilutsv sdaya egv uweyv ale utlanvdv iligwu nayadvv ogagilvdvi wugadvlehisdii nahna utana asidv amaya ugasadvi igano sdaya egv ama ale ogadvganv wili dayuwelunv Bobby tiniya atsadi degadvdvi ale widunisanesv atsadi si nidunadvtsvnagwu Ot utana asidvi",
+      "english": "",
+      "start": 221.95,
+      "end": 267.51,
+      "cer": 0.1545,
+      "emitted_text": "mawinokwu ohsta utanhthv unhohstiha totsinvnelv uthana tsati'uniyvhv'i okanikihsv okiyoluhsv khohiyokiluhtsv staya eka uweyale yuhsanvtv elikwu nayhahthv'v okakhilvtv'i wukhthvlehihsti'i nanhv uthana ahsithv amayu ukhsathv'i ikanhahihstaya eka ama ale okhthvkanv wili tayukwelhunhv wati thiniya tsati tekitvtv'i utunhtshanehsv tsat si nitunatvtsvnakwu nane uthanahsithv'i",
+      "words": [
+        {
+          "word": "Bobby nogwu",
+          "start": 221.95,
+          "end": 222.73,
+          "confidence": 0.9887740280893114,
+          "flagged": false,
+          "syllabary_word": "Bobby ᏃᏊ"
+        },
+        {
+          "word": "osda",
+          "start": 222.99,
+          "end": 223.35,
+          "confidence": 0.9971464037895202,
+          "flagged": false,
+          "syllabary_word": "ᎣᏍᏓ"
+        },
+        {
+          "word": "udanvdv",
+          "start": 224.2,
+          "end": 224.92,
+          "confidence": 0.986496165394783,
+          "flagged": false,
+          "syllabary_word": "ᎤᏓᏅᏛ,"
+        },
+        {
+          "word": "unosdiha",
+          "start": 225.61,
+          "end": 226.41,
+          "confidence": 0.9787083685398101,
+          "flagged": false,
+          "syllabary_word": "ᎤᏃᏍᏗᎭ"
+        },
+        {
+          "word": "dotsinvnelv",
+          "start": 227.18,
+          "end": 228.2,
+          "confidence": 0.9986515532840382,
+          "flagged": false,
+          "syllabary_word": "ᏙᏥᏅᏁᎸ"
+        },
+        {
+          "word": "wutanv",
+          "start": 228.65,
+          "end": 229.03,
+          "confidence": 0.96647576491038,
+          "flagged": false,
+          "syllabary_word": "ᏭᏔᏅ"
+        },
+        {
+          "word": "atsadi uniyvhvi",
+          "start": 229.15,
+          "end": 230.37,
+          "confidence": 0.9259078979492188,
+          "flagged": false,
+          "syllabary_word": "ᎠᏣᏗ ᎤᏂᏴᎲᎢ."
+        },
+        {
+          "word": "oganigisv",
+          "start": 231.23,
+          "end": 232.13,
+          "confidence": 0.9714561641216278,
+          "flagged": false,
+          "syllabary_word": "ᎣᎦᏂᎩᏒ"
+        },
+        {
+          "word": "ogiyoluso",
+          "start": 233.03,
+          "end": 234.07,
+          "confidence": 0.9596017181873322,
+          "flagged": false,
+          "syllabary_word": "ᎣᎩᏲᎷᏐ,"
+        },
+        {
+          "word": "gohiiyv ogilutsv",
+          "start": 234.7,
+          "end": 235.88,
+          "confidence": 0.9702294866243998,
+          "flagged": false,
+          "syllabary_word": "ᎪᎯᎢᏴ ᎣᎩᎷᏨ"
+        },
+        {
+          "word": "sdaya",
+          "start": 236.395,
+          "end": 236.895,
+          "confidence": 0.9992539644241333,
+          "flagged": false,
+          "syllabary_word": "ᏍᏓᏯ"
+        },
+        {
+          "word": "egv",
+          "start": 237.075,
+          "end": 237.375,
+          "confidence": 0.9982613523801168,
+          "flagged": false,
+          "syllabary_word": "ᎡᎬ"
+        },
+        {
+          "word": "uweyv ale utlanvdv",
+          "start": 237.955,
+          "end": 240.06,
+          "confidence": 0.9878178688268813,
+          "flagged": false,
+          "syllabary_word": "ᎤᏪᏴ ᎠᎴ ᎤᏝᏅᏛ"
+        },
+        {
+          "word": "iligwu",
+          "start": 240.555,
+          "end": 241.055,
+          "confidence": 0.9251059194405874,
+          "flagged": false,
+          "syllabary_word": "ᎢᎵᏊ"
+        },
+        {
+          "word": "nayadvv",
+          "start": 241.575,
+          "end": 242.475,
+          "confidence": 0.9687608697197654,
+          "flagged": false,
+          "syllabary_word": "ᎾᏯᏛᎥ"
+        },
+        {
+          "word": "ogagilvdvi",
+          "start": 242.815,
+          "end": 243.835,
+          "confidence": 0.996051033337911,
+          "flagged": false,
+          "syllabary_word": "ᎣᎦᎩᎸᏛᎢ"
+        },
+        {
+          "word": "wugadvlehisdii",
+          "start": 244.2,
+          "end": 245.6,
+          "confidence": 0.9290219229810378,
+          "flagged": false,
+          "syllabary_word": "ᏭᎦᏛᎴᎯᏍᏗᎢ,"
+        },
+        {
+          "word": "nahna",
+          "start": 246.39,
+          "end": 246.77,
+          "confidence": 0.9415533781051636,
+          "flagged": false,
+          "syllabary_word": "ᎾᎿ"
+        },
+        {
+          "word": "utana",
+          "start": 246.91,
+          "end": 247.33,
+          "confidence": 0.9981451034545898,
+          "flagged": false,
+          "syllabary_word": "ᎤᏔᎾ"
+        },
+        {
+          "word": "asidv",
+          "start": 247.92,
+          "end": 248.7,
+          "confidence": 0.9683459741728646,
+          "flagged": false,
+          "syllabary_word": "ᎠᏏᏛ"
+        },
+        {
+          "word": "amaya",
+          "start": 249.34,
+          "end": 249.88,
+          "confidence": 0.9603304266929626,
+          "flagged": false,
+          "syllabary_word": "ᎠᎹᏯ"
+        },
+        {
+          "word": "ugasadvi",
+          "start": 250.02,
+          "end": 250.78,
+          "confidence": 0.9995969235897064,
+          "flagged": false,
+          "syllabary_word": "ᎤᎦᏌᏛᎢ."
+        },
+        {
+          "word": "igano sdaya",
+          "start": 251.45,
+          "end": 252.63,
+          "confidence": 0.9468256341559547,
+          "flagged": false,
+          "syllabary_word": "ᎢᎦᏃ ᏍᏓᏯ"
+        },
+        {
+          "word": "egv",
+          "start": 252.79,
+          "end": 252.99,
+          "confidence": 0.9982868035634359,
+          "flagged": false,
+          "syllabary_word": "ᎡᎬ"
+        },
+        {
+          "word": "ama",
+          "start": 253.33,
+          "end": 253.57,
+          "confidence": 0.9958235025405884,
+          "flagged": false,
+          "syllabary_word": "ᎠᎹ"
+        },
+        {
+          "word": "ale",
+          "start": 254.27,
+          "end": 254.49,
+          "confidence": 0.9999152024586996,
+          "flagged": false,
+          "syllabary_word": "ᎠᎴ"
+        },
+        {
+          "word": "ogadvganv",
+          "start": 255.035,
+          "end": 255.835,
+          "confidence": 0.954039317369461,
+          "flagged": false,
+          "syllabary_word": "ᎣᎦᏛᎦᏅ"
+        },
+        {
+          "word": "wili",
+          "start": 256.09,
+          "end": 256.47,
+          "confidence": 0.9999666512012482,
+          "flagged": false,
+          "syllabary_word": "ᏫᎵ"
+        },
+        {
+          "word": "dayuwelunv Bobby",
+          "start": 256.59,
+          "end": 258.38,
+          "confidence": 0.9278785431614289,
+          "flagged": false,
+          "syllabary_word": "ᏓᏳᏪᎷᏅ, Bobby"
+        },
+        {
+          "word": "tiniya",
+          "start": 258.715,
+          "end": 259.115,
+          "confidence": 0.9888504317828587,
+          "flagged": false,
+          "syllabary_word": "ᏘᏂᏯ"
+        },
+        {
+          "word": "atsadi",
+          "start": 259.235,
+          "end": 259.555,
+          "confidence": 0.9987088084220886,
+          "flagged": false,
+          "syllabary_word": "ᎠᏣᏗ"
+        },
+        {
+          "word": "degadvdvi",
+          "start": 260.12,
+          "end": 261.02,
+          "confidence": 0.998591011762619,
+          "flagged": false,
+          "syllabary_word": "ᏕᎦᏛᏛᎢ,"
+        },
+        {
+          "word": "ale widunisanesv atsadi",
+          "start": 261.465,
+          "end": 262.805,
+          "confidence": 0.9836951462285859,
+          "flagged": false,
+          "syllabary_word": "ᎠᎴ ᏫᏚᏂᏌᏁᏒ ᎠᏣᏗ"
+        },
+        {
+          "word": "si",
+          "start": 263.47,
+          "end": 263.61,
+          "confidence": 0.9999803900718689,
+          "flagged": false,
+          "syllabary_word": "Ꮟ"
+        },
+        {
+          "word": "nidunadvtsvnagwu Ot",
+          "start": 264.005,
+          "end": 266.25,
+          "confidence": 0.9772127233445644,
+          "flagged": false,
+          "syllabary_word": "ᏂᏚᎾᏛᏨᎾᏊ Ot"
+        },
+        {
+          "word": "utana asidvi",
+          "start": 266.37,
+          "end": 267.51,
+          "confidence": 0.9777561042990003,
+          "flagged": false,
+          "syllabary_word": "ᎤᏔᎾ ᎠᏏᏛᎢ!”"
+        }
+      ]
+    },
+    {
+      "line_id": "8",
+      "cherokee_syllabary": "ᎣᏂᏱᏊ! ᏏᏃ Bobby ᏫᏂᏗᎦᎾᏌᏁᏍᎬᎾ ᎠᏣᏛ ᏕᎦᏛᏛᎢ ᎠᎹᏱ, ᎣᎦᎩᎸᏛ ᏚᎸᏛᏂᏍᏔᏅ ᎤᏔᎾ ᎠᏏᏛᎢ ᎠᎴ ᎠᏣᏗ ᏕᎦᏛᏛ ᏚᎧᏬᏍᏗᎦᎸᏨ ᎣᎦᎩᎸᏛ ᎠᎴ ᎠᏏᏛᎢ. Bobby ᏍᏓᏯ ᏭᎾᏌᏁᏒ ᎠᏣᏗ ᏕᎦᏛᏛᎢ, ᎠᏎᏃ ᏌᏊ ᎠᏣᏗ ᎦᏛ ᏕᎦᏛᏛᎢ, ᎾᎿ ᎠᏆᏤᎵ ᏧᎵᏍᏓᎾᎵ, Bobby ᏍᏓᏱ ᏭᏂᏌᏁᏒ ᏕᎦᏛᏛ ᎤᏕᏍᏔᏅ ᏅᏤᎵ ᎠᏣᏓ, ᎢᎦᏊ ᎤᏘᏴ ᎠᏣᏗ ᏧᎭᏁᎦᎸᏅᎢ. Bobby ᎢᎦ ᎤᎾᎸᏨ ᎤᏲᎱᏎᎸ ᎠᏣᏗ, ᏭᏂᏴᎲ ᎠᏣᏗ ᏕᎦᏛᏛ ᎠᎴ ᎤᏕᏒ ᏧᎵᏍᏓᎾᎵ ᎠᎴ ᎯᎠ ᏄᏪᏒ,  ᎦᏙ ᎤᏤᎵ ᎯᎠ? ᎠᎴ ᎠᎹᏯ ᏭᏓᏯᏅᏒ. ᏩᏇᏡᏅ, hey, ᎠᏯ ᎠᏆᏤᎵ ᎠᏣᏗ! ᏫᎵ ᎠᎴ ᎼᏏ ᏚᏂᎶᏒ ᎣᎦᎩᎸᏛ ᎢᎦ ᎤᏂᏰᏣᏍᎬ.",
+      "text": "oniyigwu sino Bobby winidiganasanesgvna atsadv degadvdvi amayi ogagilvdv dulvdvnistanv utana asidvi ale atsadi degadvdv dukawosdigalvtsv ogagilvdv ale asidvi Bobby sdaya wunasanesv atsadi degadvdvi aseno sagwu atsadi gadv degadvdvi nahna agwatseli tsulisdanali Bobby sdayi wunisanesv degadvdv udestanv nvtseli atsada igagwu utiyv atsadi tsuhanegalvnvi Bobby iga unalvtsv uyohuselv atsadi wuniyvhv atsadi degadvdv ale udesv tsulisdanali ale hia nuwesv  gado utseli hia ale amaya wudayanvsv wagwetlunv hey aya agwatseli atsadi wili ale mosi dunilosv ogagilvdv iga uniyetsasgv",
+      "english": "",
+      "start": 268.35,
+      "end": 325.335,
+      "cer": 0.2726,
+      "emitted_text": "onhiyikwu sinhamati wunikahsanehskvna atsati tekatvtv'i amayi okakhilvte tulatvnihsthanv uthana ahsithv ale atsati tekatvtv tuwoyhtikalvtsv okvkhilvta ale ahsithv'i nonha akwatseli tsulihstanali wawihstayv wultshanehsv tekatvtv uteyhsthanv utseli atsati unhokh ikakwu uthiyv atsvti tsuhanekalvnv'i maki ikv winhalvtsv uyohuhselv tsati wuniyvhv tsati tekatvtvli utehsv tsulihstananali yhanuwehse kako witseli hi'a ale amayv uta'invhsv wakwelhunhahe'i ayv witselv tsati wili ale mohsi tunilohsv okakhilvte ika uniyetskv",
+      "words": [
+        {
+          "word": "oniyigwu",
+          "start": 268.35,
+          "end": 269.13,
+          "confidence": 0.9997720585929023,
+          "flagged": false,
+          "syllabary_word": "ᎣᏂᏱᏊ!"
+        },
+        {
+          "word": "sino Bobby winidiganasanesgvna",
+          "start": 269.92,
+          "end": 272.55,
+          "confidence": 0.9939101879892787,
+          "flagged": false,
+          "syllabary_word": "ᏏᏃ Bobby ᏫᏂᏗᎦᎾᏌᏁᏍᎬᎾ"
+        },
+        {
+          "word": "atsadv",
+          "start": 272.94,
+          "end": 273.38,
+          "confidence": 0.9996703565120697,
+          "flagged": false,
+          "syllabary_word": "ᎠᏣᏛ"
+        },
+        {
+          "word": "degadvdvi",
+          "start": 273.745,
+          "end": 274.505,
+          "confidence": 0.9978240191936493,
+          "flagged": false,
+          "syllabary_word": "ᏕᎦᏛᏛᎢ"
+        },
+        {
+          "word": "amayi",
+          "start": 274.645,
+          "end": 275.165,
+          "confidence": 0.9999190330505371,
+          "flagged": false,
+          "syllabary_word": "ᎠᎹᏱ,"
+        },
+        {
+          "word": "ogagilvdv",
+          "start": 276.06,
+          "end": 276.96,
+          "confidence": 0.9998513877391815,
+          "flagged": false,
+          "syllabary_word": "ᎣᎦᎩᎸᏛ"
+        },
+        {
+          "word": "dulvdvnistanv",
+          "start": 277.48,
+          "end": 278.62,
+          "confidence": 0.9758811990420023,
+          "flagged": false,
+          "syllabary_word": "ᏚᎸᏛᏂᏍᏔᏅ"
+        },
+        {
+          "word": "utana",
+          "start": 278.82,
+          "end": 279.3,
+          "confidence": 0.9999256630738577,
+          "flagged": false,
+          "syllabary_word": "ᎤᏔᎾ"
+        },
+        {
+          "word": "asidvi",
+          "start": 279.4,
+          "end": 279.98,
+          "confidence": 0.986019662448338,
+          "flagged": false,
+          "syllabary_word": "ᎠᏏᏛᎢ"
+        },
+        {
+          "word": "ale",
+          "start": 280.5,
+          "end": 280.64,
+          "confidence": 0.9069615801175436,
+          "flagged": false,
+          "syllabary_word": "ᎠᎴ"
+        },
+        {
+          "word": "atsadi",
+          "start": 280.74,
+          "end": 281.22,
+          "confidence": 0.9866892596085867,
+          "flagged": false,
+          "syllabary_word": "ᎠᏣᏗ"
+        },
+        {
+          "word": "degadvdv",
+          "start": 281.81,
+          "end": 282.51,
+          "confidence": 0.9952243864536285,
+          "flagged": false,
+          "syllabary_word": "ᏕᎦᏛᏛ"
+        },
+        {
+          "word": "dukawosdigalvtsv",
+          "start": 282.88,
+          "end": 284.16,
+          "confidence": 0.9491000612576802,
+          "flagged": false,
+          "syllabary_word": "ᏚᎧᏬᏍᏗᎦᎸᏨ"
+        },
+        {
+          "word": "ogagilvdv",
+          "start": 284.45,
+          "end": 285.19,
+          "confidence": 0.9810799539089203,
+          "flagged": false,
+          "syllabary_word": "ᎣᎦᎩᎸᏛ"
+        },
+        {
+          "word": "ale",
+          "start": 285.31,
+          "end": 285.47,
+          "confidence": 0.9979570905367533,
+          "flagged": false,
+          "syllabary_word": "ᎠᎴ"
+        },
+        {
+          "word": "asidvi",
+          "start": 285.63,
+          "end": 286.43,
+          "confidence": 0.9500858651267158,
+          "flagged": false,
+          "syllabary_word": "ᎠᏏᏛᎢ."
+        },
+        {
+          "word": "Bobby sdaya wunasanesv atsadi",
+          "start": 286.9,
+          "end": 287.26,
+          "confidence": 0.99842609167099,
+          "flagged": false,
+          "syllabary_word": "Bobby ᏍᏓᏯ ᏭᎾᏌᏁᏒ ᎠᏣᏗ"
+        },
+        {
+          "word": "degadvdvi aseno sagwu atsadi",
+          "start": 287.32,
+          "end": 287.98,
+          "confidence": 0.9958518147468567,
+          "flagged": false,
+          "syllabary_word": "ᏕᎦᏛᏛᎢ, ᎠᏎᏃ ᏌᏊ ᎠᏣᏗ"
+        },
+        {
+          "word": "gadv degadvdvi nahna agwatseli",
+          "start": 288.21,
+          "end": 289.15,
+          "confidence": 0.9769419890183669,
+          "flagged": false,
+          "syllabary_word": "ᎦᏛ ᏕᎦᏛᏛᎢ, ᎾᎿ ᎠᏆᏤᎵ"
+        },
+        {
+          "word": "tsulisdanali Bobby sdayi wunisanesv",
+          "start": 289.585,
+          "end": 291.88,
+          "confidence": 0.9806790630022685,
+          "flagged": false,
+          "syllabary_word": "ᏧᎵᏍᏓᎾᎵ, Bobby ᏍᏓᏱ ᏭᏂᏌᏁᏒ"
+        },
+        {
+          "word": "degadvdv",
+          "start": 292.235,
+          "end": 292.935,
+          "confidence": 0.9999520480632782,
+          "flagged": false,
+          "syllabary_word": "ᏕᎦᏛᏛ"
+        },
+        {
+          "word": "udestanv",
+          "start": 293.56,
+          "end": 294.38,
+          "confidence": 0.959744084965099,
+          "flagged": false,
+          "syllabary_word": "ᎤᏕᏍᏔᏅ"
+        },
+        {
+          "word": "nvtseli atsada",
+          "start": 294.46,
+          "end": 296.48,
+          "confidence": 0.9590226444933149,
+          "flagged": false,
+          "syllabary_word": "ᏅᏤᎵ ᎠᏣᏓ,"
+        },
+        {
+          "word": "igagwu",
+          "start": 297.06,
+          "end": 297.52,
+          "confidence": 0.999951958656311,
+          "flagged": false,
+          "syllabary_word": "ᎢᎦᏊ"
+        },
+        {
+          "word": "utiyv",
+          "start": 297.62,
+          "end": 298.24,
+          "confidence": 0.9969601432482401,
+          "flagged": false,
+          "syllabary_word": "ᎤᏘᏴ"
+        },
+        {
+          "word": "atsadi",
+          "start": 298.76,
+          "end": 299.24,
+          "confidence": 0.9964733223120371,
+          "flagged": false,
+          "syllabary_word": "ᎠᏣᏗ"
+        },
+        {
+          "word": "tsuhanegalvnvi",
+          "start": 299.76,
+          "end": 300.9,
+          "confidence": 0.9985651691754659,
+          "flagged": false,
+          "syllabary_word": "ᏧᎭᏁᎦᎸᏅᎢ."
+        },
+        {
+          "word": "Bobby iga unalvtsv",
+          "start": 301.48,
+          "end": 303.04,
+          "confidence": 0.9499678134918214,
+          "flagged": false,
+          "syllabary_word": "Bobby ᎢᎦ ᎤᎾᎸᏨ"
+        },
+        {
+          "word": "uyohuselv",
+          "start": 303.555,
+          "end": 304.375,
+          "confidence": 0.9999391257762908,
+          "flagged": false,
+          "syllabary_word": "ᎤᏲᎱᏎᎸ"
+        },
+        {
+          "word": "atsadi",
+          "start": 304.455,
+          "end": 304.795,
+          "confidence": 0.9999128937721252,
+          "flagged": false,
+          "syllabary_word": "ᎠᏣᏗ,"
+        },
+        {
+          "word": "wuniyvhv",
+          "start": 305.43,
+          "end": 306.13,
+          "confidence": 0.9992612078785896,
+          "flagged": false,
+          "syllabary_word": "ᏭᏂᏴᎲ"
+        },
+        {
+          "word": "atsadi",
+          "start": 306.29,
+          "end": 306.61,
+          "confidence": 0.9999272108078003,
+          "flagged": false,
+          "syllabary_word": "ᎠᏣᏗ"
+        },
+        {
+          "word": "degadvdv ale",
+          "start": 307.15,
+          "end": 308.03,
+          "confidence": 0.9940007030963898,
+          "flagged": false,
+          "syllabary_word": "ᏕᎦᏛᏛ ᎠᎴ"
+        },
+        {
+          "word": "udesv",
+          "start": 308.61,
+          "end": 309.29,
+          "confidence": 0.9961233039697012,
+          "flagged": false,
+          "syllabary_word": "ᎤᏕᏒ"
+        },
+        {
+          "word": "tsulisdanali ale",
+          "start": 309.43,
+          "end": 310.43,
+          "confidence": 0.9509121855099996,
+          "flagged": false,
+          "syllabary_word": "ᏧᎵᏍᏓᎾᎵ ᎠᎴ"
+        },
+        {
+          "word": "hia nuwesv",
+          "start": 310.51,
+          "end": 311.17,
+          "confidence": 0.8968346118927002,
+          "flagged": false,
+          "syllabary_word": "ᎯᎠ ᏄᏪᏒ,"
+        },
+        {
+          "word": "gado utseli",
+          "start": 311.6,
+          "end": 312.6,
+          "confidence": 0.9905859189374107,
+          "flagged": false,
+          "syllabary_word": "ᎦᏙ ᎤᏤᎵ"
+        },
+        {
+          "word": "hia",
+          "start": 312.68,
+          "end": 312.92,
+          "confidence": 0.971458688378334,
+          "flagged": false,
+          "syllabary_word": "ᎯᎠ?"
+        },
+        {
+          "word": "ale",
+          "start": 313.56,
+          "end": 313.7,
+          "confidence": 0.9999727805455526,
+          "flagged": false,
+          "syllabary_word": "ᎠᎴ"
+        },
+        {
+          "word": "amaya",
+          "start": 313.82,
+          "end": 314.32,
+          "confidence": 0.9689887642860413,
+          "flagged": false,
+          "syllabary_word": "ᎠᎹᏯ"
+        },
+        {
+          "word": "wudayanvsv",
+          "start": 314.93,
+          "end": 315.89,
+          "confidence": 0.9658496677875519,
+          "flagged": false,
+          "syllabary_word": "ᏭᏓᏯᏅᏒ."
+        },
+        {
+          "word": "wagwetlunv hey aya agwatseli",
+          "start": 316.6,
+          "end": 319.385,
+          "confidence": 0.9334436386350601,
+          "flagged": false,
+          "syllabary_word": "ᏩᏇᏡᏅ, hey, ᎠᏯ ᎠᏆᏤᎵ"
+        },
+        {
+          "word": "atsadi",
+          "start": 319.505,
+          "end": 319.845,
+          "confidence": 0.9995109796524048,
+          "flagged": false,
+          "syllabary_word": "ᎠᏣᏗ!"
+        },
+        {
+          "word": "wili",
+          "start": 320.53,
+          "end": 320.85,
+          "confidence": 0.9954962581396103,
+          "flagged": false,
+          "syllabary_word": "ᏫᎵ"
+        },
+        {
+          "word": "ale",
+          "start": 320.93,
+          "end": 321.11,
+          "confidence": 0.9999555349349976,
+          "flagged": false,
+          "syllabary_word": "ᎠᎴ"
+        },
+        {
+          "word": "mosi",
+          "start": 321.21,
+          "end": 321.67,
+          "confidence": 0.9998989820480346,
+          "flagged": false,
+          "syllabary_word": "ᎼᏏ"
+        },
+        {
+          "word": "dunilosv",
+          "start": 321.79,
+          "end": 322.51,
+          "confidence": 0.9983788265122308,
+          "flagged": false,
+          "syllabary_word": "ᏚᏂᎶᏒ"
+        },
+        {
+          "word": "ogagilvdv",
+          "start": 323.11,
+          "end": 323.81,
+          "confidence": 0.9978609442710876,
+          "flagged": false,
+          "syllabary_word": "ᎣᎦᎩᎸᏛ"
+        },
+        {
+          "word": "iga",
+          "start": 324.215,
+          "end": 324.395,
+          "confidence": 0.9999650319417318,
+          "flagged": false,
+          "syllabary_word": "ᎢᎦ"
+        },
+        {
+          "word": "uniyetsasgv",
+          "start": 324.535,
+          "end": 325.335,
+          "confidence": 0.9536257982254028,
+          "flagged": false,
+          "syllabary_word": "ᎤᏂᏰᏣᏍᎬ."
+        }
+      ]
+    },
+    {
+      "line_id": "9",
+      "cherokee_syllabary": "ᎾᎿᏊ ᎤᎵᏍᏘᏅ ᎣᎩᏲᎷᏒ ᎢᏧᎳ ᎠᏯ ᎠᎴ Bobby ᎣᎩᏂᎾᎸᏒ ᏅᏗᎦᎵᏍᏙᏗᏍᎬ ᏃᎩᏂᎩᏓ ᎨᏒ ᎤᏃᏍᏗ ᎠᏕᎳ Bobby ᎤᎾᏫᏛᎲ ᎠᏣᏗ ᏗᎦᏛᏙᏗ ᎠᏣᏗ ᏧᎭᏁᎦᎸᏅ ᏕᎦᏛ Ꮟ.",
+      "text": "nahnagwu ulistinv ogiyolusv itsula aya ale Bobby ogininalvsv nvdigalisdodisgv noginigida gesv unosdi adela Bobby unawidvhv atsadi digadvdodi atsadi tsuhanegalvnv degadv si",
+      "english": "",
+      "start": 326.03,
+      "end": 345.885,
+      "cer": 0.1607,
+      "emitted_text": "nakwunhv ulhsthina okiyoluhsv itsula ayale mati okininhalvhsv tsanikahstohtihskv nokinikita kehsv unhohsti atela waku nawitvha atsati tikitvtohti atsati tsuhanekalvnv tekatv si",
+      "words": [
+        {
+          "word": "nahnagwu ulistinv",
+          "start": 326.03,
+          "end": 327.87,
+          "confidence": 0.997389730066061,
+          "flagged": false,
+          "syllabary_word": "ᎾᎿᏊ ᎤᎵᏍᏘᏅ"
+        },
+        {
+          "word": "ogiyolusv",
+          "start": 328.305,
+          "end": 329.285,
+          "confidence": 0.9850581049919128,
+          "flagged": false,
+          "syllabary_word": "ᎣᎩᏲᎷᏒ"
+        },
+        {
+          "word": "itsula",
+          "start": 329.99,
+          "end": 330.57,
+          "confidence": 0.9907463391621908,
+          "flagged": false,
+          "syllabary_word": "ᎢᏧᎳ"
+        },
+        {
+          "word": "aya ale",
+          "start": 330.67,
+          "end": 331.11,
+          "confidence": 0.999929666519165,
+          "flagged": false,
+          "syllabary_word": "ᎠᏯ ᎠᎴ"
+        },
+        {
+          "word": "Bobby ogininalvsv nvdigalisdodisgv",
+          "start": 331.27,
+          "end": 335.2,
+          "confidence": 0.9666547861873593,
+          "flagged": false,
+          "syllabary_word": "Bobby ᎣᎩᏂᎾᎸᏒ ᏅᏗᎦᎵᏍᏙᏗᏍᎬ"
+        },
+        {
+          "word": "noginigida",
+          "start": 335.87,
+          "end": 336.81,
+          "confidence": 0.9998667001724243,
+          "flagged": false,
+          "syllabary_word": "ᏃᎩᏂᎩᏓ"
+        },
+        {
+          "word": "gesv",
+          "start": 336.93,
+          "end": 337.31,
+          "confidence": 0.9999729633331299,
+          "flagged": false,
+          "syllabary_word": "ᎨᏒ"
+        },
+        {
+          "word": "unosdi",
+          "start": 337.59,
+          "end": 338.23,
+          "confidence": 0.9244403317570686,
+          "flagged": false,
+          "syllabary_word": "ᎤᏃᏍᏗ"
+        },
+        {
+          "word": "adela",
+          "start": 338.5,
+          "end": 338.96,
+          "confidence": 0.9989452958106995,
+          "flagged": false,
+          "syllabary_word": "ᎠᏕᎳ"
+        },
+        {
+          "word": "Bobby unawidvhv",
+          "start": 339.59,
+          "end": 340.83,
+          "confidence": 0.964469812810421,
+          "flagged": false,
+          "syllabary_word": "Bobby ᎤᎾᏫᏛᎲ"
+        },
+        {
+          "word": "atsadi",
+          "start": 340.91,
+          "end": 341.29,
+          "confidence": 0.9715291361014048,
+          "flagged": false,
+          "syllabary_word": "ᎠᏣᏗ"
+        },
+        {
+          "word": "digadvdodi",
+          "start": 341.37,
+          "end": 342.21,
+          "confidence": 0.9990939118645408,
+          "flagged": false,
+          "syllabary_word": "ᏗᎦᏛᏙᏗ"
+        },
+        {
+          "word": "atsadi",
+          "start": 342.79,
+          "end": 343.19,
+          "confidence": 0.9999023179213206,
+          "flagged": false,
+          "syllabary_word": "ᎠᏣᏗ"
+        },
+        {
+          "word": "tsuhanegalvnv",
+          "start": 343.25,
+          "end": 344.23,
+          "confidence": 0.9604887733092675,
+          "flagged": false,
+          "syllabary_word": "ᏧᎭᏁᎦᎸᏅ"
+        },
+        {
+          "word": "degadv",
+          "start": 344.72,
+          "end": 345.22,
+          "confidence": 0.9997234046459198,
+          "flagged": false,
+          "syllabary_word": "ᏕᎦᏛ"
+        },
+        {
+          "word": "si",
+          "start": 345.745,
+          "end": 345.885,
+          "confidence": 0.9999033510684967,
+          "flagged": false,
+          "syllabary_word": "Ꮟ."
+        }
+      ]
+    }
+  ]
+}

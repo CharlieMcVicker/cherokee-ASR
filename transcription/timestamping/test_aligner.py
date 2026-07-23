@@ -153,6 +153,61 @@ class TestAligner(unittest.TestCase):
         self.assertLessEqual(result.metrics.overall_cer, 0.10)
         self.assertLessEqual(result.verses[0].cer, 0.10)
 
+    def test_multi_token_asr_fusion_to_gt(self):
+        # Two split ASR tokens ("word1wo", "ord2") mapping onto single GT segment ("word1 word2")
+        tokens = [
+            {"word": "word1wo", "start_time": 1.0, "end_time": 1.5, "confidence": 0.88},
+            {"word": "ord2", "start_time": 1.6, "end_time": 2.1, "confidence": 0.85},
+        ]
+        verses = [
+            {
+                "line_id": "020101",
+                "cherokee_syllabary": "word1 word2",
+                "raw_phonetic": "word1 word2",
+                "normalized_text": "word1 word2",
+                "english": "test segment",
+            }
+        ]
+
+        result = align_tokens_to_verses(tokens, verses, audio_source="test.wav")
+        v0 = result.verses[0]
+        self.assertEqual(len(v0.words), 1)
+        self.assertEqual(v0.words[0].word, "word1 word2")
+        self.assertEqual(v0.words[0].start_sec, 1.0)
+        self.assertEqual(v0.words[0].end_sec, 2.1)
+
+    def test_distinct_words_do_not_fuse(self):
+        # Distinct words ("nvhskayohi'a", "tsinikvnha") should align 1-to-1 against GT ("nasgiya hia", "tsinigvnv")
+        # rather than being false-fused together into a single segment.
+        tokens = [
+            {
+                "word": "nvhskayohi'a",
+                "start_time": 1.0,
+                "end_time": 1.5,
+                "confidence": 0.90,
+            },
+            {
+                "word": "tsinikvnha",
+                "start_time": 1.6,
+                "end_time": 2.1,
+                "confidence": 0.90,
+            },
+        ]
+        verses = [
+            {
+                "line_id": "020101",
+                "cherokee_syllabary": "ᎾᏍᎩᏯ ᎯᎠ ᏥᏂᎬᏅ",
+                "raw_phonetic": "Na-s-gi-ya hi-a tsi-ni-gv-nv",
+                "normalized_text": "nasgiya hia tsinigvnv",
+                "english": "as it is written",
+            }
+        ]
+
+        result = align_tokens_to_verses(tokens, verses, audio_source="test.wav")
+        v0 = result.verses[0]
+        # Should align as 2 distinct word intervals, not fused into 1 interval
+        self.assertEqual(len(v0.words), 2)
+
 
 if __name__ == "__main__":
     unittest.main()

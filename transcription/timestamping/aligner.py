@@ -20,6 +20,7 @@ class WordInterval:
     end_sec: float
     confidence: float = 1.0
     flagged: bool = False
+    cherokee_syllabary: str = ""
 
 
 @dataclass
@@ -121,6 +122,7 @@ def compute_alignment_metrics(alignment_result: AlignmentResult) -> AlignmentMet
 def _align_words_char_range(
     raw_words: List[str],
     matched_tokens: List[Dict[str, Any]],
+    raw_syllabary_words: Optional[List[str]] = None,
 ) -> List[WordInterval]:
     """
     Aligns ground-truth words to matched emission tokens using Needleman-Wunsch DP string edit distance.
@@ -139,7 +141,8 @@ def _align_words_char_range(
 
     # DP state: dp[i, j] = (min_cost, parent_i, parent_j)
     GAP_COST = 0.8
-    MAX_FUSE_GT = 4  # maximum consecutive GT words allowed to fuse onto 1 ASR token
+    MAX_FUSE_GT = 4  # maximum consecutive GT words allowed to fuse
+    MAX_FUSE_ASR = 3  # maximum consecutive ASR tokens allowed to fuse
 
     dp = np.full((N + 1, M + 1), fill_value=1e9, dtype=np.float32)
     parent = [[None for _ in range(M + 1)] for _ in range(N + 1)]
@@ -167,19 +170,26 @@ def _align_words_char_range(
                     dp[i, j + 1] = cost
                     parent[i][j + 1] = (i, j, "gap_token")
 
-            # Option 3: Match 1 token against K GT words (K = 1..MAX_FUSE_GT)
-            if j + 1 <= M:
-                t_str = norm_tokens[j]
-                for k in range(1, MAX_FUSE_GT + 1):
-                    if i + k <= N:
-                        gt_concat = " ".join(norm_words[i : i + k])
-                        edit_cost = compute_trigram_edit_cost(t_str, gt_concat)
-                        # Add slight penalty per fused word to prefer 1-to-1 matches when cost is equal
-                        cost = current_cost + edit_cost + (0.05 * (k - 1))
+            # Option 3: Match M ASR tokens against K GT words
+            for m_len in range(1, MAX_FUSE_ASR + 1):
+                if j + m_len <= M:
+                    asr_concat = "".join(norm_tokens[j : j + m_len])
+                    for k in range(1, MAX_FUSE_GT + 1):
+                        if i + k <= N:
+                            gt_concat = " ".join(norm_words[i : i + k])
+                            edit_cost = compute_trigram_edit_cost(asr_concat, gt_concat)
+                            # Penalty per additional fused element (0.15) to prefer 1-to-1 matches
+                            # unless fusion provides a clear improvement in edit distance.
+                            penalty = 0.15 * (k - 1) + 0.15 * (m_len - 1)
+                            cost = current_cost + edit_cost + penalty
 
-                        if cost < dp[i + k, j + 1]:
-                            dp[i + k][j + 1] = cost
-                            parent[i + k][j + 1] = (i, j, f"match_fuse_{k}")
+                            if cost < dp[i + k, j + m_len]:
+                                dp[i + k][j + m_len] = cost
+                                parent[i + k][j + m_len] = (
+                                    i,
+                                    j,
+                                    f"match_fuse_{k}_{m_len}",
+                                )
 
     # Backtrack optimal DP path
     i, j = N, M
@@ -202,6 +212,11 @@ def _align_words_char_range(
         if action_type == "gap_gt":
             # Unaligned GT word: Interpolate timestamp
             raw_w = raw_words[pi]
+            syll_w = (
+                raw_syllabary_words[pi]
+                if (raw_syllabary_words and pi < len(raw_syllabary_words))
+                else ""
+            )
             prev_end = (
                 fused_intervals[-1].end_sec
                 if fused_intervals
@@ -214,22 +229,38 @@ def _align_words_char_range(
                     end_sec=prev_end,
                     confidence=0.0,
                     flagged=True,
+                    cherokee_syllabary=syll_w,
                 )
             )
         elif action_type == "gap_token":
             continue
         elif action_type.startswith("match_fuse_"):
-            k = int(action_type.split("_")[-1])
+            parts = action_type.split("_")
+            k = int(parts[2])
+            m_len = int(parts[3]) if len(parts) > 3 else 1
             fused_gt_text = " ".join(raw_words[pi : pi + k])
-            matched_tok = matched_tokens[pj]
+            syll_w = (
+                " ".join(raw_syllabary_words[pi : pi + k])
+                if (raw_syllabary_words and pi + k <= len(raw_syllabary_words))
+                else ""
+            )
+
+            first_tok = matched_tokens[pj]
+            last_tok = matched_tokens[pj + m_len - 1]
+
+            confidences = [
+                t.get("confidence", 1.0) for t in matched_tokens[pj : pj + m_len]
+            ]
+            avg_conf = float(np.mean(confidences)) if confidences else 1.0
 
             fused_intervals.append(
                 WordInterval(
                     word=fused_gt_text,
-                    start_sec=matched_tok["start_time"],
-                    end_sec=matched_tok["end_time"],
-                    confidence=matched_tok.get("confidence", 1.0),
-                    flagged=matched_tok.get("confidence", 1.0) < 0.5,
+                    start_sec=first_tok["start_time"],
+                    end_sec=last_tok["end_time"],
+                    confidence=avg_conf,
+                    flagged=avg_conf < 0.5,
+                    cherokee_syllabary=syll_w,
                 )
             )
 
@@ -339,9 +370,21 @@ def align_tokens_to_verses(
                     if curr_start + k > num_tokens:
                         break
                     candidate_tokens = token_emissions[curr_start : curr_start + k]
-                    candidate_str = " ".join([t["word"] for t in candidate_tokens])
-                    candidate_norm = normalize_text_for_alignment(candidate_str)
-                    cost = compute_trigram_edit_cost(candidate_norm, norm_txt)
+                    tok_words = [t["word"] for t in candidate_tokens]
+                    candidate_norm_spaced = normalize_text_for_alignment(
+                        " ".join(tok_words)
+                    )
+                    candidate_norm_concat = normalize_text_for_alignment(
+                        "".join(tok_words)
+                    )
+
+                    cost_spaced = compute_trigram_edit_cost(
+                        candidate_norm_spaced, norm_txt
+                    )
+                    cost_concat = compute_trigram_edit_cost(
+                        candidate_norm_concat, norm_txt
+                    )
+                    cost = min(cost_spaced, cost_concat)
 
                     if cost < best_cost:
                         best_cost = cost
@@ -357,8 +400,13 @@ def align_tokens_to_verses(
             emitted_norm = normalize_text_for_alignment(emitted_text)
             verse_cer = compute_trigram_edit_cost(emitted_norm, norm_txt)
 
+            raw_syllabary_words = [
+                w for w in v.get("cherokee_syllabary", "").split() if w
+            ]
             # Map words using character-range alignment and fuse words mapping to single tokens
-            word_intervals = _align_words_char_range(raw_words, matched_tokens)
+            word_intervals = _align_words_char_range(
+                raw_words, matched_tokens, raw_syllabary_words=raw_syllabary_words
+            )
             token_idx = best_end_idx
         else:
             # Fallback if no matching tokens available in stream

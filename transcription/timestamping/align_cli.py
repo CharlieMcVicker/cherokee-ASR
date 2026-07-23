@@ -12,7 +12,10 @@ import sys
 import numpy as np
 
 from transcription.timestamping.audio_segmenter import segment_long_audio
-from transcription.timestamping.prepare_ground_truth import parse_bible_metadata
+from transcription.timestamping.prepare_ground_truth import (
+    parse_bible_metadata,
+    parse_chunk_list,
+)
 from transcription.timestamping.aligner import align_tokens_to_verses
 from transcription.timestamping.exporter import (
     export_praat_textgrid,
@@ -22,15 +25,25 @@ from transcription.timestamping.exporter import (
 
 def run_alignment_pipeline(
     audio_path: str,
-    metadata_path: str,
     output_dir: str,
+    bible_metadata_path: str = None,
+    chunk_list_path: str = None,
     export_praat: bool = True,
     model_path: str = None,
 ) -> None:
     """Executes full alignment pipeline end-to-end."""
-    print(f"[1/4] Ingesting ground-truth metadata from '{metadata_path}'...")
-    verses = parse_bible_metadata(metadata_path)
-    print(f"      Parsed {len(verses)} verse entries.")
+    if bible_metadata_path:
+        print(
+            f"[1/4] Ingesting Bible ground-truth metadata from '{bible_metadata_path}'..."
+        )
+        verses = parse_bible_metadata(bible_metadata_path)
+    elif chunk_list_path:
+        print(f"[1/4] Ingesting ground-truth chunk list from '{chunk_list_path}'...")
+        verses = parse_chunk_list(chunk_list_path)
+    else:
+        raise ValueError("Either --bible-metadata or --chunk-list must be provided.")
+
+    print(f"      Parsed {len(verses)} ground-truth segment entries.")
 
     print(f"[2/4] Segmenting audio file '{audio_path}' with VAD...")
     chunks = segment_long_audio(audio_path)
@@ -138,9 +151,22 @@ def main():
     parser.add_argument(
         "--audio", required=True, help="Path to input audio file (.wav/.mp3)"
     )
-    parser.add_argument(
-        "--metadata", required=True, help="Path to raw metadata JSON file"
+
+    # Ground truth ingest options
+    gt_group = parser.add_mutually_exclusive_group(required=True)
+    gt_group.add_argument(
+        "--bible-metadata",
+        help="Path to Bible verse metadata JSON file (key-value dict format)",
     )
+    gt_group.add_argument(
+        "--chunk-list",
+        help="Path to target chunk list JSON file (list of segment dicts)",
+    )
+    gt_group.add_argument(
+        "--metadata",
+        help="Alias for --bible-metadata for backward compatibility",
+    )
+
     parser.add_argument(
         "--output-dir", required=True, help="Directory to save output files"
     )
@@ -155,9 +181,13 @@ def main():
     )
 
     args = parser.parse_args()
+
+    bible_meta = args.bible_metadata or args.metadata
+
     run_alignment_pipeline(
         audio_path=args.audio,
-        metadata_path=args.metadata,
+        bible_metadata_path=bible_meta,
+        chunk_list_path=args.chunk_list,
         output_dir=args.output_dir,
         export_praat=args.export_praat,
         model_path=args.model_path,

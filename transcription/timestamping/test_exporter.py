@@ -86,6 +86,29 @@ class TestExporter(unittest.TestCase):
             self.assertIn("mark_01.wav", content)
             self.assertIn("020101", content)
 
+    def test_export_alignment_manifest_with_syllabary_word(self):
+        w1 = WordInterval(
+            word="ataleniskv", start_sec=1.0, end_sec=1.5, cherokee_syllabary="ᎠᏓᎴᏂᏍᎬ"
+        )
+        v1 = VerseInterval(
+            line_id="020101",
+            cherokee_syllabary="ᎠᏓᎴᏂᏍᎬ",
+            raw_phonetic="A-da-le-ni-s-gv",
+            english="The beginning",
+            start_sec=1.0,
+            end_sec=1.5,
+            words=[w1],
+        )
+        alignment = AlignmentResult(audio_source="test.wav", verses=[v1])
+        with tempfile.TemporaryDirectory() as tmpdir:
+            out_file = os.path.join(tmpdir, "alignment_manifest.json")
+            export_alignment_manifest(alignment, out_file)
+            self.assertTrue(os.path.exists(out_file))
+
+            with open(out_file, "r") as f:
+                content = f.read()
+            self.assertIn('"syllabary_word": "ᎠᏓᎴᏂᏍᎬ"', content)
+
 
 if __name__ == "__main__":
     unittest.main()

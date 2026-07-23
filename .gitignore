@@ -35,6 +35,8 @@ remote_output_w2v2/
 run*.txt
 data/results/test_inference_results.csv
 data/results/batch_inference_results.csv
+data/results/CVCS_all.csv
+data/results/cvcs_all_noisy.csv
 
 # segment output directories
 data/processed/segments/

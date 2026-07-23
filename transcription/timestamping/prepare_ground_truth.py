@@ -47,6 +47,53 @@ def normalize_text_for_alignment(text: str) -> str:
     return text
 
 
+def parse_chunk_list(chunk_list_path: str) -> List[Dict[str, Any]]:
+    """
+    Parses a simple JSON list of chunk dictionaries into normalized segment records.
+
+    Expected JSON format:
+    [
+        {
+            "line_id": "seg_01", (optional)
+            "raw_phonetic": "...",
+            "cherokee_syllabary": "...", (optional)
+            "english": "..." (optional)
+        }, ...
+    ]
+    """
+    if not os.path.exists(chunk_list_path):
+        raise FileNotFoundError(f"Chunk list file not found: {chunk_list_path}")
+
+    with open(chunk_list_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    if not isinstance(data, list):
+        raise ValueError("Chunk list JSON must be a top-level list of dictionaries.")
+
+    segments = []
+    for idx, item in enumerate(data):
+        line_id = str(item.get("line_id", f"chunk_{idx + 1:03d}"))
+        raw_phonetic = item.get("raw_phonetic", item.get("phonetic", ""))
+        cherokee = item.get("cherokee_syllabary", item.get("cherokee", ""))
+        english = item.get("english", "")
+
+        normalized = item.get("normalized_text", "")
+        if not normalized:
+            normalized = normalize_text_for_alignment(raw_phonetic)
+
+        segments.append(
+            {
+                "line_id": line_id,
+                "cherokee_syllabary": cherokee,
+                "raw_phonetic": raw_phonetic,
+                "normalized_text": normalized,
+                "english": english,
+            }
+        )
+
+    return segments
+
+
 def parse_bible_metadata(metadata_path: str) -> List[Dict[str, Any]]:
     """
     Parses mark_01_metadata.json into a list of normalized verse records.

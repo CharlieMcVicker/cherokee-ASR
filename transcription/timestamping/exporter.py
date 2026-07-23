@@ -254,16 +254,19 @@ def export_alignment_manifest(alignment: AlignmentResult, output_path: str) -> N
 
     manifest_lines = []
     for v in alignment.verses:
-        word_objs = [
-            {
+        word_objs = []
+        for w in v.words:
+            w_dict = {
                 "word": w.word,
                 "start": w.start_sec,
                 "end": w.end_sec,
                 "confidence": w.confidence,
                 "flagged": w.flagged,
             }
-            for w in v.words
-        ]
+            if w.cherokee_syllabary:
+                w_dict["syllabary_word"] = w.cherokee_syllabary
+            word_objs.append(w_dict)
+
         manifest_lines.append(
             {
                 "line_id": v.line_id,
