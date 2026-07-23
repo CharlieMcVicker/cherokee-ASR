@@ -1,13 +1,13 @@
 {
   "audio_source": "timestamping_test_data/Cherokee Story-Our Fishing Trip.wav",
   "metrics": {
-    "total_verses": 9,
-    "matched_verses": 9,
+    "total_verses": 13,
+    "matched_verses": 13,
     "matched_verse_ratio": 1.0,
-    "overall_cer": 0.1631,
-    "mean_verse_cer": 0.1605,
+    "overall_cer": 0.1613,
+    "mean_verse_cer": 0.1567,
     "total_ground_truth_chars": 2796,
-    "total_emitted_chars": 2595
+    "total_emitted_chars": 2590
   },
   "lines": [
     {
@@ -460,13 +460,13 @@
     },
     {
       "line_id": "3",
-      "cherokee_syllabary": "ᏥᎾᏌᏁᏍᎬ ᏑᏗ ᎠᏏᎳᏛ ᏙᎢ ᏄᎵᏍᏔᏅ,ᎠᏆᏓᏅᏖᎸ ᎾᎿ ᎠᏆᏤᎵ ᏑᏗ ᏙᎢ ᏄᎵᏍᏔᏅᎢ, ᎠᏎᏃ Ꮟ ᎾᏍᎩ ᎤᏟᏂᎩᏓ ᎨᏒ. ᎠᏆᎴᏅᎲ ᏙᎢ ᏥᎾᏌᏁᏍᎬ ᎠᏏᎳᏛ ᎠᎴ ᎾᎠᏂᎩᏍᏗ ᎤᎷᏣ ᎤᎴᏅᎲ ᎠᏓᏅᏍᎬ ᎠᏍᏆᎨᎾᏗᏢ, ᎦᏓᏅᏖᏍᎬ ᎡᏁᏊᎴ ᎤᏍᏗ ᎠᏓ ᏳᏪᏏ ᎾᏍᎩᏃ ᏱᎦᏂᏏᏁᎦ ᎨᎵᏍᎬ. ᏃᎴ ᎠᏏᎳᏛ ᎤᎴᏅᎲ, \"ᎠᏓᏅᏌᏁᏍᎬ ᎠᎴ ᎠᏆᏓᏅᏖᎸ,\" ᎠᏣᏗᏍ ᎦᏓᎠ ᏑᏗ ᎨᎵᏍᎬ?\" ᏙᎯᏳᏃ ᏥᏂᏴᎲ ᎠᏣᏗ ᎠᎴ ᎠᏇᎷᏅ ᎠᏂᏐᎢ ᎤᎾᏛᎪᏗ \"hey ᏥᏂᏯ ᎠᏣᏓ!\" ᏂᎦᏓ ᏫᏚᎾᎧᎾᏅ ᏑᏗ ᎠᏏᎳᏛ ᎠᏆᏤᎵᎢ ᎠᎴ ᏫᎵ ᎯᎠ ᏄᏪᏒ, \"ᎯᎾᏌᎾᎩ.\" ᎾᏍᎩᏃ ᎾᏆᏛᏁᎸ ᎠᎴ ᏥᏂᏴᎲ ᏧᎵᏍᏓᎾᎵ ᎦᏛᎢ ᏑᏗᎢ.",
-      "text": "tsinasanesgv sudi asiladv doi nulistanvagwadanvtelv nahna agwatseli sudi doi nulistanvi aseno si nasgi utlinigida gesv agwalenvhv doi tsinasanesgv asiladv ale naanigisdi ulutsa ulenvhv adanvsgv asgwagenaditlv gadanvtesgv enegwule usdi ada yuwesi nasgino yiganisinega gelisgv nole asiladv ulenvhv adanvsanesgv ale agwadanvtelv atsadis gadaa sudi gelisgv dohiyuno tsiniyvhv atsadi ale agwelunv anisoi unadvgodi hey tsiniya atsada nigada widunakananv sudi asiladv agwatselii ale wili hia nuwesv hinasanagi nasgino nagwadvnelv ale tsiniyvhv tsulisdanali gadvi sudii",
+      "cherokee_syllabary": "ᏥᎾᏌᏁᏍᎬ ᏑᏗ ᎠᏏᎳᏛ ᏙᎢ ᏄᎵᏍᏔᏅ,ᎠᏆᏓᏅᏖᎸ ᎾᎿ ᎠᏆᏤᎵ ᏑᏗ ᏙᎢ ᏄᎵᏍᏔᏅᎢ, ᎠᏎᏃ Ꮟ ᎾᏍᎩ ᎤᏟᏂᎩᏓ ᎨᏒ. ᎠᏆᎴᏅᎲ ᏙᎢ ᏥᎾᏌᏁᏍᎬ ᎠᏏᎳᏛ ᎠᎴ ᎾᎠᏂᎩᏍᏗ ᎤᎷᏣ ᎤᎴᏅᎲ ᎠᏓᏅᏍᎬ ᎠᏍᏆᎨᎾᏗᏢ, ᎦᏓᏅᏖᏍᎬ ᎡᏁᏊᎴ ᎤᏍᏗ ᎠᏓ ᏳᏪᏏ ᎾᏍᎩᏃ ᏱᎦᏂᏏᏁᎦ ᎨᎵᏍᎬ.",
+      "text": "tsinasanesgv sudi asiladv doi nulistanvagwadanvtelv nahna agwatseli sudi doi nulistanvi aseno si nasgi utlinigida gesv agwalenvhv doi tsinasanesgv asiladv ale naanigisdi ulutsa ulenvhv adanvsgv asgwagenaditlv gadanvtesgv enegwule usdi ada yuwesi nasgino yiganisinega gelisgv",
       "english": "",
       "start": 66.93,
-      "end": 137.19,
-      "cer": 0.0926,
-      "emitted_text": "tsinahsanehskv hsuh ti ahsilatv thowi nulhsthanv akwatanhthelhv nanhv' akwatseli hsuh ti thoyi nulhsthanv'i hahsenhv hsinahski ulhinikita kehsv akwalenvhv thowi tsinahsanehskv ahsilatv ale na'anhikehsti uluhtsa ulenvhv atanvhskv ahskwakeni tila katanathehskv elikwule uhsti ata yuwehsi nahskinho yhikanhtshanaka kelihskv nole ahsilatv ulenvhv atanhsanehskvale akwatanhthelhv atsatihskito' suhti kelihskv tohiyinu tsiniyvhv atsati ale akwelhanv atihso'i unathv koti he'i tsiniya tsati nikata witsunakhanhanv suhti ahsilatv akwitsili ale wili yh'anuwehse hinahsanaki nohskinho nakwatvnelv ale tsiniyvhe tsulihstanalikatv suh ti'i",
+      "end": 103.255,
+      "cer": 0.0886,
+      "emitted_text": "tsinahsanehskv hsuh ti ahsilatv thowi nulhsthanv akwatanhthelhv nanhv' akwatseli hsuh ti thoyi nulhsthanv'i hahsenhv hsinahski ulhinikita kehsv akwalenvhv thowi tsinahsanehskv ahsilatv ale na'anhikehsti uluhtsa ulenvhv atanvhskv ahskwakeni tila katanathehskv elikwule uhsti ata yuwehsi nahskinho yhikanhtshanaka kelihskv",
       "words": [
         {
           "word": "tsinasanesgv",
@@ -723,7 +723,19 @@
           "confidence": 0.9997710064053535,
           "flagged": false,
           "syllabary_word": "ᎨᎵᏍᎬ."
-        },
+        }
+      ]
+    },
+    {
+      "line_id": "4",
+      "cherokee_syllabary": "ᏃᎴ ᎠᏏᎳᏛ ᎤᎴᏅᎲ, \"ᎠᏓᏅᏌᏁᏍᎬ ᎠᎴ ᎠᏆᏓᏅᏖᎸ,\" ᎠᏣᏗᏍ ᎦᏓᎠ ᏑᏗ ᎨᎵᏍᎬ?\" ᏙᎯᏳᏃ ᏥᏂᏴᎲ ᎠᏣᏗ ᎠᎴ ᎠᏇᎷᏅ ᎠᏂᏐᎢ ᎤᎾᏛᎪᏗ",
+      "text": "nole asiladv ulenvhv adanvsanesgv ale agwadanvtelv atsadis gadaa sudi gelisgv dohiyuno tsiniyvhv atsadi ale agwelunv anisoi unadvgodi",
+      "english": "",
+      "start": 103.88,
+      "end": 118.855,
+      "cer": 0.0923,
+      "emitted_text": "nole ahsilatv ulenvhv atanhsanehskvale akwatanhthelhv atsatihskito' suhti kelihskv tohiyinu tsiniyvhv atsati ale akwelhanv atihso'i unathv koti",
+      "words": [
         {
           "word": "nole",
           "start": 103.88,
@@ -837,20 +849,32 @@
           "syllabary_word": "ᎠᏂᏐᎢ"
         },
         {
-          "word": "unadvgodi hey",
+          "word": "unadvgodi",
           "start": 118.035,
-          "end": 119.495,
-          "confidence": 0.9835564742485682,
+          "end": 118.855,
+          "confidence": 0.986189678311348,
           "flagged": false,
-          "syllabary_word": "ᎤᎾᏛᎪᏗ \"hey"
-        },
+          "syllabary_word": "ᎤᎾᏛᎪᏗ"
+        }
+      ]
+    },
+    {
+      "line_id": "5",
+      "cherokee_syllabary": "\"hey ᏥᏂᏯ ᎠᏣᏓ!\" ᏂᎦᏓ ᏫᏚᎾᎧᎾᏅ ᏑᏗ ᎠᏏᎳᏛ ᎠᏆᏤᎵᎢ ᎠᎴ ᏫᎵ ᎯᎠ ᏄᏪᏒ, \"ᎯᎾᏌᎾᎩ.\" ᎾᏍᎩᏃ ᎾᏆᏛᏁᎸ ᎠᎴ ᏥᏂᏴᎲ ᏧᎵᏍᏓᎾᎵ ᎦᏛᎢ ᏑᏗᎢ.",
+      "text": "hey tsiniya atsada nigada widunakananv sudi asiladv agwatselii ale wili hia nuwesv hinasanagi nasgino nagwadvnelv ale tsiniyvhv tsulisdanali gadvi sudii",
+      "english": "",
+      "start": 119.095,
+      "end": 137.19,
+      "cer": 0.1014,
+      "emitted_text": "he'i tsiniya tsati nikata witsunakhanhanv suhti ahsilatv akwitsili ale wili yh'anuwehse hinahsanaki nohskinho nakwatvnelv ale tsiniyvhe tsulihstanalikatv suh ti'i",
+      "words": [
         {
-          "word": "tsiniya",
-          "start": 120.21,
+          "word": "hey tsiniya",
+          "start": 119.095,
           "end": 120.71,
-          "confidence": 0.9767248545374189,
+          "confidence": 0.9775074603302139,
           "flagged": false,
-          "syllabary_word": "ᏥᏂᏯ"
+          "syllabary_word": "\"hey ᏥᏂᏯ"
         },
         {
           "word": "atsada",
@@ -983,7 +1007,7 @@
       ]
     },
     {
-      "line_id": "4",
+      "line_id": "6",
       "cherokee_syllabary": "ᎦᏥᏃᎯᏎᎸ ᎠᏂᏧᏣ, “ᏃᏊ ᎢᏣᏈᏯ, ᎠᏯ ᎢᎬᏱ ᏥᏂᏯ ᎠᏣᏗ!” ᏃᏊᏃ Bobby ᎤᎾᎸᏨ ᏅᏗᎦᎵᏍᏙᏗ ᎾᏍᎩ ᎤᏚᎵᏍᎬ ᎢᎬᏱ ᎤᏂᏴᏗ ᎠᏣᏗ. ᎠᏆᏛᏅᏃ ᏥᏂᏴᏓ ᏧᎵᏍᏓᎾᎵ ᎾᎿ ᎠᏣᏗ ᏗᎦᏛᏙᏗᎢ ᎠᎴ ᎠᏆᏛᏅ ᎤᎳᏗᏢ ᎾᎿ ᎠᏲᎷᎲᏍᎩ ᎣᎦᎩᎸᎢ, ᎠᎴ ᎠᏣᏗ ᏥᏛᏅ ᎠᎹᏱ ᏩᏆᏙᏅᏔᏅᎢ, ᎾᎿ ᎤᎦᏦᏛ ᎤᎳᏗᏢᎢ.",
       "text": "gatsinohiselv anitsutsa nogwu itsagwiya aya igvyi tsiniya atsadi nogwuno Bobby unalvtsv nvdigalisdodi nasgi udulisgv igvyi uniyvdi atsadi agwadvnvno tsiniyvda tsulisdanali nahna atsadi digadvdodii ale agwadvnv uladitlv nahna ayoluhvsgi ogagilvi ale atsadi tsidvnv amayi wagwadonvtanvi nahna ugatsodv uladitlvi",
       "english": "",
@@ -1235,7 +1259,7 @@
       ]
     },
     {
-      "line_id": "5",
+      "line_id": "7",
       "cherokee_syllabary": "ᏂᎦᏲᏣᎢᏒ ᎣᎩᏲᎷᎲ ᎤᏪᏴ ᎠᎴ ᏏᏊ ᎣᎦᎴᏫᏍᏔᏅ ᎾᎿ ᎦᏁᎲᏊ ᎠᎹ ᎣᎦᎴᏅᎲ ᎣᏣᏑᎲᏍᎬᎢ. ᎨᎳᏊ ᎢᏴ Bobby ᏓᏳᏪᎷᏅ ᎠᎴ ᎯᎠ ᏄᏪᏒ! \"ᎠᏣᏗ ᏥᏂᏯ!\" Bobby ᎤᏂᏴᎲ ᎣᏍᏓ ᎢᎩᏓ ᎠᏣᏘ ᎤᏃᎦ, ᎤᏔᏅᏃ ᎾᏃ  ᏧᎵᏍᏓᎾᎵ, ᏃᏊ ᎣᏍᏓ ᎤᏰᎸᏒ ᏄᏗᎦᎵᏍᏙᏗᏍᎬ",
       "text": "nigayotsaisv ogiyoluhv uweyv ale sigwu ogalewistanv nahna ganehvgwu ama ogalenvhv otsasuhvsgvi gelagwu iyv Bobby dayuwelunv ale hia nuwesv atsadi tsiniya Bobby uniyvhv osda igida atsati unoga utanvno nano  tsulisdanali nogwu osda uyelvsv nudigalisdodisgv",
       "english": "",
@@ -1447,7 +1471,7 @@
       ]
     },
     {
-      "line_id": "6",
+      "line_id": "8",
       "cherokee_syllabary": "ᏭᏔᏅ ᎠᏣᏗ ᎤᏂᏴᎲᎢ, ᏃᏊ ᎤᏃᏍᏗᎭ ᏙᏥᏅᏁᎸ, ᏭᏁᏒ ᎠᏣᏗ ᏗᎦᏛᏙᏗᎢ ᎤᏛᏅ ᏕᎦᏛᏛ ᎠᏣᏗ ᎠᎴ ᎠᎹᎢ ᏭᏓᎢᏅᏒᎢ ᎤᎳᏗᏢ ᎣᎦᎩᎸᏛᎢ.",
       "text": "wutanv atsadi uniyvhvi nogwu unosdiha dotsinvnelv wunesv atsadi digadvdodii udvnv degadvdv atsadi ale amai wudainvsvi uladitlv ogagilvdvi",
       "english": "",
@@ -1579,14 +1603,14 @@
       ]
     },
     {
-      "line_id": "7",
-      "cherokee_syllabary": "Bobby ᏃᏊ ᎣᏍᏓ ᎤᏓᏅᏛ, ᎤᏃᏍᏗᎭ ᏙᏥᏅᏁᎸ ᏭᏔᏅ ᎠᏣᏗ ᎤᏂᏴᎲᎢ. ᎣᎦᏂᎩᏒ ᎣᎩᏲᎷᏐ, ᎪᎯᎢᏴ ᎣᎩᎷᏨ ᏍᏓᏯ ᎡᎬ ᎤᏪᏴ ᎠᎴ ᎤᏝᏅᏛ ᎢᎵᏊ ᎾᏯᏛᎥ ᎣᎦᎩᎸᏛᎢ ᏭᎦᏛᎴᎯᏍᏗᎢ, ᎾᎿ ᎤᏔᎾ ᎠᏏᏛ ᎠᎹᏯ ᎤᎦᏌᏛᎢ. ᎢᎦᏃ ᏍᏓᏯ ᎡᎬ ᎠᎹ ᎠᎴ ᎣᎦᏛᎦᏅ ᏫᎵ ᏓᏳᏪᎷᏅ, Bobby ᏘᏂᏯ ᎠᏣᏗ ᏕᎦᏛᏛᎢ, ᎠᎴ ᏫᏚᏂᏌᏁᏒ ᎠᏣᏗ Ꮟ ᏂᏚᎾᏛᏨᎾᏊ Ot ᎤᏔᎾ ᎠᏏᏛᎢ!”",
-      "text": "Bobby nogwu osda udanvdv unosdiha dotsinvnelv wutanv atsadi uniyvhvi oganigisv ogiyoluso gohiiyv ogilutsv sdaya egv uweyv ale utlanvdv iligwu nayadvv ogagilvdvi wugadvlehisdii nahna utana asidv amaya ugasadvi igano sdaya egv ama ale ogadvganv wili dayuwelunv Bobby tiniya atsadi degadvdvi ale widunisanesv atsadi si nidunadvtsvnagwu Ot utana asidvi",
+      "line_id": "9",
+      "cherokee_syllabary": "Bobby ᏃᏊ ᎣᏍᏓ ᎤᏓᏅᏛ, ᎤᏃᏍᏗᎭ ᏙᏥᏅᏁᎸ ᏭᏔᏅ ᎠᏣᏗ ᎤᏂᏴᎲᎢ. ᎣᎦᏂᎩᏒ ᎣᎩᏲᎷᏐ, ᎪᎯᎢᏴ ᎣᎩᎷᏨ ᏍᏓᏯ ᎡᎬ ᎤᏪᏴ ᎠᎴ ᎤᏝᏅᏛ ᎢᎵᏊ ᎾᏯᏛᎥ ᎣᎦᎩᎸᏛᎢ ᏭᎦᏛᎴᎯᏍᏗᎢ, ᎾᎿ ᎤᏔᎾ ᎠᏏᏛ ᎠᎹᏯ ᎤᎦᏌᏛᎢ.",
+      "text": "Bobby nogwu osda udanvdv unosdiha dotsinvnelv wutanv atsadi uniyvhvi oganigisv ogiyoluso gohiiyv ogilutsv sdaya egv uweyv ale utlanvdv iligwu nayadvv ogagilvdvi wugadvlehisdii nahna utana asidv amaya ugasadvi",
       "english": "",
       "start": 221.95,
-      "end": 267.51,
-      "cer": 0.1545,
-      "emitted_text": "mawinokwu ohsta utanhthv unhohstiha totsinvnelv uthana tsati'uniyvhv'i okanikihsv okiyoluhsv khohiyokiluhtsv staya eka uweyale yuhsanvtv elikwu nayhahthv'v okakhilvtv'i wukhthvlehihsti'i nanhv uthana ahsithv amayu ukhsathv'i ikanhahihstaya eka ama ale okhthvkanv wili tayukwelhunhv wati thiniya tsati tekitvtv'i utunhtshanehsv tsat si nitunatvtsvnakwu nane uthanahsithv'i",
+      "end": 250.78,
+      "cer": 0.1281,
+      "emitted_text": "mawinokwu ohsta utanhthv unhohstiha totsinvnelv uthana tsati'uniyvhv'i okanikihsv okiyoluhsv khohiyokiluhtsv staya eka uweyale yuhsanvtv elikwu nayhahthv'v okakhilvtv'i wukhthvlehihsti'i nanhv uthana ahsithv amayu ukhsathv'i",
       "words": [
         {
           "word": "Bobby nogwu",
@@ -1763,7 +1787,19 @@
           "confidence": 0.9995969235897064,
           "flagged": false,
           "syllabary_word": "ᎤᎦᏌᏛᎢ."
-        },
+        }
+      ]
+    },
+    {
+      "line_id": "10",
+      "cherokee_syllabary": "ᎢᎦᏃ ᏍᏓᏯ ᎡᎬ ᎠᎹ ᎠᎴ ᎣᎦᏛᎦᏅ ᏫᎵ ᏓᏳᏪᎷᏅ, Bobby ᏘᏂᏯ ᎠᏣᏗ ᏕᎦᏛᏛᎢ, ᎠᎴ ᏫᏚᏂᏌᏁᏒ ᎠᏣᏗ Ꮟ ᏂᏚᎾᏛᏨᎾᏊ Ot ᎤᏔᎾ ᎠᏏᏛᎢ!”",
+      "text": "igano sdaya egv ama ale ogadvganv wili dayuwelunv Bobby tiniya atsadi degadvdvi ale widunisanesv atsadi si nidunadvtsvnagwu Ot utana asidvi",
+      "english": "",
+      "start": 251.45,
+      "end": 267.51,
+      "cer": 0.1942,
+      "emitted_text": "ikanhahihstaya eka ama ale okhthvkanv wili tayukwelhunhv wati thiniya tsati tekitvtv'i utunhtshanehsv tsat si nitunatvtsvnakwu nane uthanahsithv'i",
+      "words": [
         {
           "word": "igano sdaya",
           "start": 251.45,
@@ -1879,14 +1915,14 @@
       ]
     },
     {
-      "line_id": "8",
-      "cherokee_syllabary": "ᎣᏂᏱᏊ! ᏏᏃ Bobby ᏫᏂᏗᎦᎾᏌᏁᏍᎬᎾ ᎠᏣᏛ ᏕᎦᏛᏛᎢ ᎠᎹᏱ, ᎣᎦᎩᎸᏛ ᏚᎸᏛᏂᏍᏔᏅ ᎤᏔᎾ ᎠᏏᏛᎢ ᎠᎴ ᎠᏣᏗ ᏕᎦᏛᏛ ᏚᎧᏬᏍᏗᎦᎸᏨ ᎣᎦᎩᎸᏛ ᎠᎴ ᎠᏏᏛᎢ. Bobby ᏍᏓᏯ ᏭᎾᏌᏁᏒ ᎠᏣᏗ ᏕᎦᏛᏛᎢ, ᎠᏎᏃ ᏌᏊ ᎠᏣᏗ ᎦᏛ ᏕᎦᏛᏛᎢ, ᎾᎿ ᎠᏆᏤᎵ ᏧᎵᏍᏓᎾᎵ, Bobby ᏍᏓᏱ ᏭᏂᏌᏁᏒ ᏕᎦᏛᏛ ᎤᏕᏍᏔᏅ ᏅᏤᎵ ᎠᏣᏓ, ᎢᎦᏊ ᎤᏘᏴ ᎠᏣᏗ ᏧᎭᏁᎦᎸᏅᎢ. Bobby ᎢᎦ ᎤᎾᎸᏨ ᎤᏲᎱᏎᎸ ᎠᏣᏗ, ᏭᏂᏴᎲ ᎠᏣᏗ ᏕᎦᏛᏛ ᎠᎴ ᎤᏕᏒ ᏧᎵᏍᏓᎾᎵ ᎠᎴ ᎯᎠ ᏄᏪᏒ,  ᎦᏙ ᎤᏤᎵ ᎯᎠ? ᎠᎴ ᎠᎹᏯ ᏭᏓᏯᏅᏒ. ᏩᏇᏡᏅ, hey, ᎠᏯ ᎠᏆᏤᎵ ᎠᏣᏗ! ᏫᎵ ᎠᎴ ᎼᏏ ᏚᏂᎶᏒ ᎣᎦᎩᎸᏛ ᎢᎦ ᎤᏂᏰᏣᏍᎬ.",
-      "text": "oniyigwu sino Bobby winidiganasanesgvna atsadv degadvdvi amayi ogagilvdv dulvdvnistanv utana asidvi ale atsadi degadvdv dukawosdigalvtsv ogagilvdv ale asidvi Bobby sdaya wunasanesv atsadi degadvdvi aseno sagwu atsadi gadv degadvdvi nahna agwatseli tsulisdanali Bobby sdayi wunisanesv degadvdv udestanv nvtseli atsada igagwu utiyv atsadi tsuhanegalvnvi Bobby iga unalvtsv uyohuselv atsadi wuniyvhv atsadi degadvdv ale udesv tsulisdanali ale hia nuwesv  gado utseli hia ale amaya wudayanvsv wagwetlunv hey aya agwatseli atsadi wili ale mosi dunilosv ogagilvdv iga uniyetsasgv",
+      "line_id": "11",
+      "cherokee_syllabary": "ᎣᏂᏱᏊ! ᏏᏃ Bobby ᏫᏂᏗᎦᎾᏌᏁᏍᎬᎾ ᎠᏣᏛ ᏕᎦᏛᏛᎢ ᎠᎹᏱ, ᎣᎦᎩᎸᏛ ᏚᎸᏛᏂᏍᏔᏅ ᎤᏔᎾ ᎠᏏᏛᎢ ᎠᎴ ᎠᏣᏗ ᏕᎦᏛᏛ ᏚᎧᏬᏍᏗᎦᎸᏨ ᎣᎦᎩᎸᏛ ᎠᎴ ᎠᏏᏛᎢ. Bobby ᏍᏓᏯ ᏭᎾᏌᏁᏒ ᎠᏣᏗ ᏕᎦᏛᏛᎢ, ᎠᏎᏃ ᏌᏊ ᎠᏣᏗ ᎦᏛ ᏕᎦᏛᏛᎢ, ᎾᎿ ᎠᏆᏤᎵ ᏧᎵᏍᏓᎾᎵ, Bobby ᏍᏓᏱ ᏭᏂᏌᏁᏒ ᏕᎦᏛᏛ ᎤᏕᏍᏔᏅ ᏅᏤᎵ ᎠᏣᏓ,",
+      "text": "oniyigwu sino Bobby winidiganasanesgvna atsadv degadvdvi amayi ogagilvdv dulvdvnistanv utana asidvi ale atsadi degadvdv dukawosdigalvtsv ogagilvdv ale asidvi Bobby sdaya wunasanesv atsadi degadvdvi aseno sagwu atsadi gadv degadvdvi nahna agwatseli tsulisdanali Bobby sdayi wunisanesv degadvdv udestanv nvtseli atsada",
       "english": "",
       "start": 268.35,
-      "end": 325.335,
-      "cer": 0.2726,
-      "emitted_text": "onhiyikwu sinhamati wunikahsanehskvna atsati tekatvtv'i amayi okakhilvte tulatvnihsthanv uthana ahsithv ale atsati tekatvtv tuwoyhtikalvtsv okvkhilvta ale ahsithv'i nonha akwatseli tsulihstanali wawihstayv wultshanehsv tekatvtv uteyhsthanv utseli atsati unhokh ikakwu uthiyv atsvti tsuhanekalvnv'i maki ikv winhalvtsv uyohuhselv tsati wuniyvhv tsati tekatvtvli utehsv tsulihstananali yhanuwehse kako witseli hi'a ale amayv uta'invhsv wakwelhunhahe'i ayv witselv tsati wili ale mohsi tunilohsv okakhilvte ika uniyetskv",
+      "end": 295.5,
+      "cer": 0.3429,
+      "emitted_text": "onhiyikwu sinhamati wunikahsanehskvna atsati tekatvtv'i amayi okakhilvte tulatvnihsthanv uthana ahsithv ale atsati tekatvtv tuwoyhtikalvtsv okvkhilvta ale ahsithv'i nonha akwatseli tsulihstanali wawihstayv wultshanehsv tekatvtv uteyhsthanv utseli atsati",
       "words": [
         {
           "word": "oniyigwu",
@@ -2065,13 +2101,33 @@
           "syllabary_word": "ᎤᏕᏍᏔᏅ"
         },
         {
-          "word": "nvtseli atsada",
+          "word": "nvtseli",
           "start": 294.46,
-          "end": 296.48,
-          "confidence": 0.9590226444933149,
+          "end": 294.94,
+          "confidence": 0.9188789824644724,
           "flagged": false,
-          "syllabary_word": "ᏅᏤᎵ ᎠᏣᏓ,"
+          "syllabary_word": "ᏅᏤᎵ"
         },
+        {
+          "word": "atsada",
+          "start": 295.06,
+          "end": 295.5,
+          "confidence": 0.9998974899450938,
+          "flagged": false,
+          "syllabary_word": "ᎠᏣᏓ,"
+        }
+      ]
+    },
+    {
+      "line_id": "12",
+      "cherokee_syllabary": "ᎢᎦᏊ ᎤᏘᏴ ᎠᏣᏗ ᏧᎭᏁᎦᎸᏅᎢ. Bobby ᎢᎦ ᎤᎾᎸᏨ ᎤᏲᎱᏎᎸ ᎠᏣᏗ, ᏭᏂᏴᎲ ᎠᏣᏗ ᏕᎦᏛᏛ ᎠᎴ ᎤᏕᏒ ᏧᎵᏍᏓᎾᎵ ᎠᎴ ᎯᎠ ᏄᏪᏒ,  ᎦᏙ ᎤᏤᎵ ᎯᎠ? ᎠᎴ ᎠᎹᏯ ᏭᏓᏯᏅᏒ. ᏩᏇᏡᏅ, hey, ᎠᏯ ᎠᏆᏤᎵ ᎠᏣᏗ! ᏫᎵ ᎠᎴ ᎼᏏ ᏚᏂᎶᏒ ᎣᎦᎩᎸᏛ ᎢᎦ ᎤᏂᏰᏣᏍᎬ.",
+      "text": "igagwu utiyv atsadi tsuhanegalvnvi Bobby iga unalvtsv uyohuselv atsadi wuniyvhv atsadi degadvdv ale udesv tsulisdanali ale hia nuwesv  gado utseli hia ale amaya wudayanvsv wagwetlunv hey aya agwatseli atsadi wili ale mosi dunilosv ogagilvdv iga uniyetsasgv",
+      "english": "",
+      "start": 297.06,
+      "end": 325.335,
+      "cer": 0.1647,
+      "emitted_text": "ikakwu uthiyv atsvti tsuhanekalvnv'i maki ikv winhalvtsv uyohuhselv tsati wuniyvhv tsati tekatvtvli utehsv tsulihstananali yhanuwehse kako witseli hi'a ale amayv uta'invhsv wakwelhunhahe'i ayv witselv tsati wili ale mohsi tunilohsv okakhilvte ika uniyetskv",
+      "words": [
         {
           "word": "igagwu",
           "start": 297.06,
@@ -2291,7 +2347,7 @@
       ]
     },
     {
-      "line_id": "9",
+      "line_id": "13",
       "cherokee_syllabary": "ᎾᎿᏊ ᎤᎵᏍᏘᏅ ᎣᎩᏲᎷᏒ ᎢᏧᎳ ᎠᏯ ᎠᎴ Bobby ᎣᎩᏂᎾᎸᏒ ᏅᏗᎦᎵᏍᏙᏗᏍᎬ ᏃᎩᏂᎩᏓ ᎨᏒ ᎤᏃᏍᏗ ᎠᏕᎳ Bobby ᎤᎾᏫᏛᎲ ᎠᏣᏗ ᏗᎦᏛᏙᏗ ᎠᏣᏗ ᏧᎭᏁᎦᎸᏅ ᏕᎦᏛ Ꮟ.",
       "text": "nahnagwu ulistinv ogiyolusv itsula aya ale Bobby ogininalvsv nvdigalisdodisgv noginigida gesv unosdi adela Bobby unawidvhv atsadi digadvdodi atsadi tsuhanegalvnv degadv si",
       "english": "",

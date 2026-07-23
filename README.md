@@ -13,13 +13,21 @@ workshop-transcription/
 │   ├── inference/                # Model inference and active labeling
 │   │   ├── single.py             # Run inference on a single audio file
 │   │   ├── batch.py              # Batch inference on a directory of WAVs
+│   │   ├── infer.py              # Core greedy inference and confidence scoring
 │   │   └── labeler.py            # Web-based interface for low-confidence labeling
+│   ├── timestamping/             # Ground-truth DTW timestamp alignment pipeline
+│   │   ├── align_cli.py          # Unified CLI runner for timestamp alignment
+│   │   ├── aligner.py            # Dynamic Time Warping (DTW) & Needleman-Wunsch aligner
+│   │   ├── audio_segmenter.py    # VAD speech chunking for long audio
+│   │   ├── exporter.py           # Praat TextGrid & JSON manifest export
+│   │   └── prepare_ground_truth.py # Ingest Bible metadata or chunk JSON lists
 │   ├── training/                 # Training, evaluation, and data prep
 │   │   ├── prepare_csv.py        # Prepare training splits from raw CSV
 │   │   ├── train.py              # Offline/local/remote Wav2Vec2 training
 │   │   ├── evaluate_checkpoint.py # Score checkpoint against test set
 │   │   └── evaluate_revisions.py  # Score Git revisions from Hugging Face
 │   └── utils/                    # Utilities and checks
+│       ├── model_utils.py        # Checkpoint selection and config loading
 │       ├── tone_normalization.py  # Normalizes tones in transcripts
 │       └── verify_mps.py          # Verifies PyTorch MPS backend support
 │
@@ -27,6 +35,8 @@ workshop-transcription/
 │   ├── raw/                      # Raw unsegmented audio files and datasets
 │   ├── processed/                # Segmented audio folders and dataset CSV splits
 │   └── results/                  # Inference outputs and evaluation results
+│
+├── timestamping_test_data/       # Test data & sample input generators for timestamping
 │
 ├── archive/                      # Installer files and ZIP backups
 │
@@ -135,23 +145,60 @@ Then visit `http://localhost:8000/` in your browser. It automatically pulls data
     --output-csv data/results/revision_scores.csv
   ```
 
----
+### 7. Inference Tooling - Ground-Truth Timestamp Alignment
 
-## Docker Execution
+The timestamping pipeline aligns ground-truth text (such as story transcripts or Bible verses) to long-form audio recordings. It uses VAD pre-segmentation, extracts CTC emissions from the ASR model, and applies Dynamic Time Warping (DTW) character/token alignment with Needleman-Wunsch fusion to calculate precise word start and end timestamps.
 
-The project contains a prebaked Docker image that compiles KenLM, installs all PyTorch/CUDA dependencies, and downloads the base model checkpoint.
-
-To run a container and mount your workspace for training (with Hugging Face authentication to push results):
+#### Usage Example
 
 ```bash
-docker run --gpus all \
-  -v $(pwd):/workspace \
-  -e HF_TOKEN="your_hugging_face_token" \
-  <image_name> \
-  python3 -m transcription.training.train \
-    --push-to-hub \
-    --resume-from-repo "charliemcvicker/length-only-20260702-173608-asr-cherokee" \
-    --resume-from-revision "cb9110d86220d2eef2799c3400eed697e96e2999" \
-    --hub-model-id "charliemcvicker/asr-cherokee" \
-    --hub-token "key"
+python3 -m transcription.timestamping.align_cli \
+  --audio 'timestamping_test_data/Cherokee Story-Our Fishing Trip.wav' \
+  --chunk-list 'timestamping_test_data/fishing_story.json' \
+  --output-dir timestamping_test_data/fishing \
+  --export-praat
 ```
+
+#### Ground-Truth Input Formats
+
+You can provide ground-truth transcript data using either `--chunk-list` or `--bible-metadata`:
+
+1. **Chunk List JSON (`--chunk-list`)**: A JSON array of segment objects. You can generate this using `timestamping_test_data/make_json.py`.
+   ```json
+   [
+     {
+       "line_id": "segment_001",
+       "raw_phonetic": "tsani ahwesolvtanvi",
+       "cherokee_syllabary": "ᏣᏂ ᎠᏪᏐᎸᏔᏅᎢ"
+     }
+   ]
+   ```
+2. **Bible Metadata JSON (`--bible-metadata` or `--metadata`)**: A JSON dictionary mapping verse identifiers to ground-truth text strings.
+   ```json
+    "020101": {
+      "image_path": "images/020101.png",
+      "english": "The beginning of the gospel of Jesus Christ, the Son of God;",
+      "cherokee": "ᎠᏓᎴᏂᏍᎬ ᏱᏍᏛ ᎧᏃᎮᏛ, ᏥᏌ ᎦᎶᏁᏛ ᎤᏁᎳᏅᎯ ᎤᏪᏥ ᎤᏤᎵᎦ.",
+      "phonetic": "A-da-le-ni-s-gv yi-s-dv ka-no-he-dv, Tsi-sa Ga-lo-ne-dv U-ne-la-nv-hi U-we-tsi u-tse-li-ga."
+    },
+   ```
+
+#### Optional CLI Arguments
+
+- `--model-path`: Path to a custom local checkpoint directory or Hugging Face model repository (defaults to best local config or `facebook/wav2vec2-base-960h`).
+- `--export-praat`: Exports a Praat `.TextGrid` file alongside the JSON manifest (enabled by default).
+
+#### Generated Output Artifacts
+
+Running the alignment pipeline writes the following files to `--output-dir`:
+
+- **`alignment_manifest.json`**: Structured alignment output including:
+  - Verse/segment text, start/end timestamps, and matched Cherokee Syllabary word mappings.
+  - Aligned words with exact start and end times.
+  - Alignment evaluation metrics (Matched GT Verses ratio, Matched-Verse CER, and Character counts).
+- **`alignment.TextGrid`**: Praat TextGrid annotation file containing:
+  - **Ground Truth Words**: GT words mapped onto aligned time intervals.
+  - **Padded GT Words**: GT word boundaries padded slightly to avoid truncation.
+  - **ASR Model Emissions**: Raw acoustic CTC emissions emitted by the Wav2Vec2 model.
+
+---
