@@ -59,9 +59,11 @@ def run_alignment_pipeline(
     )
 
     token = os.environ.get("HF_TOKEN", None)
+    model_revision = None
     if model_path is None:
         model_config = get_best_model_config()
         model_path = model_config.get("repo", "facebook/wav2vec2-base-960h")
+        model_revision = model_config.get("revision", None)
 
     print(f"      Loading model from '{model_path}'...")
     device = (
@@ -70,14 +72,19 @@ def run_alignment_pipeline(
         else ("mps" if torch.backends.mps.is_available() else "cpu")
     )
     try:
-        processor = Wav2Vec2Processor.from_pretrained(model_path, token=token)
-        model = Wav2Vec2ForCTC.from_pretrained(model_path, token=token).to(device)
+        processor = Wav2Vec2Processor.from_pretrained(
+            model_path, token=token, revision=model_revision
+        )
+        model = Wav2Vec2ForCTC.from_pretrained(
+            model_path, token=token, revision=model_revision
+        ).to(device)
     except Exception as e:
         fallback_repo = "facebook/wav2vec2-base-960h"
         print(
             f"      [Warning] Could not load '{model_path}' ({e}). Falling back to public model '{fallback_repo}'..."
         )
         model_path = fallback_repo
+        model_revision = None
         processor = Wav2Vec2Processor.from_pretrained(model_path)
         model = Wav2Vec2ForCTC.from_pretrained(model_path).to(device)
 
