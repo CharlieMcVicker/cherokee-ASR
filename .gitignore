@@ -114,3 +114,10 @@ dist/
 # OS/System files
 .DS_Store
 Thumbs.db
+
+# Build artifacts & package metadata
+*.egg-info/
+build/
+dist/
+*.egg
+

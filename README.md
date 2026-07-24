@@ -152,7 +152,7 @@ The timestamping pipeline aligns ground-truth text (such as story transcripts or
 #### Usage Example
 
 ```bash
-python3 -m transcription.timestamping.align_cli \
+align-cherokee \
   --audio 'timestamping_test_data/Cherokee Story-Our Fishing Trip.wav' \
   --chunk-list 'timestamping_test_data/fishing_story.json' \
   --output-dir timestamping_test_data/fishing \
@@ -200,5 +200,3 @@ Running the alignment pipeline writes the following files to `--output-dir`:
   - **Ground Truth Words**: GT words mapped onto aligned time intervals.
   - **Padded GT Words**: GT word boundaries padded slightly to avoid truncation.
   - **ASR Model Emissions**: Raw acoustic CTC emissions emitted by the Wav2Vec2 model.
-
----

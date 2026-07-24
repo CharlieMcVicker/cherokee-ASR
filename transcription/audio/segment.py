@@ -285,5 +285,165 @@ def main():
         print_table(results)
 
 
+def get_best_parameters(dbfs_profile, total_len_ms):
+    """
+    Finds the best segmentation parameters matching maximum segment duration <= 10s.
+    """
+    thresholds = [-55, -50, -45, -40, -35, -30, -25, -20]
+    min_silence_lens = [100, 200, 300, 500, 800, 1000]
+    keep_silences = [0, 50, 100, 150, 200]
+
+    results = []
+    for thresh in thresholds:
+        for min_sil in min_silence_lens:
+            for keep_sil in keep_silences:
+                segments = segment_audio_from_profile(
+                    dbfs_profile,
+                    total_len_ms,
+                    step_ms=10,
+                    min_silence_len=min_sil,
+                    silence_thresh=thresh,
+                    keep_silence=keep_sil,
+                )
+                metrics = compute_metrics(segments, total_len_ms)
+
+                # Overlap calculation
+                sorted_segs = sorted(segments, key=lambda s: s["start"])
+                overlap_ms = 0
+                for i in range(len(sorted_segs) - 1):
+                    cur_end = sorted_segs[i]["end"]
+                    nxt_start = sorted_segs[i + 1]["start"]
+                    if nxt_start < cur_end:
+                        overlap_ms += (
+                            min(cur_end, sorted_segs[i + 1]["end"]) - nxt_start
+                        )
+
+                overlap_percent = (
+                    (overlap_ms / total_len_ms * 100.0) if total_len_ms > 0 else 0.0
+                )
+
+                results.append(
+                    {
+                        "silence_thresh": thresh,
+                        "min_silence_len": min_sil,
+                        "keep_silence": keep_sil,
+                        "percent_segmented": metrics["percent_segmented"],
+                        "overlap_percent": overlap_percent,
+                        "max_len": metrics["max_len"],
+                        "avg_len": metrics["avg_len"],
+                        "count": metrics["count"],
+                        "segments": segments,
+                    }
+                )
+
+    # Filter for max_len <= 10.0 and at least 1 segment
+    valid_results = [r for r in results if r["max_len"] <= 10.0 and r["count"] > 0]
+
+    def score_config(r):
+        net_coverage = r["percent_segmented"] - r["overlap_percent"]
+        silence_penalty = (r["keep_silence"] / 100.0) * 0.5
+        fragment_penalty = 5.0 if (r["avg_len"] < 1.0 and r["count"] > 5) else 0.0
+        return net_coverage - silence_penalty - fragment_penalty
+
+    if valid_results:
+        best = max(valid_results, key=score_config)
+    else:
+        # Fallback: pick the one with minimum max_len among those with > 0 segments
+        with_segments = [r for r in results if r["count"] > 0]
+        if with_segments:
+            best = min(with_segments, key=lambda x: x["max_len"])
+        else:
+            best = {
+                "silence_thresh": -40,
+                "min_silence_len": 500,
+                "keep_silence": 100,
+                "segments": [],
+            }
+
+    return best
+
+
+def split_long_segments_smart(segments, audio, max_duration_ms=10000, overlap_ms=250):
+    """
+    Splits any segments longer than max_duration_ms by scanning for internal silence/pauses,
+    or falling back to the quietest point within the segment to avoid cutting in the middle of words.
+    Adds overlap_ms padding at boundaries where a fallback split occurred.
+    """
+    final_segs = []
+
+    def process_segment(start_ms, end_ms):
+        duration = end_ms - start_ms
+        if duration <= max_duration_ms:
+            final_segs.append({"start": start_ms, "end": end_ms, "duration": duration})
+            return
+
+        # Extract the long sub-audio
+        sub_audio = audio[start_ms:end_ms]
+        dbfs_profile = get_energy_profile(sub_audio, step_ms=10)
+
+        # Grid parameters to find brief pauses/silences inside active speech
+        thresholds = [-45, -40, -35, -30, -25, -20, -15]
+        min_silence_lens = [500, 400, 300, 200, 100, 50]
+        keep_silences = [100, 50, 0]
+
+        for min_sil in min_silence_lens:
+            for thresh in thresholds:
+                for keep_sil in keep_silences:
+                    sub_segs = segment_audio_from_profile(
+                        dbfs_profile,
+                        duration,
+                        step_ms=10,
+                        min_silence_len=min_sil,
+                        silence_thresh=thresh,
+                        keep_silence=keep_sil,
+                    )
+                    # Filter out empty or trivial splits that don't subdivide the duration
+                    if not sub_segs or len(sub_segs) <= 1:
+                        continue
+
+                    max_sub_len = max(s["duration"] for s in sub_segs)
+                    if max_sub_len <= max_duration_ms:
+                        # Found a configuration that splits all parts to <= 10s!
+                        for s in sub_segs:
+                            process_segment(start_ms + s["start"], start_ms + s["end"])
+                        return
+
+        # Fallback: Find the quietest 100ms window in the middle 40% (30% to 70%) of the segment to split
+        samples = np.array(sub_audio.get_array_of_samples(), dtype=np.float32)
+        sr = sub_audio.frame_rate
+        win_size = int(sr * 0.1)  # 100ms
+
+        start_search = int(len(samples) * 0.3)
+        end_search = int(len(samples) * 0.7)
+
+        if end_search - start_search > win_size:
+            min_energy = float("inf")
+            best_split_idx = (start_search + end_search) // 2
+            step = int(sr * 0.05)  # 50ms step
+
+            for idx in range(start_search, end_search - win_size, step):
+                win = samples[idx : idx + win_size]
+                energy = np.mean(win**2)
+                if energy < min_energy:
+                    min_energy = energy
+                    best_split_idx = idx + (win_size // 2)
+
+            split_ms = int((best_split_idx / sr) * 1000)
+        else:
+            split_ms = duration // 2
+
+        # Recursively process the two halves with overlap padding to prevent phrase/word clipping
+        left_end = min(end_ms, start_ms + split_ms + overlap_ms)
+        right_start = max(start_ms, start_ms + split_ms - overlap_ms)
+
+        process_segment(start_ms, left_end)
+        process_segment(right_start, end_ms)
+
+    for seg in segments:
+        process_segment(seg["start"], seg["end"])
+
+    return final_segs
+
+
 if __name__ == "__main__":
     main()

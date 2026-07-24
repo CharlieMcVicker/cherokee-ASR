@@ -10,8 +10,12 @@ from dataclasses import dataclass
 from typing import List, Union
 from pydub import AudioSegment
 
-from scripts.process_interviews import get_best_parameters, split_long_segments_smart
-from transcription.audio.segment import get_energy_profile, segment_audio_from_profile
+from transcription.audio.segment import (
+    get_energy_profile,
+    segment_audio_from_profile,
+    get_best_parameters,
+    split_long_segments_smart,
+)
 
 
 @dataclass
