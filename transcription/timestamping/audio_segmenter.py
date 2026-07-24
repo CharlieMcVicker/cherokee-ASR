@@ -9,6 +9,7 @@ Chunks long recordings into manageable pieces (<10s) while tracking global times
 from dataclasses import dataclass
 from typing import List, Union
 from pydub import AudioSegment
+from pydub.effects import normalize
 
 from transcription.audio.segment import (
     get_energy_profile,
@@ -50,6 +51,10 @@ def segment_long_audio(
         audio = AudioSegment.from_file(audio_or_path)
     else:
         audio = audio_or_path
+
+    audio = normalize(audio)
+    if audio.frame_rate != 16000:
+        audio = audio.set_frame_rate(16000)
 
     total_len_ms = len(audio)
     dbfs_profile = get_energy_profile(audio, step_ms=10)
@@ -129,7 +134,7 @@ def segment_long_audio(
         chunks.append(
             AudioChunk(
                 chunk_index=idx,
-                audio=chunk_audio,
+                audio=normalize(chunk_audio),
                 start_sec=start_sec,
                 end_sec=end_sec,
             )
