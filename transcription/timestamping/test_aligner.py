@@ -6,7 +6,12 @@ Unit tests for aligner.py
 """
 
 import unittest
-from transcription.timestamping.aligner import align_tokens_to_verses, AlignmentResult
+from transcription.timestamping.aligner import (
+    align_tokens_to_verses,
+    align_emissions_to_text,
+    align_audio_segment,
+    AlignmentResult,
+)
 
 
 class TestAligner(unittest.TestCase):
@@ -38,6 +43,97 @@ class TestAligner(unittest.TestCase):
         self.assertEqual(v0.start_sec, 1.0)
         self.assertEqual(v0.end_sec, 2.0)
         self.assertEqual(len(v0.words), 2)
+
+    def test_align_emissions_to_text(self):
+        tokens = [
+            {
+                "word": "ataleniskv",
+                "start_time": 0.5,
+                "end_time": 1.0,
+                "confidence": 0.95,
+            },
+            {"word": "yisthv", "start_time": 1.1, "end_time": 1.8, "confidence": 0.92},
+        ]
+        verses = [
+            {
+                "line_id": "020101",
+                "cherokee_syllabary": "ᎠᏓᎴᏂᏍᎬ ᏱᏍᏛ",
+                "raw_phonetic": "A-da-le-ni-s-gv yi-s-dv",
+                "normalized_text": "ataleniskv yisthv",
+                "english": "The beginning of the gospel",
+            }
+        ]
+        result = align_emissions_to_text(
+            tokens, verses, audio_source="in_memory_emissions"
+        )
+        self.assertIsInstance(result, AlignmentResult)
+        self.assertEqual(result.audio_source, "in_memory_emissions")
+        self.assertEqual(len(result.verses), 1)
+        self.assertEqual(result.verses[0].start_sec, 0.5)
+
+    def test_align_audio_segment_with_token_emissions(self):
+        tokens = [
+            {
+                "word": "ataleniskv",
+                "start_time": 0.0,
+                "end_time": 0.5,
+                "confidence": 0.95,
+            },
+        ]
+        verses = [
+            {
+                "line_id": "020101",
+                "cherokee_syllabary": "ᎠᏓᎴᏂᏍᎬ",
+                "raw_phonetic": "A-da-le-ni-s-gv",
+                "normalized_text": "ataleniskv",
+                "english": "Beginning",
+            }
+        ]
+        result = align_audio_segment(
+            audio_input=None,
+            verses=verses,
+            token_emissions=tokens,
+            audio_source="precomputed_emissions",
+            skip_vad=True,
+        )
+        self.assertEqual(len(result.verses), 1)
+        self.assertEqual(result.verses[0].start_sec, 0.0)
+
+    def test_align_audio_segment_with_callable_fn(self):
+        from pydub import AudioSegment
+
+        dummy_audio = AudioSegment.silent(duration=2000, frame_rate=16000)
+
+        def mock_fn(samples, sample_rate):
+            return [
+                {
+                    "word": "ataleniskv",
+                    "start_time": 0.2,
+                    "end_time": 0.8,
+                    "confidence": 0.99,
+                }
+            ]
+
+        verses = [
+            {
+                "line_id": "020101",
+                "cherokee_syllabary": "ᎠᏓᎴᏂᏍᎬ",
+                "raw_phonetic": "A-da-le-ni-s-gv",
+                "normalized_text": "ataleniskv",
+                "english": "Beginning",
+            }
+        ]
+
+        result = align_audio_segment(
+            audio_input=dummy_audio,
+            verses=verses,
+            model_or_fn=mock_fn,
+            skip_vad=True,
+            audio_source="dummy_audio",
+        )
+        self.assertEqual(len(result.verses), 1)
+        self.assertEqual(result.verses[0].start_sec, 0.2)
+        self.assertEqual(result.verses[0].end_sec, 0.8)
 
     def test_preamble_skip(self):
         # Tokens include leading preamble intro chatter (0.0s - 2.5s)
@@ -207,6 +303,10 @@ class TestAligner(unittest.TestCase):
         v0 = result.verses[0]
         # Should align as 2 distinct word intervals, not fused into 1 interval
         self.assertEqual(len(v0.words), 2)
+
+
+if __name__ == "__main__":
+    unittest.main()
 
 
 if __name__ == "__main__":

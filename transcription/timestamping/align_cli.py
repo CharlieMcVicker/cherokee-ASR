@@ -30,8 +30,10 @@ def run_alignment_pipeline(
     chunk_list_path: str = None,
     export_praat: bool = True,
     model_path: str = None,
-) -> None:
-    """Executes full alignment pipeline end-to-end."""
+    skip_vad: bool = False,
+    debug_export: bool = False,
+) -> AlignmentResult:
+    """Executes full alignment pipeline end-to-end using align_audio_segment."""
     if bible_metadata_path:
         print(
             f"[1/4] Ingesting Bible ground-truth metadata from '{bible_metadata_path}'..."
@@ -45,18 +47,15 @@ def run_alignment_pipeline(
 
     print(f"      Parsed {len(verses)} ground-truth segment entries.")
 
-    print(f"[2/4] Segmenting audio file '{audio_path}' with VAD...")
-    chunks = segment_long_audio(audio_path)
-    print(f"      Generated {len(chunks)} speech chunks.")
+    if skip_vad:
+        print(f"[2/4] Skipping VAD audio segmentation (skip_vad=True)...")
+    else:
+        print(f"[2/4] Segmenting audio file '{audio_path}' with VAD...")
 
     print(f"[3/4] Running ASR emission extraction & DTW alignment...")
     import torch
     from transformers import Wav2Vec2ForCTC, Wav2Vec2Processor
     from transcription.utils.model_utils import get_best_model_config
-    from transcription.inference.infer import (
-        calculate_word_confidences,
-        greedy_inference,
-    )
 
     token = os.environ.get("HF_TOKEN", None)
     model_revision = None
@@ -90,38 +89,16 @@ def run_alignment_pipeline(
 
     model.eval()
 
-    all_tokens = []
-    for c in chunks:
-        # Extract audio waveform array from AudioChunk
-        samples = np.array(c.audio.get_array_of_samples(), dtype=np.float32)
-        if c.audio.channels > 1:
-            samples = samples.reshape((-1, c.audio.channels)).mean(axis=1)
-        # Normalize audio amplitude float32
-        max_val = float(1 << (8 * c.audio.sample_width - 1))
-        samples = samples / max_val
+    from transcription.timestamping.aligner import align_audio_segment
 
-        input_values = processor(
-            samples, sampling_rate=16000, return_tensors="pt"
-        ).input_values.to(device)
-        with torch.no_grad():
-            logits = model(input_values).logits[0]
-
-        pred_ids = torch.argmax(logits, dim=-1)
-        probs = torch.softmax(logits, dim=-1)
-        chunk_words = calculate_word_confidences(probs, pred_ids, processor)
-
-        for w_info in chunk_words:
-            all_tokens.append(
-                {
-                    "word": w_info["word"],
-                    "start_time": round(c.start_sec + w_info["start_time"], 3),
-                    "end_time": round(c.start_sec + w_info["end_time"], 3),
-                    "confidence": w_info["confidence"],
-                }
-            )
-
-    print(f"      Extracted {len(all_tokens)} raw ASR word emissions across audio.")
-    alignment = align_tokens_to_verses(all_tokens, verses, audio_source=audio_path)
+    alignment = align_audio_segment(
+        audio_input=audio_path,
+        verses=verses,
+        model_or_fn=model,
+        processor=processor,
+        audio_source=audio_path,
+        skip_vad=skip_vad,
+    )
 
     print(f"[4/4] Exporting alignment results to '{output_dir}'...")
     os.makedirs(output_dir, exist_ok=True)
@@ -133,6 +110,23 @@ def run_alignment_pipeline(
         textgrid_path = os.path.join(output_dir, "alignment.TextGrid")
         export_praat_textgrid(alignment, textgrid_path)
         print(f"      Saved Praat TextGrid: {textgrid_path}")
+
+    if debug_export:
+        debug_path = os.path.join(output_dir, "alignment_debug.json")
+        import json
+
+        with open(debug_path, "w", encoding="utf-8") as f:
+            json.dump(
+                {
+                    "audio_source": alignment.audio_source,
+                    "raw_tokens": alignment.raw_tokens,
+                    "verse_count": len(alignment.verses),
+                },
+                f,
+                indent=2,
+                ensure_ascii=False,
+            )
+        print(f"      Saved debug export: {debug_path}")
 
     if alignment.metrics:
         m = alignment.metrics
@@ -149,6 +143,7 @@ def run_alignment_pipeline(
         )
 
     print("\nAlignment pipeline complete!")
+    return alignment
 
 
 def main():
@@ -186,6 +181,18 @@ def main():
     parser.add_argument(
         "--model-path", default=None, help="Path to custom Wav2Vec2 model directory"
     )
+    parser.add_argument(
+        "--skip-vad",
+        action="store_true",
+        default=False,
+        help="Bypass VAD audio segmentation when audio is pre-cut",
+    )
+    parser.add_argument(
+        "--debug-export",
+        action="store_true",
+        default=False,
+        help="Save additional debug alignment output file",
+    )
 
     args = parser.parse_args()
 
@@ -198,6 +205,8 @@ def main():
         output_dir=args.output_dir,
         export_praat=args.export_praat,
         model_path=args.model_path,
+        skip_vad=args.skip_vad,
+        debug_export=args.debug_export,
     )
 
 

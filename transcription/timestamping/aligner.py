@@ -11,6 +11,7 @@ from jiwer import cer as jiwer_cer
 import numpy as np
 
 from transcription.timestamping.prepare_ground_truth import normalize_text_for_alignment
+from transcription.timestamping.audio_segmenter import segment_long_audio, AudioChunk
 
 
 @dataclass
@@ -53,6 +54,140 @@ class AlignmentResult:
     verses: List[VerseInterval]
     metrics: Optional[AlignmentMetrics] = None
     raw_tokens: List[Dict[str, Any]] = field(default_factory=list)
+
+
+def align_emissions_to_text(
+    token_emissions: List[Dict[str, Any]],
+    verses: List[Dict[str, Any]],
+    audio_source: str = "",
+) -> AlignmentResult:
+    """
+    Lightweight CPU-based alignment function taking pre-computed emitted tokens
+    and ground-truth verse dictionary objects in memory.
+
+    Args:
+        token_emissions: List of word dicts with start_time, end_time, and word text.
+        verses: List of ground-truth verse/segment dicts.
+        audio_source: Optional identifier or path string for metadata.
+
+    Returns:
+        AlignmentResult data structure.
+    """
+    return align_tokens_to_verses(token_emissions, verses, audio_source=audio_source)
+
+
+def align_audio_segment(
+    audio_input: Any,
+    verses: List[Dict[str, Any]],
+    model_or_fn: Optional[Any] = None,
+    processor: Optional[Any] = None,
+    audio_source: str = "",
+    skip_vad: bool = False,
+    token_emissions: Optional[List[Dict[str, Any]]] = None,
+) -> AlignmentResult:
+    """
+    Exposes audio/emissions alignment for in-memory execution.
+
+    Args:
+        audio_input: Audio file path, AudioSegment, or raw audio waveform sample array.
+        verses: List of ground-truth verse/segment dicts.
+        model_or_fn: PyTorch Wav2Vec2 model instance or callable taking samples array and returning word emissions list,
+                     or None if token_emissions are provided directly.
+        processor: Wav2Vec2Processor instance if model_or_fn is a PyTorch Wav2Vec2 model.
+        audio_source: Optional label or path string for output metadata.
+        skip_vad: If True, bypasses VAD audio pre-segmentation when operating on pre-cut audio clips.
+        token_emissions: Pre-computed token emissions list (dicts with 'word', 'start_time', 'end_time', 'confidence').
+
+    Returns:
+        AlignmentResult data structure.
+    """
+    if token_emissions is not None:
+        return align_emissions_to_text(
+            token_emissions, verses, audio_source=audio_source
+        )
+
+    if skip_vad:
+        # Bypass VAD segmentation - handle audio as a single chunk
+        from pydub import AudioSegment
+
+        if isinstance(audio_input, str):
+            audio_seg = AudioSegment.from_file(audio_input)
+        elif isinstance(audio_input, AudioSegment):
+            audio_seg = audio_input
+        else:
+            # If raw numpy array or torch tensor audio samples passed in memory
+            # caller can pass token_emissions or AudioSegment
+            audio_seg = audio_input
+
+        if isinstance(audio_seg, AudioSegment):
+            chunks = [
+                AudioChunk(
+                    chunk_index=0,
+                    audio=audio_seg,
+                    start_sec=0.0,
+                    end_sec=round(len(audio_seg) / 1000.0, 3),
+                )
+            ]
+        else:
+            chunks = []
+    else:
+        chunks = segment_long_audio(audio_input)
+
+    if token_emissions is None:
+        if model_or_fn is None:
+            raise ValueError(
+                "Either token_emissions or model_or_fn must be provided to align_audio_segment."
+            )
+
+        extracted_tokens = []
+        import torch
+
+        for c in chunks:
+            if callable(model_or_fn) and processor is None:
+                # Custom inference callback function: fn(samples, sample_rate) -> list of word dicts
+                samples = np.array(c.audio.get_array_of_samples(), dtype=np.float32)
+                if c.audio.channels > 1:
+                    samples = samples.reshape((-1, c.audio.channels)).mean(axis=1)
+                max_val = float(1 << (8 * c.audio.sample_width - 1))
+                samples = samples / max_val
+                chunk_words = model_or_fn(samples, c.audio.frame_rate)
+            else:
+                # PyTorch model + processor
+                from transcription.inference.infer import calculate_word_confidences
+
+                samples = np.array(c.audio.get_array_of_samples(), dtype=np.float32)
+                if c.audio.channels > 1:
+                    samples = samples.reshape((-1, c.audio.channels)).mean(axis=1)
+                max_val = float(1 << (8 * c.audio.sample_width - 1))
+                samples = samples / max_val
+
+                device = (
+                    next(model_or_fn.parameters()).device
+                    if hasattr(model_or_fn, "parameters")
+                    else "cpu"
+                )
+                input_values = processor(
+                    samples, sampling_rate=c.audio.frame_rate, return_tensors="pt"
+                ).input_values.to(device)
+                with torch.no_grad():
+                    logits = model_or_fn(input_values).logits[0]
+
+                pred_ids = torch.argmax(logits, dim=-1)
+                probs = torch.softmax(logits, dim=-1)
+                chunk_words = calculate_word_confidences(probs, pred_ids, processor)
+
+            for w_info in chunk_words:
+                extracted_tokens.append(
+                    {
+                        "word": w_info["word"],
+                        "start_time": round(c.start_sec + w_info["start_time"], 3),
+                        "end_time": round(c.start_sec + w_info["end_time"], 3),
+                        "confidence": w_info.get("confidence", 1.0),
+                    }
+                )
+        token_emissions = extracted_tokens
+
+    return align_emissions_to_text(token_emissions, verses, audio_source=audio_source)
 
 
 def compute_trigram_edit_cost(emissions_str: str, ground_truth_str: str) -> float:

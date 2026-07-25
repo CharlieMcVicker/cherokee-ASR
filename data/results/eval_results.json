@@ -1,0 +1,42 @@
+{
+  "summary": {
+    "test": {
+      "count": 1,
+      "raw_cer": 0.0,
+      "reconciled_cer": 0.0,
+      "delta_cer": 0.0
+    },
+    "train": {
+      "count": 0,
+      "raw_cer": 0.0,
+      "reconciled_cer": 0.0,
+      "delta_cer": 0.0
+    },
+    "validation": {
+      "count": 0,
+      "raw_cer": 0.0,
+      "reconciled_cer": 0.0,
+      "delta_cer": 0.0
+    },
+    "overall": {
+      "count": 1,
+      "raw_cer": 0.0,
+      "reconciled_cer": 0.0,
+      "delta_cer": 0.0
+    }
+  },
+  "records": [
+    {
+      "record_id": "",
+      "split": "test",
+      "syllabary_text": "",
+      "base_transliteration": "",
+      "emitted_text": "",
+      "reconciled_phonetics": "",
+      "target_phonetics": "",
+      "raw_cer": 0.0,
+      "reconciled_cer": 0.0,
+      "delta_cer": 0.0
+    }
+  ]
+}
