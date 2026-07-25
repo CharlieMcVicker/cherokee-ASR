@@ -26,7 +26,7 @@ class TestAlignmentEngine(unittest.TestCase):
 
     def test_get_base_transliteration(self):
         syl = "ᎠᏓᎴᏂᏍᎬ"
-        expected = "adalenisgv"
+        expected = "ataleniskv"
         self.assertEqual(get_base_transliteration(syl), expected)
 
     def test_align_character_syllable_basic(self):
@@ -59,7 +59,7 @@ class TestAlignmentEngine(unittest.TestCase):
         self.assertEqual(space_align.emitted_text, " ")
 
     def test_align_character_syllable_laryngeal_variation(self):
-        # Cherokee "ᏱᏍᏛ" (yisdv) aligned with emitted "yisthv" (aspirated /th/)
+        # Cherokee "ᏱᏍᏛ" (yistv) aligned with emitted "yisthv" (aspirated /th/)
         syllabary = "ᏱᏍᏛ"
         emitted = "yisthv"
         pairs = align_character_syllable(syllabary, emitted)
@@ -67,7 +67,7 @@ class TestAlignmentEngine(unittest.TestCase):
         self.assertEqual(len(pairs), len(syllabary))
         # 'Ᏹ' -> 'yi'
         # 'Ꮝ' -> 's'
-        # 'Ꮫ' -> 'thv' (laryngeal aspirated variant of dv)
+        # 'Ꮫ' -> 'thv' (laryngeal aspirated variant of tv)
         syl_map = dict(pairs)
         self.assertEqual(syl_map["Ᏹ"], "yi")
         self.assertEqual(syl_map["Ꮝ"], "s")

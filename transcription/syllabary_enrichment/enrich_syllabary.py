@@ -94,32 +94,35 @@ def _enrich_single_syllable(base: str, emitted: str) -> str:
     # 2. Check pre-aspiration 'h' or internal 'h' in emitted
     has_pre_h = emitted.startswith("h") and not base.startswith("h")
 
-    # 3. Laryngeal Toggles & Consonant modifications (t -> th, k -> kh, d -> th, g -> kh, d -> t, g -> k, etc.)
+    # 3. Laryngeal Toggles & Consonant modifications (t -> th, k -> kh, tl -> lh, etc.)
     curr = base
 
+    # Lateral Phonological Shift: tl series -> lh series when emitted indicates lateral aspiration/fricative shift
+    # Check if base starts with "tl" (e.g. tla, tle, tli, tlo, tlu, tlv)
+    if curr.startswith("tl"):
+        # Check if emitted contains lateral aspiration (e.g., 'lh', 'lha', 'lhi', 'lhah', etc.)
+        if "lh" in emitted:
+            curr = "lh" + curr[2:]
+
     # Toggle laryngeal stops:
-    # d/t -> th if emitted has 'th'
-    if ("th" in emitted or emitted.startswith("th")) and (
-        curr.startswith("d") or curr.startswith("t")
+    # t -> th if emitted has 'th'
+    if (
+        ("th" in emitted or emitted.startswith("th"))
+        and (curr.startswith("t") or curr.startswith("d"))
+        and not curr.startswith("tl")
     ):
         if curr.startswith("d"):
             curr = "th" + curr[1:]
         elif curr.startswith("t") and not curr.startswith("th"):
             curr = "th" + curr[1:]
-    # g/k -> kh if emitted has 'kh'
+    # k -> kh if emitted has 'kh'
     elif ("kh" in emitted or emitted.startswith("kh")) and (
-        curr.startswith("g") or curr.startswith("k")
+        curr.startswith("k") or curr.startswith("g")
     ):
         if curr.startswith("g"):
             curr = "kh" + curr[1:]
         elif curr.startswith("k") and not curr.startswith("kh"):
             curr = "kh" + curr[1:]
-    # d -> t if emitted starts with 't'
-    elif emitted.startswith("t") and curr.startswith("d"):
-        curr = "t" + curr[1:]
-    # g -> k if emitted starts with 'k'
-    elif emitted.startswith("k") and curr.startswith("g"):
-        curr = "k" + curr[1:]
 
     # Pre-aspiration 'h'
     if has_pre_h:
@@ -134,7 +137,18 @@ def _enrich_single_syllable(base: str, emitted: str) -> str:
         else:
             curr = curr + "'"
 
-    # 4. Rule 1: Syncopation / Vowel Deletion
+    # 4. Post-vocalic / vocalic aspiration 'h' transfer:
+    # If emitted ends with 'h' (e.g. 'yoh', 'hah', 'nih') and base ends in a vowel,
+    # append 'h' to preserve post-vocalic aspiration.
+    # Note: do not treat digraph 'th', 'kh', 'lh', 'sh', 'ch' as post-vocalic aspiration 'h' if no vowel precedes 'h' in emitted.
+    if emitted.endswith("h") and not curr.endswith("h") and base[-1] in VOWELS:
+        # Check if emitted has a vowel before the trailing 'h' or if emitted is vocalic + 'h'
+        if any(c in VOWELS for c in emitted[:-1]) or (
+            len(emitted) > 1 and emitted[-2] in VOWELS
+        ):
+            curr = curr + "h"
+
+    # 5. Rule 1: Syncopation / Vowel Deletion
     base_vowel = base[-1] if (len(base) > 0 and base[-1] in VOWELS) else None
     emitted_has_vowel = any(c in VOWELS for c in emitted)
 
@@ -144,5 +158,8 @@ def _enrich_single_syllable(base: str, emitted: str) -> str:
             curr = curr[:-1]
         elif len(curr) == 1 and curr in VOWELS:
             curr = ""
+        elif curr.endswith("h") and len(curr) > 1 and curr[-2] in VOWELS:
+            # If vowel was syncopated, strip trailing h if vowel drops
+            curr = curr[:-1]
 
     return curr

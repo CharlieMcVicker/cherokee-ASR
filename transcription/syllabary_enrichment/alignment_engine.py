@@ -22,13 +22,13 @@ CHEROKEE_SYLLABARY_MAP = {
     "Ꭳ": "o",
     "Ꭴ": "u",
     "Ꭵ": "v",
-    "Ꭶ": "ga",
-    "Ꭷ": "ka",
-    "Ꭸ": "ge",
-    "Ꭹ": "gi",
-    "Ꭺ": "go",
-    "Ꭻ": "gu",
-    "Ꭼ": "gv",
+    "Ꭶ": "ka",
+    "Ꭷ": "kha",
+    "Ꭸ": "ke",
+    "Ꭹ": "ki",
+    "Ꭺ": "ko",
+    "Ꭻ": "ku",
+    "Ꭼ": "kv",
     "Ꭽ": "ha",
     "Ꭾ": "he",
     "Ꭿ": "hi",
@@ -54,12 +54,12 @@ CHEROKEE_SYLLABARY_MAP = {
     "Ꮓ": "no",
     "Ꮔ": "nu",
     "Ꮕ": "nv",
-    "Ꮖ": "gwa",
-    "Ꮗ": "gwe",
-    "Ꮘ": "gwi",
-    "Ꮙ": "gwo",
-    "Ꮚ": "gwu",
-    "Ꮛ": "gwv",
+    "Ꮖ": "kwa",
+    "Ꮗ": "kwe",
+    "Ꮘ": "kwi",
+    "Ꮙ": "kwo",
+    "Ꮚ": "kwu",
+    "Ꮛ": "kwv",
     "Ꮜ": "sa",
     "Ꮝ": "s",
     "Ꮞ": "se",
@@ -67,17 +67,17 @@ CHEROKEE_SYLLABARY_MAP = {
     "Ꮠ": "so",
     "Ꮡ": "su",
     "Ꮢ": "sv",
-    "Ꮣ": "da",
-    "Ꮤ": "ta",
-    "Ꮥ": "de",
-    "Ꮦ": "te",
-    "Ꮧ": "di",
-    "Ꮨ": "ti",
-    "Ꮩ": "do",
-    "Ꮪ": "du",
-    "Ꮫ": "dv",
+    "Ꮣ": "ta",
+    "Ꮤ": "tha",
+    "Ꮥ": "te",
+    "Ꮦ": "the",
+    "Ꮧ": "ti",
+    "Ꮨ": "thi",
+    "Ꮩ": "to",
+    "Ꮪ": "tu",
+    "Ꮫ": "tv",
     "Ꮭ": "tla",
-    "Ꮬ": "dla",
+    "Ꮬ": "tla",
     "Ꮮ": "tle",
     "Ꮯ": "tli",
     "Ꮰ": "tlo",
@@ -136,7 +136,9 @@ def get_base_transliteration(syllabary_text: str) -> str:
         if char in CHEROKEE_SYLLABARY_MAP:
             res.append(CHEROKEE_SYLLABARY_MAP[char])
         elif is_cherokee_syllable(char):
-            res.append(cherokee_to_bad_phonetics(char))
+            res.append(
+                CHEROKEE_SYLLABARY_MAP.get(char, cherokee_to_bad_phonetics(char))
+            )
         else:
             res.append(char)
     return "".join(res)
@@ -206,7 +208,10 @@ def align_character_syllable_detailed(
     )  # (char, base_phonetic, start_idx, end_idx)
     idx = 0
     for char in syllabary_text:
-        base_phon = CHEROKEE_SYLLABARY_MAP.get(char, char)
+        base_phon = CHEROKEE_SYLLABARY_MAP.get(
+            char,
+            cherokee_to_bad_phonetics(char) if is_cherokee_syllable(char) else char,
+        )
         units.append((char, base_phon, idx, idx + len(char)))
         idx += len(char)
 
