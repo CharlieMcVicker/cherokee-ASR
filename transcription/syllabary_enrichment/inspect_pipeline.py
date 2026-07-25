@@ -213,7 +213,8 @@ def main():
                 syllabary_text, base_trans, emitted_text, aligned_pairs
             )
             cer_val = calculate_cer(target_text, rec_phon)
-            scored.append((cer_val, rec))
+            cer_base = calculate_cer(target_text, emitted_text)
+            scored.append((-(cer_base - cer_val), rec))
         scored.sort(key=lambda x: x[0], reverse=True)
         print(f"Displaying top {args.top_errors} error records:")
         for cer_val, rec in scored[: args.top_errors]:
