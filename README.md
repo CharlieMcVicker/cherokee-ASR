@@ -21,12 +21,18 @@ workshop-transcription/
 │   │   ├── audio_segmenter.py    # VAD speech chunking for long audio
 │   │   ├── exporter.py           # Praat TextGrid & JSON manifest export
 │   │   └── prepare_ground_truth.py # Ingest Bible metadata or chunk JSON lists
+│   ├── syllabary_enrichment/     # Phonetic rule merger & reconciliation engine
+│   │   ├── alignment_engine.py   # Fine-grained character & syllable level alignment engine
+│   │   ├── enrich_syllabary.py   # Core rule engine for vowel syncopation & aspiration transfer
+│   │   ├── evaluate_reconciliation.py # Evaluation framework scoring Reconciled CER vs Raw ASR CER
+│   │   └── inspect_pipeline.py   # Visual step-by-step diagnostic CLI for single recordings
 │   ├── training/                 # Training, evaluation, and data prep
 │   │   ├── prepare_csv.py        # Prepare training splits from raw CSV
 │   │   ├── train.py              # Offline/local/remote Wav2Vec2 training
 │   │   ├── evaluate_checkpoint.py # Score checkpoint against test set
 │   │   └── evaluate_revisions.py  # Score Git revisions from Hugging Face
 │   └── utils/                    # Utilities and checks
+│       ├── syllabary_map.py      # Centralized Cherokee Syllabary to respelled phonetic mapping
 │       ├── model_utils.py        # Checkpoint selection and config loading
 │       ├── tone_normalization.py  # Normalizes tones in transcripts
 │       └── verify_mps.py          # Verifies PyTorch MPS backend support
@@ -145,7 +151,35 @@ Then visit `http://localhost:8000/` in your browser. It automatically pulls data
     --output-csv data/results/revision_scores.csv
   ```
 
-### 7. Inference Tooling - Ground-Truth Timestamp Alignment
+### 7. Syllabary Enrichment Engine (Phonetic Reconciliation)
+
+The Syllabary Enrichment engine reconciles ground-truth Cherokee Syllabary text against raw ASR acoustic emissions. It uses fine-grained character/syllable dynamic programming alignment while maintaining Cherokee Syllabary as the immutable structural anchor.
+
+#### Core Reconciliation Principles
+1. **Vowel Syncopation / Deletion**: Respects ASR when vowels are omitted/dropped in speech.
+2. **Aspiration Transfer**: Systematically transfers pre-aspiration (`h-`), laryngeal/digraph aspiration (`th`, `kh`, `lh`, `nh`, `wh`, `yh`, `rh`, `sh`, `ch`), and post-vocalic aspiration (`-h`) emitted by ASR onto the base syllabary unit.
+3. **Glottal Stop Filtering**: Preserves trailing glottal stops and onset glottal stops that accompany explicit onset consonants, while filtering standalone onset glottal stops (e.g. ASR `'a` for base `ya` $\rightarrow$ `ya`).
+
+#### Evaluating Reconciliation CER vs Raw ASR CER
+
+To calculate performance improvements (Reconciled CER vs Raw ASR CER) across train, validation, and test splits:
+
+```bash
+python3 -m transcription.syllabary_enrichment.evaluate_reconciliation \
+  training_data/processed/split_audio_syl_target.csv \
+  --force-recompute
+```
+
+#### Step-by-Step Diagnostic Inspection
+
+To inspect the step-by-step alignment and rule actions for a specific recording (keyed by audio path or filename):
+
+```bash
+python3 -m transcription.syllabary_enrichment.inspect_pipeline \
+  --record-id Sentence_for_entry_1136_01.wav
+```
+
+### 8. Inference Tooling - Ground-Truth Timestamp Alignment
 
 The timestamping pipeline aligns ground-truth text (such as story transcripts or Bible verses) to long-form audio recordings. It uses VAD pre-segmentation, extracts CTC emissions from the ASR model, and applies Dynamic Time Warping (DTW) character/token alignment with Needleman-Wunsch fusion to calculate precise word start and end timestamps.
 
