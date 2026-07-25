@@ -130,6 +130,33 @@ class TestEnrichSyllabary(unittest.TestCase):
         )
         self.assertEqual(enriched, "lhah lhe lhi lho lhuh lhv")
 
+    def test_reconcile_l_series_to_lh_lateral_aspiration(self):
+        """Liquid l-series (la/le/li/lo/lu/lv) -> lh-series when ASR window contains 'lh', including syncopated vowels."""
+        syllabary = "Ꮅ"
+        base_trans = "li"
+        aligned_pairs = [("Ꮅ", "lh")]
+
+        enriched = reconcile_phonetics(syllabary, base_trans, "lh", aligned_pairs)
+        self.assertEqual(enriched, "lh")
+
+    def test_reconcile_aspiration_transfer_with_syncopation(self):
+        """As per core rules: aspiration transfer + vowel syncopation (e.g. ka + ASR 'kh' -> 'kh')."""
+        syllabary = "Ꭶ"
+        base_trans = "ka"
+        aligned_pairs = [("Ꭶ", "kh")]
+
+        enriched = reconcile_phonetics(syllabary, base_trans, "kh", aligned_pairs)
+        self.assertEqual(enriched, "kh")
+
+    def test_reconcile_drop_standalone_onset_glottal(self):
+        """Drop standalone onset glottal stop from ASR unless accompanied by an explicit onset consonant."""
+        syllabary = "Ꮿ"
+        base_trans = "ya"
+        aligned_pairs = [("Ꮿ", "'a")]
+
+        enriched = reconcile_phonetics(syllabary, base_trans, "'a", aligned_pairs)
+        self.assertEqual(enriched, "ya")
+
     def test_reconcile_empty_inputs(self):
         self.assertEqual(reconcile_phonetics("", "", "", []), "")
         self.assertEqual(reconcile_phonetics("Ꭳ", "o", "", [("Ꭳ", "")]), "o")

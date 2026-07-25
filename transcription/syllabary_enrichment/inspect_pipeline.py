@@ -22,8 +22,8 @@ from typing import List, Dict, Any, Optional
 from transcription.syllabary_enrichment.alignment_engine import (
     get_base_transliteration,
     align_character_syllable_detailed,
-    CHEROKEE_SYLLABARY_MAP,
 )
+from transcription.utils.syllabary_map import CHEROKEE_SYLLABARY_MAP
 from transcription.syllabary_enrichment.enrich_syllabary import (
     reconcile_phonetics,
     _enrich_single_syllable,
