@@ -1,11 +1,11 @@
 ---
 id: TASK-27
 title: POC run inside Docker container for pushing to Hugging Face
-status: In Progress
+status: Done
 assignee:
   - '@agent'
 created_date: '2026-07-01 00:13'
-updated_date: '2026-07-01 00:39'
+updated_date: '2026-07-26 16:11'
 labels: []
 dependencies: []
 ordinal: 27000

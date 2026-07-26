@@ -1,10 +1,11 @@
 ---
 id: TASK-21
 title: Guide user through vast.ai instance setup and verification
-status: In Progress
+status: Done
 assignee:
   - '@agent'
 created_date: '2026-06-30 23:35'
+updated_date: '2026-07-26 16:11'
 labels: []
 dependencies: []
 ordinal: 21000
