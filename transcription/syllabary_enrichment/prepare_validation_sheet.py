@@ -89,7 +89,7 @@ def syllabary_matches_phonetics(syl: str, phonetics: str):
 
     cons = phonetics_no_glottals
     cons_syl = syl_phonetics_no_glottals
-    for v in vowels + " ":
+    for v in vowels:
         cons = cons.replace(v, "")
         cons_syl = cons_syl.replace(v, "")
 
