@@ -97,15 +97,20 @@ def main():
         else ("mps" if torch.backends.mps.is_available() else "cpu")
     )
     print(f"Using device: {device}")
-    model.to(device)
+    model.to(device)  # type: ignore
 
     print(f"Transcribing audio file: {args.audio_path}...")
-    result = infer_single_audio(model, processor, args.audio_path, device=device)
+    res = infer_single_audio(model, processor, args.audio_path, device=device)
+    if isinstance(res, list):
+        res = res[0]
+
+    text = str(res["text"])
+    confidence = float(res["confidence"])
 
     print("\n" + "=" * 60)
     print("GREEDY DECODING PREDICTIONS:")
-    print(f"  Transcription: {result['text']}")
-    print(f"  Confidence:    {result['confidence']:.4f} ({result['confidence']:.2%})")
+    print(f"  Transcription: {text}")
+    print(f"  Confidence:    {confidence:.4f} ({confidence:.2%})")
     print("=" * 60 + "\n")
 
 

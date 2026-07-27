@@ -34,6 +34,8 @@ def main():
         reader = csv.DictReader(f)
         for row in reader:
             raw_text = row["sentence"]
+            if raw_text is None:
+                continue
             if isinstance(raw_text, str):
                 # First step: drop wordfinal ';' and replace word medial ';' with ':'
                 words = raw_text.split()
@@ -51,7 +53,7 @@ def main():
                     raw_text = raw_text.replace(char, "")
             # Normalizing, removing accents, turning colons to doubled vowels
             norm_text, should_drop = remove_tones_and_double_vowels(raw_text)
-            if should_drop:
+            if should_drop or norm_text is None:
                 dropped_count += 1
                 continue
 

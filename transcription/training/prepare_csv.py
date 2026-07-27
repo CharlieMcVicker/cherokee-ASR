@@ -140,15 +140,16 @@ def main():
     with open(args.csv, mode="r", encoding="utf-8") as f:
         reader = csv.DictReader(f)
 
+        fieldnames = reader.fieldnames or []
         # Check column headers
-        if "audio" not in reader.fieldnames:
+        if "audio" not in fieldnames:
             print(
                 "Error: Input CSV must contain an 'audio' column specifying filename."
             )
             return
-        if args.text_col not in reader.fieldnames:
+        if args.text_col not in fieldnames:
             print(
-                f"Error: Transcription column '{args.text_col}' not found in CSV headers: {reader.fieldnames}"
+                f"Error: Transcription column '{args.text_col}' not found in CSV headers: {fieldnames}"
             )
             return
 
@@ -166,6 +167,8 @@ def main():
 
     for row in samples:
         filename = row["audio"]
+        if not filename:
+            continue
         filepath = os.path.join(args.audio_dir, filename)
 
         # 1. Check audio file exists
@@ -180,6 +183,8 @@ def main():
 
         # 2. Reformat transcription
         raw_text = row[args.text_col]
+        if raw_text is None:
+            continue
         if isinstance(raw_text, str):
             # First step: drop wordfinal ';' and replace word medial ';' with ':'
             words = raw_text.split()
@@ -193,7 +198,7 @@ def main():
             for char in ["ʼ", "‚"]:
                 raw_text = raw_text.replace(char, "")
         norm_text, should_drop = remove_tones_and_double_vowels(raw_text)
-        if should_drop:
+        if should_drop or norm_text is None:
             dropped_tone_count += 1
             continue
 

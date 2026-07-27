@@ -176,9 +176,10 @@ def main():
 
     def prepare_batch(batch):
         audio = batch["audio"]
-        batch["input_values"] = processor(
-            audio["array"], sampling_rate=audio["sampling_rate"]
-        ).input_values[0]
+        input_vals = processor(
+            audio["array"], sampling_rate=TARGET_SAMPLE_RATE  # type: ignore
+        ).input_values  # type: ignore
+        batch["input_values"] = input_vals[0]
         return batch
 
     test_ds_prepared = test_ds.map(

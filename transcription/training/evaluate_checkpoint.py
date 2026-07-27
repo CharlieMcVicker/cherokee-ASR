@@ -170,11 +170,14 @@ def main():
         processor_path, token=token, revision=revision
     )
 
+    results_df = pd.DataFrame()
+
     def prepare_batch(batch):
         audio = batch["audio"]
-        batch["input_values"] = processor(
-            audio["array"], sampling_rate=audio["sampling_rate"]
-        ).input_values[0]
+        input_vals = processor(
+            audio["array"], sampling_rate=TARGET_SAMPLE_RATE  # type: ignore
+        ).input_values  # type: ignore
+        batch["input_values"] = input_vals[0]
         return batch
 
     test_ds_prepared = test_ds.map(
@@ -222,11 +225,14 @@ def main():
         print("Saved test results to data/results/test_inference_results.csv")
 
     # Display first few comparisons
-    print("\nSample Comparisons:")
-    for i in range(min(15, len(results_df))):
-        row = results_df.iloc[i]
-        print(f"\n[{i}] Gold:   {row['gold']}")
-        print(f"    Greedy: {row['greedy']} (WER: {row['wer_greedy']:.2f})")
+    if not results_df.empty:
+        print("\nSample Comparisons:")
+        for i in range(min(15, len(results_df))):
+            row_item = results_df.iloc[i]
+            print(f"\n[{i}] Gold:   {row_item['gold']}")
+            print(
+                f"    Greedy: {row_item['greedy']} (WER: {row_item['wer_greedy']:.2f})"
+            )
 
 
 if __name__ == "__main__":

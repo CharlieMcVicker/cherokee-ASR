@@ -12,6 +12,7 @@ import os
 # Enable fallback to CPU for unsupported MPS operations
 os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
 
+from typing import Any
 import argparse
 import sys
 import glob
@@ -70,8 +71,10 @@ def decode_worker(item_data):
 
     logits_tensor = torch.tensor(logits_np)
     res = greedy_inference(logits_tensor, global_processor)
-    greedy_raw = res["text"]
-    greedy_confidence = res["confidence"]
+    if isinstance(res, list):
+        res = res[0]
+    greedy_raw = str(res["text"])
+    greedy_confidence = float(res["confidence"])
 
     # Calculate detailed character/word confidences
     probs = torch.nn.functional.softmax(logits_tensor, dim=-1).numpy()
@@ -175,7 +178,7 @@ def main():
             f"Loading processor from Hugging Face Hub: {args.processor} (revision: {args.revision})...",
             flush=True,
         )
-    processor = Wav2Vec2Processor.from_pretrained(
+    processor: Any = Wav2Vec2Processor.from_pretrained(
         args.processor, token=token, revision=args.revision
     )
 
@@ -197,7 +200,7 @@ def main():
         else ("mps" if torch.backends.mps.is_available() else "cpu")
     )
     print(f"Using device: {device}", flush=True)
-    model.to(device)
+    model.to(device)  # type: ignore
 
     # Read audio metadata for sorting (lazy loading to minimize VRAM/RAM)
     loaded_audios = []
@@ -350,10 +353,8 @@ def main():
                 )
 
                 # Free large tensors to ensure empty_cache succeeds
-                if "input_values" in locals():
-                    del input_values
-                if "attention_mask" in locals():
-                    del attention_mask
+                for var_name in ("input_values", "attention_mask"):
+                    locals().pop(var_name, None)
 
                 if torch.cuda.is_available():
                     torch.cuda.empty_cache()
@@ -418,22 +419,20 @@ def main():
                         )
                         global_idx += 1
                     finally:
-                        if "single_logits" in locals():
-                            del single_logits
-                        if "single_inputs" in locals():
-                            del single_inputs
-                        if "single_input_values" in locals():
-                            del single_input_values
-                        if "single_attention_mask" in locals():
-                            del single_attention_mask
+                        for var_name in (
+                            "single_logits",
+                            "single_inputs",
+                            "single_input_values",
+                            "single_attention_mask",
+                        ):
+                            locals().pop(var_name, None)
                         if torch.cuda.is_available():
                             torch.cuda.empty_cache()
 
                 # Free raw speech memory from batch dicts
                 for item in batch:
                     item.pop("speech", None)
-                if "speech_list" in locals():
-                    del speech_list
+                locals().pop("speech_list", None)
 
                 continue
             elif isinstance(e, NotImplementedError) and device == "mps":
@@ -442,7 +441,7 @@ def main():
                     flush=True,
                 )
                 device = "cpu"
-                model.to(device)
+                model.to(device)  # type: ignore
                 input_values = input_values.to(device)
                 if attention_mask is not None:
                     attention_mask = attention_mask.to(device)

@@ -60,7 +60,7 @@ class LabelingToolHandler(http.server.SimpleHTTPRequestHandler):
                         )
 
                 # Sort segments by confidence ascending (lowest confidence first)
-                data.sort(key=lambda x: x["greedy_confidence"])
+                data.sort(key=lambda x: float(x["greedy_confidence"]))
 
                 # Load existing labels if train_labeled.csv exists to preserve state
                 labeled_map = {}

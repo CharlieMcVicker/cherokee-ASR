@@ -139,23 +139,26 @@ class DataCollatorCTCWithPadding:
     processor: Wav2Vec2Processor
     padding: Union[bool, str] = True
 
-    def __call__(self, features: List[Dict[str, Union[List[int], torch.Tensor]]]):
+    def __call__(
+        self, features: List[Dict[str, Union[List[int], torch.Tensor]]]
+    ) -> Dict[str, torch.Tensor]:
         input_features = [{"input_values": f["input_values"]} for f in features]
         label_features = [{"input_ids": f["labels"]} for f in features]
 
         batch = self.processor.pad(
             input_features, padding=self.padding, return_tensors="pt"
         )
-        with self.processor.as_target_processor():
-            labels_batch = self.processor.pad(
-                label_features, padding=self.padding, return_tensors="pt"
-            )
+        labels_batch = self.processor.pad(
+            labels=label_features, padding=self.padding, return_tensors="pt"
+        )
+        if batch is None or labels_batch is None:
+            raise ValueError("Processor padding returned None.")
 
         labels = labels_batch["input_ids"].masked_fill(
-            labels_batch.attention_mask.ne(1), -100
+            labels_batch["attention_mask"].ne(1), -100
         )
         batch["labels"] = labels
-        return batch
+        return batch  # type: ignore
 
 
 def parse_args():
@@ -445,7 +448,6 @@ def initialize_model_and_trainer(processor, train_ds, valid_ds, folder_model_fil
 
     training_args = TrainingArguments(
         output_dir=folder_model_files,
-        group_by_length=True,
         per_device_train_batch_size=8,
         per_device_eval_batch_size=8,
         gradient_accumulation_steps=2,
@@ -479,7 +481,7 @@ def initialize_model_and_trainer(processor, train_ds, valid_ds, folder_model_fil
         train_dataset=train_ds,
         eval_dataset=valid_ds,
         compute_metrics=compute_metrics,
-        tokenizer=processor.feature_extractor,
+        processing_class=processor.feature_extractor,
     )
 
     return trainer, data_collator

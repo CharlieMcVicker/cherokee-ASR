@@ -1,3 +1,4 @@
+from typing import Any
 import argparse
 import os
 import glob
@@ -50,79 +51,98 @@ def main():
 
     model_config = get_best_model_config()
 
-    revision = None
+    revision_str: str | None = None
     if args.model_dir == model_config["repo"]:
-        revision = model_config["revision"]
+        revision_str = str(model_config["revision"])
         print(
-            f"Using model configuration from best_model.json: {args.model_dir} (revision: {revision})"
+            f"Using model configuration from best_model.json: {args.model_dir} (revision: {revision_str})"
         )
 
-    model = Wav2Vec2ForCTC.from_pretrained(args.model_dir, revision=revision).to(device)
+    model_kwargs = {}
+    if revision_str is not None:
+        model_kwargs["revision"] = revision_str
+
+    model_obj = Wav2Vec2ForCTC.from_pretrained(args.model_dir, **model_kwargs)
+    model = model_obj.to(device)  # type: ignore
     model.eval()
-    processor = Wav2Vec2Processor.from_pretrained(args.model_dir, revision=revision)
+    processor: Any = Wav2Vec2Processor.from_pretrained(args.model_dir, **model_kwargs)
 
     print(f"Loading audio: {args.audio_file}")
     speech, sr = librosa.load(args.audio_file, sr=16000)
 
     if args.mode == "short":
         # Process the entire file
-        input_dict = processor(
+        inputs = processor(  # type: ignore
             speech, sampling_rate=16000, return_tensors="pt", padding=True
         )
+        input_values = getattr(inputs, "input_values")
         with torch.no_grad():
-            logits = model(input_dict.input_values.to(device)).logits
+            logits = model(input_values.to(device)).logits
 
         res = greedy_inference(logits[0], processor)
-        pred_text = res["text"]
+        if isinstance(res, list):
+            res = res[0]
+        pred_text = str(res["text"])
 
         final_text = convert_to_human_orthography(pred_text)
         print(f"TRANSCRIPTION: {final_text}")
 
     elif args.mode == "long":
         # Load VAD model
+        VAD_class = None
         try:
-            from speechbrain.inference.VAD import VAD
+            from speechbrain.inference.VAD import VAD as VAD_class  # type: ignore
         except ImportError:
-            from speechbrain.pretrained import VAD
+            try:
+                from speechbrain.pretrained import VAD as VAD_class  # type: ignore
+            except ImportError:
+                pass
+
+        if VAD_class is None:
+            print("SpeechBrain VAD is not available.")
+            return
 
         print("Loading VAD model...")
-        vad = VAD.from_hparams(
+        vad = VAD_class.from_hparams(
             source="speechbrain/vad-crdnn-libriparty",
             savedir="pretrained_models/vad-crdnn-libriparty",
         )
         print("Running VAD...")
-        boundaries = vad.get_speech_segments(args.audio_file)
+        boundaries = vad.get_speech_segments(args.audio_file)  # type: ignore
 
         # Chop into max 15s segments
         segments = []
         for start, end in boundaries:
-            start, end = float(start), float(end)
-            while end - start > 15.0:
-                segments.append((start, start + 15.0))
-                start += 15.0
-            segments.append((start, end))
+            start_val, end_val = float(start), float(end)
+            while end_val - start_val > 15.0:
+                segments.append((start_val, start_val + 15.0))
+                start_val += 15.0
+            segments.append((start_val, end_val))
 
         print(f"Found {len(segments)} segments to transcribe.")
         results = []
-        for start, end in segments:
-            start_idx = int(start * 16000)
-            end_idx = int(end * 16000)
+        for start_val, end_val in segments:
+            start_idx = int(start_val * 16000)
+            end_idx = int(end_val * 16000)
             chunk = speech[start_idx:end_idx]
 
             if len(chunk) < 1600:  # skip < 100ms
                 continue
 
-            input_dict = processor(
+            inputs = processor(  # type: ignore
                 chunk, sampling_rate=16000, return_tensors="pt", padding=True
             )
+            input_values = getattr(inputs, "input_values")
             with torch.no_grad():
-                logits = model(input_dict.input_values.to(device)).logits
+                logits = model(input_values.to(device)).logits
 
             res = greedy_inference(logits[0], processor)
-            pred_text = res["text"]
+            if isinstance(res, list):
+                res = res[0]
+            pred_text = str(res["text"])
 
             final_text = convert_to_human_orthography(pred_text)
-            results.append((start, end, final_text))
+            results.append((start_val, end_val, final_text))
 
         out_tsv = (
             args.output_tsv

@@ -343,16 +343,14 @@ def transcribe_audio_batch(model, processor, audio_paths, device=None, batch_siz
                         )
                         results.append({"text": "", "confidence": 0.0})
                     finally:
-                        if "single_logits" in locals():
-                            del single_logits
-                        if "single_outputs" in locals():
-                            del single_outputs
-                        if "single_inputs" in locals():
-                            del single_inputs
-                        if "single_input_values" in locals():
-                            del single_input_values
-                        if "single_attention_mask" in locals():
-                            del single_attention_mask
+                        for var_name in (
+                            "single_logits",
+                            "single_outputs",
+                            "single_inputs",
+                            "single_input_values",
+                            "single_attention_mask",
+                        ):
+                            locals().pop(var_name, None)
                         if torch.cuda.is_available():
                             torch.cuda.empty_cache()
                         elif torch.backends.mps.is_available():
@@ -391,16 +389,14 @@ def transcribe_audio_batch(model, processor, audio_paths, device=None, batch_siz
             results.append(res)
 
         # Free batch tensors to ensure we don't peak VRAM on next batch allocation
-        if "logits" in locals():
-            del logits
-        if "outputs" in locals():
-            del outputs
-        if "inputs" in locals():
-            del inputs
-        if "input_values" in locals():
-            del input_values
-        if "attention_mask" in locals():
-            del attention_mask
+        for var_name in (
+            "logits",
+            "outputs",
+            "inputs",
+            "input_values",
+            "attention_mask",
+        ):
+            locals().pop(var_name, None)
 
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
