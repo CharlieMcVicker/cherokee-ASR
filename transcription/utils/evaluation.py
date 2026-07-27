@@ -89,18 +89,26 @@ def yield_hf_revisions(repo_id, revisions, token=None):
 
 
 def yield_single_checkpoint(
-    checkpoint_path, processor_path=None, revision=None, token=None
+    checkpoint_path: str,
+    processor_path: str | None = None,
+    revision: str | None = None,
+    token: str | None = None,
 ):
     """
     Yields a single local or HF checkpoint/model.
     """
     proc_path = processor_path or checkpoint_path
-    processor = Wav2Vec2Processor.from_pretrained(
-        proc_path, token=token, revision=revision
-    )
-    model = Wav2Vec2ForCTC.from_pretrained(
-        checkpoint_path, token=token, revision=revision
-    )
+    if revision is not None:
+        processor = Wav2Vec2Processor.from_pretrained(
+            proc_path, token=token, revision=revision
+        )
+        model = Wav2Vec2ForCTC.from_pretrained(
+            checkpoint_path, token=token, revision=revision
+        )
+    else:
+        processor = Wav2Vec2Processor.from_pretrained(proc_path, token=token)
+        model = Wav2Vec2ForCTC.from_pretrained(checkpoint_path, token=token)
+
     yield "checkpoint", model, processor, checkpoint_path
     del model
 
@@ -184,7 +192,7 @@ def run_evaluation(
         for idx, logits in enumerate(all_logits):
             ref = all_gold[idx]
             res = greedy_inference(logits, processor)
-            hyp = res["text"]
+            hyp = res["text"] if isinstance(res, dict) else ""
 
             ref_safe, hyp_safe = safe(ref), safe(hyp)
 

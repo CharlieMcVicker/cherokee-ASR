@@ -234,7 +234,7 @@ def main():
             processed_count += 1
 
     with open(output_csv, mode="w", encoding="utf-8", newline="") as outf:
-        writer = csv.DictWriter(outf, fieldnames=fieldnames)
+        writer = csv.DictWriter(outf, fieldnames=fieldnames or [])
         writer.writeheader()
         writer.writerows(rows_to_write)
 
