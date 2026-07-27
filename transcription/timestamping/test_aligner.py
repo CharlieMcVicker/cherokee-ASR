@@ -245,6 +245,7 @@ class TestAligner(unittest.TestCase):
         ]
         result = align_tokens_to_verses(tokens, verses, audio_source="test.wav")
         self.assertIsNotNone(result.metrics)
+        assert result.metrics is not None
         self.assertEqual(result.metrics.matched_verses, 1)
         self.assertLessEqual(result.metrics.overall_cer, 0.10)
         self.assertLessEqual(result.verses[0].cer, 0.10)

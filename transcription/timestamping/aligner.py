@@ -6,7 +6,7 @@ ASR CTC emissions extraction & Trigram Sliding-Window DTW Alignment Engine.
 """
 
 from dataclasses import dataclass, field
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Tuple
 from jiwer import cer as jiwer_cer
 import numpy as np
 
@@ -150,7 +150,7 @@ def align_audio_segment(
                     samples = samples.reshape((-1, c.audio.channels)).mean(axis=1)
                 max_val = float(1 << (8 * c.audio.sample_width - 1))
                 samples = samples / max_val
-                chunk_words = model_or_fn(samples, c.audio.frame_rate)
+                chunk_words: Any = model_or_fn(samples, c.audio.frame_rate)
             else:
                 # PyTorch model + processor
                 from transcription.inference.infer import calculate_word_confidences
@@ -161,20 +161,25 @@ def align_audio_segment(
                 max_val = float(1 << (8 * c.audio.sample_width - 1))
                 samples = samples / max_val
 
+                model_obj: Any = model_or_fn
+                proc_obj: Any = processor
+                if proc_obj is None or model_obj is None:
+                    raise ValueError("Both model_or_fn and processor must be provided for PyTorch inference.")
+
                 device = (
-                    next(model_or_fn.parameters()).device
-                    if hasattr(model_or_fn, "parameters")
+                    next(model_obj.parameters()).device
+                    if hasattr(model_obj, "parameters")
                     else "cpu"
                 )
-                input_values = processor(
+                input_values = proc_obj(
                     samples, sampling_rate=c.audio.frame_rate, return_tensors="pt"
                 ).input_values.to(device)
                 with torch.no_grad():
-                    logits = model_or_fn(input_values).logits[0]
+                    logits = model_obj(input_values).logits[0]
 
                 pred_ids = torch.argmax(logits, dim=-1)
                 probs = torch.softmax(logits, dim=-1)
-                chunk_words = calculate_word_confidences(probs, pred_ids, processor)
+                chunk_words = calculate_word_confidences(probs, pred_ids, proc_obj)
 
             for w_info in chunk_words:
                 extracted_tokens.append(
@@ -280,7 +285,9 @@ def _align_words_char_range(
     MAX_FUSE_ASR = 3  # maximum consecutive ASR tokens allowed to fuse
 
     dp = np.full((N + 1, M + 1), fill_value=1e9, dtype=np.float32)
-    parent = [[None for _ in range(M + 1)] for _ in range(N + 1)]
+    parent: List[List[Optional[Tuple[int, int, str]]]] = [
+        [None for _ in range(M + 1)] for _ in range(N + 1)
+    ]
 
     dp[0, 0] = 0.0
 

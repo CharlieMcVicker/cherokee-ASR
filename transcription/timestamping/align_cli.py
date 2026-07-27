@@ -9,6 +9,7 @@ ASR emissions extraction, trigram DTW alignment, and export.
 import argparse
 import os
 import sys
+from typing import Optional, Any, Dict
 import numpy as np
 
 from transcription.timestamping.audio_segmenter import segment_long_audio
@@ -16,6 +17,7 @@ from transcription.timestamping.prepare_ground_truth import (
     parse_bible_metadata,
     parse_chunk_list,
 )
+from transcription.timestamping.aligner import AlignmentResult
 from transcription.timestamping.exporter import (
     export_praat_textgrid,
     export_alignment_manifest,
@@ -25,10 +27,10 @@ from transcription.timestamping.exporter import (
 def run_alignment_pipeline(
     audio_path: str,
     output_dir: str,
-    bible_metadata_path: str = None,
-    chunk_list_path: str = None,
+    bible_metadata_path: Optional[str] = None,
+    chunk_list_path: Optional[str] = None,
     export_praat: bool = True,
-    model_path: str = None,
+    model_path: Optional[str] = None,
     skip_vad: bool = False,
     debug_export: bool = False,
 ) -> AlignmentResult:
@@ -57,10 +59,10 @@ def run_alignment_pipeline(
     from transcription.utils.model_utils import get_best_model_config
 
     token = os.environ.get("HF_TOKEN", None)
-    model_revision = None
+    model_revision: Optional[str] = None
     if model_path is None:
         model_config = get_best_model_config()
-        model_path = model_config.get("repo", "facebook/wav2vec2-base-960h")
+        model_path = str(model_config.get("repo", "facebook/wav2vec2-base-960h"))
         model_revision = model_config.get("revision", None)
 
     print(f"      Loading model from '{model_path}'...")
@@ -69,22 +71,29 @@ def run_alignment_pipeline(
         if torch.cuda.is_available()
         else ("mps" if torch.backends.mps.is_available() else "cpu")
     )
+    load_kwargs: Dict[str, Any] = {}
+    if token:
+        load_kwargs["token"] = token
+    if model_revision:
+        load_kwargs["revision"] = model_revision
+
     try:
         processor = Wav2Vec2Processor.from_pretrained(
-            model_path, token=token, revision=model_revision
+            model_path, **load_kwargs
         )
-        model = Wav2Vec2ForCTC.from_pretrained(
-            model_path, token=token, revision=model_revision
-        ).to(device)
+        model_obj: Any = Wav2Vec2ForCTC.from_pretrained(
+            model_path, **load_kwargs
+        )
+        model = model_obj.to(device)
     except Exception as e:
         fallback_repo = "facebook/wav2vec2-base-960h"
         print(
             f"      [Warning] Could not load '{model_path}' ({e}). Falling back to public model '{fallback_repo}'..."
         )
         model_path = fallback_repo
-        model_revision = None
         processor = Wav2Vec2Processor.from_pretrained(model_path)
-        model = Wav2Vec2ForCTC.from_pretrained(model_path).to(device)
+        fallback_obj: Any = Wav2Vec2ForCTC.from_pretrained(model_path)
+        model = fallback_obj.to(device)
 
     model.eval()
 
