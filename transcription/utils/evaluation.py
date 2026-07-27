@@ -2,7 +2,6 @@ import os
 import re
 import glob
 import torch
-import shutil
 import pandas as pd
 import numpy as np
 from tqdm import tqdm

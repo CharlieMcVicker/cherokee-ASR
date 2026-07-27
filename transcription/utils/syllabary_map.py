@@ -9,8 +9,6 @@ and consistent across the codebase (e.g. Ꮏ -> nha).
 
 from typing import Dict
 
-from transcription.utils.tone_normalization import respell_consonants
-
 # Base Cherokee Syllabary character mapping (un-respelled base transliteration)
 # Same base phonetic definitions as alignment_engine
 _BASE_CHEROKEE_SYLLABARY_MAP: Dict[str, str] = {
