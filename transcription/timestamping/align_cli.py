@@ -16,7 +16,6 @@ from transcription.timestamping.prepare_ground_truth import (
     parse_bible_metadata,
     parse_chunk_list,
 )
-from transcription.timestamping.aligner import align_tokens_to_verses
 from transcription.timestamping.exporter import (
     export_praat_textgrid,
     export_alignment_manifest,

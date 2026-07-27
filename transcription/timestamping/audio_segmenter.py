@@ -15,7 +15,6 @@ from transcription.audio.segment import (
     get_energy_profile,
     segment_audio_from_profile,
     get_best_parameters,
-    split_long_segments_smart,
 )
 
 
@@ -68,9 +67,6 @@ def segment_long_audio(
     # Step 2: Split any segments longer than max_duration_ms
     final_segments = []
     for seg in initial_segments:
-        smart_splits = []
-        # split_long_segments_smart appends to its internal list via closure helper,
-        # so we pass an isolated sub-segment call
         sub_audio = audio[seg["start"] : seg["end"]]
 
         # Split segment if it exceeds max_duration_ms
@@ -86,12 +82,6 @@ def segment_long_audio(
                     return
 
                 # Split using quietest window
-                from scripts.process_interviews import (
-                    get_energy_profile,
-                    segment_audio_from_profile,
-                )
-                import numpy as np
-
                 sub_sub = sub_audio[start_ms:end_ms]
                 dbfs = get_energy_profile(sub_sub, step_ms=10)
                 sub_splits = segment_audio_from_profile(
