@@ -148,10 +148,12 @@ def run_batch_inference(
         or os.environ.get("HUGGING_FACE_HUB_TOKEN")
     )
 
-    processor = Wav2Vec2Processor.from_pretrained(
+    processor: Any = Wav2Vec2Processor.from_pretrained(
         processor_path, token=token, revision=revision
     )
-    model = Wav2Vec2ForCTC.from_pretrained(checkpoint, token=token, revision=revision)
+    model: Any = Wav2Vec2ForCTC.from_pretrained(
+        checkpoint, token=token, revision=revision
+    )
     model.eval()
 
     device = (
@@ -369,16 +371,16 @@ def process_batch_inference_and_alignment(
 
     if needs_inference:
         model_config = get_best_model_config()
-        checkpoint = checkpoint or model_config["repo"]
-        processor_path = processor_path or model_config["repo"]
-        revision = revision or model_config["revision"]
+        resolved_checkpoint = checkpoint or model_config["repo"]
+        resolved_processor_path = processor_path or model_config["repo"]
+        resolved_revision = revision or model_config["revision"]
 
         print("Executing batched GPU ASR inference...")
         emitted_texts = run_batch_inference(
             records=records,
-            checkpoint=checkpoint,
-            processor_path=processor_path,
-            revision=revision,
+            checkpoint=resolved_checkpoint,
+            processor_path=resolved_processor_path,
+            revision=resolved_revision,
             batch_size=batch_size,
             num_workers=num_workers,
             hf_token=hf_token,

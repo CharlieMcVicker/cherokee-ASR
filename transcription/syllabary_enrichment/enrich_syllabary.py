@@ -48,12 +48,12 @@ def reconcile_phonetics(
 
     for item in aligned_pairs:
         # Extract syllabary_char and emitted_slice whether item is tuple or SyllableAlignment
-        if hasattr(item, "syllabary_char") and hasattr(item, "emitted_text"):
-            char = item.syllabary_char
-            emitted_slice = item.emitted_text
-        elif isinstance(item, (list, tuple)) and len(item) >= 2:
+        if isinstance(item, (list, tuple)) and len(item) >= 2:
             char = item[0]
             emitted_slice = item[1]
+        elif hasattr(item, "syllabary_char") and hasattr(item, "emitted_text"):
+            char = getattr(item, "syllabary_char")
+            emitted_slice = getattr(item, "emitted_text")
         else:
             continue
 
