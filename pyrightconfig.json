@@ -1,0 +1,10 @@
+{
+  "venvPath": "/opt/homebrew/Caskroom/miniconda/base/envs",
+  "venv": "cherokee-asr",
+  "include": [
+    "transcription"
+  ],
+  "exclude": [
+    "**/__pycache__"
+  ]
+}
