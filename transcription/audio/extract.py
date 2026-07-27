@@ -4,11 +4,13 @@ import os
 import argparse
 import time
 import json
+from typing import Any, Dict, List, cast
 import numpy as np
+from numpy.typing import NDArray
 from pydub import AudioSegment
 
 
-def get_energy_profile(audio, step_ms=10):
+def get_energy_profile(audio: AudioSegment, step_ms: int = 10) -> NDArray[np.float32]:
     """
     Computes the dBFS energy profile for the audio segment in step_ms increments.
     """
@@ -16,20 +18,20 @@ def get_energy_profile(audio, step_ms=10):
     dbfs_profile = np.zeros(num_steps, dtype=np.float32)
 
     for i in range(num_steps):
-        chunk = audio[i * step_ms : (i + 1) * step_ms]
+        chunk = cast(AudioSegment, audio[i * step_ms : (i + 1) * step_ms])
         dbfs_profile[i] = chunk.dBFS
 
     return dbfs_profile
 
 
 def segment_audio_from_profile(
-    dbfs_profile,
-    total_duration_ms,
-    step_ms=10,
-    min_silence_len=500,
-    silence_thresh=-40,
-    keep_silence=100,
-):
+    dbfs_profile: NDArray[np.float32],
+    total_duration_ms: int,
+    step_ms: int = 10,
+    min_silence_len: int = 500,
+    silence_thresh: float = -40,
+    keep_silence: int = 100,
+) -> List[Dict[str, int]]:
     """
     Finds nonsilent segments directly from the precomputed dBFS energy profile.
     """

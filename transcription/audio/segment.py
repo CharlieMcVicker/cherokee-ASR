@@ -3,11 +3,13 @@ import sys
 import os
 import argparse
 import time
+from typing import Any, Dict, List, cast
 import numpy as np
+from numpy.typing import NDArray
 from pydub import AudioSegment
 
 
-def get_energy_profile(audio, step_ms=10):
+def get_energy_profile(audio: AudioSegment, step_ms: int = 10) -> NDArray[np.float32]:
     """
     Computes the dBFS energy profile for the audio segment in step_ms increments.
     Returns a numpy array of dBFS values for each step (vectorized for maximum performance).
@@ -46,13 +48,13 @@ def get_energy_profile(audio, step_ms=10):
 
 
 def segment_audio_from_profile(
-    dbfs_profile,
-    total_duration_ms,
-    step_ms=10,
-    min_silence_len=500,
-    silence_thresh=-40,
-    keep_silence=100,
-):
+    dbfs_profile: NDArray[np.float32],
+    total_duration_ms: int,
+    step_ms: int = 10,
+    min_silence_len: int = 500,
+    silence_thresh: float = -40,
+    keep_silence: int = 100,
+) -> List[Dict[str, int]]:
     """
     Finds nonsilent segments directly from the precomputed dBFS energy profile.
     """
@@ -129,7 +131,9 @@ def segment_audio_from_profile(
     return segments
 
 
-def compute_metrics(segments, total_duration_ms):
+def compute_metrics(
+    segments: List[Dict[str, int]], total_duration_ms: int
+) -> Dict[str, Any]:
     if not segments:
         return {
             "percent_segmented": 0.0,
@@ -158,10 +162,10 @@ def compute_metrics(segments, total_duration_ms):
         union_duration = 0
 
     percent_segmented = (union_duration / total_duration_ms) * 100.0
-    avg_len = np.mean(durations) / 1000.0  # seconds
-    min_len = np.min(durations) / 1000.0  # seconds
-    max_len = np.max(durations) / 1000.0  # seconds
-    median_len = np.median(durations) / 1000.0  # seconds
+    avg_len = float(np.mean(durations) / 1000.0)  # seconds
+    min_len = float(np.min(durations) / 1000.0)  # seconds
+    max_len = float(np.max(durations) / 1000.0)  # seconds
+    median_len = float(np.median(durations) / 1000.0)  # seconds
 
     return {
         "percent_segmented": percent_segmented,
@@ -173,7 +177,7 @@ def compute_metrics(segments, total_duration_ms):
     }
 
 
-def print_table(results):
+def print_table(results: List[Dict[str, Any]]) -> None:
     header = "| Thresh (dBFS) | Min Sil (ms) | Keep Sil (ms) | Seg Count | % Segmented | Avg Len (s) | Min Len (s) | Median Len (s) | Max Len (s) |"
     separator = "|---------------|--------------|---------------|-----------|-------------|-------------|-------------|----------------|-------------|"
     print(header)
@@ -285,7 +289,9 @@ def main():
         print_table(results)
 
 
-def get_best_parameters(dbfs_profile, total_len_ms):
+def get_best_parameters(
+    dbfs_profile: NDArray[np.float32], total_len_ms: int
+) -> Dict[str, Any]:
     """
     Finds the best segmentation parameters matching maximum segment duration <= 10s.
     """
@@ -339,10 +345,12 @@ def get_best_parameters(dbfs_profile, total_len_ms):
     # Filter for max_len <= 10.0 and at least 1 segment
     valid_results = [r for r in results if r["max_len"] <= 10.0 and r["count"] > 0]
 
-    def score_config(r):
-        net_coverage = r["percent_segmented"] - r["overlap_percent"]
-        silence_penalty = (r["keep_silence"] / 100.0) * 0.5
-        fragment_penalty = 5.0 if (r["avg_len"] < 1.0 and r["count"] > 5) else 0.0
+    def score_config(r: Dict[str, Any]) -> float:
+        net_coverage = float(r["percent_segmented"] - r["overlap_percent"])
+        silence_penalty = (float(r["keep_silence"]) / 100.0) * 0.5
+        fragment_penalty = (
+            5.0 if (float(r["avg_len"]) < 1.0 and int(r["count"]) > 5) else 0.0
+        )
         return net_coverage - silence_penalty - fragment_penalty
 
     if valid_results:
@@ -363,7 +371,12 @@ def get_best_parameters(dbfs_profile, total_len_ms):
     return best
 
 
-def split_long_segments_smart(segments, audio, max_duration_ms=10000, overlap_ms=250):
+def split_long_segments_smart(
+    segments: List[Dict[str, int]],
+    audio: AudioSegment,
+    max_duration_ms: int = 10000,
+    overlap_ms: int = 250,
+) -> List[Dict[str, int]]:
     """
     Splits any segments longer than max_duration_ms by scanning for internal silence/pauses,
     or falling back to the quietest point within the segment to avoid cutting in the middle of words.
@@ -378,7 +391,7 @@ def split_long_segments_smart(segments, audio, max_duration_ms=10000, overlap_ms
             return
 
         # Extract the long sub-audio
-        sub_audio = audio[start_ms:end_ms]
+        sub_audio = cast(AudioSegment, audio[start_ms:end_ms])
         dbfs_profile = get_energy_profile(sub_audio, step_ms=10)
 
         # Grid parameters to find brief pauses/silences inside active speech
