@@ -35,7 +35,6 @@ exclude = '''
     | archive
   )/
   | scripts/from_elan_to_wav_and_gsheet\.py
-  | transcription/audio/extract_from_elan\.py
   | test_topk\.py
 )
 '''

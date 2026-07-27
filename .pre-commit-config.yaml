@@ -3,7 +3,7 @@ repos:
     rev: 26.5.1
     hooks:
       - id: black
-        exclude: ^(data/|colab-script-rips/|archive/|scripts/from_elan_to_wav_and_gsheet\.py|transcription/audio/extract_from_elan\.py|transcription/inference/long_recording\.py|test_topk\.py)
+        exclude: ^(data/|colab-script-rips/|archive/|scripts/from_elan_to_wav_and_gsheet\.py|transcription/inference/long_recording\.py|test_topk\.py)
 
   - repo: https://github.com/RobertCraigie/pyright-python
     rev: v1.1.396
