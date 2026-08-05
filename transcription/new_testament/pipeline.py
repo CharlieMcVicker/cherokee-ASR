@@ -36,13 +36,14 @@ def align_chapter(
     export_praat: bool = True,
     model_path: Optional[str] = None,
     skip_vad: bool = False,
+    reconcile: bool = True,
 ) -> Any:
     """
     Align a New Testament audio recording with its syllabary transcript end-to-end.
 
     Delegates directly to the core timestamping alignment pipeline (run_alignment_pipeline),
     performing VAD, ground-truth ingest, ASR CTC emissions extraction, DTW alignment,
-    and automatic Praat TextGrid / alignment manifest export.
+    reconciliation, and automatic Praat TextGrid / alignment manifest export.
     """
     from transcription.timestamping.align_cli import run_alignment_pipeline
 
@@ -53,6 +54,7 @@ def align_chapter(
         export_praat=export_praat,
         model_path=model_path,
         skip_vad=skip_vad,
+        reconcile=reconcile,
     )
 
 

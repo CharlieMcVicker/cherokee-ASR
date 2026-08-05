@@ -33,6 +33,7 @@ def run_alignment_pipeline(
     model_path: Optional[str] = None,
     skip_vad: bool = False,
     debug_export: bool = False,
+    reconcile: bool = False,
 ) -> AlignmentResult:
     """Executes full alignment pipeline end-to-end using align_audio_segment."""
     if bible_metadata_path:
@@ -78,12 +79,8 @@ def run_alignment_pipeline(
         load_kwargs["revision"] = model_revision
 
     try:
-        processor = Wav2Vec2Processor.from_pretrained(
-            model_path, **load_kwargs
-        )
-        model_obj: Any = Wav2Vec2ForCTC.from_pretrained(
-            model_path, **load_kwargs
-        )
+        processor = Wav2Vec2Processor.from_pretrained(model_path, **load_kwargs)
+        model_obj: Any = Wav2Vec2ForCTC.from_pretrained(model_path, **load_kwargs)
         model = model_obj.to(device)
     except Exception as e:
         fallback_repo = "facebook/wav2vec2-base-960h"
@@ -106,6 +103,7 @@ def run_alignment_pipeline(
         processor=processor,
         audio_source=audio_path,
         skip_vad=skip_vad,
+        reconcile=reconcile,
     )
 
     print(f"[4/4] Exporting alignment results to '{output_dir}'...")
@@ -201,6 +199,12 @@ def main():
         default=False,
         help="Save additional debug alignment output file",
     )
+    parser.add_argument(
+        "--reconcile",
+        action="store_true",
+        default=False,
+        help="Perform syllabary/ASR phonological reconciliation",
+    )
 
     args = parser.parse_args()
 
@@ -215,6 +219,7 @@ def main():
         model_path=args.model_path,
         skip_vad=args.skip_vad,
         debug_export=args.debug_export,
+        reconcile=args.reconcile,
     )
 
 

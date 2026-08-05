@@ -141,6 +141,20 @@ def export_praat_textgrid(alignment: AlignmentResult, output_path: str) -> None:
         word_raw, total_end, pad_sec=0.10
     )
 
+    # Check if reconciled words exist
+    reconciled_raw = []
+    has_reconciled = False
+    for v in alignment.verses:
+        for w in v.words:
+            rec_text = getattr(w, "reconciled_word", "") or w.word
+            if getattr(w, "reconciled_word", ""):
+                has_reconciled = True
+            reconciled_raw.append(
+                {"start_sec": w.start_sec, "end_sec": w.end_sec, "text": rec_text}
+            )
+
+    tier_count = 5 if has_reconciled else 4
+
     # Build Tier 4: Raw ASR Emissions (Original model output tokens)
     raw_token_items = [
         {
@@ -159,7 +173,7 @@ def export_praat_textgrid(alignment: AlignmentResult, output_path: str) -> None:
         "xmin = 0",
         f"xmax = {total_end:.3f}",
         "tiers? <exists>",
-        "size = 4",
+        f"size = {tier_count}",
         "item []:",
         "    item [1]:",
         '        class = "IntervalTier"',
@@ -221,9 +235,33 @@ def export_praat_textgrid(alignment: AlignmentResult, output_path: str) -> None:
             ]
         )
 
+    curr_item = 4
+    if has_reconciled:
+        reconciled_intervals = _build_contiguous_intervals(reconciled_raw, total_end)
+        lines.extend(
+            [
+                f"    item [{curr_item}]:",
+                '        class = "IntervalTier"',
+                '        name = "Reconciled Words"',
+                "        xmin = 0",
+                f"        xmax = {total_end:.3f}",
+                f"        intervals: size = {len(reconciled_intervals)}",
+            ]
+        )
+        for idx, (xmin, xmax, label) in enumerate(reconciled_intervals, 1):
+            lines.extend(
+                [
+                    f"        intervals [{idx}]:",
+                    f"            xmin = {xmin:.3f}",
+                    f"            xmax = {xmax:.3f}",
+                    f'            text = "{label}"',
+                ]
+            )
+        curr_item += 1
+
     lines.extend(
         [
-            "    item [4]:",
+            f"    item [{curr_item}]:",
             '        class = "IntervalTier"',
             '        name = "Raw ASR Emissions"',
             "        xmin = 0",

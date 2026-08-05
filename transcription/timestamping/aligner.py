@@ -22,6 +22,8 @@ class WordInterval:
     confidence: float = 1.0
     flagged: bool = False
     cherokee_syllabary: str = ""
+    reconciled_word: str = ""
+    emitted_word: str = ""
 
 
 @dataclass
@@ -60,6 +62,7 @@ def align_emissions_to_text(
     token_emissions: List[Dict[str, Any]],
     verses: List[Dict[str, Any]],
     audio_source: str = "",
+    reconcile: bool = False,
 ) -> AlignmentResult:
     """
     Lightweight CPU-based alignment function taking pre-computed emitted tokens
@@ -73,7 +76,9 @@ def align_emissions_to_text(
     Returns:
         AlignmentResult data structure.
     """
-    return align_tokens_to_verses(token_emissions, verses, audio_source=audio_source)
+    return align_tokens_to_verses(
+        token_emissions, verses, audio_source=audio_source, reconcile=reconcile
+    )
 
 
 def align_audio_segment(
@@ -84,6 +89,7 @@ def align_audio_segment(
     audio_source: str = "",
     skip_vad: bool = False,
     token_emissions: Optional[List[Dict[str, Any]]] = None,
+    reconcile: bool = False,
 ) -> AlignmentResult:
     """
     Exposes audio/emissions alignment for in-memory execution.
@@ -97,13 +103,14 @@ def align_audio_segment(
         audio_source: Optional label or path string for output metadata.
         skip_vad: If True, bypasses VAD audio pre-segmentation when operating on pre-cut audio clips.
         token_emissions: Pre-computed token emissions list (dicts with 'word', 'start_time', 'end_time', 'confidence').
+        reconcile: If True, performs phonological syllabary/ASR reconciliation on aligned words.
 
     Returns:
         AlignmentResult data structure.
     """
     if token_emissions is not None:
         return align_emissions_to_text(
-            token_emissions, verses, audio_source=audio_source
+            token_emissions, verses, audio_source=audio_source, reconcile=reconcile
         )
 
     if skip_vad:
@@ -164,7 +171,9 @@ def align_audio_segment(
                 model_obj: Any = model_or_fn
                 proc_obj: Any = processor
                 if proc_obj is None or model_obj is None:
-                    raise ValueError("Both model_or_fn and processor must be provided for PyTorch inference.")
+                    raise ValueError(
+                        "Both model_or_fn and processor must be provided for PyTorch inference."
+                    )
 
                 device = (
                     next(model_obj.parameters()).device
@@ -192,7 +201,9 @@ def align_audio_segment(
                 )
         token_emissions = extracted_tokens
 
-    return align_emissions_to_text(token_emissions, verses, audio_source=audio_source)
+    return align_emissions_to_text(
+        token_emissions, verses, audio_source=audio_source, reconcile=reconcile
+    )
 
 
 def compute_trigram_edit_cost(emissions_str: str, ground_truth_str: str) -> float:
@@ -395,6 +406,8 @@ def _align_words_char_range(
             ]
             avg_conf = float(np.mean(confidences)) if confidences else 1.0
 
+            tok_words = " ".join([t["word"] for t in matched_tokens[pj : pj + m_len]])
+
             fused_intervals.append(
                 WordInterval(
                     word=fused_gt_text,
@@ -403,6 +416,7 @@ def _align_words_char_range(
                     confidence=avg_conf,
                     flagged=avg_conf < 0.5,
                     cherokee_syllabary=syll_w,
+                    emitted_word=tok_words,
                 )
             )
 
@@ -413,6 +427,7 @@ def align_tokens_to_verses(
     token_emissions: List[Dict[str, Any]],
     verses: List[Dict[str, Any]],
     audio_source: str = "",
+    reconcile: bool = False,
 ) -> AlignmentResult:
     """
     Aligns raw CTC token emissions with global timestamps to ground-truth verses
@@ -549,7 +564,34 @@ def align_tokens_to_verses(
             word_intervals = _align_words_char_range(
                 raw_words, matched_tokens, raw_syllabary_words=raw_syllabary_words
             )
+
+            if reconcile and word_intervals:
+                from transcription.syllabary_enrichment import (
+                    align_character_syllable,
+                    reconcile_phonetics,
+                )
+
+                for w_int in word_intervals:
+                    target_emitted = w_int.emitted_word or emitted_text
+                    if w_int.cherokee_syllabary and target_emitted:
+                        align_pairs = align_character_syllable(
+                            w_int.cherokee_syllabary, target_emitted
+                        )
+                        base_trans = "".join([pair[0] for pair in align_pairs])
+                        try:
+                            w_int.reconciled_word = reconcile_phonetics(
+                                syllabary_text=w_int.cherokee_syllabary,
+                                base_transliteration=base_trans,
+                                emitted_text=target_emitted,
+                                aligned_pairs=align_pairs,
+                            )
+                        except Exception:
+                            w_int.reconciled_word = w_int.word
+                    else:
+                        w_int.reconciled_word = w_int.word
+
             token_idx = best_end_idx
+
         else:
             # Fallback if no matching tokens available in stream
             prev_end = aligned_verses[-1].end_sec if aligned_verses else 0.0
