@@ -269,6 +269,9 @@ def run_evaluation(
         )
 
         clean_eval_cache(device)
+        model.to("cpu")
+        del model
+        clean_eval_cache(device)
 
     ranking_df = pd.DataFrame(ranking)
     return rows_by_ckpt, ranking_df

@@ -8,6 +8,13 @@ Supports local CSV files, configurable local paths, and subprocess/OS-based call
 import os
 import re
 import sys
+
+# Prevent OpenMP duplicate initialization crash on macOS conda environments
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
+# Enable CPU fallback for ops missing native MPS implementation
+os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
+
+
 import json
 import shutil
 import subprocess
@@ -400,52 +407,49 @@ def build_vocabulary_and_processor(dfs, text_col, folder_model_files):
 
 def prepare_datasets(dfs, audio_col, text_col, processor):
     print("Preparing HuggingFace Datasets and interleaving train splits...")
+    import soundfile as sf
     from datasets import Features, Value, interleave_datasets
 
-    features = Features(
-        {"audio": Audio(sampling_rate=TARGET_SAMPLE_RATE), "sentence": Value("string")}
-    )
-
     def df_to_ds(df):
-        data_dict = {"audio": df[audio_col].tolist(), "sentence": df[text_col].tolist()}
-        return Dataset.from_dict(data_dict, features=features)
+        data_dict = {
+            "audio_path": df[audio_col].tolist(),
+            "sentence": df[text_col].tolist(),
+        }
+        return Dataset.from_dict(data_dict)
 
     def prepare_batch(batch):
-        audio = batch["audio"]
-        batch["input_values"] = processor(
-            audio["array"], sampling_rate=audio["sampling_rate"]
-        ).input_values[0]
+        audio_array, sr = sf.read(batch["audio_path"])
+        batch["input_values"] = processor(audio_array, sampling_rate=sr).input_values[0]
         batch["input_length"] = len(batch["input_values"])
-        with processor.as_target_processor():
-            batch["labels"] = processor(batch["sentence"]).input_ids
+        batch["labels"] = processor(text=batch["sentence"]).input_ids
         return batch
 
     # Prepare individual splits
     ds_train_orig = df_to_ds(dfs["train_orig"]).map(
-        prepare_batch, remove_columns=["audio", "sentence"], num_proc=1
+        prepare_batch, remove_columns=["audio_path", "sentence"], num_proc=1
     )
     ds_train_bible = df_to_ds(dfs["train_bible"]).map(
-        prepare_batch, remove_columns=["audio", "sentence"], num_proc=1
+        prepare_batch, remove_columns=["audio_path", "sentence"], num_proc=1
     )
 
     ds_valid_orig = df_to_ds(dfs["valid_orig"]).map(
-        prepare_batch, remove_columns=["audio", "sentence"], num_proc=1
+        prepare_batch, remove_columns=["audio_path", "sentence"], num_proc=1
     )
     ds_valid_bible = df_to_ds(dfs["valid_bible"]).map(
-        prepare_batch, remove_columns=["audio", "sentence"], num_proc=1
+        prepare_batch, remove_columns=["audio_path", "sentence"], num_proc=1
     )
 
     ds_test_orig = df_to_ds(dfs["test_orig"]).map(
         prepare_batch,
         remove_columns=[
-            c for c in ["audio"] if c in df_to_ds(dfs["test_orig"]).column_names
+            c for c in ["audio_path"] if c in df_to_ds(dfs["test_orig"]).column_names
         ],
         num_proc=1,
     )
     ds_test_bible = df_to_ds(dfs["test_bible"]).map(
         prepare_batch,
         remove_columns=[
-            c for c in ["audio"] if c in df_to_ds(dfs["test_bible"]).column_names
+            c for c in ["audio_path"] if c in df_to_ds(dfs["test_bible"]).column_names
         ],
         num_proc=1,
     )
@@ -495,7 +499,8 @@ def initialize_model_and_trainer(processor, train_ds, valid_ds, folder_model_fil
         pad_token_id=processor.tokenizer.pad_token_id,
         vocab_size=len(processor.tokenizer),
     )
-    model.freeze_feature_encoder()
+
+    model.freeze_feature_encoder()  # type: ignore
 
     training_args = TrainingArguments(
         output_dir=folder_model_files,
@@ -515,7 +520,7 @@ def initialize_model_and_trainer(processor, train_ds, valid_ds, folder_model_fil
         load_best_model_at_end=True,
         metric_for_best_model="wer",
         greater_is_better=False,
-        train_sampling_strategy="group_by_length",
+        group_by_length=True,
         length_column_name="input_length",
         report_to="none",
         max_steps=CONFIG["max_steps"],
@@ -534,7 +539,7 @@ def initialize_model_and_trainer(processor, train_ds, valid_ds, folder_model_fil
         train_dataset=train_ds,
         eval_dataset=valid_ds,
         compute_metrics=compute_metrics,
-        processing_class=processor.feature_extractor,
+        tokenizer=processor.feature_extractor,
     )
 
     return trainer, data_collator
