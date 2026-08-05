@@ -198,4 +198,53 @@ def evaluate_checkpoints_dual(
 
 ```
 
-By decoupling pre-processing into a separate chapter-splitting script and handling interleaving inside `datasets`, your training code stays simple and your metrics remain cleanly isolated.
+
+---
+
+### 5. Audio Duration Analysis & Length Disparity Strategy
+
+#### Empirically Verified Dataset Durations
+
+| Dataset Split | Rows | Mean Audio Duration | Total Duration (Min / Hrs) |
+| :--- | :---: | :---: | :---: |
+| **`train_orig`** | 3,749 | 2.55s (max 10.8s) | 159.52 min (2.66 hrs) |
+| **`valid_orig`** | 186 | 3.71s (max 7.3s) | 11.50 min (0.19 hrs) |
+| **`test_orig`** | 185 | 3.72s (max 8.5s) | 11.46 min (0.19 hrs) |
+| **`train_bible`** | 1,395 | 14.38s (max 46.0s) | 334.30 min (5.57 hrs) |
+| **`valid_bible`** | 182 | 14.95s (max 32.2s) | 45.34 min (0.76 hrs) |
+| **`test_bible`** | 172 | 14.59s (max 34.8s) | 41.81 min (0.70 hrs) |
+| **Grand Total** | **5,869** | — | **603.93 min (10.07 hrs)** |
+
+#### Key Length Disparity Issues & Mitigations
+
+1. **Padding Waste & Memory Overhead**:
+   * *Issue*: Combining ~2.5s original audio samples with ~14s Bible verse audio in the same batch causes ~87% zero-padding bloat.
+   * *Mitigation*: Enable `group_by_length=True` in `TrainingArguments`. This buckets samples of similar input lengths together into the same batch, eliminating padding bloat and stabilizing GPU memory usage.
+
+2. **CTC Loss Gradient Dominance**:
+   * *Issue*: CTC loss sums over acoustic frames. A 14s Bible audio item produces ~5x more frames than a 2.5s item, contributing ~5x more gradient weight per step.
+   * *Mitigation*: Enable `group_by_length=True` and use gradient accumulation steps (`gradient_accumulation_steps=2` or `4`) to smooth out gradient updates across batches.
+
+3. **Audio Cutoff Threshold**:
+   * *Decision*: Keep strict `MAX_INPUT_LENGTH = TARGET_SAMPLE_RATE * 20` (20-second cutoff).
+   * *Impact*: Drops 0% of original samples and filters out 236 Bible samples (>20s) to prevent memory spikes and extreme sequence lengths during training.
+
+---
+
+By decoupling pre-processing into a separate chapter-splitting script, enabling length-grouped batching, and handling interleaving inside `datasets`, your training code stays simple and your metrics remain cleanly isolated.
+
+---
+
+### 6. Next Steps
+
+1. **Update `trainer_w2v2_local.py`**:
+   * Add arguments for all 6 CSV paths (`--train-orig-csv`, `--train-bible-csv`, `--valid-orig-csv`, `--valid-bible-csv`, `--test-orig-csv`, `--test-bible-csv`).
+   * Implement `interleave_datasets` for training streams with `probabilities=[0.5, 0.5]`.
+   * Update evaluation functions to perform dual post-training evaluations on both `test_orig` and `test_bible`.
+   * Configure `group_by_length=True` and maintain `MAX_INPUT_LENGTH = TARGET_SAMPLE_RATE * 20` (20s max cutoff) in trainer settings.
+
+2. **Dry Run Trainer Setup**:
+   * Run a 1-epoch dry run with `--max-steps 10` to verify data collator, batching, and dual-evaluation pipelines run without errors or OOMs.
+
+3. **Launch Multi-Domain Fine-Tuning**:
+   * Initiate full training run and monitor validation metrics across both original and Bible validation sets.

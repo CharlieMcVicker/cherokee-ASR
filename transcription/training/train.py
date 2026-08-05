@@ -38,9 +38,12 @@ chars_to_remove_regex = r"[\,\?\.\!\-\;\:\"\“\%\”\\(\)\[\]\{\}«»…]"
 
 # CONFIGURATION DICTIONARY
 CONFIG = {
-    "train_csv": "training_data/processed/cim-wav2vec2-train.csv",
-    "valid_csv": "training_data/processed/cim-wav2vec2-valid.csv",
-    "test_csv": "training_data/processed/cim-wav2vec2-test.csv",
+    "train_orig_csv": "training_data/processed/cim-wav2vec2-train.csv",
+    "train_bible_csv": "training_data/processed/bible-wav2vec2-train.csv",
+    "valid_orig_csv": "training_data/processed/cim-wav2vec2-valid.csv",
+    "valid_bible_csv": "training_data/processed/bible-wav2vec2-valid.csv",
+    "test_orig_csv": "training_data/processed/cim-wav2vec2-test.csv",
+    "test_bible_csv": "training_data/processed/bible-wav2vec2-test.csv",
     "audio_dir": "training_data/processed/sentence_audio",
     "output_dir": "output_w2v2",
     "base_checkpoint": "facebook/wav2vec2-large-xlsr-53",
@@ -168,22 +171,40 @@ def parse_args():
         description="Train Wav2Vec2 on local or remote machine."
     )
     parser.add_argument(
-        "--train-csv",
+        "--train-orig-csv",
         type=str,
-        default=CONFIG["train_csv"],
-        help="Path to training CSV split.",
+        default=CONFIG["train_orig_csv"],
+        help="Path to original training CSV split.",
     )
     parser.add_argument(
-        "--valid-csv",
+        "--train-bible-csv",
         type=str,
-        default=CONFIG["valid_csv"],
-        help="Path to validation CSV split.",
+        default=CONFIG["train_bible_csv"],
+        help="Path to Bible training CSV split.",
     )
     parser.add_argument(
-        "--test-csv",
+        "--valid-orig-csv",
         type=str,
-        default=CONFIG["test_csv"],
-        help="Path to test CSV split.",
+        default=CONFIG["valid_orig_csv"],
+        help="Path to original validation CSV split.",
+    )
+    parser.add_argument(
+        "--valid-bible-csv",
+        type=str,
+        default=CONFIG["valid_bible_csv"],
+        help="Path to Bible validation CSV split.",
+    )
+    parser.add_argument(
+        "--test-orig-csv",
+        type=str,
+        default=CONFIG["test_orig_csv"],
+        help="Path to original test CSV split.",
+    )
+    parser.add_argument(
+        "--test-bible-csv",
+        type=str,
+        default=CONFIG["test_bible_csv"],
+        help="Path to Bible test CSV split.",
     )
     parser.add_argument(
         "--audio-dir",
@@ -252,9 +273,12 @@ def parse_args():
     )
     args = parser.parse_args()
 
-    CONFIG["train_csv"] = args.train_csv
-    CONFIG["valid_csv"] = args.valid_csv
-    CONFIG["test_csv"] = args.test_csv
+    CONFIG["train_orig_csv"] = args.train_orig_csv
+    CONFIG["train_bible_csv"] = args.train_bible_csv
+    CONFIG["valid_orig_csv"] = args.valid_orig_csv
+    CONFIG["valid_bible_csv"] = args.valid_bible_csv
+    CONFIG["test_orig_csv"] = args.test_orig_csv
+    CONFIG["test_bible_csv"] = args.test_bible_csv
     CONFIG["audio_dir"] = args.audio_dir
     CONFIG["output_dir"] = args.output_dir
     CONFIG["epochs"] = args.epochs
@@ -302,40 +326,43 @@ def setup_directories():
 
 
 def load_and_prepare_csvs():
-    print("Loading CSVs...")
-    df_train = _try_read_csv(CONFIG["train_csv"])
-    df_valid = _try_read_csv(CONFIG["valid_csv"])
-    df_test = _try_read_csv(CONFIG["test_csv"])
+    print("Loading 6 CSV splits...")
+    dfs = {
+        "train_orig": _try_read_csv(CONFIG["train_orig_csv"]),
+        "train_bible": _try_read_csv(CONFIG["train_bible_csv"]),
+        "valid_orig": _try_read_csv(CONFIG["valid_orig_csv"]),
+        "valid_bible": _try_read_csv(CONFIG["valid_bible_csv"]),
+        "test_orig": _try_read_csv(CONFIG["test_orig_csv"]),
+        "test_bible": _try_read_csv(CONFIG["test_bible_csv"]),
+    }
 
     audio_col, text_col = _detect_columns(
-        df_train, CONFIG["audio_column"], CONFIG["text_column"]
+        dfs["train_orig"], CONFIG["audio_column"], CONFIG["text_column"]
     )
-    print(f"Using audio column: '{audio_col}' | text column: '{text_col}'")
-    print(f"Sizes: Train={len(df_train)}, Valid={len(df_valid)}, Test={len(df_test)}")
+    print(f"Detected columns -> Audio: '{audio_col}' | Text: '{text_col}'")
 
-    for df in (df_train, df_valid, df_test):
+    for key, df in dfs.items():
         df[audio_col] = df[audio_col].apply(
             lambda p: _resolve_audio_path(p, CONFIG["audio_dir"])
         )
         df[text_col] = df[text_col].apply(normalize_text)
         df.dropna(subset=[audio_col, text_col], inplace=True)
+        print(f"Split {key}: {len(df)} samples")
 
-    missing = [p for p in df_train[audio_col].tolist()[:50] if not os.path.exists(p)]
+    missing = [
+        p for p in dfs["train_orig"][audio_col].tolist()[:50] if not os.path.exists(p)
+    ]
     if missing:
         print("WARNING: some audio files not found, e.g.:", missing[:5])
     else:
         print("Audio path checks passed (sampled).")
 
-    return df_train, df_valid, df_test, audio_col, text_col
+    return dfs, audio_col, text_col
 
 
-def build_vocabulary_and_processor(
-    df_train, df_valid, df_test, text_col, folder_model_files
-):
-    print("Building vocabulary...")
-    all_text = " ".join(
-        pd.concat([df_train[text_col], df_valid[text_col], df_test[text_col]]).tolist()
-    )
+def build_vocabulary_and_processor(dfs, text_col, folder_model_files):
+    print("Building vocabulary across all 6 CSV splits...")
+    all_text = " ".join(pd.concat([df[text_col] for df in dfs.values()]).tolist())
     vocab = sorted(set(all_text))
     vocab_dict = {v: k for k, v in enumerate(vocab)}
     if " " in vocab_dict:
@@ -371,9 +398,9 @@ def build_vocabulary_and_processor(
     return processor
 
 
-def prepare_datasets(df_train, df_valid, df_test, audio_col, text_col, processor):
-    print("Preparing HuggingFace Datasets...")
-    from datasets import Features, Value
+def prepare_datasets(dfs, audio_col, text_col, processor):
+    print("Preparing HuggingFace Datasets and interleaving train splits...")
+    from datasets import Features, Value, interleave_datasets
 
     features = Features(
         {"audio": Audio(sampling_rate=TARGET_SAMPLE_RATE), "sentence": Value("string")}
@@ -381,12 +408,7 @@ def prepare_datasets(df_train, df_valid, df_test, audio_col, text_col, processor
 
     def df_to_ds(df):
         data_dict = {"audio": df[audio_col].tolist(), "sentence": df[text_col].tolist()}
-        ds = Dataset.from_dict(data_dict, features=features)
-        return ds
-
-    train_ds = df_to_ds(df_train)
-    valid_ds = df_to_ds(df_valid)
-    test_ds = df_to_ds(df_test)
+        return Dataset.from_dict(data_dict, features=features)
 
     def prepare_batch(batch):
         audio = batch["audio"]
@@ -398,16 +420,42 @@ def prepare_datasets(df_train, df_valid, df_test, audio_col, text_col, processor
             batch["labels"] = processor(batch["sentence"]).input_ids
         return batch
 
-    train_ds = train_ds.map(
-        prepare_batch, remove_columns=train_ds.column_names, num_proc=1
+    # Prepare individual splits
+    ds_train_orig = df_to_ds(dfs["train_orig"]).map(
+        prepare_batch, remove_columns=["audio", "sentence"], num_proc=1
     )
-    valid_ds = valid_ds.map(
-        prepare_batch, remove_columns=valid_ds.column_names, num_proc=1
+    ds_train_bible = df_to_ds(dfs["train_bible"]).map(
+        prepare_batch, remove_columns=["audio", "sentence"], num_proc=1
     )
-    test_ds_prepared = test_ds.map(
+
+    ds_valid_orig = df_to_ds(dfs["valid_orig"]).map(
+        prepare_batch, remove_columns=["audio", "sentence"], num_proc=1
+    )
+    ds_valid_bible = df_to_ds(dfs["valid_bible"]).map(
+        prepare_batch, remove_columns=["audio", "sentence"], num_proc=1
+    )
+
+    ds_test_orig = df_to_ds(dfs["test_orig"]).map(
         prepare_batch,
-        remove_columns=[c for c in test_ds.column_names if c != "sentence"],
+        remove_columns=[
+            c for c in ["audio"] if c in df_to_ds(dfs["test_orig"]).column_names
+        ],
         num_proc=1,
+    )
+    ds_test_bible = df_to_ds(dfs["test_bible"]).map(
+        prepare_batch,
+        remove_columns=[
+            c for c in ["audio"] if c in df_to_ds(dfs["test_bible"]).column_names
+        ],
+        num_proc=1,
+    )
+
+    # 1. Live 50/50 Interleaved Train Stream
+    train_ds = interleave_datasets(
+        [ds_train_orig, ds_train_bible],
+        probabilities=[0.5, 0.5],
+        seed=42,
+        stopping_strategy="all_exhausted",
     )
 
     MAX_INPUT_LENGTH = TARGET_SAMPLE_RATE * 20
@@ -415,7 +463,10 @@ def prepare_datasets(df_train, df_valid, df_test, audio_col, text_col, processor
         lambda x: x < MAX_INPUT_LENGTH, input_columns=["input_length"]
     )
 
-    return train_ds, valid_ds, test_ds_prepared
+    # 2. Validation set strategy: Anchor on original domain for early stopping
+    valid_ds = ds_valid_orig
+
+    return train_ds, valid_ds, ds_test_orig, ds_test_bible
 
 
 def initialize_model_and_trainer(processor, train_ds, valid_ds, folder_model_files):
@@ -464,6 +515,8 @@ def initialize_model_and_trainer(processor, train_ds, valid_ds, folder_model_fil
         load_best_model_at_end=True,
         metric_for_best_model="wer",
         greater_is_better=False,
+        train_sampling_strategy="group_by_length",
+        length_column_name="input_length",
         report_to="none",
         max_steps=CONFIG["max_steps"],
         push_to_hub=CONFIG["push_to_hub"],
@@ -567,25 +620,40 @@ def train_model(trainer, resume_checkpoint, folder_model_files, processor):
     print("Training complete. Base model saved.")
 
 
-def evaluate_checkpoints(
-    folder_model_files, test_ds_prepared, data_collator, processor
+def evaluate_checkpoints_dual(
+    folder_model_files, test_orig_ds, test_bible_ds, data_collator, processor
 ):
-    print("Starting post-training evaluation of checkpoints...")
+    print("\n==========================================")
+    print("STARTING DISAGGREGATED POST-TRAINING EVALUATION")
+    print("==========================================\n")
     from transcription.utils.evaluation import yield_local_checkpoints, run_evaluation
 
-    generator = yield_local_checkpoints(
+    # Pass 1: Original Test Set (Baseline Progress & Forgetfulness Anchor)
+    print("Evaluating checkpoints on ORIGINAL Test Set...")
+    gen_orig = yield_local_checkpoints(
         folder_model_files, processor_path=folder_model_files
     )
-
-    rows_by_ckpt, ranking_df = run_evaluation(
-        generator,
-        test_ds_prepared,
+    rows_orig, ranking_orig = run_evaluation(
+        gen_orig,
+        test_orig_ds,
         data_collator,
         batch_size=CONFIG.get("eval_batch_size", 16),
     )
 
-    # Find the best unmasked checkpoint
-    ranking_unmasked = ranking_df.sort_values(
+    # Pass 2: Bible Test Set (Unseen Chapters/Books)
+    print("Evaluating checkpoints on BIBLE Test Set...")
+    gen_bible = yield_local_checkpoints(
+        folder_model_files, processor_path=folder_model_files
+    )
+    rows_bible, ranking_bible = run_evaluation(
+        gen_bible,
+        test_bible_ds,
+        data_collator,
+        batch_size=CONFIG.get("eval_batch_size", 16),
+    )
+
+    # Summarize best checkpoints on original test set
+    ranking_unmasked = ranking_orig.sort_values(
         by=[
             "median_wer_greedy",
             "median_cer_greedy",
@@ -597,8 +665,7 @@ def evaluate_checkpoints(
     best_unmasked_ckpt = ranking_unmasked.iloc[0]["checkpoint"]
     best_unmasked_wer = ranking_unmasked.iloc[0]["agg_wer_greedy"]
 
-    # Find the best masked checkpoint
-    ranking_masked = ranking_df.sort_values(
+    ranking_masked = ranking_orig.sort_values(
         by=[
             "median_wer_greedy_masked",
             "median_cer_greedy_masked",
@@ -611,7 +678,7 @@ def evaluate_checkpoints(
     best_masked_wer = ranking_masked.iloc[0]["agg_wer_greedy_masked"]
 
     print(f"\n==========================================")
-    print(f"EVALUATION SUMMARY:")
+    print(f"ORIGINAL TEST SET EVALUATION SUMMARY:")
     print(
         f"Best Unmasked Checkpoint: {best_unmasked_ckpt} (WER: {best_unmasked_wer:.4f})"
     )
@@ -619,9 +686,9 @@ def evaluate_checkpoints(
     print(f"==========================================\n")
 
     best_ckpt_label = best_unmasked_ckpt
-    best_ckpt_path = ranking_df[ranking_df["checkpoint"] == best_ckpt_label].iloc[0][
-        "path"
-    ]
+    best_ckpt_path = ranking_orig[ranking_orig["checkpoint"] == best_ckpt_label].iloc[
+        0
+    ]["path"]
 
     return (
         best_unmasked_ckpt,
@@ -630,8 +697,10 @@ def evaluate_checkpoints(
         best_masked_wer,
         best_ckpt_label,
         best_ckpt_path,
-        rows_by_ckpt,
-        ranking_df,
+        rows_orig,
+        ranking_orig,
+        rows_bible,
+        ranking_bible,
     )
 
 
@@ -658,8 +727,10 @@ def promote_best_checkpoint(
 
 
 def save_results_summary(
-    rows_by_ckpt,
-    ranking_df,
+    rows_orig,
+    ranking_orig,
+    rows_bible,
+    ranking_bible,
     best_unmasked_ckpt,
     best_unmasked_wer,
     best_masked_ckpt,
@@ -667,16 +738,29 @@ def save_results_summary(
     best_ckpt_label,
     folder_log_files,
 ):
-    all_rows = []
-    for ckpt_label, rows in rows_by_ckpt.items():
-        all_rows.extend(rows)
-    results_df = pd.DataFrame(all_rows)
-
     output_prefix = f"{CONFIG['asr_lang']}-wav2vec2"
-    per_sentence_csv = os.path.join(
-        folder_log_files, f"{output_prefix}-run{CONFIG['run_id']}-test-results.csv"
+
+    # Original test set results
+    all_rows_orig = []
+    for ckpt_label, rows in rows_orig.items():
+        all_rows_orig.extend(rows)
+    results_orig_df = pd.DataFrame(all_rows_orig)
+    per_sentence_orig_csv = os.path.join(
+        folder_log_files,
+        f"{output_prefix}-run{CONFIG['run_id']}-orig-test-results.csv",
     )
-    results_df.to_csv(per_sentence_csv, index=False, encoding="utf-8")
+    results_orig_df.to_csv(per_sentence_orig_csv, index=False, encoding="utf-8")
+
+    # Bible test set results
+    all_rows_bible = []
+    for ckpt_label, rows in rows_bible.items():
+        all_rows_bible.extend(rows)
+    results_bible_df = pd.DataFrame(all_rows_bible)
+    per_sentence_bible_csv = os.path.join(
+        folder_log_files,
+        f"{output_prefix}-run{CONFIG['run_id']}-bible-test-results.csv",
+    )
+    results_bible_df.to_csv(per_sentence_bible_csv, index=False, encoding="utf-8")
 
     summary_txt = os.path.join(
         folder_log_files, f"{output_prefix}-run{CONFIG['run_id']}-summary.txt"
@@ -684,25 +768,24 @@ def save_results_summary(
     with open(summary_txt, "w", encoding="utf-8") as f:
         f.write(f"ASR Language: {CONFIG['asr_lang']}\nRun ID: {CONFIG['run_id']}\n")
         f.write(
-            f"Best Unmasked Checkpoint: {best_unmasked_ckpt} (WER: {best_unmasked_wer:.4f})\n"
+            f"Best Unmasked Checkpoint (Orig): {best_unmasked_ckpt} (WER: {best_unmasked_wer:.4f})\n"
         )
         f.write(
-            f"Best Masked Checkpoint:   {best_masked_ckpt} (WER: {best_masked_wer:.4f})\n"
+            f"Best Masked Checkpoint (Orig):   {best_masked_ckpt} (WER: {best_masked_wer:.4f})\n"
         )
-        f.write(f"Promoted checkpoint: {best_ckpt_label}\n")
-        f.write(f"Ranking:\n{ranking_df.to_string()}\n")
+        f.write(f"Promoted checkpoint: {best_ckpt_label}\n\n")
+        f.write(f"ORIGINAL TEST SET RANKING:\n{ranking_orig.to_string()}\n\n")
+        f.write(f"BIBLE TEST SET RANKING:\n{ranking_bible.to_string()}\n")
     print(f"Summary written to {summary_txt}")
 
 
 def main():
     args = parse_args()
     folder_log_files, folder_model_files = setup_directories()
-    df_train, df_valid, df_test, audio_col, text_col = load_and_prepare_csvs()
-    processor = build_vocabulary_and_processor(
-        df_train, df_valid, df_test, text_col, folder_model_files
-    )
-    train_ds, valid_ds, test_ds_prepared = prepare_datasets(
-        df_train, df_valid, df_test, audio_col, text_col, processor
+    dfs, audio_col, text_col = load_and_prepare_csvs()
+    processor = build_vocabulary_and_processor(dfs, text_col, folder_model_files)
+    train_ds, valid_ds, ds_test_orig, ds_test_bible = prepare_datasets(
+        dfs, audio_col, text_col, processor
     )
     resume_checkpoint = resolve_resume_checkpoint(args, folder_model_files)
     trainer, data_collator = initialize_model_and_trainer(
@@ -717,10 +800,12 @@ def main():
         best_masked_wer,
         best_ckpt_label,
         best_ckpt_path,
-        rows_by_ckpt,
-        ranking_df,
-    ) = evaluate_checkpoints(
-        folder_model_files, test_ds_prepared, data_collator, processor
+        rows_orig,
+        ranking_orig,
+        rows_bible,
+        ranking_bible,
+    ) = evaluate_checkpoints_dual(
+        folder_model_files, ds_test_orig, ds_test_bible, data_collator, processor
     )
 
     promote_best_checkpoint(
@@ -728,8 +813,10 @@ def main():
     )
 
     save_results_summary(
-        rows_by_ckpt,
-        ranking_df,
+        rows_orig,
+        ranking_orig,
+        rows_bible,
+        ranking_bible,
         best_unmasked_ckpt,
         best_unmasked_wer,
         best_masked_ckpt,
