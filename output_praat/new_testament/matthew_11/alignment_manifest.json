@@ -1,0 +1,3245 @@
+{
+  "audio_source": "/Users/julietmcvicker/code/workshop-transcription/cherokee_new_testament/audio_source/matthew_11.mp3",
+  "metrics": {
+    "total_verses": 30,
+    "matched_verses": 30,
+    "matched_verse_ratio": 1.0,
+    "overall_cer": 0.1467,
+    "mean_verse_cer": 0.142,
+    "total_ground_truth_chars": 3470,
+    "total_emitted_chars": 3655
+  },
+  "lines": [
+    {
+      "line_id": "011101",
+      "cherokee_syllabary": "ᎯᎠᏃ ᏄᎵᏍᏔᏅᎩ; ᏥᏌ ᎤᏍᏆᏛ ᏕᎧᏁᏤᎲ ᏔᎳᏚ ᎢᏯᏂᏛ ᎬᏩᏍᏓᏩᏗᏙᎯ, ᎤᏂᎩᏒᎩ ᎾᎿᎭᏂ, ᏚᏕᏲᎤᏒᎩ ᎠᎴ ᎤᎵᏥᏙᏅᏒᎩ ᏚᏂᏚᎿᎭᎥᎢ.",
+      "text": "Hi-a-no nu-li-s-ta-nv-gi; Tsi-sa u-s-qua-dv de-ka-ne-tse-hv ta-la-du i-ya-ni-dv gv-wa-s-da-wa-di-do-hi, u-ni-gi-sv-gi na-hna-ni, du-de-yo-u-sv-gi a-le u-li-tsi-do-nv-sv-gi du-ni-du-hna-v-i.",
+      "english": "And it came to pass, when Jesus had made an end of commanding his twelve disciples, he departed thence to teach and to preach in their cities.",
+      "start": 4.255,
+      "end": 20.38,
+      "cer": 0.0923,
+      "emitted_text": "hi'anho nulhsthanvki tsihsa uhskwa'tv tekhanetsehv thalatu iyanita kvwhstakwatitohi unhikihsvki nanhani vi tuteyhonhvhsvki ale ulhtsatonvhvki tunitunha'v'i",
+      "words": [
+        {
+          "word": "Hi-a-no",
+          "start": 4.255,
+          "end": 4.575,
+          "confidence": 0.8728691254343305,
+          "flagged": false,
+          "syllabary_word": "ᎯᎠᏃ"
+        },
+        {
+          "word": "nu-li-s-ta-nv-gi;",
+          "start": 4.655,
+          "end": 5.495,
+          "confidence": 0.9886169483264288,
+          "flagged": false,
+          "syllabary_word": "ᏄᎵᏍᏔᏅᎩ;"
+        },
+        {
+          "word": "Tsi-sa",
+          "start": 6.12,
+          "end": 6.48,
+          "confidence": 0.9997945626576742,
+          "flagged": false,
+          "syllabary_word": "ᏥᏌ"
+        },
+        {
+          "word": "u-s-qua-dv",
+          "start": 6.58,
+          "end": 7.02,
+          "confidence": 0.973490403758155,
+          "flagged": false,
+          "syllabary_word": "ᎤᏍᏆᏛ"
+        },
+        {
+          "word": "de-ka-ne-tse-hv",
+          "start": 7.88,
+          "end": 8.74,
+          "confidence": 0.997845783829689,
+          "flagged": false,
+          "syllabary_word": "ᏕᎧᏁᏤᎲ"
+        },
+        {
+          "word": "ta-la-du",
+          "start": 8.9,
+          "end": 9.32,
+          "confidence": 0.9601490327290126,
+          "flagged": false,
+          "syllabary_word": "ᏔᎳᏚ"
+        },
+        {
+          "word": "i-ya-ni-dv",
+          "start": 9.46,
+          "end": 10.0,
+          "confidence": 0.9929772700582232,
+          "flagged": false,
+          "syllabary_word": "ᎢᏯᏂᏛ"
+        },
+        {
+          "word": "gv-wa-s-da-wa-di-do-hi,",
+          "start": 10.28,
+          "end": 11.42,
+          "confidence": 0.984891016036272,
+          "flagged": false,
+          "syllabary_word": "ᎬᏩᏍᏓᏩᏗᏙᎯ,"
+        },
+        {
+          "word": "u-ni-gi-sv-gi",
+          "start": 12.575,
+          "end": 13.415,
+          "confidence": 0.9636416381055658,
+          "flagged": false,
+          "syllabary_word": "ᎤᏂᎩᏒᎩ"
+        },
+        {
+          "word": "na-hna-ni,",
+          "start": 13.595,
+          "end": 14.175,
+          "confidence": 0.9706851669720241,
+          "flagged": false,
+          "syllabary_word": "ᎾᎿᎭᏂ,"
+        },
+        {
+          "word": "du-de-yo-u-sv-gi",
+          "start": 14.69,
+          "end": 16.475,
+          "confidence": 0.7389834980169931,
+          "flagged": false,
+          "syllabary_word": "ᏚᏕᏲᎤᏒᎩ"
+        },
+        {
+          "word": "a-le",
+          "start": 16.815,
+          "end": 17.015,
+          "confidence": 0.9882790446281433,
+          "flagged": false,
+          "syllabary_word": "ᎠᎴ"
+        },
+        {
+          "word": "u-li-tsi-do-nv-sv-gi",
+          "start": 17.335,
+          "end": 18.475,
+          "confidence": 0.9377856765474591,
+          "flagged": false,
+          "syllabary_word": "ᎤᎵᏥᏙᏅᏒᎩ"
+        },
+        {
+          "word": "du-ni-du-hna-v-i.",
+          "start": 19.18,
+          "end": 20.38,
+          "confidence": 0.9812059035668006,
+          "flagged": false,
+          "syllabary_word": "ᏚᏂᏚᎿᎭᎥᎢ."
+        }
+      ]
+    },
+    {
+      "line_id": "011102",
+      "cherokee_syllabary": "ᎿᎭᏉᏃ ᏣᏂ ᏣᏥᏍᏚᎲ ᏧᏛᎦᏅ ᏄᏍᏛ ᏚᎸᏫᏍᏓᏁᎲ ᎦᎶᏁᏛ, ᏙᏧᏅᏎ ᎠᏂᏔᎵ ᎬᏩᏍᏓᏩᏗᏙᎯ,",
+      "text": "Hna-quo-no Tsa-ni tsa-tsi-s-du-hv tsu-dv-ga-nv nu-s-dv du-lv-wi-s-da-ne-hv Ga-lo-ne-dv, do-tsu-nv-se a-ni-ta-li gv-wa-s-da-wa-di-do-hi,",
+      "english": "Now when John had heard in the prison the works of Christ, he sent two of his disciples,",
+      "start": 21.185,
+      "end": 32.65,
+      "cer": 0.0737,
+      "emitted_text": "nakwunho tsani tsatsihstuhv tsuthvkana nukhstv tulvwhihstanehv kaloneta i totsunvhse anitha'li kvwhstawatitohi",
+      "words": [
+        {
+          "word": "Hna-quo-no",
+          "start": 21.185,
+          "end": 21.625,
+          "confidence": 0.9529303833842278,
+          "flagged": false,
+          "syllabary_word": "ᎿᎭᏉᏃ"
+        },
+        {
+          "word": "Tsa-ni",
+          "start": 21.705,
+          "end": 22.165,
+          "confidence": 0.9999586343765259,
+          "flagged": false,
+          "syllabary_word": "ᏣᏂ"
+        },
+        {
+          "word": "tsa-tsi-s-du-hv",
+          "start": 22.555,
+          "end": 23.375,
+          "confidence": 0.9758104483286539,
+          "flagged": false,
+          "syllabary_word": "ᏣᏥᏍᏚᎲ"
+        },
+        {
+          "word": "tsu-dv-ga-nv",
+          "start": 23.695,
+          "end": 24.595,
+          "confidence": 0.999790894985199,
+          "flagged": false,
+          "syllabary_word": "ᏧᏛᎦᏅ"
+        },
+        {
+          "word": "nu-s-dv",
+          "start": 25.385,
+          "end": 25.865,
+          "confidence": 0.9771893790790013,
+          "flagged": false,
+          "syllabary_word": "ᏄᏍᏛ"
+        },
+        {
+          "word": "du-lv-wi-s-da-ne-hv",
+          "start": 26.285,
+          "end": 27.525,
+          "confidence": 0.9811411142349243,
+          "flagged": false,
+          "syllabary_word": "ᏚᎸᏫᏍᏓᏁᎲ"
+        },
+        {
+          "word": "Ga-lo-ne-dv,",
+          "start": 27.785,
+          "end": 28.385,
+          "confidence": 0.999892957508564,
+          "flagged": false,
+          "syllabary_word": "ᎦᎶᏁᏛ,"
+        },
+        {
+          "word": "do-tsu-nv-se",
+          "start": 29.1,
+          "end": 30.39,
+          "confidence": 0.6867118746042251,
+          "flagged": false,
+          "syllabary_word": "ᏙᏧᏅᏎ"
+        },
+        {
+          "word": "a-ni-ta-li",
+          "start": 30.63,
+          "end": 31.23,
+          "confidence": 0.8702222771114774,
+          "flagged": false,
+          "syllabary_word": "ᎠᏂᏔᎵ"
+        },
+        {
+          "word": "gv-wa-s-da-wa-di-do-hi,",
+          "start": 31.57,
+          "end": 32.65,
+          "confidence": 0.9822251915931701,
+          "flagged": false,
+          "syllabary_word": "ᎬᏩᏍᏓᏩᏗᏙᎯ,"
+        }
+      ]
+    },
+    {
+      "line_id": "011103",
+      "cherokee_syllabary": "ᎯᎠ ᏅᏓᏳᏪᏎᎸᎩ; ᏂᎯᏍᎪ Ꮎ ᎤᎷᎯᏍᏗ ᏥᎩ, ᏥᎪᎨ ᏅᏩᏓᎴ ᎣᏥᎦᏖᏃᎮᏍᏗ?",
+      "text": "Hi-a nv-da-yu-we-se-lv-gi; Ni-hi-s-go na u-lu-hi-s-di tsi-gi, tsi-go-ge nv-wa-da-le o-tsi-ga-te-no-he-s-di?",
+      "english": "And said unto him, Art thou he that should come, or do we look for another?",
+      "start": 33.68,
+      "end": 45.86,
+      "cer": 0.0959,
+      "emitted_text": "hi'a v nitayuwehselvki nihihsko na uluhihsti' tsiki yikokhe nvwtale tsikathenohehsti",
+      "words": [
+        {
+          "word": "Hi-a",
+          "start": 33.68,
+          "end": 33.96,
+          "confidence": 0.9999559819698334,
+          "flagged": false,
+          "syllabary_word": "ᎯᎠ"
+        },
+        {
+          "word": "nv-da-yu-we-se-lv-gi;",
+          "start": 34.39,
+          "end": 36.325,
+          "confidence": 0.7022610535224278,
+          "flagged": false,
+          "syllabary_word": "ᏅᏓᏳᏪᏎᎸᎩ;"
+        },
+        {
+          "word": "Ni-hi-s-go",
+          "start": 37.735,
+          "end": 38.335,
+          "confidence": 0.9726087301969528,
+          "flagged": false,
+          "syllabary_word": "ᏂᎯᏍᎪ"
+        },
+        {
+          "word": "na",
+          "start": 38.755,
+          "end": 38.895,
+          "confidence": 0.9864758253097534,
+          "flagged": false,
+          "syllabary_word": "Ꮎ"
+        },
+        {
+          "word": "u-lu-hi-s-di",
+          "start": 39.515,
+          "end": 40.475,
+          "confidence": 0.927576196193695,
+          "flagged": false,
+          "syllabary_word": "ᎤᎷᎯᏍᏗ"
+        },
+        {
+          "word": "tsi-gi,",
+          "start": 40.965,
+          "end": 41.245,
+          "confidence": 0.9999419450759888,
+          "flagged": false,
+          "syllabary_word": "ᏥᎩ,"
+        },
+        {
+          "word": "tsi-go-ge",
+          "start": 42.325,
+          "end": 42.865,
+          "confidence": 0.968442269733974,
+          "flagged": false,
+          "syllabary_word": "ᏥᎪᎨ"
+        },
+        {
+          "word": "nv-wa-da-le",
+          "start": 43.68,
+          "end": 44.22,
+          "confidence": 0.9518573965345111,
+          "flagged": false,
+          "syllabary_word": "ᏅᏩᏓᎴ"
+        },
+        {
+          "word": "o-tsi-ga-te-no-he-s-di?",
+          "start": 44.66,
+          "end": 45.86,
+          "confidence": 0.992802020162344,
+          "flagged": false,
+          "syllabary_word": "ᎣᏥᎦᏖᏃᎮᏍᏗ?"
+        }
+      ]
+    },
+    {
+      "line_id": "011104",
+      "cherokee_syllabary": "ᏥᏌᏃ ᎤᏁᏨ ᎯᎠ ᏂᏚᏪᏎᎸᎩ; ᏥᏍᏕᎾ ᏣᏂ ᏫᎡᏍᏗᏃᎲᏏ ᏂᎦᎥ ᎢᏍᏓᏛᎩᏍᎬᎢ ᎠᎴ ᎢᏍᏗᎪᏩᏘᏍᎬᎢ:",
+      "text": "Tsi-sa-no u-ne-tsv hi-a ni-du-we-se-lv-gi; tsi-s-de-na Tsa-ni wi-e-s-di-no-hv-si ni-ga-v i-s-da-dv-gi-s-gv-i a-le i-s-di-go-wa-ti-s-gv-i:",
+      "english": "Jesus answered and said unto them, Go and shew John again those things which ye do hear and see:",
+      "start": 46.93,
+      "end": 60.77,
+      "cer": 0.0316,
+      "emitted_text": "kihsanho unhetsv hi'a nituwehselvki tsihstena tsani' wi'ehstinohvhsi nika'v ihstatshvkihskv'i ale ihstikowhahthihskv'i",
+      "words": [
+        {
+          "word": "Tsi-sa-no",
+          "start": 46.93,
+          "end": 47.35,
+          "confidence": 0.8933593779802322,
+          "flagged": false,
+          "syllabary_word": "ᏥᏌᏃ"
+        },
+        {
+          "word": "u-ne-tsv",
+          "start": 47.47,
+          "end": 48.03,
+          "confidence": 0.9900651233536857,
+          "flagged": false,
+          "syllabary_word": "ᎤᏁᏨ"
+        },
+        {
+          "word": "hi-a",
+          "start": 49.075,
+          "end": 49.315,
+          "confidence": 0.9992916584014893,
+          "flagged": false,
+          "syllabary_word": "ᎯᎠ"
+        },
+        {
+          "word": "ni-du-we-se-lv-gi;",
+          "start": 49.595,
+          "end": 50.655,
+          "confidence": 0.9651716168110187,
+          "flagged": false,
+          "syllabary_word": "ᏂᏚᏪᏎᎸᎩ;"
+        },
+        {
+          "word": "tsi-s-de-na",
+          "start": 51.72,
+          "end": 52.36,
+          "confidence": 0.9954632719357809,
+          "flagged": false,
+          "syllabary_word": "ᏥᏍᏕᎾ"
+        },
+        {
+          "word": "Tsa-ni",
+          "start": 52.945,
+          "end": 53.465,
+          "confidence": 0.9776850243409475,
+          "flagged": false,
+          "syllabary_word": "ᏣᏂ"
+        },
+        {
+          "word": "wi-e-s-di-no-hv-si",
+          "start": 53.84,
+          "end": 55.08,
+          "confidence": 0.9517214337984721,
+          "flagged": false,
+          "syllabary_word": "ᏫᎡᏍᏗᏃᎲᏏ"
+        },
+        {
+          "word": "ni-ga-v",
+          "start": 55.34,
+          "end": 55.8,
+          "confidence": 0.9999536275863647,
+          "flagged": false,
+          "syllabary_word": "ᏂᎦᎥ"
+        },
+        {
+          "word": "i-s-da-dv-gi-s-gv-i",
+          "start": 56.6,
+          "end": 57.78,
+          "confidence": 0.9675516030367683,
+          "flagged": false,
+          "syllabary_word": "ᎢᏍᏓᏛᎩᏍᎬᎢ"
+        },
+        {
+          "word": "a-le",
+          "start": 58.67,
+          "end": 58.87,
+          "confidence": 0.9999622901280721,
+          "flagged": false,
+          "syllabary_word": "ᎠᎴ"
+        },
+        {
+          "word": "i-s-di-go-wa-ti-s-gv-i:",
+          "start": 59.35,
+          "end": 60.77,
+          "confidence": 0.9775377362966537,
+          "flagged": false,
+          "syllabary_word": "ᎢᏍᏗᎪᏩᏘᏍᎬᎢ:"
+        }
+      ]
+    },
+    {
+      "line_id": "011105",
+      "cherokee_syllabary": "ᏗᏂᎨᏫ ᎠᏂᎪᏩᏘᎭ, ᏗᏂᏲᎤᎵᏃ ᎠᏁᏙᎭ, ᎠᏓᏰᏍᎩ ᏧᏂᏢᎩ ᏚᎾᏗᏩᏍᎦ, ᏧᏂᎵᎡᎾᏃ ᎠᎾᏛᎩᎭ, ᏧᏂᏲᎱᏒᎯᏃ ᏕᎨᎦᎴᏗᎭ ᎤᏲᏃ ᎢᏳᎾᏛᎿᎭᏕᎩ ᎣᏍᏛ ᎧᏃᎮᏛ ᎢᎨᎦᎵᏥᏙᏁᎭ.",
+      "text": "Di-ni-ge-wi a-ni-go-wa-ti-ha, di-ni-yo-u-li-no a-ne-do-ha, a-da-ye-s-gi tsu-ni-tlv-gi du-na-di-wa-s-ga, tsu-ni-li-e-na-no a-na-dv-gi-ha, tsu-ni-yo-hu-sv-hi-no de-ge-ga-le-di-ha u-yo-no i-yu-na-dv-hna-de-gi o-s-dv ka-no-he-dv i-ge-ga-li-tsi-do-ne-ha.",
+      "english": "The blind receive their sight, and the lame walk, the lepers are cleansed, and the deaf hear, the dead are raised up, and the poor have the gospel preached to them.",
+      "start": 61.91,
+      "end": 87.305,
+      "cer": 0.1317,
+      "emitted_text": "tinikhewi anikvwahthiha ai tiniyo'ulhinho anetoha i atayhehski tsunitlvki tunatiwhskv v tsunili'enanho anahthvkiha i tsuniyohuhsvhino yikekaletiha v uyonha iyunatvnhateki ohstv khanohetv tei ikekalitsatonheha",
+      "words": [
+        {
+          "word": "Di-ni-ge-wi",
+          "start": 61.91,
+          "end": 62.55,
+          "confidence": 0.9835007323159112,
+          "flagged": false,
+          "syllabary_word": "ᏗᏂᎨᏫ"
+        },
+        {
+          "word": "a-ni-go-wa-ti-ha,",
+          "start": 63.43,
+          "end": 64.39,
+          "confidence": 0.9985518272106464,
+          "flagged": false,
+          "syllabary_word": "ᎠᏂᎪᏩᏘᎭ,"
+        },
+        {
+          "word": "di-ni-yo-u-li-no",
+          "start": 64.74,
+          "end": 66.735,
+          "confidence": 0.7840850459677833,
+          "flagged": false,
+          "syllabary_word": "ᏗᏂᏲᎤᎵᏃ"
+        },
+        {
+          "word": "a-ne-do-ha,",
+          "start": 67.135,
+          "end": 67.855,
+          "confidence": 0.9891737358910697,
+          "flagged": false,
+          "syllabary_word": "ᎠᏁᏙᎭ,"
+        },
+        {
+          "word": "a-da-ye-s-gi",
+          "start": 68.92,
+          "end": 69.87,
+          "confidence": 0.8567622780799866,
+          "flagged": false,
+          "syllabary_word": "ᎠᏓᏰᏍᎩ"
+        },
+        {
+          "word": "tsu-ni-tlv-gi",
+          "start": 70.09,
+          "end": 71.01,
+          "confidence": 0.9998283803462982,
+          "flagged": false,
+          "syllabary_word": "ᏧᏂᏢᎩ"
+        },
+        {
+          "word": "du-na-di-wa-s-ga,",
+          "start": 71.515,
+          "end": 72.495,
+          "confidence": 0.9929240454326976,
+          "flagged": false,
+          "syllabary_word": "ᏚᎾᏗᏩᏍᎦ,"
+        },
+        {
+          "word": "tsu-ni-li-e-na-no",
+          "start": 73.22,
+          "end": 74.7,
+          "confidence": 0.8309550051178252,
+          "flagged": false,
+          "syllabary_word": "ᏧᏂᎵᎡᎾᏃ"
+        },
+        {
+          "word": "a-na-dv-gi-ha,",
+          "start": 75.12,
+          "end": 76.08,
+          "confidence": 0.9997805736281655,
+          "flagged": false,
+          "syllabary_word": "ᎠᎾᏛᎩᎭ,"
+        },
+        {
+          "word": "tsu-ni-yo-hu-sv-hi-no",
+          "start": 76.9,
+          "end": 78.43,
+          "confidence": 0.7677362393587828,
+          "flagged": false,
+          "syllabary_word": "ᏧᏂᏲᎱᏒᎯᏃ"
+        },
+        {
+          "word": "de-ge-ga-le-di-ha",
+          "start": 79.075,
+          "end": 80.695,
+          "confidence": 0.7580917775630951,
+          "flagged": false,
+          "syllabary_word": "ᏕᎨᎦᎴᏗᎭ"
+        },
+        {
+          "word": "u-yo-no",
+          "start": 81.195,
+          "end": 81.775,
+          "confidence": 0.9380823969841003,
+          "flagged": false,
+          "syllabary_word": "ᎤᏲᏃ"
+        },
+        {
+          "word": "i-yu-na-dv-hna-de-gi",
+          "start": 81.955,
+          "end": 83.195,
+          "confidence": 0.9815655606133598,
+          "flagged": false,
+          "syllabary_word": "ᎢᏳᎾᏛᎿᎭᏕᎩ"
+        },
+        {
+          "word": "o-s-dv",
+          "start": 83.675,
+          "end": 83.995,
+          "confidence": 0.9476606726646424,
+          "flagged": false,
+          "syllabary_word": "ᎣᏍᏛ"
+        },
+        {
+          "word": "ka-no-he-dv",
+          "start": 84.235,
+          "end": 84.855,
+          "confidence": 0.9865501523017883,
+          "flagged": false,
+          "syllabary_word": "ᎧᏃᎮᏛ"
+        },
+        {
+          "word": "i-ge-ga-li-tsi-do-ne-ha.",
+          "start": 85.06,
+          "end": 87.305,
+          "confidence": 0.8524909843416775,
+          "flagged": false,
+          "syllabary_word": "ᎢᎨᎦᎵᏥᏙᏁᎭ."
+        }
+      ]
+    },
+    {
+      "line_id": "011106",
+      "cherokee_syllabary": "ᎠᎴ ᎣᏏᏳ ᎢᏳᎵᏍᏓᏁᏗ ᎩᎶᏂᏗᏥᏲᏕᏍᏗᏍᎬᎾ ᎢᎨᏎᏍᏗ.",
+      "text": "A-le o-si-yu i-yu-li-s-da-ne-di gi-lo-ni-di-tsi-yo-de-s-di-s-gv-na i-ge-se-s-di.",
+      "english": "And blessed is he, whosoever shall not be offended in me.",
+      "start": 88.6,
+      "end": 95.485,
+      "cer": 0.0727,
+      "emitted_text": "ale ohsiyu iyulhstanhehti khilo v nititsiyotehstihskvna ikehsehsti",
+      "words": [
+        {
+          "word": "A-le",
+          "start": 88.6,
+          "end": 88.78,
+          "confidence": 0.997597853342692,
+          "flagged": false,
+          "syllabary_word": "ᎠᎴ"
+        },
+        {
+          "word": "o-si-yu",
+          "start": 89.0,
+          "end": 89.54,
+          "confidence": 0.972797304391861,
+          "flagged": false,
+          "syllabary_word": "ᎣᏏᏳ"
+        },
+        {
+          "word": "i-yu-li-s-da-ne-di",
+          "start": 89.88,
+          "end": 90.88,
+          "confidence": 0.9979996766362872,
+          "flagged": false,
+          "syllabary_word": "ᎢᏳᎵᏍᏓᏁᏗ"
+        },
+        {
+          "word": "gi-lo-ni-di-tsi-yo-de-s-di-s-gv-na",
+          "start": 91.18,
+          "end": 94.485,
+          "confidence": 0.9978570389369178,
+          "flagged": false,
+          "syllabary_word": "ᎩᎶᏂᏗᏥᏲᏕᏍᏗᏍᎬᎾ"
+        },
+        {
+          "word": "i-ge-se-s-di.",
+          "start": 94.685,
+          "end": 95.485,
+          "confidence": 0.9069776892662048,
+          "flagged": false,
+          "syllabary_word": "ᎢᎨᏎᏍᏗ."
+        }
+      ]
+    },
+    {
+      "line_id": "011107",
+      "cherokee_syllabary": "ᎢᎤᏁᏅᏃ ᏥᏌ ᎤᎴᏅᎲᎩ ᎯᎠ ᏂᏚᏪᏎᎸᎩ ᎤᏂᏣᏘ ᏣᏂ ᏚᏃᎮᏓᏁᎸᎩ; ᎦᏙ ᎢᏣᎦᏔᏅᏎ ᎢᎾᎨᎢ?  ᏩᏐᎾᏍᎪ ᎤᏃᎴ ᎤᏖᎸᎮᏍᎬᎢ?",
+      "text": "I-u-ne-nv-no Tsi-sa u-le-nv-hv-gi hi-a ni-du-we-se-lv-gi u-ni-tsa-ti Tsa-ni du-no-he-da-ne-lv-gi; Ga-do i-tsa-ga-ta-nv-se i-na-ge-i?  Wa-so-na-s-go u-no-le u-te-lv-he-s-gv-i?",
+      "english": "And as they departed, Jesus began to say unto the multitudes concerning John, What went ye out into the wilderness to see? A reed shaken with the wind?",
+      "start": 96.895,
+      "end": 112.59,
+      "cer": 0.125,
+      "emitted_text": "i'unenanho tsihsv ulenvhvki ahi avh hi'a tikwehselvki unitsathi tsani tsunahehtanelvki kato itsakhthanhvhse inake'i wahsonihsko unole uthelvhvhskv'i",
+      "words": [
+        {
+          "word": "I-u-ne-nv-no",
+          "start": 96.895,
+          "end": 97.795,
+          "confidence": 0.9476270139217376,
+          "flagged": false,
+          "syllabary_word": "ᎢᎤᏁᏅᏃ"
+        },
+        {
+          "word": "Tsi-sa",
+          "start": 98.195,
+          "end": 98.615,
+          "confidence": 0.9671313265959421,
+          "flagged": false,
+          "syllabary_word": "ᏥᏌ"
+        },
+        {
+          "word": "u-le-nv-hv-gi",
+          "start": 98.835,
+          "end": 100.58,
+          "confidence": 0.7979106527787668,
+          "flagged": false,
+          "syllabary_word": "ᎤᎴᏅᎲᎩ"
+        },
+        {
+          "word": "hi-a",
+          "start": 100.745,
+          "end": 101.005,
+          "confidence": 0.8963263481855392,
+          "flagged": false,
+          "syllabary_word": "ᎯᎠ"
+        },
+        {
+          "word": "ni-du-we-se-lv-gi",
+          "start": 101.105,
+          "end": 102.005,
+          "confidence": 0.9809810419877371,
+          "flagged": false,
+          "syllabary_word": "ᏂᏚᏪᏎᎸᎩ"
+        },
+        {
+          "word": "u-ni-tsa-ti",
+          "start": 102.345,
+          "end": 103.005,
+          "confidence": 0.9995832575692071,
+          "flagged": false,
+          "syllabary_word": "ᎤᏂᏣᏘ"
+        },
+        {
+          "word": "Tsa-ni",
+          "start": 103.305,
+          "end": 103.645,
+          "confidence": 0.9999654769897461,
+          "flagged": false,
+          "syllabary_word": "ᏣᏂ"
+        },
+        {
+          "word": "du-no-he-da-ne-lv-gi;",
+          "start": 103.885,
+          "end": 105.105,
+          "confidence": 0.9016714990139008,
+          "flagged": false,
+          "syllabary_word": "ᏚᏃᎮᏓᏁᎸᎩ;"
+        },
+        {
+          "word": "Ga-do",
+          "start": 105.795,
+          "end": 106.095,
+          "confidence": 0.9998941272497177,
+          "flagged": false,
+          "syllabary_word": "ᎦᏙ"
+        },
+        {
+          "word": "i-tsa-ga-ta-nv-se",
+          "start": 106.395,
+          "end": 107.635,
+          "confidence": 0.9702848712603251,
+          "flagged": false,
+          "syllabary_word": "ᎢᏣᎦᏔᏅᏎ"
+        },
+        {
+          "word": "i-na-ge-i?",
+          "start": 108.26,
+          "end": 108.78,
+          "confidence": 0.9999505111149379,
+          "flagged": false,
+          "syllabary_word": "ᎢᎾᎨᎢ?"
+        },
+        {
+          "word": "Wa-so-na-s-go",
+          "start": 109.4,
+          "end": 110.3,
+          "confidence": 0.9922894672913984,
+          "flagged": false,
+          "syllabary_word": "ᏩᏐᎾᏍᎪ"
+        },
+        {
+          "word": "u-no-le",
+          "start": 110.73,
+          "end": 111.21,
+          "confidence": 0.9997339725494385,
+          "flagged": false,
+          "syllabary_word": "ᎤᏃᎴ"
+        },
+        {
+          "word": "u-te-lv-he-s-gv-i?",
+          "start": 111.45,
+          "end": 112.59,
+          "confidence": 0.9816039247172219,
+          "flagged": false,
+          "syllabary_word": "ᎤᏖᎸᎮᏍᎬᎢ?"
+        }
+      ]
+    },
+    {
+      "line_id": "011108",
+      "cherokee_syllabary": "ᎦᏙᎨ ᎢᏣᎦᏔᏅᏎᎢ?  ᎠᏍᎦᏯᏍᎪ ᏗᏩᎾᎨ ᏧᏄᏩᎢ?  ᎬᏂᏳᏉ ᏗᏩᎾᎨ ᏧᎾᏄᏩᎢ ᎤᏂᎬᏫᏳᎯ ᏓᏂᏁᎸ ᎠᏁᎰᎢ.",
+      "text": "Ga-do-ge i-tsa-ga-ta-nv-se-i?  A-s-ga-ya-s-go di-wa-na-ge tsu-nu-wa-i?  Gv-ni-yu-quo di-wa-na-ge tsu-na-nu-wa-i u-ni-gv-wi-yu-hi da-ni-ne-lv a-ne-ho-i.",
+      "english": "But what went ye out for to see? A man clothed in soft raiment? behold, they that wear soft clothing are in kings' houses.",
+      "start": 113.21,
+      "end": 126.375,
+      "cer": 0.0288,
+      "emitted_text": "katokhe itsakhthanhvhse'i ahskayahsko tiwanake tsunhawa'i kvnhiyukwu tiwanake tsunanhuwa'i unikvwiyuhi taninelv aneho'i",
+      "words": [
+        {
+          "word": "Ga-do-ge",
+          "start": 113.21,
+          "end": 113.65,
+          "confidence": 0.987540568624224,
+          "flagged": false,
+          "syllabary_word": "ᎦᏙᎨ"
+        },
+        {
+          "word": "i-tsa-ga-ta-nv-se-i?",
+          "start": 114.11,
+          "end": 115.25,
+          "confidence": 0.9978765319375431,
+          "flagged": false,
+          "syllabary_word": "ᎢᏣᎦᏔᏅᏎᎢ?"
+        },
+        {
+          "word": "A-s-ga-ya-s-go",
+          "start": 116.065,
+          "end": 116.805,
+          "confidence": 0.9877954613078724,
+          "flagged": false,
+          "syllabary_word": "ᎠᏍᎦᏯᏍᎪ"
+        },
+        {
+          "word": "di-wa-na-ge",
+          "start": 117.4,
+          "end": 118.04,
+          "confidence": 0.9987746551632881,
+          "flagged": false,
+          "syllabary_word": "ᏗᏩᎾᎨ"
+        },
+        {
+          "word": "tsu-nu-wa-i?",
+          "start": 118.515,
+          "end": 119.135,
+          "confidence": 0.9559462010860443,
+          "flagged": false,
+          "syllabary_word": "ᏧᏄᏩᎢ?"
+        },
+        {
+          "word": "Gv-ni-yu-quo",
+          "start": 119.95,
+          "end": 120.69,
+          "confidence": 0.9377128928899765,
+          "flagged": false,
+          "syllabary_word": "ᎬᏂᏳᏉ"
+        },
+        {
+          "word": "di-wa-na-ge",
+          "start": 121.03,
+          "end": 121.65,
+          "confidence": 0.9987899884581566,
+          "flagged": false,
+          "syllabary_word": "ᏗᏩᎾᎨ"
+        },
+        {
+          "word": "tsu-na-nu-wa-i",
+          "start": 121.93,
+          "end": 122.75,
+          "confidence": 0.9907560845216116,
+          "flagged": false,
+          "syllabary_word": "ᏧᎾᏄᏩᎢ"
+        },
+        {
+          "word": "u-ni-gv-wi-yu-hi",
+          "start": 123.03,
+          "end": 124.03,
+          "confidence": 0.9883452924815092,
+          "flagged": false,
+          "syllabary_word": "ᎤᏂᎬᏫᏳᎯ"
+        },
+        {
+          "word": "da-ni-ne-lv",
+          "start": 124.835,
+          "end": 125.535,
+          "confidence": 0.9995652735233307,
+          "flagged": false,
+          "syllabary_word": "ᏓᏂᏁᎸ"
+        },
+        {
+          "word": "a-ne-ho-i.",
+          "start": 125.675,
+          "end": 126.375,
+          "confidence": 0.9985829762050084,
+          "flagged": false,
+          "syllabary_word": "ᎠᏁᎰᎢ."
+        }
+      ]
+    },
+    {
+      "line_id": "011109",
+      "cherokee_syllabary": "ᎦᏙᎨ ᎢᏣᎦᏔᏅᏎᎢ?  ᎠᏙᎴᎰᏍᎩᏍᎪ?  ᎥᎥ, ᎢᏨᏲᏎᎭ, ᎠᎴ ᎤᏟᎯᏳ ᎡᏍᎦᏉ ᎠᏙᎴᎰᏍᎩ.",
+      "text": "Ga-do-ge i-tsa-ga-ta-nv-se-i?  A-do-le-ho-s-gi-s-go?  V-v, i-tsv-yo-se-ha, a-le u-tli-hi-yu e-s-ga-quo a-do-le-ho-s-gi.",
+      "english": "But what went ye out for to see? A prophet? yea, I say unto you, and more than a prophet.",
+      "start": 126.95,
+      "end": 138.435,
+      "cer": 0.1184,
+      "emitted_text": "katokhe'' itsakhthanhvhse'i atalehohskihsko v'v itsvyoheha ale ulihiyu ehskakwu atakwalehohski",
+      "words": [
+        {
+          "word": "Ga-do-ge",
+          "start": 126.95,
+          "end": 127.69,
+          "confidence": 0.9241616328557333,
+          "flagged": false,
+          "syllabary_word": "ᎦᏙᎨ"
+        },
+        {
+          "word": "i-tsa-ga-ta-nv-se-i?",
+          "start": 128.39,
+          "end": 129.43,
+          "confidence": 0.9649871447507072,
+          "flagged": false,
+          "syllabary_word": "ᎢᏣᎦᏔᏅᏎᎢ?"
+        },
+        {
+          "word": "A-do-le-ho-s-gi-s-go?",
+          "start": 130.355,
+          "end": 131.475,
+          "confidence": 0.9971873124440511,
+          "flagged": false,
+          "syllabary_word": "ᎠᏙᎴᎰᏍᎩᏍᎪ?"
+        },
+        {
+          "word": "V-v,",
+          "start": 132.275,
+          "end": 132.635,
+          "confidence": 0.9996839364369711,
+          "flagged": false,
+          "syllabary_word": "ᎥᎥ,"
+        },
+        {
+          "word": "i-tsv-yo-se-ha,",
+          "start": 133.515,
+          "end": 134.275,
+          "confidence": 0.9177556693553924,
+          "flagged": false,
+          "syllabary_word": "ᎢᏨᏲᏎᎭ,"
+        },
+        {
+          "word": "a-le",
+          "start": 135.015,
+          "end": 135.215,
+          "confidence": 0.9999553759892782,
+          "flagged": false,
+          "syllabary_word": "ᎠᎴ"
+        },
+        {
+          "word": "u-tli-hi-yu",
+          "start": 135.735,
+          "end": 136.395,
+          "confidence": 0.9993625027792794,
+          "flagged": false,
+          "syllabary_word": "ᎤᏟᎯᏳ"
+        },
+        {
+          "word": "e-s-ga-quo",
+          "start": 136.855,
+          "end": 137.375,
+          "confidence": 0.9998537003993988,
+          "flagged": false,
+          "syllabary_word": "ᎡᏍᎦᏉ"
+        },
+        {
+          "word": "a-do-le-ho-s-gi.",
+          "start": 137.495,
+          "end": 138.435,
+          "confidence": 0.9882934008325849,
+          "flagged": false,
+          "syllabary_word": "ᎠᏙᎴᎰᏍᎩ."
+        }
+      ]
+    },
+    {
+      "line_id": "011110",
+      "cherokee_syllabary": "ᎾᏍᎩᏍᎩᏂ ᎯᎠ Ꮎ ᎨᎪᏪᎸ ᎯᎠ ᎠᏥᏃᎮᎸᏍᎬ ᏥᏂᎬᏅ; ᎬᏂᏳᏉ, ᏥᏅᎵ ᏥᏅᏏᏓᏍᏗ ᏣᎧᏛ ᎢᎬᏱᏗᏢ, ᎾᏍᎩ ᏓᏣᏛᏅᎢᏍᏓᏁᎵ ᏣᎶᎯᏍᏗᏱ ᎢᎬᏱᏗᏢ.",
+      "text": "Na-s-gi-s-gi-ni hi-a na ge-go-we-lv hi-a a-tsi-no-he-lv-s-gv tsi-ni-gv-nv; Gv-ni-yu-quo, tsi-nv-li tsi-nv-si-da-s-di tsa-ka-dv i-gv-yi-di-tlv, na-s-gi da-tsa-dv-nv-i-s-da-ne-li tsa-lo-hi-s-di-yi i-gv-yi-di-tlv.",
+      "english": "For this is he, of whom it is written, Behold, I send my messenger before thy face, which shall prepare thy way before thee.",
+      "start": 139.435,
+      "end": 158.82,
+      "cer": 0.1824,
+      "emitted_text": "nvhskihskini hi'v'na ktikowhelv i ai hi'aninohehskv tsinikvnha i kvnhiyikwu tsinvli yinvhsitahsti tsakathv ikvyatitla nvhskiy tvtsatvna'ihstaneli tsalohihstiyi ikvyatitla",
+      "words": [
+        {
+          "word": "Na-s-gi-s-gi-ni",
+          "start": 139.435,
+          "end": 140.175,
+          "confidence": 0.9514788389205933,
+          "flagged": false,
+          "syllabary_word": "ᎾᏍᎩᏍᎩᏂ"
+        },
+        {
+          "word": "hi-a na",
+          "start": 140.435,
+          "end": 141.035,
+          "confidence": 0.9645360708236694,
+          "flagged": false,
+          "syllabary_word": "ᎯᎠ Ꮎ"
+        },
+        {
+          "word": "ge-go-we-lv",
+          "start": 142.03,
+          "end": 142.89,
+          "confidence": 0.956440395116806,
+          "flagged": false,
+          "syllabary_word": "ᎨᎪᏪᎸ"
+        },
+        {
+          "word": "hi-a a-tsi-no-he-lv-s-gv",
+          "start": 143.345,
+          "end": 145.21,
+          "confidence": 0.7656977205049423,
+          "flagged": false,
+          "syllabary_word": "ᎯᎠ ᎠᏥᏃᎮᎸᏍᎬ"
+        },
+        {
+          "word": "tsi-ni-gv-nv;",
+          "start": 145.76,
+          "end": 146.4,
+          "confidence": 0.9873720288276673,
+          "flagged": false,
+          "syllabary_word": "ᏥᏂᎬᏅ;"
+        },
+        {
+          "word": "Gv-ni-yu-quo,",
+          "start": 146.84,
+          "end": 147.87,
+          "confidence": 0.7646318465471268,
+          "flagged": false,
+          "syllabary_word": "ᎬᏂᏳᏉ,"
+        },
+        {
+          "word": "tsi-nv-li",
+          "start": 148.21,
+          "end": 148.83,
+          "confidence": 0.9997415627752032,
+          "flagged": false,
+          "syllabary_word": "ᏥᏅᎵ"
+        },
+        {
+          "word": "tsi-nv-si-da-s-di",
+          "start": 149.29,
+          "end": 150.29,
+          "confidence": 0.9840295223089365,
+          "flagged": false,
+          "syllabary_word": "ᏥᏅᏏᏓᏍᏗ"
+        },
+        {
+          "word": "tsa-ka-dv",
+          "start": 150.57,
+          "end": 151.03,
+          "confidence": 0.9892728701233864,
+          "flagged": false,
+          "syllabary_word": "ᏣᎧᏛ"
+        },
+        {
+          "word": "i-gv-yi-di-tlv,",
+          "start": 151.595,
+          "end": 152.355,
+          "confidence": 0.9999385297298431,
+          "flagged": false,
+          "syllabary_word": "ᎢᎬᏱᏗᏢ,"
+        },
+        {
+          "word": "na-s-gi da-tsa-dv-nv-i-s-da-ne-li",
+          "start": 152.885,
+          "end": 155.695,
+          "confidence": 0.9800802554403032,
+          "flagged": false,
+          "syllabary_word": "ᎾᏍᎩ ᏓᏣᏛᏅᎢᏍᏓᏁᎵ"
+        },
+        {
+          "word": "tsa-lo-hi-s-di-yi",
+          "start": 156.29,
+          "end": 157.35,
+          "confidence": 0.990420231452355,
+          "flagged": false,
+          "syllabary_word": "ᏣᎶᎯᏍᏗᏱ"
+        },
+        {
+          "word": "i-gv-yi-di-tlv.",
+          "start": 158.08,
+          "end": 158.82,
+          "confidence": 0.9934544384479522,
+          "flagged": false,
+          "syllabary_word": "ᎢᎬᏱᏗᏢ."
+        }
+      ]
+    },
+    {
+      "line_id": "011111",
+      "cherokee_syllabary": "ᎤᏙᎯᏳᎯᏯ ᎯᎠ ᏂᏨᏪᏎᎭ, ᎠᏂᎨᏴ ᎬᏩᏂᎾᏄᎪᏫᏒᎯ ᏥᎩ ᎥᏝ ᎩᎶ ᏳᎾᏄᎪᏨ ᎬᏩᏓᎵᏁᎯᏕᏗ ᏣᏂ ᏗᏓᏬᏍᎩ; ᎠᏎᏃ ᎤᏍᏗᎧᏂ ᎦᎸᎳᏗ ᎡᎯ ᎤᎬᏫᏳᎯ ᎨᏒ ᎤᏟ ᎠᏥᎸᏉᏗᏳ ᎡᏍᎦᏉ ᏣᏂ.",
+      "text": "U-do-hi-yu-hi-ya hi-a ni-tsv-we-se-ha, A-ni-ge-yv gv-wa-ni-na-nu-go-wi-sv-hi tsi-gi v-tla gi-lo yu-na-nu-go-tsv gv-wa-da-li-ne-hi-de-di Tsa-ni di-da-wo-s-gi; a-se-no u-s-di-ka-ni ga-lv-la-di e-hi u-gv-wi-yu-hi ge-sv u-tli a-tsi-lv-quo-di-yu e-s-ga-quo tsa-ni.",
+      "english": "Verily I say unto you, Among them that are born of women there hath not risen a greater than John the Baptist: notwithstanding he that is least in the kingdom of heaven is greater than he.",
+      "start": 159.78,
+      "end": 184.925,
+      "cer": 0.1421,
+      "emitted_text": "utohiyuyv hi' nitsvwehseha anikeyha kvwninvkowhuhsvhi tsiki vlha khilo yunanukotsa i v kvwtalinehitehti tsani si titawohski ahseno i uhstikhani i kalvlati ehi ukvwiyuhikehv utli atsilvwotiyu ehskakwu tsani'",
+      "words": [
+        {
+          "word": "U-do-hi-yu-hi-ya hi-a",
+          "start": 159.78,
+          "end": 160.84,
+          "confidence": 0.9902507828341589,
+          "flagged": false,
+          "syllabary_word": "ᎤᏙᎯᏳᎯᏯ ᎯᎠ"
+        },
+        {
+          "word": "ni-tsv-we-se-ha,",
+          "start": 161.12,
+          "end": 162.02,
+          "confidence": 0.9932213326295217,
+          "flagged": false,
+          "syllabary_word": "ᏂᏨᏪᏎᎭ,"
+        },
+        {
+          "word": "A-ni-ge-yv",
+          "start": 162.66,
+          "end": 163.44,
+          "confidence": 0.9991450905799866,
+          "flagged": false,
+          "syllabary_word": "ᎠᏂᎨᏴ"
+        },
+        {
+          "word": "gv-wa-ni-na-nu-go-wi-sv-hi",
+          "start": 164.615,
+          "end": 165.975,
+          "confidence": 0.9033432883374831,
+          "flagged": false,
+          "syllabary_word": "ᎬᏩᏂᎾᏄᎪᏫᏒᎯ"
+        },
+        {
+          "word": "tsi-gi",
+          "start": 166.175,
+          "end": 166.435,
+          "confidence": 0.9994141101837158,
+          "flagged": false,
+          "syllabary_word": "ᏥᎩ"
+        },
+        {
+          "word": "v-tla",
+          "start": 167.41,
+          "end": 167.71,
+          "confidence": 0.9698280692100525,
+          "flagged": false,
+          "syllabary_word": "ᎥᏝ"
+        },
+        {
+          "word": "gi-lo",
+          "start": 167.79,
+          "end": 168.09,
+          "confidence": 0.9997041702270508,
+          "flagged": false,
+          "syllabary_word": "ᎩᎶ"
+        },
+        {
+          "word": "yu-na-nu-go-tsv",
+          "start": 168.69,
+          "end": 170.45,
+          "confidence": 0.6549848561937158,
+          "flagged": false,
+          "syllabary_word": "ᏳᎾᏄᎪᏨ"
+        },
+        {
+          "word": "gv-wa-da-li-ne-hi-de-di",
+          "start": 170.77,
+          "end": 172.17,
+          "confidence": 0.9674209766089916,
+          "flagged": false,
+          "syllabary_word": "ᎬᏩᏓᎵᏁᎯᏕᏗ"
+        },
+        {
+          "word": "Tsa-ni",
+          "start": 172.37,
+          "end": 172.77,
+          "confidence": 0.9999650716781616,
+          "flagged": false,
+          "syllabary_word": "ᏣᏂ"
+        },
+        {
+          "word": "di-da-wo-s-gi;",
+          "start": 173.02,
+          "end": 174.16,
+          "confidence": 0.9451186746358872,
+          "flagged": false,
+          "syllabary_word": "ᏗᏓᏬᏍᎩ;"
+        },
+        {
+          "word": "a-se-no",
+          "start": 174.795,
+          "end": 175.255,
+          "confidence": 0.9998812476793925,
+          "flagged": false,
+          "syllabary_word": "ᎠᏎᏃ"
+        },
+        {
+          "word": "u-s-di-ka-ni",
+          "start": 175.995,
+          "end": 177.75,
+          "confidence": 0.6764185388882954,
+          "flagged": false,
+          "syllabary_word": "ᎤᏍᏗᎧᏂ"
+        },
+        {
+          "word": "ga-lv-la-di",
+          "start": 178.265,
+          "end": 178.765,
+          "confidence": 0.9998218640685081,
+          "flagged": false,
+          "syllabary_word": "ᎦᎸᎳᏗ"
+        },
+        {
+          "word": "e-hi",
+          "start": 178.885,
+          "end": 179.105,
+          "confidence": 0.9998735785484314,
+          "flagged": false,
+          "syllabary_word": "ᎡᎯ"
+        },
+        {
+          "word": "u-gv-wi-yu-hi ge-sv",
+          "start": 179.225,
+          "end": 180.445,
+          "confidence": 0.9965534577002892,
+          "flagged": false,
+          "syllabary_word": "ᎤᎬᏫᏳᎯ ᎨᏒ"
+        },
+        {
+          "word": "u-tli",
+          "start": 180.605,
+          "end": 180.905,
+          "confidence": 0.9982503056526184,
+          "flagged": false,
+          "syllabary_word": "ᎤᏟ"
+        },
+        {
+          "word": "a-tsi-lv-quo-di-yu",
+          "start": 181.785,
+          "end": 182.825,
+          "confidence": 0.9922944257656733,
+          "flagged": false,
+          "syllabary_word": "ᎠᏥᎸᏉᏗᏳ"
+        },
+        {
+          "word": "e-s-ga-quo",
+          "start": 183.365,
+          "end": 183.945,
+          "confidence": 0.9536351412534714,
+          "flagged": false,
+          "syllabary_word": "ᎡᏍᎦᏉ"
+        },
+        {
+          "word": "tsa-ni.",
+          "start": 184.385,
+          "end": 184.925,
+          "confidence": 0.9219290912151337,
+          "flagged": false,
+          "syllabary_word": "ᏣᏂ."
+        }
+      ]
+    },
+    {
+      "line_id": "011112",
+      "cherokee_syllabary": "ᏣᏂᏃ ᏗᏓᏬᏍᎩ ᎤᎾᏄᎪᏨ ᏅᏓᎬᏩᏓᎴᏅᏛ ᎪᎯ ᎢᏯᏍᏘ ᎦᎸᎳᏗ ᎡᎯ ᎤᎬᏫᏳᎯ ᎨᏒ ᎠᎾᏁᎷᎩᎡᎭ, ᎠᎾᏁᎷᎩᏍᎩᏃ ᎬᏍᎦᎢᏍᏓᎩ ᏓᏂᏂᏱᎭ.",
+      "text": "Tsa-ni-no di-da-wo-s-gi u-na-nu-go-tsv nv-da-gv-wa-da-le-nv-dv go-hi i-ya-s-ti ga-lv-la-di e-hi u-gv-wi-yu-hi ge-sv a-na-ne-lu-gi-e-ha, a-na-ne-lu-gi-s-gi-no gv-s-ga-i-s-da-gi da-ni-ni-yi-ha.",
+      "english": "And from the days of John the Baptist until now the kingdom of heaven suffereth violence, and the violent take it by force.",
+      "start": 186.02,
+      "end": 204.315,
+      "cer": 0.1221,
+      "emitted_text": "tsaninho titawohski unanukotsa i v i tikvwatalenvta khohi iyahsti ahi kalvlati ehi ukvwiyuhi kehsv i ananeluki'eha ananelukihskvnho kvhskahstaki taniniyvha",
+      "words": [
+        {
+          "word": "Tsa-ni-no",
+          "start": 186.02,
+          "end": 186.58,
+          "confidence": 0.9998578950762749,
+          "flagged": false,
+          "syllabary_word": "ᏣᏂᏃ"
+        },
+        {
+          "word": "di-da-wo-s-gi",
+          "start": 186.8,
+          "end": 187.82,
+          "confidence": 0.9989806354045868,
+          "flagged": false,
+          "syllabary_word": "ᏗᏓᏬᏍᎩ"
+        },
+        {
+          "word": "u-na-nu-go-tsv",
+          "start": 188.14,
+          "end": 190.17,
+          "confidence": 0.6681090732415518,
+          "flagged": false,
+          "syllabary_word": "ᎤᎾᏄᎪᏨ"
+        },
+        {
+          "word": "nv-da-gv-wa-da-le-nv-dv",
+          "start": 190.55,
+          "end": 191.895,
+          "confidence": 0.8309527209826878,
+          "flagged": false,
+          "syllabary_word": "ᏅᏓᎬᏩᏓᎴᏅᏛ"
+        },
+        {
+          "word": "go-hi",
+          "start": 192.135,
+          "end": 192.415,
+          "confidence": 0.9999739170074463,
+          "flagged": false,
+          "syllabary_word": "ᎪᎯ"
+        },
+        {
+          "word": "i-ya-s-ti",
+          "start": 192.595,
+          "end": 193.115,
+          "confidence": 0.9330913850239345,
+          "flagged": false,
+          "syllabary_word": "ᎢᏯᏍᏘ"
+        },
+        {
+          "word": "ga-lv-la-di",
+          "start": 193.4,
+          "end": 194.485,
+          "confidence": 0.827938474714756,
+          "flagged": false,
+          "syllabary_word": "ᎦᎸᎳᏗ"
+        },
+        {
+          "word": "e-hi",
+          "start": 194.605,
+          "end": 194.805,
+          "confidence": 0.9583733081817627,
+          "flagged": false,
+          "syllabary_word": "ᎡᎯ"
+        },
+        {
+          "word": "u-gv-wi-yu-hi",
+          "start": 194.905,
+          "end": 195.525,
+          "confidence": 0.9883926312128702,
+          "flagged": false,
+          "syllabary_word": "ᎤᎬᏫᏳᎯ"
+        },
+        {
+          "word": "ge-sv",
+          "start": 195.565,
+          "end": 195.965,
+          "confidence": 0.9865025520324707,
+          "flagged": false,
+          "syllabary_word": "ᎨᏒ"
+        },
+        {
+          "word": "a-na-ne-lu-gi-e-ha,",
+          "start": 196.59,
+          "end": 198.2,
+          "confidence": 0.6771998646167608,
+          "flagged": false,
+          "syllabary_word": "ᎠᎾᏁᎷᎩᎡᎭ,"
+        },
+        {
+          "word": "a-na-ne-lu-gi-s-gi-no",
+          "start": 199.18,
+          "end": 200.82,
+          "confidence": 0.9681656993925571,
+          "flagged": false,
+          "syllabary_word": "ᎠᎾᏁᎷᎩᏍᎩᏃ"
+        },
+        {
+          "word": "gv-s-ga-i-s-da-gi",
+          "start": 201.7,
+          "end": 202.74,
+          "confidence": 0.9995612700780233,
+          "flagged": false,
+          "syllabary_word": "ᎬᏍᎦᎢᏍᏓᎩ"
+        },
+        {
+          "word": "da-ni-ni-yi-ha.",
+          "start": 203.315,
+          "end": 204.315,
+          "confidence": 0.9999494612216949,
+          "flagged": false,
+          "syllabary_word": "ᏓᏂᏂᏱᎭ."
+        }
+      ]
+    },
+    {
+      "line_id": "011113",
+      "cherokee_syllabary": "ᎾᏂᎥᏰᏃ ᎠᎾᏙᎴᎰᏍᎩ ᎠᎴ ᏗᎧᎿᎭᏩᏛᏍᏗ ᎠᎾᏙᎴᎰᏍᎬᎩ ᏣᏂ ᎤᎾᏄᎪᏥᎸ ᎢᏯᏍᏘ.",
+      "text": "Na-ni-v-ye-no a-na-do-le-ho-s-gi a-le di-ka-hna-wa-dv-s-di a-na-do-le-ho-s-gv-gi Tsa-ni u-na-nu-go-tsi-lv i-ya-s-ti.",
+      "english": "For all the prophets and the law prophesied until John.",
+      "start": 204.99,
+      "end": 214.57,
+      "cer": 0.1139,
+      "emitted_text": "nani'vyhenho anatalehohski ale tikhanowatvhsti anatelohohs kvki tsoni unanukotila iyvhsthi",
+      "words": [
+        {
+          "word": "Na-ni-v-ye-no",
+          "start": 204.99,
+          "end": 206.03,
+          "confidence": 0.9958899070819219,
+          "flagged": false,
+          "syllabary_word": "ᎾᏂᎥᏰᏃ"
+        },
+        {
+          "word": "a-na-do-le-ho-s-gi",
+          "start": 206.53,
+          "end": 207.71,
+          "confidence": 0.9747072320718032,
+          "flagged": false,
+          "syllabary_word": "ᎠᎾᏙᎴᎰᏍᎩ"
+        },
+        {
+          "word": "a-le",
+          "start": 207.83,
+          "end": 208.03,
+          "confidence": 0.9876075585683187,
+          "flagged": false,
+          "syllabary_word": "ᎠᎴ"
+        },
+        {
+          "word": "di-ka-hna-wa-dv-s-di",
+          "start": 208.41,
+          "end": 209.51,
+          "confidence": 0.9806020776430766,
+          "flagged": false,
+          "syllabary_word": "ᏗᎧᎿᎭᏩᏛᏍᏗ"
+        },
+        {
+          "word": "a-na-do-le-ho-s-gv-gi",
+          "start": 210.07,
+          "end": 211.825,
+          "confidence": 0.9996944151141427,
+          "flagged": false,
+          "syllabary_word": "ᎠᎾᏙᎴᎰᏍᎬᎩ"
+        },
+        {
+          "word": "Tsa-ni",
+          "start": 212.39,
+          "end": 212.69,
+          "confidence": 0.9801350235939026,
+          "flagged": false,
+          "syllabary_word": "ᏣᏂ"
+        },
+        {
+          "word": "u-na-nu-go-tsi-lv",
+          "start": 212.81,
+          "end": 213.75,
+          "confidence": 0.9021745432506908,
+          "flagged": false,
+          "syllabary_word": "ᎤᎾᏄᎪᏥᎸ"
+        },
+        {
+          "word": "i-ya-s-ti.",
+          "start": 213.95,
+          "end": 214.57,
+          "confidence": 0.9662361294031143,
+          "flagged": false,
+          "syllabary_word": "ᎢᏯᏍᏘ."
+        }
+      ]
+    },
+    {
+      "line_id": "011114",
+      "cherokee_syllabary": "ᎢᏳᏃ ᏗᎨᏣᏓᏂᎸᎢᏍᏗ ᎨᏎᏍᏗ, ᎾᏍᎩ ᎯᎠ ᎢᎳᏯ ᎤᎷᎯᏍᏗ ᏥᎨᏒᎩ.",
+      "text": "I-yu-no di-ge-tsa-da-ni-lv-i-s-di ge-se-s-di, na-s-gi hi-a I-la-ya u-lu-hi-s-di tsi-ge-sv-gi.",
+      "english": "And if ye will receive it, this is Elias, which was for to come.",
+      "start": 215.38,
+      "end": 223.975,
+      "cer": 0.0938,
+      "emitted_text": "iyunho tiketsatanilv'ihstikehsehs tinhski hi'a ilaya uluhihsti'i tikehsvki",
+      "words": [
+        {
+          "word": "I-yu-no",
+          "start": 215.38,
+          "end": 215.84,
+          "confidence": 0.9992833733558655,
+          "flagged": false,
+          "syllabary_word": "ᎢᏳᏃ"
+        },
+        {
+          "word": "di-ge-tsa-da-ni-lv-i-s-di ge-se-s-di, na-s-gi",
+          "start": 216.595,
+          "end": 219.595,
+          "confidence": 0.9862425798898216,
+          "flagged": false,
+          "syllabary_word": "ᏗᎨᏣᏓᏂᎸᎢᏍᏗ ᎨᏎᏍᏗ, ᎾᏍᎩ"
+        },
+        {
+          "word": "hi-a",
+          "start": 219.975,
+          "end": 220.255,
+          "confidence": 0.9981435388326645,
+          "flagged": false,
+          "syllabary_word": "ᎯᎠ"
+        },
+        {
+          "word": "I-la-ya",
+          "start": 221.075,
+          "end": 221.615,
+          "confidence": 0.979382848739624,
+          "flagged": false,
+          "syllabary_word": "ᎢᎳᏯ"
+        },
+        {
+          "word": "u-lu-hi-s-di",
+          "start": 221.815,
+          "end": 222.635,
+          "confidence": 0.9484302509914745,
+          "flagged": false,
+          "syllabary_word": "ᎤᎷᎯᏍᏗ"
+        },
+        {
+          "word": "tsi-ge-sv-gi.",
+          "start": 223.255,
+          "end": 223.975,
+          "confidence": 0.9982876380284628,
+          "flagged": false,
+          "syllabary_word": "ᏥᎨᏒᎩ."
+        }
+      ]
+    },
+    {
+      "line_id": "011115",
+      "cherokee_syllabary": "ᎩᎶ ᏕᎦᎵᎷᎨᏍᏗ ᎤᏛᎪᏗᏱ ᎾᏍᎩ ᎠᏛᎩᏍᎨᏍᏗ.",
+      "text": "Gi-lo de-ga-li-lu-ge-s-di u-dv-go-di-yi na-s-gi a-dv-gi-s-ge-s-di.",
+      "english": "He that hath ears to hear, let him hear.",
+      "start": 224.665,
+      "end": 229.78,
+      "cer": 0.0652,
+      "emitted_text": "khilo tekaliluhkehsti uthvkotiyi nvhskyathvkihskehsti",
+      "words": [
+        {
+          "word": "Gi-lo",
+          "start": 224.665,
+          "end": 224.945,
+          "confidence": 0.9997081995010376,
+          "flagged": false,
+          "syllabary_word": "ᎩᎶ"
+        },
+        {
+          "word": "de-ga-li-lu-ge-s-di",
+          "start": 225.165,
+          "end": 226.385,
+          "confidence": 0.967625868320465,
+          "flagged": false,
+          "syllabary_word": "ᏕᎦᎵᎷᎨᏍᏗ"
+        },
+        {
+          "word": "u-dv-go-di-yi",
+          "start": 226.955,
+          "end": 227.755,
+          "confidence": 0.9983355522155761,
+          "flagged": false,
+          "syllabary_word": "ᎤᏛᎪᏗᏱ"
+        },
+        {
+          "word": "na-s-gi a-dv-gi-s-ge-s-di.",
+          "start": 228.3,
+          "end": 229.78,
+          "confidence": 0.9010526686906815,
+          "flagged": false,
+          "syllabary_word": "ᎾᏍᎩ ᎠᏛᎩᏍᎨᏍᏗ."
+        }
+      ]
+    },
+    {
+      "line_id": "011116",
+      "cherokee_syllabary": "ᎦᏙᎨ ᏙᏓᎦᏥᏯᏟᎶᏍᏔᏂ ᎯᎠ ᎪᎯ ᏣᏁᎭ?  ᏗᏂᏲᎵᏉ ᎾᏍᎩᏯ ᎦᏃᏙᏗᏱ ᏣᏂᏃᎢ ᎠᎴ ᏥᏫᏓᏂᏯᏂᏍᎪ ᎤᏁᏓᏍᏗ;",
+      "text": "Ga-do-ge do-da-ga-tsi-ya-tli-lo-s-ta-ni hi-a go-hi tsa-ne-ha?  Di-ni-yo-li-quo na-s-gi-ya ga-no-do-di-yi tsa-ni-no-i a-le tsi-wi-da-ni-ya-ni-s-go u-ne-da-s-di;",
+      "english": "But whereunto shall I liken this generation? It is like unto children sitting in the markets, and calling unto their fellows,",
+      "start": 230.505,
+      "end": 247.18,
+      "cer": 0.1964,
+      "emitted_text": "katokhe totakv tsiyatilohsthani ahi nihikhohi hs tsaneha tiniyolhikwu nvhskiyahv tanhtohyiye tsanino'i ale khu witaniyanihsko unetahstiyi",
+      "words": [
+        {
+          "word": "Ga-do-ge",
+          "start": 230.505,
+          "end": 231.005,
+          "confidence": 0.9614283697945731,
+          "flagged": false,
+          "syllabary_word": "ᎦᏙᎨ"
+        },
+        {
+          "word": "do-da-ga-tsi-ya-tli-lo-s-ta-ni",
+          "start": 231.33,
+          "end": 234.095,
+          "confidence": 0.94272630661726,
+          "flagged": false,
+          "syllabary_word": "ᏙᏓᎦᏥᏯᏟᎶᏍᏔᏂ"
+        },
+        {
+          "word": "hi-a go-hi tsa-ne-ha?",
+          "start": 234.33,
+          "end": 236.645,
+          "confidence": 0.9854156642994552,
+          "flagged": false,
+          "syllabary_word": "ᎯᎠ ᎪᎯ ᏣᏁᎭ?"
+        },
+        {
+          "word": "Di-ni-yo-li-quo",
+          "start": 237.37,
+          "end": 238.27,
+          "confidence": 0.9660262167453766,
+          "flagged": false,
+          "syllabary_word": "ᏗᏂᏲᎵᏉ"
+        },
+        {
+          "word": "na-s-gi-ya ga-no-do-di-yi",
+          "start": 238.63,
+          "end": 240.945,
+          "confidence": 0.9445491232655265,
+          "flagged": false,
+          "syllabary_word": "ᎾᏍᎩᏯ ᎦᏃᏙᏗᏱ"
+        },
+        {
+          "word": "tsa-ni-no-i",
+          "start": 241.47,
+          "end": 242.23,
+          "confidence": 0.9695393972926669,
+          "flagged": false,
+          "syllabary_word": "ᏣᏂᏃᎢ"
+        },
+        {
+          "word": "a-le",
+          "start": 243.105,
+          "end": 243.305,
+          "confidence": 0.9999801317850748,
+          "flagged": false,
+          "syllabary_word": "ᎠᎴ"
+        },
+        {
+          "word": "tsi-wi-da-ni-ya-ni-s-go",
+          "start": 243.905,
+          "end": 245.735,
+          "confidence": 0.9920041007655007,
+          "flagged": false,
+          "syllabary_word": "ᏥᏫᏓᏂᏯᏂᏍᎪ"
+        },
+        {
+          "word": "u-ne-da-s-di;",
+          "start": 246.24,
+          "end": 247.18,
+          "confidence": 0.9998326301574707,
+          "flagged": false,
+          "syllabary_word": "ᎤᏁᏓᏍᏗ;"
+        }
+      ]
+    },
+    {
+      "line_id": "011117",
+      "cherokee_syllabary": "ᎠᎴ ᎯᎠ ᏥᏂᏓᏂᏪᏎᎰᎢ; ᎠᏤᎷᎩ ᎣᎬᏔᏅ ᏕᏨᏃᎩᎡᎸ, ᎠᏎᏃ ᎥᏝ ᏱᏣᎵᏍᎩᏒ; ᏙᏥᏴᎬᎩ ᎢᏣᏛᎪᏗ, ᎠᏎᏃ ᎥᏝ ᏱᏗᏣᏠᏱᎸ.",
+      "text": "A-le hi-a tsi-ni-da-ni-we-se-ho-i; a-tse-lu-gi o-gv-ta-nv de-tsv-no-gi-e-lv, a-se-no v-tla yi-tsa-li-s-gi-sv; do-tsi-yv-gv-gi i-tsa-dv-go-di, a-se-no v-tla yi-di-tsa-tlo-yi-lv.",
+      "english": "And saying, We have piped unto you, and ye have not danced; we have mourned unto you, and ye have not lamented.",
+      "start": 253.885,
+      "end": 274.575,
+      "cer": 0.392,
+      "emitted_text": "tsuwitaniyhanihsko unet unetahsti ale hi'a tsinitaniweheho'i atselhuhki'o kokhthanv tetsanoki'ela v ahsenho'vlha i itsalihskilha ohi totsiyvhkvki itsathvkoti ahsenho vlha yititsatloyhilo",
+      "words": [
+        {
+          "word": "A-le",
+          "start": 257.54,
+          "end": 257.72,
+          "confidence": 0.9999371767044067,
+          "flagged": false,
+          "syllabary_word": "ᎠᎴ"
+        },
+        {
+          "word": "hi-a",
+          "start": 257.8,
+          "end": 258.02,
+          "confidence": 0.8045558333396912,
+          "flagged": false,
+          "syllabary_word": "ᎯᎠ"
+        },
+        {
+          "word": "tsi-ni-da-ni-we-se-ho-i;",
+          "start": 258.16,
+          "end": 259.64,
+          "confidence": 0.9734583567170536,
+          "flagged": false,
+          "syllabary_word": "ᏥᏂᏓᏂᏪᏎᎰᎢ;"
+        },
+        {
+          "word": "a-tse-lu-gi",
+          "start": 260.48,
+          "end": 261.66,
+          "confidence": 0.9605215489864349,
+          "flagged": false,
+          "syllabary_word": "ᎠᏤᎷᎩ"
+        },
+        {
+          "word": "o-gv-ta-nv",
+          "start": 262.025,
+          "end": 262.785,
+          "confidence": 0.9609537124633789,
+          "flagged": false,
+          "syllabary_word": "ᎣᎬᏔᏅ"
+        },
+        {
+          "word": "de-tsv-no-gi-e-lv,",
+          "start": 263.58,
+          "end": 265.39,
+          "confidence": 0.7967102917341086,
+          "flagged": false,
+          "syllabary_word": "ᏕᏨᏃᎩᎡᎸ,"
+        },
+        {
+          "word": "a-se-no v-tla",
+          "start": 265.895,
+          "end": 266.735,
+          "confidence": 0.9909699708223343,
+          "flagged": false,
+          "syllabary_word": "ᎠᏎᏃ ᎥᏝ"
+        },
+        {
+          "word": "yi-tsa-li-s-gi-sv;",
+          "start": 267.2,
+          "end": 269.065,
+          "confidence": 0.7202607793176276,
+          "flagged": false,
+          "syllabary_word": "ᏱᏣᎵᏍᎩᏒ;"
+        },
+        {
+          "word": "do-tsi-yv-gv-gi",
+          "start": 269.265,
+          "end": 270.225,
+          "confidence": 0.9994444797436396,
+          "flagged": false,
+          "syllabary_word": "ᏙᏥᏴᎬᎩ"
+        },
+        {
+          "word": "i-tsa-dv-go-di,",
+          "start": 271.005,
+          "end": 271.825,
+          "confidence": 0.9998968839645386,
+          "flagged": false,
+          "syllabary_word": "ᎢᏣᏛᎪᏗ,"
+        },
+        {
+          "word": "a-se-no",
+          "start": 271.905,
+          "end": 272.325,
+          "confidence": 0.9674615349088397,
+          "flagged": false,
+          "syllabary_word": "ᎠᏎᏃ"
+        },
+        {
+          "word": "v-tla",
+          "start": 272.565,
+          "end": 272.865,
+          "confidence": 0.9971212297677994,
+          "flagged": false,
+          "syllabary_word": "ᎥᏝ"
+        },
+        {
+          "word": "yi-di-tsa-tlo-yi-lv.",
+          "start": 273.615,
+          "end": 274.575,
+          "confidence": 0.9021325945854187,
+          "flagged": false,
+          "syllabary_word": "ᏱᏗᏣᏠᏱᎸ."
+        }
+      ]
+    },
+    {
+      "line_id": "011118",
+      "cherokee_syllabary": "ᏣᏂᏰᏃ ᎤᎷᏨᎩ ᎥᏝ ᏯᎵᏍᏓᏴᎲᏍᎨᎢ ᎠᎴ ᎥᏝ ᏯᏗᏔᏍᎨᎢ, ᎠᏎᏃ ᏂᎠᏂᏪᎭ; ᎠᏍᎩᎾ ᎤᏯᎠ.",
+      "text": "Tsa-ni-ye-no u-lu-tsv-gi v-tla ya-li-s-da-yv-hv-s-ge-i a-le v-tla ya-di-ta-s-ge-i, a-se-no ni-a-ni-we-ha; A-s-gi-na u-ya-a.",
+      "english": "For John came neither eating nor drinking, and they say, He hath a devil.",
+      "start": 275.47,
+      "end": 287.75,
+      "cer": 0.2118,
+      "emitted_text": "taniyhenho uluhtsvki vlha i yalhstayvhvhske'i ale vlha yatithvhske'i v hiyanho vi ni'aniweha v ahskina uya'",
+      "words": [
+        {
+          "word": "Tsa-ni-ye-no",
+          "start": 275.47,
+          "end": 276.11,
+          "confidence": 0.9149452149868011,
+          "flagged": false,
+          "syllabary_word": "ᏣᏂᏰᏃ"
+        },
+        {
+          "word": "u-lu-tsv-gi",
+          "start": 276.41,
+          "end": 277.13,
+          "confidence": 0.962373243437873,
+          "flagged": false,
+          "syllabary_word": "ᎤᎷᏨᎩ"
+        },
+        {
+          "word": "v-tla",
+          "start": 277.39,
+          "end": 277.67,
+          "confidence": 0.9046859741210938,
+          "flagged": false,
+          "syllabary_word": "ᎥᏝ"
+        },
+        {
+          "word": "ya-li-s-da-yv-hv-s-ge-i",
+          "start": 278.09,
+          "end": 279.595,
+          "confidence": 0.7645672787638271,
+          "flagged": false,
+          "syllabary_word": "ᏯᎵᏍᏓᏴᎲᏍᎨᎢ"
+        },
+        {
+          "word": "a-le",
+          "start": 280.365,
+          "end": 280.505,
+          "confidence": 0.9846102197964987,
+          "flagged": false,
+          "syllabary_word": "ᎠᎴ"
+        },
+        {
+          "word": "v-tla",
+          "start": 280.645,
+          "end": 280.905,
+          "confidence": 0.9998316913843155,
+          "flagged": false,
+          "syllabary_word": "ᎥᏝ"
+        },
+        {
+          "word": "ya-di-ta-s-ge-i, a-se-no",
+          "start": 281.165,
+          "end": 283.325,
+          "confidence": 0.7417328895884993,
+          "flagged": false,
+          "syllabary_word": "ᏯᏗᏔᏍᎨᎢ, ᎠᏎᏃ"
+        },
+        {
+          "word": "ni-a-ni-we-ha;",
+          "start": 283.8,
+          "end": 286.085,
+          "confidence": 0.7662956446409225,
+          "flagged": false,
+          "syllabary_word": "ᏂᎠᏂᏪᎭ;"
+        },
+        {
+          "word": "A-s-gi-na",
+          "start": 286.33,
+          "end": 286.91,
+          "confidence": 0.999923757144383,
+          "flagged": false,
+          "syllabary_word": "ᎠᏍᎩᎾ"
+        },
+        {
+          "word": "u-ya-a.",
+          "start": 287.29,
+          "end": 287.75,
+          "confidence": 0.9993399083614349,
+          "flagged": false,
+          "syllabary_word": "ᎤᏯᎠ."
+        }
+      ]
+    },
+    {
+      "line_id": "011119",
+      "cherokee_syllabary": "ᏴᏫ ᎤᏪᏥ ᎤᎷᏨ ᎠᎵᏍᏓᏴᎲᏍᎦ ᎠᎴ ᎠᏗᏔᏍᎦ, ᎯᎠᏃ ᏂᎠᏂᏪᎭ; ᎬᏂᏳᏉ ᎠᏍᎦᏯ ᎤᎬᎥᏍᎩ ᎠᎵᏍᏓᏴᏗ ᎠᎴ ᎩᎦᎨ-ᎠᏗᏔᏍᏗ, ᎠᏕᎸ ᎠᏂᎩᏏᏙᎯ ᎠᎴ ᎠᏂᏍᏕᎾ ᎤᎾᎵᎢ.  ᎠᏎᏃ ᎠᎦᏔᎿᎭᎢ ᏧᏪᏥ ᎣᏏᏳ ᎢᎬᏩᏰᎸᎭ.",
+      "text": "Yv-wi u-we-tsi u-lu-tsv a-li-s-da-yv-hv-s-ga a-le a-di-ta-s-ga, hi-a-no ni-a-ni-we-ha; Gv-ni-yu-quo a-s-ga-ya u-gv-v-s-gi a-li-s-da-yv-di a-le gi-ga-ge--a-di-ta-s-di, a-de-lv a-ni-gi-si-do-hi a-le a-ni-s-de-na u-na-li-i.  A-se-no a-ga-ta-hna-i tsu-we-tsi o-si-yu i-gv-wa-ye-lv-ha.",
+      "english": "The Son of man came eating and drinking, and they say, Behold a man gluttonous, and a winebibber, a friend of publicans and sinners. But wisdom is justified of her children.",
+      "start": 289.11,
+      "end": 317.135,
+      "cer": 0.1518,
+      "emitted_text": "yvwi uwetsi uluhtsv v alhstayvhvhska ale v atithahska hahv hi'anho ni'aniweha ai kvniyikwu ahskaya ukha'vvhski alhstayvhti i ale kikake atithvhsti a atela anikihsitohi ale anihskana unali'i ahsenho i akhthanha'i i uwetsi ohsiyu ikvwayelvha",
+      "words": [
+        {
+          "word": "Yv-wi",
+          "start": 289.11,
+          "end": 289.49,
+          "confidence": 0.9874506443738937,
+          "flagged": false,
+          "syllabary_word": "ᏴᏫ"
+        },
+        {
+          "word": "u-we-tsi",
+          "start": 289.59,
+          "end": 290.05,
+          "confidence": 0.9908764064311981,
+          "flagged": false,
+          "syllabary_word": "ᎤᏪᏥ"
+        },
+        {
+          "word": "u-lu-tsv",
+          "start": 290.15,
+          "end": 290.69,
+          "confidence": 0.9422187549727303,
+          "flagged": false,
+          "syllabary_word": "ᎤᎷᏨ"
+        },
+        {
+          "word": "a-li-s-da-yv-hv-s-ga",
+          "start": 291.36,
+          "end": 292.725,
+          "confidence": 0.9751964147601808,
+          "flagged": false,
+          "syllabary_word": "ᎠᎵᏍᏓᏴᎲᏍᎦ"
+        },
+        {
+          "word": "a-le",
+          "start": 292.965,
+          "end": 293.145,
+          "confidence": 0.9999357859293619,
+          "flagged": false,
+          "syllabary_word": "ᎠᎴ"
+        },
+        {
+          "word": "a-di-ta-s-ga,",
+          "start": 293.47,
+          "end": 295.3,
+          "confidence": 0.8704052383701008,
+          "flagged": false,
+          "syllabary_word": "ᎠᏗᏔᏍᎦ,"
+        },
+        {
+          "word": "hi-a-no",
+          "start": 295.45,
+          "end": 295.85,
+          "confidence": 0.9091494594301496,
+          "flagged": false,
+          "syllabary_word": "ᎯᎠᏃ"
+        },
+        {
+          "word": "ni-a-ni-we-ha;",
+          "start": 296.51,
+          "end": 297.33,
+          "confidence": 0.9603046655654908,
+          "flagged": false,
+          "syllabary_word": "ᏂᎠᏂᏪᎭ;"
+        },
+        {
+          "word": "Gv-ni-yu-quo",
+          "start": 297.88,
+          "end": 299.095,
+          "confidence": 0.8286752626299858,
+          "flagged": false,
+          "syllabary_word": "ᎬᏂᏳᏉ"
+        },
+        {
+          "word": "a-s-ga-ya",
+          "start": 299.215,
+          "end": 299.695,
+          "confidence": 0.9996695603643145,
+          "flagged": false,
+          "syllabary_word": "ᎠᏍᎦᏯ"
+        },
+        {
+          "word": "u-gv-v-s-gi",
+          "start": 300.38,
+          "end": 301.16,
+          "confidence": 0.9363318464972756,
+          "flagged": false,
+          "syllabary_word": "ᎤᎬᎥᏍᎩ"
+        },
+        {
+          "word": "a-li-s-da-yv-di",
+          "start": 301.42,
+          "end": 302.65,
+          "confidence": 0.8929758071899414,
+          "flagged": false,
+          "syllabary_word": "ᎠᎵᏍᏓᏴᏗ"
+        },
+        {
+          "word": "a-le",
+          "start": 302.87,
+          "end": 303.03,
+          "confidence": 0.9999199509620667,
+          "flagged": false,
+          "syllabary_word": "ᎠᎴ"
+        },
+        {
+          "word": "gi-ga-ge--a-di-ta-s-di,",
+          "start": 303.25,
+          "end": 305.08,
+          "confidence": 0.8262225336498684,
+          "flagged": false,
+          "syllabary_word": "ᎩᎦᎨ-ᎠᏗᏔᏍᏗ,"
+        },
+        {
+          "word": "a-de-lv",
+          "start": 305.785,
+          "end": 306.145,
+          "confidence": 0.999889361858368,
+          "flagged": false,
+          "syllabary_word": "ᎠᏕᎸ"
+        },
+        {
+          "word": "a-ni-gi-si-do-hi",
+          "start": 306.225,
+          "end": 307.285,
+          "confidence": 0.9878769467274348,
+          "flagged": false,
+          "syllabary_word": "ᎠᏂᎩᏏᏙᎯ"
+        },
+        {
+          "word": "a-le",
+          "start": 307.505,
+          "end": 307.685,
+          "confidence": 0.9999005198478699,
+          "flagged": false,
+          "syllabary_word": "ᎠᎴ"
+        },
+        {
+          "word": "a-ni-s-de-na",
+          "start": 307.885,
+          "end": 308.485,
+          "confidence": 0.9485762119293213,
+          "flagged": false,
+          "syllabary_word": "ᎠᏂᏍᏕᎾ"
+        },
+        {
+          "word": "u-na-li-i.",
+          "start": 309.17,
+          "end": 309.85,
+          "confidence": 0.9998685802732196,
+          "flagged": false,
+          "syllabary_word": "ᎤᎾᎵᎢ."
+        },
+        {
+          "word": "A-se-no",
+          "start": 311.06,
+          "end": 311.56,
+          "confidence": 0.9563106213297162,
+          "flagged": false,
+          "syllabary_word": "ᎠᏎᏃ"
+        },
+        {
+          "word": "a-ga-ta-hna-i",
+          "start": 312.165,
+          "end": 313.33,
+          "confidence": 0.672185863960873,
+          "flagged": false,
+          "syllabary_word": "ᎠᎦᏔᎿᎭᎢ"
+        },
+        {
+          "word": "tsu-we-tsi",
+          "start": 313.69,
+          "end": 314.695,
+          "confidence": 0.6538046002388,
+          "flagged": false,
+          "syllabary_word": "ᏧᏪᏥ"
+        },
+        {
+          "word": "o-si-yu",
+          "start": 314.835,
+          "end": 315.355,
+          "confidence": 0.9377196133136749,
+          "flagged": false,
+          "syllabary_word": "ᎣᏏᏳ"
+        },
+        {
+          "word": "i-gv-wa-ye-lv-ha.",
+          "start": 316.155,
+          "end": 317.135,
+          "confidence": 0.968679048798301,
+          "flagged": false,
+          "syllabary_word": "ᎢᎬᏩᏰᎸᎭ."
+        }
+      ]
+    },
+    {
+      "line_id": "011120",
+      "cherokee_syllabary": "ᎿᎭᏉᏃ ᎤᎴᏅᎲᎩ ᏚᎬᏍᎪᎸᏅᎩ ᏚᏂᏚᎲᎢ ᎾᎿᎭᎤᏟ ᎢᎦᎢ ᎤᏍᏆᏂᎪᏗ ᏚᎸᏫᏍᏓᏁᎸᎢ, ᏅᏓᎦᎵᏍᏙᏗᏍᎬᎩ ᏚᎾᏓᏅᏛ ᏂᏚᏂᏁᏟᏴᏒᎾ ᎨᏒᎢ.",
+      "text": "Hna-quo-no u-le-nv-hv-gi du-gv-s-go-lv-nv-gi du-ni-du-hv-i na-hna u-tli i-ga-i u-s-qua-ni-go-di du-lv-wi-s-da-ne-lv-i, nv-da-ga-li-s-do-di-s-gv-gi du-na-da-nv-dv ni-du-ni-ne-tli-yv-sv-na ge-sv-i.",
+      "english": "Then began he to upbraid the cities wherein most of his mighty works were done, because they repented not:",
+      "start": 318.3,
+      "end": 334.875,
+      "cer": 0.1333,
+      "emitted_text": "nvkwu nho ulenvhvki tukvhskolanvki tunituhv'i i vnhv uli'ika'i uhskwanikhti tulvwhihstanelv'i nvtakalhstohtihskvki tsunatanhthv yituninetsiyvhsvna akelhv'i",
+      "words": [
+        {
+          "word": "Hna-quo-no",
+          "start": 318.3,
+          "end": 318.8,
+          "confidence": 0.9285483300685883,
+          "flagged": false,
+          "syllabary_word": "ᎿᎭᏉᏃ"
+        },
+        {
+          "word": "u-le-nv-hv-gi",
+          "start": 318.94,
+          "end": 319.8,
+          "confidence": 0.9880667726198832,
+          "flagged": false,
+          "syllabary_word": "ᎤᎴᏅᎲᎩ"
+        },
+        {
+          "word": "du-gv-s-go-lv-nv-gi",
+          "start": 320.16,
+          "end": 321.38,
+          "confidence": 0.9878569117614201,
+          "flagged": false,
+          "syllabary_word": "ᏚᎬᏍᎪᎸᏅᎩ"
+        },
+        {
+          "word": "du-ni-du-hv-i",
+          "start": 321.97,
+          "end": 322.87,
+          "confidence": 0.9999437808990479,
+          "flagged": false,
+          "syllabary_word": "ᏚᏂᏚᎲᎢ"
+        },
+        {
+          "word": "na-hna u-tli i-ga-i",
+          "start": 323.35,
+          "end": 324.91,
+          "confidence": 0.8502418001492819,
+          "flagged": false,
+          "syllabary_word": "ᎾᎿᎭᎤᏟ ᎢᎦᎢ ᎤᏍᏆᏂᎪᏗ"
+        },
+        {
+          "word": "u-s-qua-ni-go-di",
+          "start": 325.75,
+          "end": 326.43,
+          "confidence": 0.9981487989425659,
+          "flagged": false,
+          "syllabary_word": "ᏚᎸᏫᏍᏓᏁᎸᎢ,"
+        },
+        {
+          "word": "du-lv-wi-s-da-ne-lv-i,",
+          "start": 327.05,
+          "end": 328.27,
+          "confidence": 0.9716025661019718,
+          "flagged": false,
+          "syllabary_word": "ᏅᏓᎦᎵᏍᏙᏗᏍᎬᎩ"
+        },
+        {
+          "word": "nv-da-ga-li-s-do-di-s-gv-gi",
+          "start": 329.005,
+          "end": 330.305,
+          "confidence": 0.9864144116640091,
+          "flagged": false,
+          "syllabary_word": "ᏚᎾᏓᏅᏛ"
+        },
+        {
+          "word": "du-na-da-nv-dv",
+          "start": 330.97,
+          "end": 331.81,
+          "confidence": 0.9548113942146301,
+          "flagged": false,
+          "syllabary_word": "ᏂᏚᏂᏁᏟᏴᏒᎾ"
+        },
+        {
+          "word": "ni-du-ni-ne-tli-yv-sv-na ge-sv-i.",
+          "start": 332.655,
+          "end": 334.875,
+          "confidence": 0.9631252839333482,
+          "flagged": false
+        }
+      ]
+    },
+    {
+      "line_id": "011121",
+      "cherokee_syllabary": "ᎤᏲᎢᏳ ᎢᏣᎵᏍᏓᏁᏗ ᎪᎴᏏᏂ, ᎤᏲᎢᏳ ᎢᏣᎵᏍᏓᏁᏗ ᏇᏣᏱᏗ; ᎢᏳᏰᏃ ᎤᏍᏆᏂᎪᏗ ᏕᎦᎸᏫᏍᏓᏁᎸ ᏂᎯ ᎢᏤᎲ ᏱᏙᎦᎸᏫᏍᏓᏁᎴ ᏔᏯ ᎠᎴ ᏌᏙᏂ, ᎪᎯᎩ ᏗᎬᏩᏂᏁᏟᏴᏛ ᏱᎨᏎ ᏚᎾᏓᏅᏛᎢ, ᏧᏏᏕᎾ ᏱᏚᎾᏄᏬᎡ ᎠᎴ ᎪᏍᏚ ᏳᎾᏓᏅᎵᏰᎡᎢ.",
+      "text": "U-yo-i-yu i-tsa-li-s-da-ne-di Go-le-si-ni, u-yo-i-yu i-tsa-li-s-da-ne-di Que-tsa-yi-di; i-yu-ye-no u-s-qua-ni-go-di de-ga-lv-wi-s-da-ne-lv ni-hi i-tse-hv yi-do-ga-lv-wi-s-da-ne-le Ta-ya a-le Sa-do-ni, go-hi-gi di-gv-wa-ni-ne-tli-yv-dv yi-ge-se du-na-da-nv-dv-i, tsu-si-de-na yi-du-na-nu-wo-e a-le go-s-du yu-na-da-nv-li-ye-e-i.",
+      "english": "Woe unto thee, Chorazin! woe unto thee, Bethsaida! for if the mighty works, which were done in you, had been done in Tyre and Sidon, they would have repented long ago in sackcloth and ashes.",
+      "start": 335.88,
+      "end": 371.76,
+      "cer": 0.1645,
+      "emitted_text": "uyo'iyu iyulhstanhehti kolehsini i uyo'iyu iyulhstanehti kwetsvyitsi v si iyuyhenho uhskwanikhti hi tikalvwhihstanelv nihi'itsehv ai yitokalvwhihstanelv thayv ale satoni v kohiki tikvwininetliyvta yikehse tunatanhthv'i v tsuhsihthena itunanhawo'e ale v kohstu yunatanvliye'e'i",
+      "words": [
+        {
+          "word": "U-yo-i-yu",
+          "start": 335.88,
+          "end": 336.62,
+          "confidence": 0.9998948148318699,
+          "flagged": false,
+          "syllabary_word": "ᎤᏲᎢᏳ"
+        },
+        {
+          "word": "i-tsa-li-s-da-ne-di",
+          "start": 337.365,
+          "end": 338.645,
+          "confidence": 0.9850403155599322,
+          "flagged": false,
+          "syllabary_word": "ᎢᏣᎵᏍᏓᏁᏗ"
+        },
+        {
+          "word": "Go-le-si-ni,",
+          "start": 339.575,
+          "end": 342.215,
+          "confidence": 0.8274375134044223,
+          "flagged": false,
+          "syllabary_word": "ᎪᎴᏏᏂ,"
+        },
+        {
+          "word": "u-yo-i-yu",
+          "start": 342.47,
+          "end": 343.07,
+          "confidence": 0.9963271958487374,
+          "flagged": false,
+          "syllabary_word": "ᎤᏲᎢᏳ"
+        },
+        {
+          "word": "i-tsa-li-s-da-ne-di",
+          "start": 343.35,
+          "end": 344.25,
+          "confidence": 0.960510070507343,
+          "flagged": false,
+          "syllabary_word": "ᎢᏣᎵᏍᏓᏁᏗ"
+        },
+        {
+          "word": "Que-tsa-yi-di;",
+          "start": 345.21,
+          "end": 347.4,
+          "confidence": 0.7294879691167311,
+          "flagged": false,
+          "syllabary_word": "ᏇᏣᏱᏗ;"
+        },
+        {
+          "word": "i-yu-ye-no",
+          "start": 347.82,
+          "end": 348.38,
+          "confidence": 0.999375065167745,
+          "flagged": false,
+          "syllabary_word": "ᎢᏳᏰᏃ"
+        },
+        {
+          "word": "u-s-qua-ni-go-di",
+          "start": 348.7,
+          "end": 349.44,
+          "confidence": 0.9999361485242844,
+          "flagged": false,
+          "syllabary_word": "ᎤᏍᏆᏂᎪᏗ"
+        },
+        {
+          "word": "de-ga-lv-wi-s-da-ne-lv",
+          "start": 350.55,
+          "end": 352.195,
+          "confidence": 0.9687793430160074,
+          "flagged": false,
+          "syllabary_word": "ᏕᎦᎸᏫᏍᏓᏁᎸ"
+        },
+        {
+          "word": "ni-hi i-tse-hv",
+          "start": 352.395,
+          "end": 353.355,
+          "confidence": 0.9729573618281971,
+          "flagged": false,
+          "syllabary_word": "ᏂᎯ ᎢᏤᎲ"
+        },
+        {
+          "word": "yi-do-ga-lv-wi-s-da-ne-le",
+          "start": 353.665,
+          "end": 355.975,
+          "confidence": 0.8157926958642507,
+          "flagged": false,
+          "syllabary_word": "ᏱᏙᎦᎸᏫᏍᏓᏁᎴ"
+        },
+        {
+          "word": "Ta-ya",
+          "start": 357.24,
+          "end": 357.72,
+          "confidence": 0.999899399280548,
+          "flagged": false,
+          "syllabary_word": "ᏔᏯ"
+        },
+        {
+          "word": "a-le",
+          "start": 357.84,
+          "end": 358.0,
+          "confidence": 0.8917481303215027,
+          "flagged": false,
+          "syllabary_word": "ᎠᎴ"
+        },
+        {
+          "word": "Sa-do-ni,",
+          "start": 358.535,
+          "end": 359.855,
+          "confidence": 0.8672660042842228,
+          "flagged": false,
+          "syllabary_word": "ᏌᏙᏂ,"
+        },
+        {
+          "word": "go-hi-gi",
+          "start": 360.12,
+          "end": 360.72,
+          "confidence": 0.9983625610669454,
+          "flagged": false,
+          "syllabary_word": "ᎪᎯᎩ"
+        },
+        {
+          "word": "di-gv-wa-ni-ne-tli-yv-dv",
+          "start": 361.14,
+          "end": 362.4,
+          "confidence": 0.9954226507860071,
+          "flagged": false,
+          "syllabary_word": "ᏗᎬᏩᏂᏁᏟᏴᏛ"
+        },
+        {
+          "word": "yi-ge-se",
+          "start": 363.09,
+          "end": 363.69,
+          "confidence": 0.9852744340896606,
+          "flagged": false,
+          "syllabary_word": "ᏱᎨᏎ"
+        },
+        {
+          "word": "du-na-da-nv-dv-i,",
+          "start": 363.79,
+          "end": 365.17,
+          "confidence": 0.7129657463385508,
+          "flagged": false,
+          "syllabary_word": "ᏚᎾᏓᏅᏛᎢ,"
+        },
+        {
+          "word": "tsu-si-de-na",
+          "start": 365.735,
+          "end": 366.595,
+          "confidence": 0.9351047972838084,
+          "flagged": false,
+          "syllabary_word": "ᏧᏏᏕᎾ"
+        },
+        {
+          "word": "yi-du-na-nu-wo-e",
+          "start": 366.855,
+          "end": 367.835,
+          "confidence": 0.9993446270624796,
+          "flagged": false,
+          "syllabary_word": "ᏱᏚᎾᏄᏬᎡ"
+        },
+        {
+          "word": "a-le",
+          "start": 367.995,
+          "end": 368.195,
+          "confidence": 0.9981293280919393,
+          "flagged": false,
+          "syllabary_word": "ᎠᎴ"
+        },
+        {
+          "word": "go-s-du",
+          "start": 368.64,
+          "end": 369.36,
+          "confidence": 0.9862529188394547,
+          "flagged": false,
+          "syllabary_word": "ᎪᏍᏚ"
+        },
+        {
+          "word": "yu-na-da-nv-li-ye-e-i.",
+          "start": 370.16,
+          "end": 371.76,
+          "confidence": 0.9623948074877262,
+          "flagged": false,
+          "syllabary_word": "ᏳᎾᏓᏅᎵᏰᎡᎢ."
+        }
+      ]
+    },
+    {
+      "line_id": "011122",
+      "cherokee_syllabary": "ᎠᏎᏃ ᎯᎠ ᏂᏨᏪᏎᎭ; ᎡᏍᎦᏉ ᎢᎦᎢ ᎤᏂᎩᎵᏲᎢᏍᏗ ᎨᏎᏍᏗ ᏔᏯ ᎠᎴ ᏌᏙᏂ, ᏗᎫᎪᏙᏗᏱ ᎢᎦ ᎨᏎᏍᏗ, ᎤᏟᎯᏳ ᏂᎯ.",
+      "text": "A-se-no hi-a ni-tsv-we-se-ha; e-s-ga-quo i-ga-i u-ni-gi-li-yo-i-s-di ge-se-s-di Ta-ya a-le Sa-do-ni, di-gu-go-do-di-yi i-ga ge-se-s-di, u-tli-hi-yu ni-hi.",
+      "english": "But I say unto you, It shall be more tolerable for Tyre and Sidon at the day of judgment, than for you.",
+      "start": 372.74,
+      "end": 388.17,
+      "cer": 0.1028,
+      "emitted_text": "ahsenho hi'a nitsvwehseha ehskwakwu ika'i unikilhiyo'ihsti kelhehsti thaya ale hsatoni vi v tikukhthohtiyi ika kehsehsti i utlihiyu nihi",
+      "words": [
+        {
+          "word": "A-se-no",
+          "start": 372.74,
+          "end": 373.1,
+          "confidence": 0.9524116090365818,
+          "flagged": false,
+          "syllabary_word": "ᎠᏎᏃ"
+        },
+        {
+          "word": "hi-a",
+          "start": 373.22,
+          "end": 373.46,
+          "confidence": 0.9941382259130478,
+          "flagged": false,
+          "syllabary_word": "ᎯᎠ"
+        },
+        {
+          "word": "ni-tsv-we-se-ha;",
+          "start": 373.62,
+          "end": 374.54,
+          "confidence": 0.9862502813339233,
+          "flagged": false,
+          "syllabary_word": "ᏂᏨᏪᏎᎭ;"
+        },
+        {
+          "word": "e-s-ga-quo",
+          "start": 375.52,
+          "end": 376.08,
+          "confidence": 0.9684099819925096,
+          "flagged": false,
+          "syllabary_word": "ᎡᏍᎦᏉ"
+        },
+        {
+          "word": "i-ga-i",
+          "start": 376.28,
+          "end": 376.82,
+          "confidence": 0.9947995781898499,
+          "flagged": false,
+          "syllabary_word": "ᎢᎦᎢ"
+        },
+        {
+          "word": "u-ni-gi-li-yo-i-s-di",
+          "start": 377.22,
+          "end": 378.46,
+          "confidence": 0.9673439599573612,
+          "flagged": false,
+          "syllabary_word": "ᎤᏂᎩᎵᏲᎢᏍᏗ"
+        },
+        {
+          "word": "ge-se-s-di",
+          "start": 378.64,
+          "end": 379.42,
+          "confidence": 0.9823127720091078,
+          "flagged": false,
+          "syllabary_word": "ᎨᏎᏍᏗ"
+        },
+        {
+          "word": "Ta-ya",
+          "start": 380.09,
+          "end": 380.67,
+          "confidence": 0.9998370170593261,
+          "flagged": false,
+          "syllabary_word": "ᏔᏯ"
+        },
+        {
+          "word": "a-le",
+          "start": 380.85,
+          "end": 381.05,
+          "confidence": 0.9976455569267273,
+          "flagged": false,
+          "syllabary_word": "ᎠᎴ"
+        },
+        {
+          "word": "Sa-do-ni,",
+          "start": 381.57,
+          "end": 382.25,
+          "confidence": 0.9991710867200579,
+          "flagged": false,
+          "syllabary_word": "ᏌᏙᏂ,"
+        },
+        {
+          "word": "di-gu-go-do-di-yi",
+          "start": 382.6,
+          "end": 384.275,
+          "confidence": 0.8113731429690407,
+          "flagged": false,
+          "syllabary_word": "ᏗᎫᎪᏙᏗᏱ"
+        },
+        {
+          "word": "i-ga",
+          "start": 384.655,
+          "end": 384.935,
+          "confidence": 0.9995802839597067,
+          "flagged": false,
+          "syllabary_word": "ᎢᎦ"
+        },
+        {
+          "word": "ge-se-s-di,",
+          "start": 385.235,
+          "end": 385.895,
+          "confidence": 0.975938638051351,
+          "flagged": false,
+          "syllabary_word": "ᎨᏎᏍᏗ,"
+        },
+        {
+          "word": "u-tli-hi-yu",
+          "start": 386.42,
+          "end": 387.69,
+          "confidence": 0.8217073604464531,
+          "flagged": false,
+          "syllabary_word": "ᎤᏟᎯᏳ"
+        },
+        {
+          "word": "ni-hi.",
+          "start": 387.91,
+          "end": 388.17,
+          "confidence": 0.9984134286642075,
+          "flagged": false,
+          "syllabary_word": "ᏂᎯ."
+        }
+      ]
+    },
+    {
+      "line_id": "011123",
+      "cherokee_syllabary": "ᏂᎯᏃ ᎨᏆᏂ ᎦᎸᎳᏗ ᎢᏴᏛ ᏤᏣᏌᎳᏓ, ᏨᏍᎩᏃᎢ ᏮᏓᏰᎶᎥᏔᏂ; ᎢᏳᏰᏃ ᎤᏍᏆᏂᎪᏗ ᏕᎦᎸᏫᏍᏓᏁᎸ ᏂᎯ ᎢᏤᎲ ᏱᏙᎦᎸᏫᏍᏓᏁᎴ ᏐᏓᎻᏱ, ᎠᏏ ᎪᎯ ᎨᏒ ᏱᏂᎬᏩᏍᏕᏉ.",
+      "text": "Ni-hi-no Ge-qua-ni ga-lv-la-di i-yv-dv tse-tsa-sa-la-da, tsv-s-gi-no-i wv-da-ye-lo-v-ta-ni; i-yu-ye-no u-s-qua-ni-go-di de-ga-lv-wi-s-da-ne-lv ni-hi i-tse-hv yi-do-ga-lv-wi-s-da-ne-le So-da-mi-yi, a-si go-hi ge-sv yi-ni-gv-wa-s-de-quo.",
+      "english": "And thou, Capernaum, which art exalted unto heaven, shalt be brought down to hell: for if the mighty works, which have been done in thee, had been done in Sodom, it would have remained until this day.",
+      "start": 389.36,
+      "end": 413.825,
+      "cer": 0.1807,
+      "emitted_text": "nihino kekwani kalvlati iyvta tetsahsolotv tsvhskinonha wiyvtaye tsalo'vnhthani iyuhenho uhskwanik ti tekalvwhihstanelv ai nihi'itsehv yitokalvwhihstanele v sotaniyi i v vhsikhohi kehsv yinikvwhstekwo",
+      "words": [
+        {
+          "word": "Ni-hi-no",
+          "start": 389.36,
+          "end": 389.78,
+          "confidence": 0.9948361814022064,
+          "flagged": false,
+          "syllabary_word": "ᏂᎯᏃ"
+        },
+        {
+          "word": "Ge-qua-ni",
+          "start": 390.14,
+          "end": 390.86,
+          "confidence": 0.9671551755496434,
+          "flagged": false,
+          "syllabary_word": "ᎨᏆᏂ"
+        },
+        {
+          "word": "ga-lv-la-di",
+          "start": 391.14,
+          "end": 391.7,
+          "confidence": 0.9952435344457626,
+          "flagged": false,
+          "syllabary_word": "ᎦᎸᎳᏗ"
+        },
+        {
+          "word": "i-yv-dv",
+          "start": 391.84,
+          "end": 392.22,
+          "confidence": 0.999860966205597,
+          "flagged": false,
+          "syllabary_word": "ᎢᏴᏛ"
+        },
+        {
+          "word": "tse-tsa-sa-la-da,",
+          "start": 392.925,
+          "end": 393.805,
+          "confidence": 0.9149469385544459,
+          "flagged": false,
+          "syllabary_word": "ᏤᏣᏌᎳᏓ,"
+        },
+        {
+          "word": "tsv-s-gi-no-i wv-da-ye-lo-v-ta-ni;",
+          "start": 394.65,
+          "end": 397.83,
+          "confidence": 0.9705792291769906,
+          "flagged": false,
+          "syllabary_word": "ᏨᏍᎩᏃᎢ ᏮᏓᏰᎶᎥᏔᏂ;"
+        },
+        {
+          "word": "i-yu-ye-no",
+          "start": 398.545,
+          "end": 399.065,
+          "confidence": 0.991025984287262,
+          "flagged": false,
+          "syllabary_word": "ᎢᏳᏰᏃ"
+        },
+        {
+          "word": "u-s-qua-ni-go-di",
+          "start": 399.285,
+          "end": 400.38,
+          "confidence": 0.9994949913687177,
+          "flagged": false,
+          "syllabary_word": "ᎤᏍᏆᏂᎪᏗ"
+        },
+        {
+          "word": "de-ga-lv-wi-s-da-ne-lv",
+          "start": 401.12,
+          "end": 402.915,
+          "confidence": 0.9112226296873653,
+          "flagged": false,
+          "syllabary_word": "ᏕᎦᎸᏫᏍᏓᏁᎸ"
+        },
+        {
+          "word": "ni-hi i-tse-hv",
+          "start": 403.345,
+          "end": 404.405,
+          "confidence": 0.9974361224607988,
+          "flagged": false,
+          "syllabary_word": "ᏂᎯ ᎢᏤᎲ"
+        },
+        {
+          "word": "yi-do-ga-lv-wi-s-da-ne-le",
+          "start": 405.625,
+          "end": 407.69,
+          "confidence": 0.9905465480528379,
+          "flagged": false,
+          "syllabary_word": "ᏱᏙᎦᎸᏫᏍᏓᏁᎴ"
+        },
+        {
+          "word": "So-da-mi-yi,",
+          "start": 407.95,
+          "end": 409.55,
+          "confidence": 0.5729222695032755,
+          "flagged": false,
+          "syllabary_word": "ᏐᏓᎻᏱ,"
+        },
+        {
+          "word": "a-si go-hi",
+          "start": 410.255,
+          "end": 411.095,
+          "confidence": 0.9586684571372138,
+          "flagged": false,
+          "syllabary_word": "ᎠᏏ ᎪᎯ"
+        },
+        {
+          "word": "ge-sv",
+          "start": 411.615,
+          "end": 412.015,
+          "confidence": 0.9676872134208679,
+          "flagged": false,
+          "syllabary_word": "ᎨᏒ"
+        },
+        {
+          "word": "yi-ni-gv-wa-s-de-quo.",
+          "start": 412.745,
+          "end": 413.825,
+          "confidence": 0.9828782635075706,
+          "flagged": false,
+          "syllabary_word": "ᏱᏂᎬᏩᏍᏕᏉ."
+        }
+      ]
+    },
+    {
+      "line_id": "011124",
+      "cherokee_syllabary": "ᎠᏎᏃ ᎯᎠ ᏂᏨᏪᏎᎭ; ᎡᏍᎦᏉ ᎢᎦᎢ ᎤᏂᎩᎵᏲᎢᏍᏗ ᎨᏎᏍᏗ ᏐᎵᎻ ᏗᎫᎪᏙᏗᏱ ᎢᎦ ᎨᏎᏍᏗ, ᎤᏟᎯᏳ ᏂᎯ.",
+      "text": "A-se-no hi-a ni-tsv-we-se-ha; E-s-ga-quo i-ga-i u-ni-gi-li-yo-i-s-di ge-se-s-di So-li-mi di-gu-go-do-di-yi i-ga ge-se-s-di, u-tli-hi-yu ni-hi.",
+      "english": "But I say unto you, That it shall be more tolerable for the land of Sodom in the day of judgment, than for thee.",
+      "start": 414.665,
+      "end": 427.965,
+      "cer": 0.1735,
+      "emitted_text": "ahsenho hi'a nitsvwehseha ehskwokwu ika'i v unitilhiyo'ihsti ikehsehsti hsotvni vhi tikukhthohtiyi ikvkehsehsti v utlihiyu nihi",
+      "words": [
+        {
+          "word": "A-se-no",
+          "start": 414.665,
+          "end": 415.085,
+          "confidence": 0.9996441176959446,
+          "flagged": false,
+          "syllabary_word": "ᎠᏎᏃ"
+        },
+        {
+          "word": "hi-a",
+          "start": 415.245,
+          "end": 415.485,
+          "confidence": 0.8973327577114105,
+          "flagged": false,
+          "syllabary_word": "ᎯᎠ"
+        },
+        {
+          "word": "ni-tsv-we-se-ha;",
+          "start": 415.705,
+          "end": 416.605,
+          "confidence": 0.9752085854609808,
+          "flagged": false,
+          "syllabary_word": "ᏂᏨᏪᏎᎭ;"
+        },
+        {
+          "word": "E-s-ga-quo",
+          "start": 417.325,
+          "end": 417.865,
+          "confidence": 0.9426859252982669,
+          "flagged": false,
+          "syllabary_word": "ᎡᏍᎦᏉ"
+        },
+        {
+          "word": "i-ga-i",
+          "start": 418.005,
+          "end": 418.505,
+          "confidence": 0.9999490022659302,
+          "flagged": false,
+          "syllabary_word": "ᎢᎦᎢ"
+        },
+        {
+          "word": "u-ni-gi-li-yo-i-s-di",
+          "start": 419.04,
+          "end": 420.565,
+          "confidence": 0.8069451712071896,
+          "flagged": false,
+          "syllabary_word": "ᎤᏂᎩᎵᏲᎢᏍᏗ"
+        },
+        {
+          "word": "ge-se-s-di",
+          "start": 420.765,
+          "end": 421.485,
+          "confidence": 0.9527377903461456,
+          "flagged": false,
+          "syllabary_word": "ᎨᏎᏍᏗ"
+        },
+        {
+          "word": "So-li-mi di-gu-go-do-di-yi",
+          "start": 422.105,
+          "end": 424.72,
+          "confidence": 0.9041935967074499,
+          "flagged": false,
+          "syllabary_word": "ᏐᎵᎻ ᏗᎫᎪᏙᏗᏱ"
+        },
+        {
+          "word": "i-ga ge-se-s-di,",
+          "start": 424.88,
+          "end": 426.52,
+          "confidence": 0.9848288496335347,
+          "flagged": false,
+          "syllabary_word": "ᎢᎦ ᎨᏎᏍᏗ,"
+        },
+        {
+          "word": "u-tli-hi-yu",
+          "start": 426.825,
+          "end": 427.485,
+          "confidence": 0.9739567264914513,
+          "flagged": false,
+          "syllabary_word": "ᎤᏟᎯᏳ"
+        },
+        {
+          "word": "ni-hi.",
+          "start": 427.685,
+          "end": 427.965,
+          "confidence": 0.9035775810480118,
+          "flagged": false,
+          "syllabary_word": "ᏂᎯ."
+        }
+      ]
+    },
+    {
+      "line_id": "011125",
+      "cherokee_syllabary": "ᎾᎯᏳ ᏥᏌ ᎤᏁᏨ ᎯᎠ ᏄᏪᏒᎩ; ᎬᏯᎵᎡᎵᏤᎭ ᎡᏙᏓ, ᏣᎬᏫᏳᎯ ᎦᎸᎳᏗ ᎠᎴ ᎡᎶᎯ, ᎾᏍᎩ ᎯᎠ ᏥᏕᎲᏍᎦᎳᏁᎸ ᎠᏂᏏᎾᏌᏂ ᎠᎴ ᎠᏁᏯᏔᎯ, ᏗᏂᏲᎵᏃ ᏥᏕᎯᎾᏄᎪᏫᏎᎸ.",
+      "text": "Na-hi-yu Tsi-sa u-ne-tsv hi-a nu-we-sv-gi; Gv-ya-li-e-li-tse-ha E-do-da, Tsa-gv-wi-yu-hi ga-lv-la-di a-le e-lo-hi, na-s-gi hi-a tsi-de-hv-s-ga-la-ne-lv a-ni-si-na-sa-ni a-le a-ne-ya-ta-hi, di-ni-yo-li-no tsi-de-hi-na-nu-go-wi-se-lv.",
+      "english": "At that time Jesus answered and said, I thank thee, O Father, Lord of heaven and earth, because thou hast hid these things from the wise and prudent, and hast revealed them unto babes.",
+      "start": 428.965,
+      "end": 452.455,
+      "cer": 0.1447,
+      "emitted_text": "nvhiyutsihsa unhetsvhi'v nuwehsvki kvyali'eli tseha etota hi tsakvwiyuhi alvlati ale elohi v nvhskinihi titehvhs titehvhskalanela anihsinahsani ale aneyhahthahi tiniyolhinho tsitehi nlanukowhihsela",
+      "words": [
+        {
+          "word": "Na-hi-yu Tsi-sa",
+          "start": 428.965,
+          "end": 429.985,
+          "confidence": 0.983752558628718,
+          "flagged": false,
+          "syllabary_word": "ᎾᎯᏳ ᏥᏌ"
+        },
+        {
+          "word": "u-ne-tsv hi-a",
+          "start": 430.125,
+          "end": 431.025,
+          "confidence": 0.9447815743359652,
+          "flagged": false,
+          "syllabary_word": "ᎤᏁᏨ ᎯᎠ"
+        },
+        {
+          "word": "nu-we-sv-gi;",
+          "start": 431.185,
+          "end": 431.865,
+          "confidence": 0.999435305595398,
+          "flagged": false,
+          "syllabary_word": "ᏄᏪᏒᎩ;"
+        },
+        {
+          "word": "Gv-ya-li-e-li-tse-ha",
+          "start": 432.91,
+          "end": 434.27,
+          "confidence": 0.9979019939899445,
+          "flagged": false,
+          "syllabary_word": "ᎬᏯᎵᎡᎵᏤᎭ"
+        },
+        {
+          "word": "E-do-da,",
+          "start": 434.45,
+          "end": 434.97,
+          "confidence": 0.991461431980133,
+          "flagged": false,
+          "syllabary_word": "ᎡᏙᏓ,"
+        },
+        {
+          "word": "Tsa-gv-wi-yu-hi",
+          "start": 435.295,
+          "end": 437.12,
+          "confidence": 0.7408784397623756,
+          "flagged": false,
+          "syllabary_word": "ᏣᎬᏫᏳᎯ"
+        },
+        {
+          "word": "ga-lv-la-di",
+          "start": 437.24,
+          "end": 437.76,
+          "confidence": 0.9997235792023795,
+          "flagged": false,
+          "syllabary_word": "ᎦᎸᎳᏗ"
+        },
+        {
+          "word": "a-le",
+          "start": 437.94,
+          "end": 438.1,
+          "confidence": 0.9983947475751241,
+          "flagged": false,
+          "syllabary_word": "ᎠᎴ"
+        },
+        {
+          "word": "e-lo-hi,",
+          "start": 438.22,
+          "end": 438.76,
+          "confidence": 0.9998111367225647,
+          "flagged": false,
+          "syllabary_word": "ᎡᎶᎯ,"
+        },
+        {
+          "word": "na-s-gi hi-a",
+          "start": 439.6,
+          "end": 440.72,
+          "confidence": 0.9709955304861069,
+          "flagged": false,
+          "syllabary_word": "ᎾᏍᎩ ᎯᎠ"
+        },
+        {
+          "word": "tsi-de-hv-s-ga-la-ne-lv",
+          "start": 441.49,
+          "end": 443.87,
+          "confidence": 0.9945044759660959,
+          "flagged": false,
+          "syllabary_word": "ᏥᏕᎲᏍᎦᎳᏁᎸ"
+        },
+        {
+          "word": "a-ni-si-na-sa-ni",
+          "start": 445.09,
+          "end": 446.09,
+          "confidence": 0.9968675420834467,
+          "flagged": false,
+          "syllabary_word": "ᎠᏂᏏᎾᏌᏂ"
+        },
+        {
+          "word": "a-le",
+          "start": 446.23,
+          "end": 446.41,
+          "confidence": 0.9999485413233439,
+          "flagged": false,
+          "syllabary_word": "ᎠᎴ"
+        },
+        {
+          "word": "a-ne-ya-ta-hi,",
+          "start": 447.285,
+          "end": 448.105,
+          "confidence": 0.9631339212258657,
+          "flagged": false,
+          "syllabary_word": "ᎠᏁᏯᏔᎯ,"
+        },
+        {
+          "word": "di-ni-yo-li-no",
+          "start": 449.395,
+          "end": 450.275,
+          "confidence": 0.9704401244719824,
+          "flagged": false,
+          "syllabary_word": "ᏗᏂᏲᎵᏃ"
+        },
+        {
+          "word": "tsi-de-hi-na-nu-go-wi-se-lv.",
+          "start": 450.475,
+          "end": 452.455,
+          "confidence": 0.9627277425357273,
+          "flagged": false,
+          "syllabary_word": "ᏥᏕᎯᎾᏄᎪᏫᏎᎸ."
+        }
+      ]
+    },
+    {
+      "line_id": "011126",
+      "cherokee_syllabary": "ᎥᎥ, ᎡᏙᏓ, ᎾᏍᎩᏰᏃ ᎣᏏᏳ ᏣᏰᎸᏅᎯ.",
+      "text": "V-v, E-do-da, na-s-gi-ye-no o-si-yu tsa-ye-lv-nv-hi.",
+      "english": "Even so, Father: for so it seemed good in thy sight.",
+      "start": 454.525,
+      "end": 459.815,
+      "cer": 0.1429,
+      "emitted_text": "vhv etota ayv nvhskiyhenho ohsiyu tsayelvnhvhi",
+      "words": [
+        {
+          "word": "V-v,",
+          "start": 454.525,
+          "end": 455.085,
+          "confidence": 0.9968193570772806,
+          "flagged": false,
+          "syllabary_word": "ᎥᎥ,"
+        },
+        {
+          "word": "E-do-da,",
+          "start": 455.485,
+          "end": 456.025,
+          "confidence": 0.9903957605361938,
+          "flagged": false,
+          "syllabary_word": "ᎡᏙᏓ,"
+        },
+        {
+          "word": "na-s-gi-ye-no",
+          "start": 456.395,
+          "end": 457.795,
+          "confidence": 0.8221443966031075,
+          "flagged": false,
+          "syllabary_word": "ᎾᏍᎩᏰᏃ"
+        },
+        {
+          "word": "o-si-yu",
+          "start": 457.935,
+          "end": 458.455,
+          "confidence": 0.9315500557422638,
+          "flagged": false,
+          "syllabary_word": "ᎣᏏᏳ"
+        },
+        {
+          "word": "tsa-ye-lv-nv-hi.",
+          "start": 458.835,
+          "end": 459.815,
+          "confidence": 0.9998895724614462,
+          "flagged": false,
+          "syllabary_word": "ᏣᏰᎸᏅᎯ."
+        }
+      ]
+    },
+    {
+      "line_id": "011127",
+      "cherokee_syllabary": "ᏂᎦᎥ ᎪᎱᏍᏗ ᏓᎩᏲᎯᏎᎸ ᎡᏙᏓ, ᎠᎴ ᎥᏝ ᎩᎶ ᏯᎦᏔᎭ ᎤᏪᏥ ᎤᏙᏓᏉ ᎤᏩᏒ; ᎥᏝ ᎠᎴ ᎩᎶ ᏯᎦᏔᎭ ᎠᎦᏴᎵᎨᎢ ᎤᏪᏥ ᎤᏩᏒ, ᎩᎶᏃ ᎾᏍᎩ ᏥᎾᏄᎪᏫᏏ ᎡᎳ ᎤᏪᏥ.",
+      "text": "Ni-ga-v go-hu-s-di da-gi-yo-hi-se-lv E-do-da, a-le v-tla gi-lo ya-ga-ta-ha U-we-tsi U-do-da-quo u-wa-sv; v-tla a-le gi-lo ya-ga-ta-ha a-ga-yv-li-ge-i U-we-tsi u-wa-sv, gi-lo-no na-s-gi tsi-na-nu-go-wi-si e-la U-we-tsi.",
+      "english": "All things are delivered unto me of my Father: and no man knoweth the Son, but the Father; neither knoweth any man the Father, save the Son, and he to whomsoever the Son will reveal him.",
+      "start": 461.28,
+      "end": 483.235,
+      "cer": 0.1392,
+      "emitted_text": "nika'v kohuhsti takiyowhihsela etota ale'vla khilo iyakhthaha uwetsi utotakwu uwahsv a vlha le khilo yakhthaha akayvlike'i uwetsi uwahsv v si khilononvhski tsinanukowhihsi ela vi uwetsi",
+      "words": [
+        {
+          "word": "Ni-ga-v",
+          "start": 461.28,
+          "end": 461.74,
+          "confidence": 0.9804827570915222,
+          "flagged": false,
+          "syllabary_word": "ᏂᎦᎥ"
+        },
+        {
+          "word": "go-hu-s-di",
+          "start": 461.86,
+          "end": 462.64,
+          "confidence": 0.9994883686304092,
+          "flagged": false,
+          "syllabary_word": "ᎪᎱᏍᏗ"
+        },
+        {
+          "word": "da-gi-yo-hi-se-lv",
+          "start": 463.16,
+          "end": 464.3,
+          "confidence": 0.9447099438735417,
+          "flagged": false,
+          "syllabary_word": "ᏓᎩᏲᎯᏎᎸ"
+        },
+        {
+          "word": "E-do-da,",
+          "start": 464.48,
+          "end": 465.02,
+          "confidence": 0.9983625888824463,
+          "flagged": false,
+          "syllabary_word": "ᎡᏙᏓ,"
+        },
+        {
+          "word": "a-le v-tla",
+          "start": 466.135,
+          "end": 466.655,
+          "confidence": 0.9986877185957772,
+          "flagged": false,
+          "syllabary_word": "ᎠᎴ ᎥᏝ"
+        },
+        {
+          "word": "gi-lo",
+          "start": 466.735,
+          "end": 467.015,
+          "confidence": 0.9984304666519165,
+          "flagged": false,
+          "syllabary_word": "ᎩᎶ"
+        },
+        {
+          "word": "ya-ga-ta-ha",
+          "start": 467.275,
+          "end": 468.055,
+          "confidence": 0.9960339963436127,
+          "flagged": false,
+          "syllabary_word": "ᏯᎦᏔᎭ"
+        },
+        {
+          "word": "U-we-tsi",
+          "start": 468.315,
+          "end": 468.895,
+          "confidence": 0.9997238218784332,
+          "flagged": false,
+          "syllabary_word": "ᎤᏪᏥ"
+        },
+        {
+          "word": "U-do-da-quo",
+          "start": 469.695,
+          "end": 470.335,
+          "confidence": 0.9747808128595352,
+          "flagged": false,
+          "syllabary_word": "ᎤᏙᏓᏉ"
+        },
+        {
+          "word": "u-wa-sv;",
+          "start": 470.455,
+          "end": 471.245,
+          "confidence": 0.925516630212466,
+          "flagged": false,
+          "syllabary_word": "ᎤᏩᏒ;"
+        },
+        {
+          "word": "v-tla",
+          "start": 472.0,
+          "end": 472.28,
+          "confidence": 0.9591885954141617,
+          "flagged": false,
+          "syllabary_word": "ᎥᏝ"
+        },
+        {
+          "word": "a-le",
+          "start": 472.46,
+          "end": 472.56,
+          "confidence": 0.9997766017913818,
+          "flagged": false,
+          "syllabary_word": "ᎠᎴ"
+        },
+        {
+          "word": "gi-lo",
+          "start": 472.64,
+          "end": 472.92,
+          "confidence": 0.9998235583305359,
+          "flagged": false,
+          "syllabary_word": "ᎩᎶ"
+        },
+        {
+          "word": "ya-ga-ta-ha",
+          "start": 473.24,
+          "end": 473.88,
+          "confidence": 0.9996974070866903,
+          "flagged": false,
+          "syllabary_word": "ᏯᎦᏔᎭ"
+        },
+        {
+          "word": "a-ga-yv-li-ge-i",
+          "start": 474.16,
+          "end": 475.06,
+          "confidence": 0.9963996356183832,
+          "flagged": false,
+          "syllabary_word": "ᎠᎦᏴᎵᎨᎢ"
+        },
+        {
+          "word": "U-we-tsi",
+          "start": 475.725,
+          "end": 476.225,
+          "confidence": 0.9978535771369934,
+          "flagged": false,
+          "syllabary_word": "ᎤᏪᏥ"
+        },
+        {
+          "word": "u-wa-sv,",
+          "start": 476.345,
+          "end": 476.905,
+          "confidence": 0.998470296462377,
+          "flagged": false,
+          "syllabary_word": "ᎤᏩᏒ,"
+        },
+        {
+          "word": "gi-lo-no na-s-gi",
+          "start": 477.54,
+          "end": 478.9,
+          "confidence": 0.7644847692587436,
+          "flagged": false,
+          "syllabary_word": "ᎩᎶᏃ ᎾᏍᎩ"
+        },
+        {
+          "word": "tsi-na-nu-go-wi-si",
+          "start": 479.6,
+          "end": 480.74,
+          "confidence": 0.9967934131622315,
+          "flagged": false,
+          "syllabary_word": "ᏥᎾᏄᎪᏫᏏ"
+        },
+        {
+          "word": "e-la",
+          "start": 481.48,
+          "end": 481.72,
+          "confidence": 0.9999381303787231,
+          "flagged": false,
+          "syllabary_word": "ᎡᎳ"
+        },
+        {
+          "word": "U-we-tsi.",
+          "start": 482.32,
+          "end": 483.235,
+          "confidence": 0.7722411081194878,
+          "flagged": false,
+          "syllabary_word": "ᎤᏪᏥ."
+        }
+      ]
+    },
+    {
+      "line_id": "011128",
+      "cherokee_syllabary": "ᎡᏤᎾ, ᎠᏴ ᏍᎩᎷᏥ, ᏂᎦᏗᏳ ᎠᎩᎵᏯ ᏗᏥᎸᏫᏍᏓᏁᎯ, ᎠᎴ ᎦᎨᏛ ᏗᏣᎵᏎᎯ, ᎠᏴᏃ ᏓᏨᏯᏪᏐᎸᏍᏔᏂ.",
+      "text": "E-tse-na, a-yv s-gi-lu-tsi, ni-ga-di-yu a-gi-li-ya di-tsi-lv-wi-s-da-ne-hi, a-le ga-ge-dv di-tsa-li-se-hi, a-yv-no da-tsv-ya-we-so-lv-s-ta-ni.",
+      "english": "Come unto me, all ye that labour and are heavy laden, and I will give you rest.",
+      "start": 484.715,
+      "end": 501.38,
+      "cer": 0.3434,
+      "emitted_text": "etsena vv ayvhskiluhtsi i nikatiyu u akilhiya a titsilvwhihsta titsilvwhihstanehi aehsi ale kaketa i titsalihsehi v ayanho tatsvyawehsolvhsthani",
+      "words": [
+        {
+          "word": "E-tse-na,",
+          "start": 484.715,
+          "end": 485.295,
+          "confidence": 0.9984121918678284,
+          "flagged": false,
+          "syllabary_word": "ᎡᏤᎾ,"
+        },
+        {
+          "word": "a-yv s-gi-lu-tsi,",
+          "start": 485.615,
+          "end": 487.57,
+          "confidence": 0.7527922430099586,
+          "flagged": false,
+          "syllabary_word": "ᎠᏴ ᏍᎩᎷᏥ,"
+        },
+        {
+          "word": "ni-ga-di-yu",
+          "start": 487.91,
+          "end": 489.79,
+          "confidence": 0.7679954990744591,
+          "flagged": false,
+          "syllabary_word": "ᏂᎦᏗᏳ"
+        },
+        {
+          "word": "a-gi-li-ya",
+          "start": 489.92,
+          "end": 491.41,
+          "confidence": 0.6732210516929626,
+          "flagged": false,
+          "syllabary_word": "ᎠᎩᎵᏯ"
+        },
+        {
+          "word": "di-tsi-lv-wi-s-da-ne-hi,",
+          "start": 492.945,
+          "end": 495.11,
+          "confidence": 0.8931815147399902,
+          "flagged": false,
+          "syllabary_word": "ᏗᏥᎸᏫᏍᏓᏁᎯ,"
+        },
+        {
+          "word": "a-le",
+          "start": 495.38,
+          "end": 495.56,
+          "confidence": 0.9999695221583048,
+          "flagged": false,
+          "syllabary_word": "ᎠᎴ"
+        },
+        {
+          "word": "ga-ge-dv",
+          "start": 495.8,
+          "end": 496.46,
+          "confidence": 0.999400774637858,
+          "flagged": false,
+          "syllabary_word": "ᎦᎨᏛ"
+        },
+        {
+          "word": "di-tsa-li-se-hi,",
+          "start": 496.905,
+          "end": 498.74,
+          "confidence": 0.611107713646359,
+          "flagged": false,
+          "syllabary_word": "ᏗᏣᎵᏎᎯ,"
+        },
+        {
+          "word": "a-yv-no",
+          "start": 499.18,
+          "end": 499.54,
+          "confidence": 0.9430400232474009,
+          "flagged": false,
+          "syllabary_word": "ᎠᏴᏃ"
+        },
+        {
+          "word": "da-tsv-ya-we-so-lv-s-ta-ni.",
+          "start": 499.76,
+          "end": 501.38,
+          "confidence": 0.9637614744050162,
+          "flagged": false,
+          "syllabary_word": "ᏓᏨᏯᏪᏐᎸᏍᏔᏂ."
+        }
+      ]
+    },
+    {
+      "line_id": "011129",
+      "cherokee_syllabary": "ᎢᏥᏴ ᎠᏆᎩᎳᎾᎶ ᎠᎴ ᏍᎩᏯᏕᎶᏆᏏ, ᎠᏆᏓᏅᏘᏳᏰᏃ ᎠᎴ ᎠᏆᏓᏙᎵᏍᏗᏳ ᎠᎩᎾᏫᏱ, ᏓᏥᏩᏛᎯᏃ ᏗᏣᏓᏅᏙ ᏧᏯᏪᏐᎸᏍᏗᏱ.",
+      "text": "I-tsi-yv a-qua-gi-la-na-lo a-le s-gi-ya-de-lo-qua-si, a-qua-da-nv-ti-yu-ye-no a-le a-qua-da-do-li-s-di-yu a-gi-na-wi-yi, da-tsi-wa-dv-hi-no di-tsa-da-nv-do tsu-ya-we-so-lv-s-di-yi.",
+      "english": "Take my yoke upon you, and learn of me; for I am meek and lowly in heart: and ye shall find rest unto your souls.",
+      "start": 503.005,
+      "end": 521.845,
+      "cer": 0.1654,
+      "emitted_text": "itsiyv akwalikalhinalo ale'uhskihstawu skiyatelhohkwahsi ukatanhthiyuyheno ale akwatatolihstiyu akinvwiyi taksiwhahthvhino itsatanhto tsuyawehsolvhstiye",
+      "words": [
+        {
+          "word": "I-tsi-yv",
+          "start": 503.005,
+          "end": 503.645,
+          "confidence": 0.9200555582841238,
+          "flagged": false,
+          "syllabary_word": "ᎢᏥᏴ"
+        },
+        {
+          "word": "a-qua-gi-la-na-lo a-le s-gi-ya-de-lo-qua-si,",
+          "start": 504.495,
+          "end": 510.27,
+          "confidence": 0.9509579317242491,
+          "flagged": false,
+          "syllabary_word": "ᎠᏆᎩᎳᎾᎶ ᎠᎴ ᏍᎩᏯᏕᎶᏆᏏ,"
+        },
+        {
+          "word": "a-qua-da-nv-ti-yu-ye-no",
+          "start": 511.49,
+          "end": 512.69,
+          "confidence": 0.9692348346990698,
+          "flagged": false,
+          "syllabary_word": "ᎠᏆᏓᏅᏘᏳᏰᏃ"
+        },
+        {
+          "word": "a-le",
+          "start": 513.465,
+          "end": 513.645,
+          "confidence": 0.9999337593714396,
+          "flagged": false,
+          "syllabary_word": "ᎠᎴ"
+        },
+        {
+          "word": "a-qua-da-do-li-s-di-yu",
+          "start": 514.285,
+          "end": 515.545,
+          "confidence": 0.9991444461047649,
+          "flagged": false,
+          "syllabary_word": "ᎠᏆᏓᏙᎵᏍᏗᏳ"
+        },
+        {
+          "word": "a-gi-na-wi-yi,",
+          "start": 516.095,
+          "end": 516.855,
+          "confidence": 0.9425476988156637,
+          "flagged": false,
+          "syllabary_word": "ᎠᎩᎾᏫᏱ,"
+        },
+        {
+          "word": "da-tsi-wa-dv-hi-no",
+          "start": 517.405,
+          "end": 518.525,
+          "confidence": 0.9834546446800232,
+          "flagged": false,
+          "syllabary_word": "ᏓᏥᏩᏛᎯᏃ"
+        },
+        {
+          "word": "di-tsa-da-nv-do",
+          "start": 519.365,
+          "end": 520.125,
+          "confidence": 0.9993373692035675,
+          "flagged": false,
+          "syllabary_word": "ᏗᏣᏓᏅᏙ"
+        },
+        {
+          "word": "tsu-ya-we-so-lv-s-di-yi.",
+          "start": 520.365,
+          "end": 521.845,
+          "confidence": 0.9907616045739915,
+          "flagged": false,
+          "syllabary_word": "ᏧᏯᏪᏐᎸᏍᏗᏱ."
+        }
+      ]
+    },
+    {
+      "line_id": "011130",
+      "cherokee_syllabary": "ᎠᏆᎩᎳᎾᎶᏰᏃ ᏄᎯᏐᏛᎾ, ᎦᎵᏎᎲᏃ ᎤᏓᏌᎧᎯᏳ.",
+      "text": "A-qua-gi-la-na-lo-ye-no nu-hi-so-dv-na, ga-li-se-hv-no u-da-sa-ka-hi-yu.",
+      "english": "For my yoke is easy, and my burden is light.",
+      "start": 522.545,
+      "end": 529.43,
+      "cer": 0.1277,
+      "emitted_text": "akwaliki lhinaloyhano nuhihsohtvna kalihsehvnho utahsvhkahiyu",
+      "words": [
+        {
+          "word": "A-qua-gi-la-na-lo-ye-no",
+          "start": 522.545,
+          "end": 524.125,
+          "confidence": 0.9801143258810043,
+          "flagged": false,
+          "syllabary_word": "ᎠᏆᎩᎳᎾᎶᏰᏃ"
+        },
+        {
+          "word": "nu-hi-so-dv-na,",
+          "start": 524.765,
+          "end": 525.665,
+          "confidence": 0.9876837035020193,
+          "flagged": false,
+          "syllabary_word": "ᏄᎯᏐᏛᎾ,"
+        },
+        {
+          "word": "ga-li-se-hv-no",
+          "start": 526.4,
+          "end": 527.38,
+          "confidence": 0.9896181772152582,
+          "flagged": false,
+          "syllabary_word": "ᎦᎵᏎᎲᏃ"
+        },
+        {
+          "word": "u-da-sa-ka-hi-yu.",
+          "start": 528.27,
+          "end": 529.43,
+          "confidence": 0.9425012744390048,
+          "flagged": false,
+          "syllabary_word": "ᎤᏓᏌᎧᎯᏳ."
+        }
+      ]
+    }
+  ]
+}
