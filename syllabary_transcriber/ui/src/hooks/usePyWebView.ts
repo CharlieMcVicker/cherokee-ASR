@@ -17,11 +17,14 @@ export function usePyWebView() {
         const rawArray =
           pcmData instanceof Float32Array ? Array.from(pcmData) : pcmData;
 
+        console.log(`[usePyWebView] Sending ${rawArray.length} PCM samples for transcription...`);
+
         if (window.pywebview?.api?.transcribe_pcm) {
           const result = await window.pywebview.api.transcribe_pcm(
             rawArray,
             sampleRate
           );
+          console.log('[usePyWebView] PyWebView result:', result);
           if (result.error) {
             setError(result.error);
           }
@@ -43,6 +46,7 @@ export function usePyWebView() {
           }
 
           const result: TranscribeResult = await response.json();
+          console.log('[usePyWebView] FastAPI result:', result);
           if (result.error) {
             setError(result.error);
           }

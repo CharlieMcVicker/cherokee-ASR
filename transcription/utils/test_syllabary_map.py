@@ -1,14 +1,8 @@
-# -*- coding: utf-8 -*-
-"""
-test_syllabary_map.py
-
-Unit tests for the centralized Cherokee Syllabary mapping module transcription.utils.syllabary_map.
-"""
-
 import unittest
 from transcription.utils.syllabary_map import (
     CHEROKEE_SYLLABARY_MAP,
     cherokee_to_bad_phonetics,
+    phonetics_to_syllabary,
 )
 
 
@@ -29,6 +23,27 @@ class TestSyllabaryMap(unittest.TestCase):
         """Ensure transliteration function converts syllabary while preserving punctuation/unknown chars."""
         self.assertEqual(cherokee_to_bad_phonetics("ᎣᏏᏲ"), "osiyo")
         self.assertEqual(cherokee_to_bad_phonetics("Ꮏ!"), "nha!")
+
+    def test_phonetics_to_syllabary_direct_matches(self):
+        """Test phonetic transliteration to Cherokee syllabary conversion."""
+        self.assertEqual(phonetics_to_syllabary("ka"), "Ꭶ")
+        self.assertEqual(phonetics_to_syllabary("kha"), "Ꭷ")
+        self.assertEqual(phonetics_to_syllabary("ta"), "Ꮣ")
+        self.assertEqual(phonetics_to_syllabary("tha"), "Ꮤ")
+        self.assertEqual(phonetics_to_syllabary("ohsiyo"), "ᎣᏏᏲ")
+        self.assertEqual(phonetics_to_syllabary("kanolv'vhska"), "ᎦᏃᎸᎥᏍᎦ")
+        self.assertEqual(phonetics_to_syllabary("kakhahiya"), "ᎦᎧᎯᏯ")
+
+    def test_phonetics_to_syllabary_h_drop_fallback(self):
+        """Test fallback behavior where 'h' is dropped when aspirated token is not found directly."""
+        # 'thv' falls back to 'tv' -> Ꮫ
+        self.assertEqual(phonetics_to_syllabary("thv"), "Ꮫ")
+        # 'khv' falls back to 'kv' -> Ꭼ
+        self.assertEqual(phonetics_to_syllabary("khv"), "Ꭼ")
+
+    def test_phonetics_to_syllabary_compound_words(self):
+        """Test multi-syllable word and phrase transliteration."""
+        self.assertEqual(phonetics_to_syllabary("kakhahv'a"), "ᎦᎧᎲᎠ")
 
 
 if __name__ == "__main__":

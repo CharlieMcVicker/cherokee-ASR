@@ -92,11 +92,17 @@ export function useVad(options: UseVadOptions = {}) {
       const workletNode = new AudioWorkletNode(audioCtx, 'vad-audio-processor');
 
       workletNode.port.onmessage = (event) => {
-        const { type, audio } = event.data;
+        const { type, audio, samples } = event.data;
         if (type === 'SPEECH_START') {
+          console.log('[VAD] Speech started');
           setUserSpeaking(true);
-        } else if (type === 'SPEECH_END' && audio) {
-          handleSpeechEnd(audio);
+        } else if (type === 'SPEECH_END') {
+          console.log(`[VAD] Speech ended (samples: ${samples ?? 0}, hasAudio: ${!!audio})`);
+          if (audio) {
+            handleSpeechEnd(audio);
+          } else {
+            setUserSpeaking(false);
+          }
         }
       };
 

@@ -6,14 +6,19 @@ Centralized inference helper module for Wav2Vec2 CTC greedy decoding.
 Provides consistent inference functions used across training, evaluation, and serving.
 """
 
+import logging
 import os
 import re
+import struct
 import unicodedata
+import numpy as np
+import soundfile as sf
 import torch
 import torchaudio
-import soundfile as sf
-import numpy as np
-from transformers import Wav2Vec2Processor, Wav2Vec2ForCTC
+from transformers import Wav2Vec2ForCTC, Wav2Vec2Processor
+from transcription.utils.syllabary_map import phonetics_to_syllabary
+
+logger = logging.getLogger(__name__)
 
 TARGET_SAMPLE_RATE = 16000
 
@@ -205,7 +210,14 @@ def greedy_inference(logits, processor):
         else:
             confidence = float(np.mean(token_probs))
 
-        results.append({"text": text, "confidence": confidence})
+        results.append(
+            {
+                "text": text,
+                "transcription": text,
+                "syllabary": phonetics_to_syllabary(text),
+                "confidence": confidence,
+            }
+        )
 
     return results if is_batched else results[0]
 
@@ -302,8 +314,19 @@ def infer_pcm_array(
         )
         speech = resampler(waveform).squeeze(0).numpy()
 
+    duration = len(speech) / TARGET_SAMPLE_RATE
+    logger.info(
+        "Running ASR inference on PCM audio: samples=%d, duration=%.2fs, sr=%d, device=%s",
+        len(speech),
+        duration,
+        sample_rate,
+        device,
+    )
+
     input_values = processor(speech, sampling_rate=TARGET_SAMPLE_RATE).input_values[0]
-    input_tensor = torch.tensor([input_values]).to(device)
+    input_tensor = torch.tensor(np.array([input_values]), dtype=torch.float32).to(
+        device
+    )
 
     try:
         with torch.no_grad():
@@ -318,7 +341,9 @@ def infer_pcm_array(
         else:
             raise e
 
-    return greedy_inference(logits, processor)
+    result = greedy_inference(logits, processor)
+    logger.info("ASR inference complete: result=%s", result)
+    return result
 
 
 def transcribe_audio_batch(model, processor, audio_paths, device=None, batch_size=16):

@@ -8,6 +8,12 @@ FastAPI backend server and PyWebView API bridge for Syllabary Transcriber.
 import base64
 import os
 import struct
+
+os.environ["CUDA_VISIBLE_DEVICES"] = ""
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
+os.environ["OMP_NUM_THREADS"] = "1"
+os.environ["MKL_NUM_THREADS"] = "1"
+
 from typing import Any, List, Union
 
 from fastapi import FastAPI, HTTPException
@@ -16,6 +22,11 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from transcription.inference.infer import infer_pcm_array, load_asr_model
+
+
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class SyllabaryApi:
@@ -62,6 +73,12 @@ class SyllabaryApi:
         else:
             pcm_array = pcm_data
 
+        logger.info(
+            "transcribe_pcm called with %d samples at %d Hz",
+            len(pcm_array),
+            sample_rate,
+        )
+
         result = infer_pcm_array(
             pcm_data=pcm_array,
             sample_rate=sample_rate,
@@ -71,7 +88,9 @@ class SyllabaryApi:
         )
         if isinstance(result, list):
             result = result[0]
-        return dict(result)
+        res_dict = dict(result)
+        logger.info("transcribe_pcm result: %s", res_dict)
+        return res_dict
 
 
 app = FastAPI(title="Syllabary Transcriber API")
