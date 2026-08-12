@@ -39,7 +39,7 @@ To see the exact outputs at every step and isolate the root cause, we will build
 ```
 ┌─────────────────────────────────────────────────────────┐
 │              Step 1: Input Syllabary & Base             │
-│        Syllabary: ᏂᎬ ᎤᏪᏍᏓᏁᎵᏙᎰ ᎠᏗᎭ                        │
+│        Syllabary: ᏂᎬ ᎤᏪᏍᏓᏁᎵᏙᎰ ᎠᏗᎭ                     │
 │        Base Trans: nigv uwesdanelidoho adiha            │
 └────────────────────────────┬────────────────────────────┘
                              │
@@ -51,15 +51,15 @@ To see the exact outputs at every step and isolate the root cause, we will build
                              │
                              ▼
 ┌─────────────────────────────────────────────────────────┐
-│        Step 3: Character / Syllable Aligned Pairs        │
-│        [("Ꮒ", "nikh"), ("Ꭼ", "v"), (" ", " "), ...]      │
+│        Step 3: Character / Syllable Aligned Pairs       │
+│        [("Ꮒ", "nikh"), ("Ꭼ", "v"), (" ", " "), ...]     │
 └────────────────────────────┬────────────────────────────┘
                              │
                              ▼
 ┌─────────────────────────────────────────────────────────┐
 │             Step 4: Syllable-by-Syllable Rules          │
 │        Input: base="nigv", emitted="nikhv"              │
-│        Action: 'g' -> 'kh' (Laryngeal Toggle)            │
+│        Action: 'g' -> 'kh' (Laryngeal Toggle)           │
 │        Output: "nikhv"                                  │
 └────────────────────────────┬────────────────────────────┘
                              │
@@ -68,7 +68,7 @@ To see the exact outputs at every step and isolate the root cause, we will build
 │            Step 5: Target vs Reconciled Diff            │
 │        Target:     nikhv uwehstanelitoho atiha          │
 │        Reconciled: nikhv uwestanelitoho atiha           │
-│        Diff:       -weh +wes                           │
+│        Diff:       -weh +wes                            │
 └─────────────────────────────────────────────────────────┘
 ```
 
