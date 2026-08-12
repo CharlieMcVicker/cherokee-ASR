@@ -240,6 +240,87 @@ def infer_single_audio(model, processor, audio_path, device=None):
     return greedy_inference(logits, processor)
 
 
+_MODEL_CACHE = {}
+
+
+def load_asr_model(repo=None, revision=None, device=None):
+    """Load and cache Wav2Vec2 model and processor based on repository and revision."""
+    from transcription.utils.model_utils import get_best_model_config
+
+    if repo is None or revision is None:
+        config = get_best_model_config()
+        repo = repo or config["repo"]
+        revision = revision or config["revision"]
+
+    cache_key = (repo, revision, device)
+    if cache_key in _MODEL_CACHE:
+        return _MODEL_CACHE[cache_key]
+
+    if device is None:
+        device = (
+            "cuda"
+            if torch.cuda.is_available()
+            else ("mps" if torch.backends.mps.is_available() else "cpu")
+        )
+
+    processor = Wav2Vec2Processor.from_pretrained(repo, revision=revision)
+    model = Wav2Vec2ForCTC.from_pretrained(repo, revision=revision)
+    model.eval()
+    model.to(device)  # type: ignore
+
+    _MODEL_CACHE[cache_key] = (model, processor, device)
+    return model, processor, device
+
+
+def infer_pcm_array(
+    model, processor, pcm_data, sample_rate=TARGET_SAMPLE_RATE, device=None
+):
+    """Transcribe raw 1D float32 PCM numpy array, bytes, or float list directly in memory."""
+    if device is None:
+        device = (
+            "cuda"
+            if torch.cuda.is_available()
+            else ("mps" if torch.backends.mps.is_available() else "cpu")
+        )
+
+    if isinstance(pcm_data, bytes):
+        speech = np.frombuffer(pcm_data, dtype=np.float32)
+    elif isinstance(pcm_data, list):
+        speech = np.array(pcm_data, dtype=np.float32)
+    elif isinstance(pcm_data, np.ndarray):
+        speech = pcm_data.astype(np.float32)
+    else:
+        raise TypeError(f"Unsupported pcm_data type: {type(pcm_data)}")
+
+    if len(speech.shape) > 1:
+        speech = np.mean(speech, axis=-1)
+
+    if sample_rate != TARGET_SAMPLE_RATE:
+        waveform = torch.tensor(speech, dtype=torch.float32).unsqueeze(0)
+        resampler = torchaudio.transforms.Resample(
+            orig_freq=sample_rate, new_freq=TARGET_SAMPLE_RATE
+        )
+        speech = resampler(waveform).squeeze(0).numpy()
+
+    input_values = processor(speech, sampling_rate=TARGET_SAMPLE_RATE).input_values[0]
+    input_tensor = torch.tensor([input_values]).to(device)
+
+    try:
+        with torch.no_grad():
+            logits = model(input_tensor).logits
+    except NotImplementedError as e:
+        if device == "mps":
+            device = "cpu"
+            model.to(device)
+            input_tensor = input_tensor.to(device)
+            with torch.no_grad():
+                logits = model(input_tensor).logits
+        else:
+            raise e
+
+    return greedy_inference(logits, processor)
+
+
 def transcribe_audio_batch(model, processor, audio_paths, device=None, batch_size=16):
     """Transcribe a list of audio files using batching, proper padding, and OOM fallbacks."""
     if device is None:
