@@ -9,6 +9,10 @@ ASR emissions extraction, trigram DTW alignment, and export.
 import argparse
 import os
 import sys
+
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
+os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
+
 from typing import Optional, Any, Dict
 import numpy as np
 
