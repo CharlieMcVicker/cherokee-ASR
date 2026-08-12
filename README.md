@@ -234,3 +234,54 @@ Running the alignment pipeline writes the following files to `--output-dir`:
   - **Ground Truth Words**: GT words mapped onto aligned time intervals.
   - **Padded GT Words**: GT word boundaries padded slightly to avoid truncation.
   - **ASR Model Emissions**: Raw acoustic CTC emissions emitted by the Wav2Vec2 model.
+
+---
+
+## 9. Building Desktop Executables (PyInstaller)
+
+The repository includes a desktop launcher (`syllabary_transcriber`) built with **PyWebView** and **FastAPI** bundled into standalone executables via **PyInstaller**.
+
+### Building for Windows (on a Windows Machine)
+
+> **Note**: PyInstaller cannot cross-compile. To generate a native Windows `.exe`, you must run these steps natively on a Windows machine or VM.
+
+1. **Set up Conda Environment**:
+   ```cmd
+   conda create -n cherokee-asr python=3.11 -y
+   conda activate cherokee-asr
+   ```
+
+2. **Install Python & Packaging Dependencies**:
+   ```cmd
+   pip install -r requirements.txt
+   pip install pyinstaller
+   ```
+
+3. **Compile the React UI**:
+   ```cmd
+   cd syllabary_transcriber\ui
+   npm install
+   npm run build
+   cd ..\..
+   ```
+
+4. **Run PyInstaller Build**:
+   ```cmd
+   set KMP_DUPLICATE_LIB_OK=TRUE
+   pyinstaller syllabary_transcriber/packaging/app.spec --workpath transcriber_build --distpath transcriber_dist --noconfirm
+   ```
+
+5. **Locate Build Output**:
+   The standalone Windows executable and bundled runtime will be created under:
+   `transcriber_dist\Cherokee Syllabary Transcriber\Cherokee Syllabary Transcriber.exe`
+
+### Building for macOS
+
+On macOS, execute:
+```bash
+npm --prefix syllabary_transcriber/ui run build
+KMP_DUPLICATE_LIB_OK=TRUE pyinstaller syllabary_transcriber/packaging/app.spec --workpath transcriber_build --distpath transcriber_dist --noconfirm
+```
+The output `.app` bundle will be generated at:
+`transcriber_dist/Cherokee Syllabary Transcriber.app`
+
