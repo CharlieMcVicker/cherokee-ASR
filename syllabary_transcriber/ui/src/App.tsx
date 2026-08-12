@@ -50,10 +50,10 @@ const MainApp: React.FC = () => {
   const [commandFeedback, setCommandFeedback] = useState<string | null>(null);
   const [isSetupComplete, setIsSetupComplete] = useState<boolean>(false);
   const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
+  const [isFetchingMic, setIsFetchingMic] = useState<boolean>(true);
   const [permissionError, setPermissionError] = useState<string | null>(null);
   const copyTimeoutRef = useRef<number | null>(null);
   const feedbackTimeoutRef = useRef<number | null>(null);
-
 
   const triggerFeedback = useCallback((msg: string) => {
     setCommandFeedback(msg);
@@ -65,9 +65,9 @@ const MainApp: React.FC = () => {
     }, 2500);
   }, []);
 
-
   const fetchDevices = useCallback(async () => {
     try {
+      setIsFetchingMic(true);
       setPermissionError(null);
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       stream.getTracks().forEach((track) => track.stop());
@@ -80,6 +80,8 @@ const MainApp: React.FC = () => {
     } catch (err: any) {
       console.error('Failed to get microphone permissions:', err);
       setPermissionError(err.message || 'Microphone access denied');
+    } finally {
+      setIsFetchingMic(false);
     }
   }, [selectedDeviceId]);
 
@@ -88,6 +90,15 @@ const MainApp: React.FC = () => {
   }, [fetchDevices]);
 
   const handleTranscriptionComplete = useCallback((result: TranscribeResult) => {
+    // Check confidence score if present (scale 0..1 or 0..100)
+    if (typeof result.confidence === 'number') {
+      const confValue = result.confidence <= 1.0 ? result.confidence * 100 : result.confidence;
+      if (confValue < 90) {
+        triggerFeedback('⚠️ Sorry, please say that again');
+        return;
+      }
+    }
+
     const transcribedText = result.syllabary || result.transcription;
     if (!transcribedText) return;
     const transcribed = transcribedText.trim();
@@ -152,6 +163,16 @@ const MainApp: React.FC = () => {
   }, [documentText]);
 
   if (!isSetupComplete) {
+    if (isFetchingMic) {
+      return (
+        <div className="setup-container" style={{ padding: '60px 40px', maxWidth: '600px', margin: '40px auto', background: '#fff', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)', textAlign: 'center' }}>
+          <div className="spinner" style={{ fontSize: '32px', marginBottom: '16px' }}>🎙️⏳</div>
+          <h2 style={{ fontSize: '22px', color: '#111', marginBottom: '8px' }}>Connecting to your microphone...</h2>
+          <p style={{ color: '#666', fontSize: '14px' }}>Please grant permission if prompted by your browser.</p>
+        </div>
+      );
+    }
+
     return (
       <div className="setup-container" style={{ padding: '40px', maxWidth: '600px', margin: '40px auto', background: '#fff', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }}>
         <h2 style={{ fontSize: '24px', marginBottom: '16px', color: '#111' }}>🎙️ Microphone Setup</h2>

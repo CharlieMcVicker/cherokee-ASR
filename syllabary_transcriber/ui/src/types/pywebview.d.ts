@@ -1,6 +1,7 @@
 export interface TranscribeResult {
   transcription: string;
   syllabary: string;
+  confidence?: number;
   error?: string;
 }
 
