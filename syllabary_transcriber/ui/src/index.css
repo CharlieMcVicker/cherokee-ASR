@@ -174,44 +174,72 @@ body {
   border-color: #555;
 }
 
-/* Command Footer */
+/* Command Footer & Action Buttons */
 .command-footer {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   padding: 0.75rem 1.25rem;
   background: #1e1e1e;
   border-radius: 8px;
   border: 1px solid #333;
-  font-size: 0.85rem;
-  color: #888;
 }
 
-.command-instructions {
+.action-buttons-group {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+}
+
+.action-btn {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-}
-
-.command-tag {
-  font-weight: 600;
-  color: #aaa;
-}
-
-.command-divider {
-  color: #444;
-}
-
-.clipboard-badge {
-  padding: 0.25rem 0.6rem;
-  border-radius: 4px;
-  font-size: 0.75rem;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  min-height: 52px;
+  min-width: 110px;
+  border-radius: 8px;
+  border: 1px solid #444;
   background: #2a2a2a;
-  color: #888;
-  transition: all 0.3s ease;
+  color: #ffffff;
+  font-size: 1.25rem;
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.15s ease-in-out;
 }
 
-.clipboard-badge.active {
+.action-btn:hover:not(:disabled) {
+  background: #383838;
+  border-color: #666;
+  transform: translateY(-1px);
+}
+
+.action-btn:active:not(:disabled) {
+  transform: translateY(1px);
+  background: #222222;
+}
+
+.action-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  border-color: #333;
+}
+
+.copy-btn.active {
   background: #1b5e20;
+  border-color: #2e7d32;
   color: #a5d6a7;
+}
+
+.btn-icon {
+  font-size: 1.4rem;
+}
+
+.btn-label {
+  font-family: "Plantagenet Cherokee", "Noto Sans Cherokee", sans-serif;
+  font-size: 1.2rem;
 }

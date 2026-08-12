@@ -104,25 +104,7 @@ const MainApp: React.FC = () => {
     const transcribed = transcribedText.trim();
     if (!transcribed) return;
 
-    const lower = transcribed.toLowerCase();
-
-    if (lower === 'clear all' || lower === 'clear' || transcribed === 'Ꭷ' || lower === 'Ꭷ') {
-      setDocumentText('');
-      triggerFeedback(`⚡ Command Executed: Canvas Cleared (${transcribed})`);
-      return;
-    }
-
-    if (lower === 'delete' || lower === 'backspace' || lower === 'erase' || transcribed === 'ᎼᏏ' || lower === 'ᎼᏏ') {
-      setDocumentText((prev) => {
-        const words = prev.trim().split(/\s+/);
-        if (words.length <= 1) return '';
-        words.pop();
-        return words.join(' ');
-      });
-      triggerFeedback(`⚡ Command Executed: Word Deleted (${transcribed})`);
-      return;
-    }
-
+    
     setDocumentText((prev) => {
       const trimmed = prev.trim();
       return trimmed ? `${trimmed} ${transcribed}` : transcribed;
@@ -140,15 +122,15 @@ const MainApp: React.FC = () => {
     onTranscriptionError: handleTranscriptionError,
   });
 
-  // Auto-clipboard sync
-  useEffect(() => {
+  // Manual document action handlers
+  const handleCopy = useCallback(() => {
     if (!documentText) return;
-
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard
         .writeText(documentText)
         .then(() => {
           setCopiedStatus(true);
+          triggerFeedback('📋 Copied');
           if (copyTimeoutRef.current) {
             window.clearTimeout(copyTimeoutRef.current);
           }
@@ -158,9 +140,25 @@ const MainApp: React.FC = () => {
         })
         .catch((err) => {
           console.error('Failed to copy text to clipboard:', err);
+          triggerFeedback('⚠️ Copy Failed');
         });
     }
-  }, [documentText]);
+  }, [documentText, triggerFeedback]);
+
+  const handleClear = useCallback(() => {
+    setDocumentText('');
+    triggerFeedback('🗑️ Cleared');
+  }, [triggerFeedback]);
+
+  const handleDeleteLastWord = useCallback(() => {
+    setDocumentText((prev) => {
+      const words = prev.trim().split(/\s+/);
+      if (words.length <= 1) return '';
+      words.pop();
+      return words.join(' ');
+    });
+    triggerFeedback('⌫ Word Deleted');
+  }, [triggerFeedback]);
 
   if (!isSetupComplete) {
     if (isFetchingMic) {
@@ -233,7 +231,13 @@ const MainApp: React.FC = () => {
         onTogglePause={toggle}
       />
       <DocumentCanvas text={documentText} onChangeText={(newText) => setDocumentText(newText)} />
-      <CommandFooter copiedStatus={copiedStatus} />
+      <CommandFooter
+        copiedStatus={copiedStatus}
+        hasText={Boolean(documentText.trim())}
+        onCopy={handleCopy}
+        onClear={handleClear}
+        onDeleteLastWord={handleDeleteLastWord}
+      />
     </div>
   );
 };
