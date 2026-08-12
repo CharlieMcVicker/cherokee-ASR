@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState, useRef } from 'react';
-import { MicVAD } from '@ricky0123/vad-web';
 import { usePyWebView } from './usePyWebView';
 import type { TranscribeResult } from '../types/pywebview';
 
@@ -18,7 +17,19 @@ export function useVad(options: UseVadOptions = {}) {
   const [userSpeaking, setUserSpeaking] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [errored, setErrored] = useState<boolean>(false);
-  const vadRef = useRef<any>(null);
+
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const workletNodeRef = useRef<AudioWorkletNode | null>(null);
+  
+  // Use refs for callbacks to avoid re-initializing audio stream when functions change
+  const onCompleteRef = useRef(options.onTranscriptionComplete);
+  const onErrorRef = useRef(options.onTranscriptionError);
+
+  useEffect(() => {
+    onCompleteRef.current = options.onTranscriptionComplete;
+    onErrorRef.current = options.onTranscriptionError;
+  }, [options.onTranscriptionComplete, options.onTranscriptionError]);
 
   const handleSpeechEnd = useCallback(
     async (audio: Float32Array) => {
@@ -26,93 +37,108 @@ export function useVad(options: UseVadOptions = {}) {
       const result = await transcribePcm(audio, 16000);
       setLatestResult(result);
       if (result.error) {
-        options.onTranscriptionError?.(result.error);
+        onErrorRef.current?.(result.error);
       } else {
-        options.onTranscriptionComplete?.(result);
+        onCompleteRef.current?.(result);
       }
     },
-    [transcribePcm, options]
+    [transcribePcm]
   );
 
-  useEffect(() => {
-    if (!options.enabled) {
-      setListening(false);
-      setLoading(false);
+  const cleanupAudio = useCallback(() => {
+    if (workletNodeRef.current) {
+      workletNodeRef.current.port.onmessage = null;
+      workletNodeRef.current.disconnect();
+      workletNodeRef.current = null;
+    }
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((track) => track.stop());
+      streamRef.current = null;
+    }
+    if (audioContextRef.current) {
+      if (audioContextRef.current.state !== 'closed') {
+        audioContextRef.current.close();
+      }
+      audioContextRef.current = null;
+    }
+    setListening(false);
+    setUserSpeaking(false);
+  }, []);
+
+  const initAudio = useCallback(async () => {
+    if (streamRef.current || audioContextRef.current) {
       return;
     }
 
-    let isMounted = true;
+    try {
+      setLoading(true);
+      setErrored(false);
 
-    async function initVad() {
-      try {
-        setLoading(true);
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: options.deviceId
+          ? { deviceId: { exact: options.deviceId }, sampleRate: 16000, channelCount: 1 }
+          : { sampleRate: 16000, channelCount: 1 },
+      });
+      streamRef.current = stream;
 
-        const vad = await MicVAD.new({
-          model: 'legacy',
-          positiveSpeechThreshold: 0.8,
-          redemptionMs: 700,
-          baseAssetPath: '/',
-          onnxWASMBasePath: '/',
-          onSpeechStart: () => {
-            if (isMounted) setUserSpeaking(true);
-          },
-          onSpeechEnd: (audio) => {
-            if (isMounted) handleSpeechEnd(audio);
-          },
-        });
+      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)({
+        sampleRate: 16000,
+      });
+      audioContextRef.current = audioCtx;
 
+      await audioCtx.audioWorklet.addModule('/vad-processor.js');
 
+      const source = audioCtx.createMediaStreamSource(stream);
+      const workletNode = new AudioWorkletNode(audioCtx, 'vad-audio-processor');
 
-
-
-
-
-        if (isMounted) {
-          vadRef.current = vad;
-          setLoading(false);
-          vad.start();
-          setListening(true);
+      workletNode.port.onmessage = (event) => {
+        const { type, audio } = event.data;
+        if (type === 'SPEECH_START') {
+          setUserSpeaking(true);
+        } else if (type === 'SPEECH_END' && audio) {
+          handleSpeechEnd(audio);
         }
-      } catch (err) {
-        console.error('Failed to initialize MicVAD:', err);
-        if (isMounted) {
-          setLoading(false);
-          setErrored(true);
-        }
-      }
+      };
+
+      source.connect(workletNode);
+      workletNodeRef.current = workletNode;
+
+      setLoading(false);
+      setListening(true);
+    } catch (err) {
+      console.error('Failed to initialize AudioWorklet VAD:', err);
+      setLoading(false);
+      setErrored(true);
+    }
+  }, [options.deviceId, handleSpeechEnd]);
+
+  useEffect(() => {
+    if (!options.enabled) {
+      cleanupAudio();
+      return;
     }
 
-    initVad();
+    initAudio();
 
     return () => {
-      isMounted = false;
-      if (vadRef.current) {
-        vadRef.current.destroy();
-        vadRef.current = null;
-      }
+      cleanupAudio();
     };
-  }, [options.enabled, options.deviceId]);
-
+  }, [options.enabled, options.deviceId, initAudio, cleanupAudio]);
 
   const start = useCallback(async () => {
-    if (vadRef.current) {
-      try {
-        await vadRef.current.start();
-        setListening(true);
-      } catch (err) {
-        console.error('Failed to start VAD:', err);
-      }
+    if (audioContextRef.current && audioContextRef.current.state === 'suspended') {
+      await audioContextRef.current.resume();
+      setListening(true);
+    } else if (!streamRef.current) {
+      await initAudio();
     }
-  }, []);
+  }, [initAudio]);
 
   const pause = useCallback(async () => {
-    if (vadRef.current) {
-      try {
-        await vadRef.current.pause();
-        setListening(false);
-      } catch (err) {
-        console.error('Failed to pause VAD:', err);
-      }
+    if (audioContextRef.current && audioContextRef.current.state === 'running') {
+      await audioContextRef.current.suspend();
+      setListening(false);
+      setUserSpeaking(false);
     }
   }, []);
 
@@ -123,7 +149,6 @@ export function useVad(options: UseVadOptions = {}) {
       await start();
     }
   }, [listening, start, pause]);
-
 
   return {
     listening,
@@ -138,4 +163,3 @@ export function useVad(options: UseVadOptions = {}) {
     toggle,
   };
 }
-
