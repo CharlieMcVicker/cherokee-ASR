@@ -5,13 +5,49 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "workshop-transcription"
 version = "0.1.0"
-dependencies = []
+description = "Cherokee Speech-to-Text ASR model training, timestamping, syllabary enrichment, and transcription tools"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "accelerate",
+    "datasets",
+    "evaluate",
+    "fastapi",
+    "ffmpeg-python",
+    "huggingface-hub",
+    "jiwer",
+    "librosa",
+    "numpy",
+    "openpyxl",
+    "pandas",
+    "pydub",
+    "pygtrie",
+    "python-multipart",
+    "pywebview",
+    "soundfile",
+    "speechbrain",
+    "streamlit",
+    "torch",
+    "torchaudio",
+    "torchcodec",
+    "tqdm",
+    "transformers",
+    "uvicorn",
+]
+
+[project.optional-dependencies]
+dev = [
+    "black",
+    "pre-commit",
+    "pytest",
+]
 
 [project.scripts]
 align-cherokee = "transcription.timestamping.align_cli:main"
+syllabary-transcriber = "syllabary_transcriber.__main__:main"
 
 [tool.setuptools.packages.find]
-include = ["transcription*"]
+include = ["transcription*", "syllabary_transcriber*"]
 
 [tool.black]
 line-length = 88
