@@ -5,12 +5,12 @@ import argparse
 import pandas as pd
 import numpy as np
 import torch
-from transformers import Wav2Vec2Processor, Wav2Vec2ForCTC
 from datasets import Dataset, Audio, Features, Value
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 
 # Import normalization helpers from our codebase
+from transcription.utils.model_utils import get_best_model
 from transcription.inference.infer import (
     greedy_inference,
     normalize_text,
@@ -135,19 +135,8 @@ def main():
 
     repo = best_model_config["repo"]
     revision = best_model_config["revision"]
-    print(f"Best Model repo: {repo} (revision: {revision})")
-
-    device = (
-        "cuda"
-        if torch.cuda.is_available()
-        else ("mps" if torch.backends.mps.is_available() else "cpu")
-    )
+    model, processor, device = get_best_model()
     print(f"Using device: {device}")
-
-    processor = Wav2Vec2Processor.from_pretrained(repo, revision=revision)
-    model = Wav2Vec2ForCTC.from_pretrained(repo, revision=revision)
-    model.eval()
-    model.to(device)
 
     # Determine the alphabet from processor's vocabulary
     vocab = processor.tokenizer.get_vocab()

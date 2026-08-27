@@ -252,36 +252,10 @@ def infer_single_audio(model, processor, audio_path, device=None):
     return greedy_inference(logits, processor)
 
 
-_MODEL_CACHE = {}
-
-
-def load_asr_model(repo=None, revision=None, device=None):
-    """Load and cache Wav2Vec2 model and processor based on repository and revision."""
-    from transcription.utils.model_utils import get_best_model_config
-
-    if repo is None or revision is None:
-        config = get_best_model_config()
-        repo = repo or config["repo"]
-        revision = revision or config["revision"]
-
-    cache_key = (repo, revision, device)
-    if cache_key in _MODEL_CACHE:
-        return _MODEL_CACHE[cache_key]
-
-    if device is None:
-        device = (
-            "cuda"
-            if torch.cuda.is_available()
-            else ("mps" if torch.backends.mps.is_available() else "cpu")
-        )
-
-    processor = Wav2Vec2Processor.from_pretrained(repo, revision=revision)
-    model = Wav2Vec2ForCTC.from_pretrained(repo, revision=revision)
-    model.eval()
-    model.to(device)  # type: ignore
-
-    _MODEL_CACHE[cache_key] = (model, processor, device)
-    return model, processor, device
+from transcription.utils.model_utils import (
+    get_best_model,
+    get_model,
+)
 
 
 def infer_pcm_array(

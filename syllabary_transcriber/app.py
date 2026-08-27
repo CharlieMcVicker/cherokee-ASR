@@ -21,7 +21,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from transcription.inference.infer import infer_pcm_array, load_asr_model
+from transcription.inference.infer import get_model, infer_pcm_array
 
 
 import logging
@@ -40,8 +40,8 @@ class SyllabaryApi:
 
     def _ensure_model_loaded(self) -> None:
         if self.model is None or self.processor is None:
-            self.model, self.processor, self.device = load_asr_model(
-                repo=self.model_dir
+            self.model, self.processor, self.device = get_model(
+                path_or_repo=self.model_dir
             )
 
     def transcribe_pcm(

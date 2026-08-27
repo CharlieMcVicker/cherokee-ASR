@@ -4,10 +4,9 @@ import os
 import glob
 import numpy as np
 import torch
-import soundfile as sf
 import librosa
-from transformers import Wav2Vec2ForCTC, Wav2Vec2Processor
 import warnings
+
 
 from transcription.inference.infer import greedy_inference
 
@@ -47,7 +46,10 @@ def main():
     print(f"Using device: {device}")
 
     print("Loading model and processor...")
-    from transcription.utils.model_utils import get_best_model_config
+    from transcription.utils.model_utils import (
+        get_best_model_config,
+        get_model,
+    )
 
     model_config = get_best_model_config()
 
@@ -58,14 +60,13 @@ def main():
             f"Using model configuration from best_model.json: {args.model_dir} (revision: {revision_str})"
         )
 
-    model_kwargs = {}
-    if revision_str is not None:
-        model_kwargs["revision"] = revision_str
-
-    model_obj = Wav2Vec2ForCTC.from_pretrained(args.model_dir, **model_kwargs)
-    model = model_obj.to(device)  # type: ignore
-    model.eval()
-    processor: Any = Wav2Vec2Processor.from_pretrained(args.model_dir, **model_kwargs)
+    model: Any
+    processor: Any
+    model, processor, device = get_model(
+        path_or_repo=args.model_dir,
+        revision=revision_str,
+        device=device,
+    )
 
     print(f"Loading audio: {args.audio_file}")
     speech, sr = librosa.load(args.audio_file, sr=16000)

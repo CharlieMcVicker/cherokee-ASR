@@ -70,33 +70,23 @@ def run_alignment_pipeline(
         model_path = str(model_config.get("repo", "facebook/wav2vec2-base-960h"))
         model_revision = model_config.get("revision", None)
 
-    print(f"      Loading model from '{model_path}'...")
-    device = (
-        "cuda"
-        if torch.cuda.is_available()
-        else ("mps" if torch.backends.mps.is_available() else "cpu")
-    )
-    load_kwargs: Dict[str, Any] = {}
-    if token:
-        load_kwargs["token"] = token
-    if model_revision:
-        load_kwargs["revision"] = model_revision
+    from transcription.utils.model_utils import get_model
 
     try:
-        processor = Wav2Vec2Processor.from_pretrained(model_path, **load_kwargs)
-        model_obj: Any = Wav2Vec2ForCTC.from_pretrained(model_path, **load_kwargs)
-        model = model_obj.to(device)
+        model, processor, device = get_model(
+            path_or_repo=model_path,
+            revision=model_revision,
+            token=token,
+        )
     except Exception as e:
         fallback_repo = "facebook/wav2vec2-base-960h"
         print(
             f"      [Warning] Could not load '{model_path}' ({e}). Falling back to public model '{fallback_repo}'..."
         )
-        model_path = fallback_repo
-        processor = Wav2Vec2Processor.from_pretrained(model_path)
-        fallback_obj: Any = Wav2Vec2ForCTC.from_pretrained(model_path)
-        model = fallback_obj.to(device)
-
-    model.eval()
+        model, processor, device = get_model(
+            path_or_repo=fallback_repo,
+            token=token,
+        )
 
     from transcription.timestamping.aligner import align_audio_segment
 

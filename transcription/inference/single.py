@@ -15,9 +15,7 @@ os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
 import argparse
 import sys
 import torch
-from transformers import Wav2Vec2Processor, Wav2Vec2ForCTC
-
-from transcription.utils.model_utils import get_best_model_config
+from transcription.utils.model_utils import get_best_model_config, get_model
 from transcription.inference.infer import infer_single_audio
 
 
@@ -64,40 +62,17 @@ def main():
         print(f"Error: Audio file '{args.audio_path}' not found.")
         sys.exit(1)
 
-    token = (
-        args.hf_token
-        or os.environ.get("HF_TOKEN")
-        or os.environ.get("HUGGING_FACE_HUB_TOKEN")
+    print(
+        f"Loading model and processor: {args.checkpoint} (revision: {args.revision})..."
+    )
+    model, processor, device = get_model(
+        path_or_repo=args.checkpoint,
+        revision=args.revision,
+        processor_path=args.processor,
+        token=args.hf_token,
     )
 
-    if os.path.exists(args.processor):
-        print(f"Loading processor from local path: {args.processor}...")
-    else:
-        print(
-            f"Loading processor from Hugging Face Hub: {args.processor} (revision: {args.revision})..."
-        )
-    processor = Wav2Vec2Processor.from_pretrained(
-        args.processor, token=token, revision=args.revision
-    )
-
-    if os.path.exists(args.checkpoint):
-        print(f"Loading model from local path: {args.checkpoint}...")
-    else:
-        print(
-            f"Loading model from Hugging Face Hub: {args.checkpoint} (revision: {args.revision})..."
-        )
-    model = Wav2Vec2ForCTC.from_pretrained(
-        args.checkpoint, token=token, revision=args.revision
-    )
-    model.eval()
-
-    device = (
-        "cuda"
-        if torch.cuda.is_available()
-        else ("mps" if torch.backends.mps.is_available() else "cpu")
-    )
     print(f"Using device: {device}")
-    model.to(device)  # type: ignore
 
     print(f"Transcribing audio file: {args.audio_path}...")
     res = infer_single_audio(model, processor, args.audio_path, device=device)

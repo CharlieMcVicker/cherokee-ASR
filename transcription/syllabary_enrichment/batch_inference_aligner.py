@@ -27,9 +27,12 @@ import torch
 import soundfile as sf
 import numpy as np
 from tqdm import tqdm
-from transformers import Wav2Vec2Processor, Wav2Vec2ForCTC
+from transcription.utils.model_utils import (
+    get_best_model_config,
+    get_model,
+)
 
-from transcription.utils.model_utils import get_best_model_config
+
 from transcription.inference.infer import (
     TARGET_SAMPLE_RATE,
     load_and_preprocess_audio,
@@ -148,20 +151,14 @@ def run_batch_inference(
         or os.environ.get("HUGGING_FACE_HUB_TOKEN")
     )
 
-    processor: Any = Wav2Vec2Processor.from_pretrained(
-        processor_path, token=token, revision=revision
+    model: Any
+    processor: Any
+    model, processor, device = get_model(
+        path_or_repo=checkpoint,
+        revision=revision,
+        processor_path=processor_path,
+        token=token,
     )
-    model: Any = Wav2Vec2ForCTC.from_pretrained(
-        checkpoint, token=token, revision=revision
-    )
-    model.eval()
-
-    device = (
-        "cuda"
-        if torch.cuda.is_available()
-        else ("mps" if torch.backends.mps.is_available() else "cpu")
-    )
-    model.to(device)
 
     # Prepare audio metadata and track record indices
     valid_audios = []

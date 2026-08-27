@@ -17,15 +17,22 @@ import argparse
 import sys
 import glob
 import csv
+
 import torch
 import soundfile as sf
 import numpy as np
-from transformers import Wav2Vec2Processor, Wav2Vec2ForCTC
 import time
+
+
 import multiprocessing
 from tqdm import tqdm
 
-from transcription.utils.model_utils import get_best_model_config
+
+from transcription.utils.model_utils import (
+    get_best_model_config,
+    get_model,
+)
+
 from transcription.inference.infer import (
     TARGET_SAMPLE_RATE,
     load_and_preprocess_audio,
@@ -46,10 +53,11 @@ def init_worker(processor_path, token, revision):
     # Restrict internal Torch threading in workers to prevent CPU oversubscription
     torch.set_num_threads(1)
 
-    from transformers import Wav2Vec2Processor
-
-    global_processor = Wav2Vec2Processor.from_pretrained(
-        processor_path, token=token, revision=revision
+    _, global_processor, _ = get_model(
+        path_or_repo=processor_path,
+        revision=revision,
+        token=token,
+        eval_mode=False,
     )
 
 
@@ -165,42 +173,26 @@ def main():
 
     print(f"Found {len(wav_files)} WAV files to process.", flush=True)
 
+    print(
+        f"Loading model from {args.checkpoint} and processor from {args.processor} (revision: {args.revision})...",
+        flush=True,
+    )
     token = (
         args.hf_token
         or os.environ.get("HF_TOKEN")
         or os.environ.get("HUGGING_FACE_HUB_TOKEN")
     )
 
-    if os.path.exists(args.processor):
-        print(f"Loading processor from local path: {args.processor}...", flush=True)
-    else:
-        print(
-            f"Loading processor from Hugging Face Hub: {args.processor} (revision: {args.revision})...",
-            flush=True,
-        )
-    processor: Any = Wav2Vec2Processor.from_pretrained(
-        args.processor, token=token, revision=args.revision
+    model: Any
+    processor: Any
+    model, processor, device = get_model(
+        path_or_repo=args.checkpoint,
+        revision=args.revision,
+        processor_path=args.processor,
+        token=token,
     )
 
-    if os.path.exists(args.checkpoint):
-        print(f"Loading model from local path: {args.checkpoint}...", flush=True)
-    else:
-        print(
-            f"Loading model from Hugging Face Hub: {args.checkpoint} (revision: {args.revision})...",
-            flush=True,
-        )
-    model = Wav2Vec2ForCTC.from_pretrained(
-        args.checkpoint, token=token, revision=args.revision
-    )
-    model.eval()
-
-    device = (
-        "cuda"
-        if torch.cuda.is_available()
-        else ("mps" if torch.backends.mps.is_available() else "cpu")
-    )
     print(f"Using device: {device}", flush=True)
-    model.to(device)  # type: ignore
 
     # Read audio metadata for sorting (lazy loading to minimize VRAM/RAM)
     loaded_audios = []

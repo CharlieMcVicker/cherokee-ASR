@@ -6,8 +6,10 @@ import pandas as pd
 import numpy as np
 from tqdm import tqdm
 from torch.utils.data import DataLoader
-from transformers import Wav2Vec2ForCTC, Wav2Vec2Processor
+from transcription.utils.model_utils import get_model
+
 from jiwer import wer as jiwer_wer, cer as jiwer_cer
+
 
 from transcription.inference.infer import (
     greedy_inference,
@@ -64,9 +66,13 @@ def yield_local_checkpoints(checkpoints_dir, processor_path=None):
         if not processor_path:
             processor_path = checkpoints_dir
 
-    processor = Wav2Vec2Processor.from_pretrained(processor_path)
     for label, path in checkpoints:
-        model = Wav2Vec2ForCTC.from_pretrained(path)
+        model, processor, _ = get_model(
+            path_or_repo=path,
+            processor_path=processor_path,
+            device="cpu",
+            use_cache=False,
+        )
         yield label, model, processor, path
         del model
 
@@ -75,15 +81,24 @@ def yield_hf_revisions(repo_id, revisions, token=None):
     """
     Yields (label, model, processor, path) for each revision in revisions list.
     """
-    fallback_processor = Wav2Vec2Processor.from_pretrained(repo_id, token=token)
     for friendly_name, rev_hash in revisions:
-        model = Wav2Vec2ForCTC.from_pretrained(repo_id, token=token, revision=rev_hash)
         try:
-            processor = Wav2Vec2Processor.from_pretrained(
-                repo_id, token=token, revision=rev_hash
+            model, processor, _ = get_model(
+                path_or_repo=repo_id,
+                revision=rev_hash,
+                token=token,
+                device="cpu",
+                use_cache=False,
             )
         except Exception:
-            processor = fallback_processor
+            model, processor, _ = get_model(
+                path_or_repo=repo_id,
+                revision=rev_hash,
+                processor_path=repo_id,
+                token=token,
+                device="cpu",
+                use_cache=False,
+            )
         yield f"{friendly_name} ({rev_hash[:7]})", model, processor, f"hf://{repo_id}@{rev_hash}"
         del model
 
@@ -98,16 +113,14 @@ def yield_single_checkpoint(
     Yields a single local or HF checkpoint/model.
     """
     proc_path = processor_path or checkpoint_path
-    if revision is not None:
-        processor = Wav2Vec2Processor.from_pretrained(
-            proc_path, token=token, revision=revision
-        )
-        model = Wav2Vec2ForCTC.from_pretrained(
-            checkpoint_path, token=token, revision=revision
-        )
-    else:
-        processor = Wav2Vec2Processor.from_pretrained(proc_path, token=token)
-        model = Wav2Vec2ForCTC.from_pretrained(checkpoint_path, token=token)
+    model, processor, _ = get_model(
+        path_or_repo=checkpoint_path,
+        revision=revision,
+        processor_path=proc_path,
+        token=token,
+        device="cpu",
+        use_cache=False,
+    )
 
     yield "checkpoint", model, processor, checkpoint_path
     del model
