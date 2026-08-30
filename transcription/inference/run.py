@@ -8,14 +8,13 @@ import librosa
 import warnings
 
 
-from transcription.inference.infer import greedy_inference
+from transcription.models.asr_model import CherokeeASRModel
+from transcription.utils.model_utils import get_best_model_config
 
 warnings.filterwarnings("ignore")
 
 
 def parse_args():
-    from transcription.utils.model_utils import get_best_model_config
-
     model_config = get_best_model_config()
     default_repo = model_config["repo"]
 
@@ -46,11 +45,6 @@ def main():
     print(f"Using device: {device}")
 
     print("Loading model and processor...")
-    from transcription.utils.model_utils import (
-        get_best_model_config,
-        get_model,
-    )
-
     model_config = get_best_model_config()
 
     revision_str: str | None = None
@@ -60,9 +54,7 @@ def main():
             f"Using model configuration from best_model.json: {args.model_dir} (revision: {revision_str})"
         )
 
-    model: Any
-    processor: Any
-    model, processor, device = get_model(
+    asr_model = CherokeeASRModel.from_pretrained(
         path_or_repo=args.model_dir,
         revision=revision_str,
         device=device,
@@ -73,17 +65,8 @@ def main():
 
     if args.mode == "short":
         # Process the entire file
-        inputs = processor(  # type: ignore
-            speech, sampling_rate=16000, return_tensors="pt", padding=True
-        )
-        input_values = getattr(inputs, "input_values")
-        with torch.no_grad():
-            logits = model(input_values.to(device)).logits
-
-        res = greedy_inference(logits[0], processor)
-        if isinstance(res, list):
-            res = res[0]
-        pred_text = str(res["text"])
+        res = asr_model.transcribe(speech, sample_rate=16000)
+        pred_text = str(res.text)
 
         final_text = convert_to_human_orthography(pred_text)
         print(f"TRANSCRIPTION: {final_text}")
@@ -130,17 +113,8 @@ def main():
             if len(chunk) < 1600:  # skip < 100ms
                 continue
 
-            inputs = processor(  # type: ignore
-                chunk, sampling_rate=16000, return_tensors="pt", padding=True
-            )
-            input_values = getattr(inputs, "input_values")
-            with torch.no_grad():
-                logits = model(input_values.to(device)).logits
-
-            res = greedy_inference(logits[0], processor)
-            if isinstance(res, list):
-                res = res[0]
-            pred_text = str(res["text"])
+            res = asr_model.transcribe(chunk, sample_rate=16000)
+            pred_text = str(res.text)
 
             final_text = convert_to_human_orthography(pred_text)
             results.append((start_val, end_val, final_text))

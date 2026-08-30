@@ -29,7 +29,6 @@ dependencies = [
     "streamlit",
     "torch",
     "torchaudio",
-    "torchcodec",
     "tqdm",
     "transformers",
     "uvicorn",
@@ -40,6 +39,7 @@ dev = [
     "black",
     "pre-commit",
     "pytest",
+    "matplotlib"
 ]
 
 [project.scripts]

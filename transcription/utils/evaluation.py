@@ -1,18 +1,18 @@
 import os
 import re
 import glob
+from typing import Any
 import torch
 import pandas as pd
 import numpy as np
 from tqdm import tqdm
 from torch.utils.data import DataLoader
-from transcription.utils.model_utils import get_model
+from transcription.models.asr_model import CherokeeASRModel
 
 from jiwer import wer as jiwer_wer, cer as jiwer_cer
 
 
 from transcription.inference.infer import (
-    greedy_inference,
     strip_tones,
     strip_length,
     strip_both,
@@ -36,7 +36,7 @@ def clean_eval_cache(device):
 
 def yield_local_checkpoints(checkpoints_dir, processor_path=None):
     """
-    Yields (label, model, processor, path) for all checkpoints in checkpoints_dir.
+    Yields (label, asr_model, processor, path) for all checkpoints in checkpoints_dir.
     """
     ckpt_dirs = glob.glob(os.path.join(checkpoints_dir, "checkpoint-*"))
 
@@ -67,23 +67,23 @@ def yield_local_checkpoints(checkpoints_dir, processor_path=None):
             processor_path = checkpoints_dir
 
     for label, path in checkpoints:
-        model, processor, _ = get_model(
+        asr_model = CherokeeASRModel.from_pretrained(
             path_or_repo=path,
             processor_path=processor_path,
             device="cpu",
             use_cache=False,
         )
-        yield label, model, processor, path
-        del model
+        yield label, asr_model, asr_model.processor, path
+        del asr_model
 
 
 def yield_hf_revisions(repo_id, revisions, token=None):
     """
-    Yields (label, model, processor, path) for each revision in revisions list.
+    Yields (label, asr_model, processor, path) for each revision in revisions list.
     """
     for friendly_name, rev_hash in revisions:
         try:
-            model, processor, _ = get_model(
+            asr_model = CherokeeASRModel.from_pretrained(
                 path_or_repo=repo_id,
                 revision=rev_hash,
                 token=token,
@@ -91,7 +91,7 @@ def yield_hf_revisions(repo_id, revisions, token=None):
                 use_cache=False,
             )
         except Exception:
-            model, processor, _ = get_model(
+            asr_model = CherokeeASRModel.from_pretrained(
                 path_or_repo=repo_id,
                 revision=rev_hash,
                 processor_path=repo_id,
@@ -99,8 +99,8 @@ def yield_hf_revisions(repo_id, revisions, token=None):
                 device="cpu",
                 use_cache=False,
             )
-        yield f"{friendly_name} ({rev_hash[:7]})", model, processor, f"hf://{repo_id}@{rev_hash}"
-        del model
+        yield f"{friendly_name} ({rev_hash[:7]})", asr_model, asr_model.processor, f"hf://{repo_id}@{rev_hash}"
+        del asr_model
 
 
 def yield_single_checkpoint(
@@ -110,10 +110,10 @@ def yield_single_checkpoint(
     token: str | None = None,
 ):
     """
-    Yields a single local or HF checkpoint/model.
+    Yields a single local or HF checkpoint/model as CherokeeASRModel.
     """
     proc_path = processor_path or checkpoint_path
-    model, processor, _ = get_model(
+    asr_model = CherokeeASRModel.from_pretrained(
         path_or_repo=checkpoint_path,
         revision=revision,
         processor_path=proc_path,
@@ -122,8 +122,8 @@ def yield_single_checkpoint(
         use_cache=False,
     )
 
-    yield "checkpoint", model, processor, checkpoint_path
-    del model
+    yield "checkpoint", asr_model, asr_model.processor, checkpoint_path
+    del asr_model
 
 
 def run_evaluation(
@@ -141,10 +141,19 @@ def run_evaluation(
     rows_by_ckpt = {}
     ranking = []
 
-    for label, model, processor, path in model_generator:
+    for label, asr_model_or_model, processor, path in model_generator:
         print(f"Evaluating model: {label} ({path})")
+        if isinstance(asr_model_or_model, CherokeeASRModel):
+            asr_model = asr_model_or_model
+            asr_model.device = device
+            if hasattr(asr_model.model, "to"):
+                asr_model.model.to(device)
+        else:
+            asr_model = CherokeeASRModel(asr_model_or_model, processor, device=device)
+
+        model = asr_model.model
+        processor = asr_model.processor
         model.eval()
-        model.to(device)
 
         # If no data_collator provided, create one dynamically
         if data_collator is None:
@@ -189,9 +198,18 @@ def run_evaluation(
 
             if attention_mask is not None:
                 input_lengths = attention_mask.sum(dim=-1)
-                output_lengths = (
-                    model._get_feat_extract_output_lengths(input_lengths).cpu().numpy()
+                feat_extractor = getattr(
+                    model, "_get_feat_extract_output_lengths", None
                 )
+                if callable(feat_extractor):
+                    raw_lens: Any = feat_extractor(input_lengths)
+                    output_lengths = (
+                        raw_lens.cpu().numpy()
+                        if hasattr(raw_lens, "cpu")
+                        else np.array(raw_lens)
+                    )
+                else:
+                    output_lengths = [logits.shape[1]] * logits.shape[0]
             else:
                 output_lengths = [logits.shape[1]] * logits.shape[0]
 
@@ -204,8 +222,8 @@ def run_evaluation(
         ckpt_rows = []
         for idx, logits in enumerate(all_logits):
             ref = all_gold[idx]
-            res = greedy_inference(logits, processor)
-            hyp = res["text"] if isinstance(res, dict) else ""
+            res = asr_model.decode(logits, compute_word_confidences=False)
+            hyp = res.text
 
             ref_safe, hyp_safe = safe(ref), safe(hyp)
 
@@ -249,41 +267,44 @@ def run_evaluation(
                 "checkpoint": label,
                 "path": path,
                 "median_wer_greedy": float(np.median(df["wer_greedy"])),
-                "median_cer_greedy": float(np.median(df["cer_greedy"])),
-                "agg_wer_greedy": jiwer_wer(golds, greedies),
-                "agg_cer_greedy": jiwer_cer(golds, greedies),
-                "median_wer_greedy_masked": float(np.median(df["wer_greedy_masked"])),
-                "median_cer_greedy_masked": float(np.median(df["cer_greedy_masked"])),
-                "agg_wer_greedy_masked": jiwer_wer(
-                    [safe(strip_length(g)) for g in golds],
+                "agg_wer_raw": jiwer_wer(
+                    [safe(g) for g in all_gold], [safe(h) for h in greedies]
+                ),
+                "agg_cer_raw": jiwer_cer(
+                    [safe(g) for g in all_gold], [safe(h) for h in greedies]
+                ),
+                "agg_wer_length_masked": jiwer_wer(
+                    [safe(strip_length(g)) for g in all_gold],
                     [safe(strip_length(h)) for h in greedies],
                 ),
-                "agg_cer_greedy_masked": jiwer_cer(
-                    [safe(strip_length(g)) for g in golds],
+                "agg_cer_length_masked": jiwer_cer(
+                    [safe(strip_length(g)) for g in all_gold],
                     [safe(strip_length(h)) for h in greedies],
                 ),
                 "agg_wer_tone_masked": jiwer_wer(
-                    [safe(strip_tones(g)) for g in golds],
+                    [safe(strip_tones(g)) for g in all_gold],
                     [safe(strip_tones(h)) for h in greedies],
                 ),
                 "agg_cer_tone_masked": jiwer_cer(
-                    [safe(strip_tones(g)) for g in golds],
+                    [safe(strip_tones(g)) for g in all_gold],
                     [safe(strip_tones(h)) for h in greedies],
                 ),
                 "agg_wer_both_masked": jiwer_wer(
-                    [safe(strip_both(g)) for g in golds],
+                    [safe(strip_both(g)) for g in all_gold],
                     [safe(strip_both(h)) for h in greedies],
                 ),
                 "agg_cer_both_masked": jiwer_cer(
-                    [safe(strip_both(g)) for g in golds],
+                    [safe(strip_both(g)) for g in all_gold],
                     [safe(strip_both(h)) for h in greedies],
                 ),
             }
         )
 
         clean_eval_cache(device)
-        model.to("cpu")
+        if hasattr(model, "to"):
+            model.to("cpu")
         del model
+        clean_eval_cache(device)
         clean_eval_cache(device)
 
     ranking_df = pd.DataFrame(ranking)

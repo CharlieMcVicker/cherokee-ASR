@@ -15,8 +15,8 @@ os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
 import argparse
 import sys
 import torch
-from transcription.utils.model_utils import get_best_model_config, get_model
-from transcription.inference.infer import infer_single_audio
+from transcription.models.asr_model import CherokeeASRModel
+from transcription.utils.model_utils import get_best_model_config
 
 
 def main():
@@ -65,22 +65,20 @@ def main():
     print(
         f"Loading model and processor: {args.checkpoint} (revision: {args.revision})..."
     )
-    model, processor, device = get_model(
+    asr_model = CherokeeASRModel.from_pretrained(
         path_or_repo=args.checkpoint,
         revision=args.revision,
         processor_path=args.processor,
         token=args.hf_token,
     )
 
-    print(f"Using device: {device}")
+    print(f"Using device: {asr_model.device}")
 
     print(f"Transcribing audio file: {args.audio_path}...")
-    res = infer_single_audio(model, processor, args.audio_path, device=device)
-    if isinstance(res, list):
-        res = res[0]
+    res = asr_model.transcribe(args.audio_path)
 
-    text = str(res["text"])
-    confidence = float(res["confidence"])
+    text = str(res.text)
+    confidence = float(res.confidence)
 
     print("\n" + "=" * 60)
     print("GREEDY DECODING PREDICTIONS:")

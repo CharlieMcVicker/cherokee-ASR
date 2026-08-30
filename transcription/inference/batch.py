@@ -28,37 +28,32 @@ import multiprocessing
 from tqdm import tqdm
 
 
-from transcription.utils.model_utils import (
-    get_best_model_config,
-    get_model,
-)
+from transcription.models.asr_model import CherokeeASRModel, WordConfidence
+from transcription.utils.model_utils import get_best_model_config
 
-from transcription.inference.infer import (
-    TARGET_SAMPLE_RATE,
-    load_and_preprocess_audio,
-    calculate_word_confidences,
-    greedy_inference,
-)
+from transcription.inference.infer import TARGET_SAMPLE_RATE
 
-# Global variables in the worker processes to avoid serializing the processor objects
+# Global variables in the worker processes to avoid serializing the model/processor objects
+global_asr_model: CherokeeASRModel | None = None
 global_processor = None
 
 
 def init_worker(processor_path, token, revision):
     """
-    Initialize global processor in worker processes once.
+    Initialize global CherokeeASRModel in worker processes once.
     This avoids pickle serialization overhead.
     """
-    global global_processor
+    global global_asr_model, global_processor
     # Restrict internal Torch threading in workers to prevent CPU oversubscription
     torch.set_num_threads(1)
 
-    _, global_processor, _ = get_model(
+    global_asr_model = CherokeeASRModel.from_pretrained(
         path_or_repo=processor_path,
         revision=revision,
         token=token,
         eval_mode=False,
     )
+    global_processor = global_asr_model.processor
 
 
 def decode_worker(item_data):
@@ -66,28 +61,22 @@ def decode_worker(item_data):
     Worker function to decode logits and compute detailed confidences.
     item_data is a tuple: (index, filename, audio_path, logits_np)
     """
-    global global_processor
-    import numpy as np
-    import torch
+    global global_asr_model
     import json
-    from transcription.inference.infer import (
-        calculate_word_confidences,
-        greedy_inference,
-    )
+    import torch
 
     idx, filename, audio_path, logits_np = item_data
 
     logits_tensor = torch.tensor(logits_np)
-    res = greedy_inference(logits_tensor, global_processor)
-    if isinstance(res, list):
-        res = res[0]
-    greedy_raw = str(res["text"])
-    greedy_confidence = float(res["confidence"])
+    assert global_asr_model is not None
+    result = global_asr_model.decode(logits_tensor, compute_word_confidences=True)
+    greedy_raw = str(result.text)
+    greedy_confidence = float(result.confidence)
 
-    # Calculate detailed character/word confidences
-    probs = torch.nn.functional.softmax(logits_tensor, dim=-1).numpy()
-    pred_ids = np.argmax(probs, axis=-1)
-    words_details = calculate_word_confidences(probs, pred_ids, global_processor)
+    # Convert word confidences to json
+    words_details = [
+        w.to_dict() if isinstance(w, WordConfidence) else w for w in result.words
+    ]
     word_confidences_json = json.dumps(words_details, ensure_ascii=False)
 
     return {
@@ -183,14 +172,15 @@ def main():
         or os.environ.get("HUGGING_FACE_HUB_TOKEN")
     )
 
-    model: Any
-    processor: Any
-    model, processor, device = get_model(
+    asr_model = CherokeeASRModel.from_pretrained(
         path_or_repo=args.checkpoint,
         revision=args.revision,
         processor_path=args.processor,
         token=token,
     )
+    model = asr_model.model
+    processor = asr_model.processor
+    device = asr_model.device
 
     print(f"Using device: {device}", flush=True)
 
@@ -296,7 +286,7 @@ def main():
         speech_list = []
         for item in batch:
             try:
-                speech = load_and_preprocess_audio(
+                speech = CherokeeASRModel.preprocess_audio(
                     item["audio_path"], TARGET_SAMPLE_RATE
                 )
                 item["speech"] = speech

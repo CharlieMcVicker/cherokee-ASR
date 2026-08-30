@@ -27,10 +27,8 @@ import torch
 import soundfile as sf
 import numpy as np
 from tqdm import tqdm
-from transcription.utils.model_utils import (
-    get_best_model_config,
-    get_model,
-)
+from transcription.models.asr_model import CherokeeASRModel
+from transcription.utils.model_utils import get_best_model_config
 
 
 from transcription.inference.infer import (
@@ -151,14 +149,15 @@ def run_batch_inference(
         or os.environ.get("HUGGING_FACE_HUB_TOKEN")
     )
 
-    model: Any
-    processor: Any
-    model, processor, device = get_model(
+    asr_model = CherokeeASRModel.from_pretrained(
         path_or_repo=checkpoint,
         revision=revision,
         processor_path=processor_path,
         token=token,
     )
+    model = asr_model.model
+    processor = asr_model.processor
+    device = asr_model.device
 
     # Prepare audio metadata and track record indices
     valid_audios = []
@@ -290,7 +289,9 @@ def run_batch_inference(
                 # MPS or OOM fallback to CPU/sequential
                 if device == "mps":
                     device = "cpu"
-                    model.to(device)
+                    from typing import cast
+
+                    cast(Any, model).to(device)
                 input_values = input_values.to(device)
                 if attention_mask is not None:
                     attention_mask = attention_mask.to(device)

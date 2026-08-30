@@ -150,7 +150,21 @@ def align_audio_segment(
         import torch
 
         for c in chunks:
-            if callable(model_or_fn) and processor is None:
+            from transcription.models.asr_model import CherokeeASRModel
+
+            if isinstance(model_or_fn, CherokeeASRModel):
+                samples = np.array(c.audio.get_array_of_samples(), dtype=np.float32)
+                if c.audio.channels > 1:
+                    samples = samples.reshape((-1, c.audio.channels)).mean(axis=1)
+                max_val = float(1 << (8 * c.audio.sample_width - 1))
+                samples = samples / max_val
+                logits = model_or_fn.get_logits(samples, sample_rate=c.audio.frame_rate)
+                word_confidences = model_or_fn.get_word_confidences(logits)
+                chunk_words = [
+                    w.to_dict() if hasattr(w, "to_dict") else w
+                    for w in word_confidences
+                ]
+            elif callable(model_or_fn) and processor is None:
                 # Custom inference callback function: fn(samples, sample_rate) -> list of word dicts
                 samples = np.array(c.audio.get_array_of_samples(), dtype=np.float32)
                 if c.audio.channels > 1:

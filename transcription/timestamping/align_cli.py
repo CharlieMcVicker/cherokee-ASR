@@ -59,8 +59,7 @@ def run_alignment_pipeline(
         print(f"[2/4] Segmenting audio file '{audio_path}' with VAD...")
 
     print(f"[3/4] Running ASR emission extraction & DTW alignment...")
-    import torch
-    from transformers import Wav2Vec2ForCTC, Wav2Vec2Processor
+    from transcription.models.asr_model import CherokeeASRModel
     from transcription.utils.model_utils import get_best_model_config
 
     token = os.environ.get("HF_TOKEN", None)
@@ -70,10 +69,8 @@ def run_alignment_pipeline(
         model_path = str(model_config.get("repo", "facebook/wav2vec2-base-960h"))
         model_revision = model_config.get("revision", None)
 
-    from transcription.utils.model_utils import get_model
-
     try:
-        model, processor, device = get_model(
+        asr_model = CherokeeASRModel.from_pretrained(
             path_or_repo=model_path,
             revision=model_revision,
             token=token,
@@ -83,7 +80,7 @@ def run_alignment_pipeline(
         print(
             f"      [Warning] Could not load '{model_path}' ({e}). Falling back to public model '{fallback_repo}'..."
         )
-        model, processor, device = get_model(
+        asr_model = CherokeeASRModel.from_pretrained(
             path_or_repo=fallback_repo,
             token=token,
         )
@@ -93,8 +90,7 @@ def run_alignment_pipeline(
     alignment = align_audio_segment(
         audio_input=audio_path,
         verses=verses,
-        model_or_fn=model,
-        processor=processor,
+        model_or_fn=asr_model,
         audio_source=audio_path,
         skip_vad=skip_vad,
         reconcile=reconcile,
