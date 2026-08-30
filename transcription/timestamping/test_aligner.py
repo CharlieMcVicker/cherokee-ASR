@@ -10,7 +10,12 @@ from transcription.timestamping.aligner import (
     align_tokens_to_verses,
     align_emissions_to_text,
     align_audio_segment,
+    create_audio_aligner,
     AlignmentResult,
+)
+from transcription.alignment.strategies.extractors import (
+    PrecomputedEmissionsExtractor,
+    CallbackEmissionsExtractor,
 )
 
 
@@ -71,35 +76,7 @@ class TestAligner(unittest.TestCase):
         self.assertEqual(len(result.verses), 1)
         self.assertEqual(result.verses[0].start_sec, 0.5)
 
-    def test_align_audio_segment_with_token_emissions(self):
-        tokens = [
-            {
-                "word": "ataleniskv",
-                "start_time": 0.0,
-                "end_time": 0.5,
-                "confidence": 0.95,
-            },
-        ]
-        verses = [
-            {
-                "line_id": "020101",
-                "cherokee_syllabary": "ᎠᏓᎴᏂᏍᎬ",
-                "raw_phonetic": "A-da-le-ni-s-gv",
-                "normalized_text": "ataleniskv",
-                "english": "Beginning",
-            }
-        ]
-        result = align_audio_segment(
-            audio_input=None,
-            verses=verses,
-            token_emissions=tokens,
-            audio_source="precomputed_emissions",
-            skip_vad=True,
-        )
-        self.assertEqual(len(result.verses), 1)
-        self.assertEqual(result.verses[0].start_sec, 0.0)
-
-    def test_align_audio_segment_with_callable_fn(self):
+    def test_align_audio_segment_with_extractor(self):
         from pydub import AudioSegment
 
         dummy_audio = AudioSegment.silent(duration=2000, frame_rate=16000)
@@ -124,16 +101,48 @@ class TestAligner(unittest.TestCase):
             }
         ]
 
+        extractor = CallbackEmissionsExtractor(callback=mock_fn, skip_vad=True)
         result = align_audio_segment(
             audio_input=dummy_audio,
             verses=verses,
-            model_or_fn=mock_fn,
-            skip_vad=True,
+            extractor=extractor,
             audio_source="dummy_audio",
         )
         self.assertEqual(len(result.verses), 1)
         self.assertEqual(result.verses[0].start_sec, 0.2)
         self.assertEqual(result.verses[0].end_sec, 0.8)
+
+    def test_create_audio_aligner(self):
+        from pydub import AudioSegment
+
+        dummy_audio = AudioSegment.silent(duration=2000, frame_rate=16000)
+
+        def mock_fn(samples, sample_rate):
+            return [
+                {
+                    "word": "ataleniskv",
+                    "start_time": 0.2,
+                    "end_time": 0.8,
+                    "confidence": 0.99,
+                }
+            ]
+
+        verses = [
+            {
+                "line_id": "020101",
+                "cherokee_syllabary": "ᎠᏓᎴᏂᏍᎬ",
+                "raw_phonetic": "A-da-le-ni-s-gv",
+                "normalized_text": "ataleniskv",
+                "english": "Beginning",
+            }
+        ]
+
+        extractor = CallbackEmissionsExtractor(callback=mock_fn, skip_vad=True)
+        aligner_fn = create_audio_aligner(extractor=extractor)
+        result = aligner_fn(dummy_audio, verses, audio_source="curried_aligner")
+        self.assertEqual(result.audio_source, "curried_aligner")
+        self.assertEqual(len(result.verses), 1)
+        self.assertEqual(result.verses[0].start_sec, 0.2)
 
     def test_preamble_skip(self):
         # Tokens include leading preamble intro chatter (0.0s - 2.5s)

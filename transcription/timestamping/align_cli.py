@@ -86,13 +86,13 @@ def run_alignment_pipeline(
         )
 
     from transcription.timestamping.aligner import align_audio_segment
+    from transcription.alignment.strategies.extractors import CherokeeASRExtractor
 
     alignment = align_audio_segment(
         audio_input=audio_path,
         verses=verses,
-        model_or_fn=asr_model,
+        extractor=CherokeeASRExtractor(asr_model, skip_vad=skip_vad),
         audio_source=audio_path,
-        skip_vad=skip_vad,
         reconcile=reconcile,
     )
 
