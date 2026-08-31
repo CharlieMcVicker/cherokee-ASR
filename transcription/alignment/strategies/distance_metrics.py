@@ -28,18 +28,17 @@ class PhonologicalDistanceMetric:
     """
     Configurable weighted edit distance metric.
 
-    Allows specifying custom substitution costs for phonetic/phonological pairs,
-    defaulting to 1.0 for standard insertions/deletions and substitutions.
+    Allows specifying custom substitution costs for phonetic/phonological pairs.
     """
 
     def __init__(
         self,
-        substitution_weights: Optional[Dict[Tuple[str, str], float]] = None,
-        insertion_cost: float = 1.0,
-        deletion_cost: float = 1.0,
-        default_substitution_cost: float = 1.0,
+        substitution_weights: Dict[Tuple[str, str], float],
+        insertion_cost: float,
+        deletion_cost: float,
+        default_substitution_cost: float,
     ):
-        self.substitution_weights = substitution_weights or {}
+        self.substitution_weights = substitution_weights
         self.insertion_cost = insertion_cost
         self.deletion_cost = deletion_cost
         self.default_substitution_cost = default_substitution_cost
@@ -85,3 +84,19 @@ class PhonologicalDistanceMetric:
 
         raw_distance = dp[m][n]
         return float(raw_distance / m)
+
+    @classmethod
+    def make_default(
+        cls,
+        substitution_weights: Optional[Dict[Tuple[str, str], float]] = None,
+        insertion_cost: float = 1.0,
+        deletion_cost: float = 1.0,
+        default_substitution_cost: float = 1.0,
+    ) -> "PhonologicalDistanceMetric":
+        """Factory method creating a PhonologicalDistanceMetric with default parameters."""
+        return cls(
+            substitution_weights=substitution_weights or {},
+            insertion_cost=insertion_cost,
+            deletion_cost=deletion_cost,
+            default_substitution_cost=default_substitution_cost,
+        )

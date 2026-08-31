@@ -26,7 +26,7 @@ from transcription.alignment.domain.models import (
 
 
 def test_bible_metadata_verse_adapter_dict():
-    adapter = BibleMetadataVerseAdapter()
+    adapter = BibleMetadataVerseAdapter.make_default()
     data = {
         "020101": {
             "phonetic": "A-da-le-ni-s-gv",
@@ -49,7 +49,7 @@ def test_bible_metadata_verse_adapter_dict():
 
 
 def test_bible_metadata_verse_adapter_file():
-    adapter = BibleMetadataVerseAdapter()
+    adapter = BibleMetadataVerseAdapter.make_default()
     data = {
         "020101": {
             "phonetic": "A-da-le-ni-s-gv",
@@ -67,47 +67,8 @@ def test_bible_metadata_verse_adapter_file():
         assert chunks[0].chunk_id == "020101"
 
 
-def test_bible_metadata_verse_adapter_to_verse_intervals():
-    adapter = BibleMetadataVerseAdapter()
-    chunk = TextChunk(
-        chunk_id="020101",
-        raw_text="A-da-le-ni-s-gv",
-        syllabary_text="ᎠᏓᎴᏂᏍᎬ",
-        metadata={"english": "The beginning"},
-    )
-    word = WordInterval(
-        word="adalenisgv",
-        start_sec=1.0,
-        end_sec=1.5,
-        confidence=0.9,
-        syllabary="ᎠᏓᎴᏂᏍᎬ",
-    )
-    aligned = AlignedChunk(
-        chunk_id="020101",
-        chunk=chunk,
-        start_sec=1.0,
-        end_sec=1.5,
-        words=[word],
-        distance_score=0.0,
-        emitted_text="adalenisgv",
-    )
-    output = AlignmentOutput(
-        source_id="test.wav",
-        aligned_chunks=[aligned],
-    )
-
-    verses = adapter.to_verse_intervals(output)
-    assert len(verses) == 1
-    assert verses[0].line_id == "020101"
-    assert verses[0].cherokee_syllabary == "ᎠᏓᎴᏂᏍᎬ"
-    assert verses[0].raw_phonetic == "A-da-le-ni-s-gv"
-    assert verses[0].english == "The beginning"
-    assert len(verses[0].words) == 1
-    assert verses[0].words[0].word == "adalenisgv"
-
-
 def test_generic_chunk_list_adapter():
-    adapter = GenericChunkListAdapter()
+    adapter = GenericChunkListAdapter.make_default()
     items = [
         {
             "id": "c1",
@@ -140,7 +101,7 @@ def test_generic_chunk_list_adapter():
 
 
 def test_praat_textgrid_adapter_export():
-    adapter = PraatTextGridAdapter()
+    adapter = PraatTextGridAdapter.make_default()
     chunk = TextChunk(
         chunk_id="chunk_01",
         raw_text="A-da-le-ni-s-gv",
@@ -234,3 +195,44 @@ def test_manifest_json_adapter_export():
         assert data["lines"][0]["english"] == "The beginning"
         assert data["lines"][0]["words"][0]["syllabary_word"] == "ᎠᏓᎴᏂᏍᎬ"
         assert data["lines"][0]["words"][0]["reconciled_word"] == "adalenisgv_rec"
+
+
+def test_inbound_adapters_implement_protocol():
+    from transcription.alignment.ports.protocols import InboundChunkAdapter
+
+    data = {
+        "020101": {
+            "phonetic": "A-da-le-ni-s-gv",
+            "cherokee": "ᎠᏓᎴᏂᏍᎬ",
+            "english": "The beginning",
+        }
+    }
+    with tempfile.TemporaryDirectory() as tmpdir:
+        json_path = os.path.join(tmpdir, "meta.json")
+        with open(json_path, "w", encoding="utf-8") as f:
+            json.dump(data, f)
+
+        bible_adapter = BibleMetadataVerseAdapter.make_default(path=json_path)
+        assert isinstance(bible_adapter, InboundChunkAdapter)
+        chunks = bible_adapter.load_chunks()
+        assert len(chunks) == 1
+
+        generic_items = [{"id": "c1", "text": "osiyo"}]
+        chunk_json_path = os.path.join(tmpdir, "chunks.json")
+        with open(chunk_json_path, "w", encoding="utf-8") as f:
+            json.dump(generic_items, f)
+
+        generic_adapter = GenericChunkListAdapter.make_default(path=chunk_json_path)
+        assert isinstance(generic_adapter, InboundChunkAdapter)
+        generic_chunks = generic_adapter.load_chunks()
+        assert len(generic_chunks) == 1
+
+
+def test_outbound_adapters_implement_protocol():
+    from transcription.alignment.ports.protocols import OutboundAlignmentAdapter
+
+    praat_adapter = PraatTextGridAdapter.make_default()
+    manifest_adapter = ManifestJsonAdapter()
+
+    assert isinstance(praat_adapter, OutboundAlignmentAdapter)
+    assert isinstance(manifest_adapter, OutboundAlignmentAdapter)

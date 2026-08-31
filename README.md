@@ -15,12 +15,14 @@ workshop-transcription/
 │   │   ├── batch.py              # Batch inference on a directory of WAVs
 │   │   ├── infer.py              # Core greedy inference and confidence scoring
 │   │   └── labeler.py            # Web-based interface for low-confidence labeling
-│   ├── timestamping/             # Ground-truth DTW timestamp alignment pipeline
-│   │   ├── align_cli.py          # Unified CLI runner for timestamp alignment
-│   │   ├── aligner.py            # Dynamic Time Warping (DTW) & Needleman-Wunsch aligner
-│   │   ├── audio_segmenter.py    # VAD speech chunking for long audio
-│   │   ├── exporter.py           # Praat TextGrid & JSON manifest export
-│   │   └── prepare_ground_truth.py # Ingest Bible metadata or chunk JSON lists
+│   ├── alignment/                # Ground-truth DTW timestamp alignment pipeline (Ports & Adapters)
+│   │   ├── cli.py                # Unified CLI runner for timestamp alignment
+│   │   ├── pipeline.py           # Alignment orchestrator
+│   │   ├── core/                 # Pure alignment engines (DTW & Needleman-Wunsch)
+│   │   ├── domain/               # Core domain models
+│   │   ├── ports/                # System protocols and interfaces
+│   │   ├── strategies/           # Extraction, metrics, preprocessors & reconciliation
+│   │   └── adapters/             # Inbound & Outbound adapters (Praat, JSON, Bible)
 │   ├── syllabary_enrichment/     # Phonetic rule merger & reconciliation engine
 │   │   ├── alignment_engine.py   # Fine-grained character & syllable level alignment engine
 │   │   ├── enrich_syllabary.py   # Core rule engine for vowel syncopation & aspiration transfer

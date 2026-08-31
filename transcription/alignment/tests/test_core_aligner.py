@@ -23,7 +23,7 @@ from transcription.alignment.strategies.preprocessors import (
 
 
 def test_word_aligner_exact_match():
-    aligner = NeedlemanWunschWordAligner()
+    aligner = NeedlemanWunschWordAligner.make_default()
     raw_words = ["osiyo", "tohiju"]
     tokens = [
         TokenEmission(word="osiyo", start_sec=0.1, end_sec=0.6, confidence=0.9),
@@ -42,7 +42,7 @@ def test_word_aligner_exact_match():
 
 
 def test_word_aligner_fusion_gt_and_asr():
-    aligner = NeedlemanWunschWordAligner()
+    aligner = NeedlemanWunschWordAligner.make_default()
     # 1 ASR token corresponds to 2 GT words: "o si" -> "osi"
     raw_words = ["o", "si", "yo"]
     tokens = [
@@ -65,11 +65,11 @@ def test_word_aligner_fusion_gt_and_asr():
 
 
 def test_word_aligner_with_custom_metric_and_preprocessor():
-    custom_metric = PhonologicalDistanceMetric()
+    custom_metric = PhonologicalDistanceMetric.make_default()
     custom_prep = CherokeePhoneticPreprocessor()
-    aligner = NeedlemanWunschWordAligner(
-        default_distance_metric=custom_metric,
-        default_preprocessor=custom_prep,
+    aligner = NeedlemanWunschWordAligner.make_default(
+        distance_metric=custom_metric,
+        preprocessor=custom_prep,
     )
     raw_words = ["quana"]
     tokens = [TokenEmission(word="gwana", start_sec=0.0, end_sec=0.5, confidence=0.8)]
@@ -80,12 +80,12 @@ def test_word_aligner_with_custom_metric_and_preprocessor():
 
 
 def test_sliding_window_dtw_aligner_protocol():
-    aligner = SlidingWindowDTWAligner()
+    aligner = SlidingWindowDTWAligner.make_default()
     assert isinstance(aligner, ChunkAlignmentEngine)
 
 
 def test_sliding_window_dtw_alignment_flow():
-    aligner = SlidingWindowDTWAligner()
+    aligner = SlidingWindowDTWAligner.make_default()
 
     chunks = [
         TextChunk(
@@ -111,11 +111,8 @@ def test_sliding_window_dtw_alignment_flow():
         TokenEmission(word="yisdv", start_sec=1.3, end_sec=1.8, confidence=0.90),
     ]
 
-    out = aligner.align_chunks(
-        emissions=emissions, chunks=chunks, audio_source="test.wav"
-    )
+    out = aligner.align_chunks(emissions=emissions, chunks=chunks)
     assert isinstance(out, AlignmentOutput)
-    assert out.source_id == "test.wav"
     assert len(out.aligned_chunks) == 2
 
     c1 = out.aligned_chunks[0]
@@ -139,7 +136,7 @@ def test_sliding_window_dtw_alignment_flow():
 
 
 def test_sliding_window_empty_inputs():
-    aligner = SlidingWindowDTWAligner()
+    aligner = SlidingWindowDTWAligner.make_default()
     chunks = [TextChunk(chunk_id="c1", raw_text="osiyo")]
 
     # Empty emissions
@@ -165,7 +162,9 @@ def test_sliding_window_reconciliation_mock():
         def reconcile(self, syllabary_text: str, emitted_text: str):
             return f"reconciled_{emitted_text}", [(syllabary_text, emitted_text)]
 
-    aligner = SlidingWindowDTWAligner()
+    aligner = SlidingWindowDTWAligner.make_default(
+        reconciliation_strategy=DummyReconciliation()
+    )
     chunks = [
         TextChunk(
             chunk_id="c1",
@@ -179,7 +178,6 @@ def test_sliding_window_reconciliation_mock():
     out = aligner.align_chunks(
         emissions=emissions,
         chunks=chunks,
-        reconciliation_strategy=DummyReconciliation(),
     )
     assert len(out.aligned_chunks) == 1
     assert len(out.aligned_chunks[0].words) == 1

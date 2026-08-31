@@ -45,7 +45,7 @@ def align_chapter(
     performing VAD, ground-truth ingest, ASR CTC emissions extraction, DTW alignment,
     reconciliation, and automatic Praat TextGrid / alignment manifest export.
     """
-    from transcription.timestamping.align_cli import run_alignment_pipeline
+    from transcription.alignment.cli import run_alignment_pipeline
 
     return run_alignment_pipeline(
         audio_path=str(audio_path),

@@ -23,8 +23,21 @@ class BibleMetadataVerseAdapter:
     Maps chapter dictionaries (keyed by verse_id or list of verse objects) to TextChunks.
     """
 
-    def __init__(self, preprocessor: Optional[PhoneticPreprocessor] = None):
-        self.preprocessor = preprocessor or CherokeePhoneticPreprocessor()
+    def __init__(
+        self,
+        preprocessor: PhoneticPreprocessor,
+        path: Optional[str] = None,
+    ):
+        self.preprocessor = preprocessor
+        self.path = path
+
+    def load_chunks(self) -> List[TextChunk]:
+        """
+        Loads TextChunk domain entities from self.path.
+        """
+        if not self.path:
+            raise ValueError("No path provided to BibleMetadataVerseAdapter.")
+        return self.load_chunks_from_file(self.path)
 
     def load_chunks_from_file(self, path: str) -> List[TextChunk]:
         """
@@ -134,53 +147,17 @@ class BibleMetadataVerseAdapter:
 
         return chunks
 
-    def to_verse_intervals(self, output: AlignmentOutput) -> List[Any]:
-        """
-        Maps AlignmentOutput's AlignedChunks back to legacy VerseInterval objects.
-        """
-        from transcription.timestamping.aligner import (
-            VerseInterval,
-            WordInterval as LegacyWordInterval,
+    @classmethod
+    def make_default(
+        cls,
+        path: Optional[str] = None,
+        preprocessor: Optional[PhoneticPreprocessor] = None,
+    ) -> "BibleMetadataVerseAdapter":
+        """Factory method creating a BibleMetadataVerseAdapter with default preprocessor."""
+        return cls(
+            preprocessor=preprocessor or CherokeePhoneticPreprocessor(),
+            path=path,
         )
-
-        verse_intervals: List[VerseInterval] = []
-
-        for aligned in output.aligned_chunks:
-            legacy_words = [
-                LegacyWordInterval(
-                    word=w.word,
-                    start_sec=w.start_sec,
-                    end_sec=w.end_sec,
-                    confidence=w.confidence,
-                    flagged=w.flagged,
-                    cherokee_syllabary=w.syllabary or "",
-                    reconciled_word=w.reconciled_word or "",
-                    emitted_word=w.emitted_word or "",
-                )
-                for w in aligned.words
-            ]
-
-            meta = aligned.chunk.metadata
-            line_id = meta.get("line_id", meta.get("verse_id", aligned.chunk_id))
-            english = meta.get("english", "")
-            raw_phonetic = aligned.chunk.raw_text
-            syllabary = aligned.chunk.syllabary_text or ""
-
-            verse_intervals.append(
-                VerseInterval(
-                    line_id=line_id,
-                    cherokee_syllabary=syllabary,
-                    raw_phonetic=raw_phonetic,
-                    english=english,
-                    start_sec=aligned.start_sec,
-                    end_sec=aligned.end_sec,
-                    words=legacy_words,
-                    cer=aligned.distance_score,
-                    emitted_text=aligned.emitted_text,
-                )
-            )
-
-        return verse_intervals
 
 
 class GenericChunkListAdapter:
@@ -188,8 +165,21 @@ class GenericChunkListAdapter:
     Adapter for arbitrary list of text segments / chunks from JSON files or in-memory lists.
     """
 
-    def __init__(self, preprocessor: Optional[PhoneticPreprocessor] = None):
-        self.preprocessor = preprocessor or CherokeePhoneticPreprocessor()
+    def __init__(
+        self,
+        preprocessor: PhoneticPreprocessor,
+        path: Optional[str] = None,
+    ):
+        self.preprocessor = preprocessor
+        self.path = path
+
+    def load_chunks(self) -> List[TextChunk]:
+        """
+        Loads TextChunk domain entities from self.path.
+        """
+        if not self.path:
+            raise ValueError("No path provided to GenericChunkListAdapter.")
+        return self.load_chunks_from_file(self.path)
 
     def load_chunks_from_file(self, path: str) -> List[TextChunk]:
         """
@@ -260,3 +250,15 @@ class GenericChunkListAdapter:
             )
 
         return chunks
+
+    @classmethod
+    def make_default(
+        cls,
+        path: Optional[str] = None,
+        preprocessor: Optional[PhoneticPreprocessor] = None,
+    ) -> "GenericChunkListAdapter":
+        """Factory method creating a GenericChunkListAdapter with default preprocessor."""
+        return cls(
+            preprocessor=preprocessor or CherokeePhoneticPreprocessor(),
+            path=path,
+        )

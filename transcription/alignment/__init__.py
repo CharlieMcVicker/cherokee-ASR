@@ -12,6 +12,7 @@ from transcription.alignment.domain.models import (
     TokenEmission,
     WordInterval,
 )
+from transcription.alignment.pipeline import AlignmentPipeline
 from transcription.alignment.strategies.extractors import (
     CallbackEmissionsExtractor,
     CherokeeASRExtractor,
@@ -22,6 +23,7 @@ __all__ = [
     "AlignedChunk",
     "AlignmentMetrics",
     "AlignmentOutput",
+    "AlignmentPipeline",
     "CallbackEmissionsExtractor",
     "CherokeeASRExtractor",
     "PrecomputedEmissionsExtractor",

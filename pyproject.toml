@@ -43,7 +43,7 @@ dev = [
 ]
 
 [project.scripts]
-align-cherokee = "transcription.timestamping.align_cli:main"
+align-cherokee = "transcription.alignment.cli:main"
 syllabary-transcriber = "syllabary_transcriber.__main__:main"
 
 [tool.setuptools.packages.find]
@@ -71,7 +71,18 @@ exclude = '''
     | archive
   )/
   | scripts/from_elan_to_wav_and_gsheet\.py
-  | test_topk\.py
 )
 '''
+
+[tool.pytest.ini_options]
+testpaths = ["transcription"]
+norecursedirs = [
+    "transcriber_dist",
+    "transcriber_build",
+    "dist",
+    "build",
+    ".venv",
+    ".git",
+]
+
 

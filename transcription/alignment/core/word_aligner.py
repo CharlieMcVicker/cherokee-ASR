@@ -22,31 +22,25 @@ class NeedlemanWunschWordAligner:
 
     def __init__(
         self,
-        gap_cost: float = 0.8,
-        max_fuse_gt: int = 4,
-        max_fuse_asr: int = 3,
-        fuse_penalty: float = 0.15,
-        default_distance_metric: Optional[DistanceMetric] = None,
-        default_preprocessor: Optional[PhoneticPreprocessor] = None,
+        distance_metric: DistanceMetric,
+        preprocessor: PhoneticPreprocessor,
+        gap_cost: float,
+        max_fuse_gt: int,
+        max_fuse_asr: int,
+        fuse_penalty: float,
     ):
+        self.distance_metric = distance_metric
+        self.preprocessor = preprocessor
         self.gap_cost = gap_cost
         self.max_fuse_gt = max_fuse_gt
         self.max_fuse_asr = max_fuse_asr
         self.fuse_penalty = fuse_penalty
-        self.default_distance_metric = (
-            default_distance_metric or DefaultCERDistanceMetric()
-        )
-        self.default_preprocessor = (
-            default_preprocessor or CherokeePhoneticPreprocessor()
-        )
 
     def align_words(
         self,
         raw_words: Sequence[str],
         matched_tokens: Sequence[TokenEmission],
         raw_syllabary_words: Optional[Sequence[str]] = None,
-        distance_metric: Optional[DistanceMetric] = None,
-        preprocessor: Optional[PhoneticPreprocessor] = None,
     ) -> List[WordInterval]:
         """
         Aligns raw words to matched emission tokens.
@@ -55,8 +49,6 @@ class NeedlemanWunschWordAligner:
             raw_words: List of ground-truth phonetic words.
             matched_tokens: List of TokenEmission objects matched to this chunk.
             raw_syllabary_words: Optional list of corresponding Cherokee syllabary words.
-            distance_metric: Injected distance metric (default: self.default_distance_metric).
-            preprocessor: Injected phonetic preprocessor (default: self.default_preprocessor).
 
         Returns:
             List of WordInterval objects with computed start_sec, end_sec, and word text.
@@ -70,15 +62,15 @@ class NeedlemanWunschWordAligner:
             list(raw_syllabary_words) if raw_syllabary_words is not None else None
         )
 
-        metric = distance_metric or self.default_distance_metric
-        cleaner = preprocessor or self.default_preprocessor
+        metric = self.distance_metric
+        prep = self.preprocessor
 
         N = len(words_list)
         M = len(tokens_list)
 
         # Pre-normalize raw words and tokens
-        norm_words = [cleaner.normalize(w) for w in words_list]
-        norm_tokens = [cleaner.normalize(t.word) for t in tokens_list]
+        norm_words = [prep.normalize(w) for w in words_list]
+        norm_tokens = [prep.normalize(t.word) for t in tokens_list]
 
         # DP state: dp[i, j] = cost
         dp = np.full((N + 1, M + 1), fill_value=1e9, dtype=np.float32)
@@ -203,3 +195,23 @@ class NeedlemanWunschWordAligner:
                 )
 
         return fused_intervals
+
+    @classmethod
+    def make_default(
+        cls,
+        distance_metric: Optional[DistanceMetric] = None,
+        preprocessor: Optional[PhoneticPreprocessor] = None,
+        gap_cost: float = 0.8,
+        max_fuse_gt: int = 4,
+        max_fuse_asr: int = 3,
+        fuse_penalty: float = 0.15,
+    ) -> "NeedlemanWunschWordAligner":
+        """Factory method creating a NeedlemanWunschWordAligner with default strategies and parameters."""
+        return cls(
+            distance_metric=distance_metric or DefaultCERDistanceMetric(),
+            preprocessor=preprocessor or CherokeePhoneticPreprocessor(),
+            gap_cost=gap_cost,
+            max_fuse_gt=max_fuse_gt,
+            max_fuse_asr=max_fuse_asr,
+            fuse_penalty=fuse_penalty,
+        )

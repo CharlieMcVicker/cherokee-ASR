@@ -19,7 +19,7 @@ class PraatTextGridAdapter:
     - Final Tier: Raw ASR Emissions (if present)
     """
 
-    def __init__(self, pad_sec: float = 0.10):
+    def __init__(self, pad_sec: float):
         self.pad_sec = pad_sec
 
     def _build_contiguous_intervals(
@@ -285,6 +285,11 @@ class PraatTextGridAdapter:
         with open(output_path, "w", encoding="utf-8") as f:
             f.write("\n".join(lines) + "\n")
 
+    @classmethod
+    def make_default(cls, pad_sec: float = 0.10) -> "PraatTextGridAdapter":
+        """Factory method creating a PraatTextGridAdapter with default padding."""
+        return cls(pad_sec=pad_sec)
+
 
 class ManifestJsonAdapter:
     """
@@ -347,3 +352,42 @@ class ManifestJsonAdapter:
 
         with open(output_path, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2, ensure_ascii=False)
+
+
+class DebugJsonAdapter:
+    """
+    Adapter for exporting AlignmentOutput raw tokens, chunks count, and metrics to debug JSON.
+    """
+
+    def export(self, alignment: AlignmentOutput, output_path: str) -> None:
+        """
+        Writes debug alignment JSON.
+        """
+        os.makedirs(os.path.dirname(os.path.abspath(output_path)), exist_ok=True)
+        raw_toks = [
+            {
+                "word": t.word,
+                "start_sec": t.start_sec,
+                "end_sec": t.end_sec,
+                "confidence": t.confidence,
+            }
+            for t in (alignment.raw_tokens or [])
+        ]
+        metrics_dict: Dict[str, Any] = {}
+        if alignment.metrics:
+            metrics_dict = {
+                "total_chunks": alignment.metrics.total_chunks,
+                "matched_chunks": alignment.metrics.matched_chunks,
+                "match_ratio": alignment.metrics.match_ratio,
+                "mean_distance_score": alignment.metrics.mean_distance_score,
+                "total_ground_truth_chars": alignment.metrics.total_ground_truth_chars,
+                "total_emitted_chars": alignment.metrics.total_emitted_chars,
+            }
+        debug_data = {
+            "audio_source": alignment.source_id,
+            "raw_tokens": raw_toks,
+            "aligned_chunks_count": len(alignment.aligned_chunks),
+            "metrics": metrics_dict,
+        }
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(debug_data, f, indent=2, ensure_ascii=False)

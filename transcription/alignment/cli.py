@@ -1,30 +1,33 @@
 # -*- coding: utf-8 -*-
 """
-align_cli.py
+cli.py
 
-Main CLI runner orchestrating audio segmentation, ground truth ingest,
-ASR emissions extraction, trigram DTW alignment, and export.
+Lightweight CLI entrypoint for the modular Cherokee alignment pipeline.
 """
 
 import argparse
 import os
 import sys
+from typing import Any, Optional
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
 
-from typing import Optional, Any, Dict
-import numpy as np
-
-from transcription.timestamping.audio_segmenter import segment_long_audio
-from transcription.timestamping.prepare_ground_truth import (
-    parse_bible_metadata,
-    parse_chunk_list,
+from transcription.alignment.adapters.inbound import (
+    BibleMetadataVerseAdapter,
+    GenericChunkListAdapter,
 )
-from transcription.timestamping.aligner import AlignmentResult
-from transcription.timestamping.exporter import (
-    export_praat_textgrid,
-    export_alignment_manifest,
+from transcription.alignment.adapters.outbound import (
+    DebugJsonAdapter,
+    ManifestJsonAdapter,
+    PraatTextGridAdapter,
+)
+from transcription.alignment.core.sliding_window import SlidingWindowDTWAligner
+from transcription.alignment.domain.models import AlignmentOutput
+from transcription.alignment.pipeline import AlignmentPipeline
+from transcription.alignment.strategies.extractors import CherokeeASRExtractor
+from transcription.alignment.strategies.reconciliation import (
+    CherokeeSyllabaryReconciliationStrategy,
 )
 
 
@@ -34,31 +37,30 @@ def run_alignment_pipeline(
     bible_metadata_path: Optional[str] = None,
     chunk_list_path: Optional[str] = None,
     export_praat: bool = True,
+    export_manifest: bool = True,
     model_path: Optional[str] = None,
     skip_vad: bool = False,
     debug_export: bool = False,
     reconcile: bool = False,
-) -> AlignmentResult:
-    """Executes full alignment pipeline end-to-end using align_audio_segment."""
+) -> AlignmentOutput:
+    """Prepares ports, strategies, and adapters, and runs the AlignmentPipeline."""
     if bible_metadata_path:
         print(
             f"[1/4] Ingesting Bible ground-truth metadata from '{bible_metadata_path}'..."
         )
-        verses = parse_bible_metadata(bible_metadata_path)
+        chunk_adapter = BibleMetadataVerseAdapter.make_default(path=bible_metadata_path)
     elif chunk_list_path:
         print(f"[1/4] Ingesting ground-truth chunk list from '{chunk_list_path}'...")
-        verses = parse_chunk_list(chunk_list_path)
+        chunk_adapter = GenericChunkListAdapter.make_default(path=chunk_list_path)
     else:
         raise ValueError("Either --bible-metadata or --chunk-list must be provided.")
-
-    print(f"      Parsed {len(verses)} ground-truth segment entries.")
 
     if skip_vad:
         print(f"[2/4] Skipping VAD audio segmentation (skip_vad=True)...")
     else:
         print(f"[2/4] Segmenting audio file '{audio_path}' with VAD...")
 
-    print(f"[3/4] Running ASR emission extraction & DTW alignment...")
+    print(f"[3/4] Running ASR emission extraction & alignment...")
     from transcription.models.asr_model import CherokeeASRModel
     from transcription.utils.model_utils import get_best_model_config
 
@@ -85,55 +87,41 @@ def run_alignment_pipeline(
             token=token,
         )
 
-    from transcription.timestamping.aligner import align_audio_segment
-    from transcription.alignment.strategies.extractors import CherokeeASRExtractor
-
-    alignment = align_audio_segment(
-        audio_input=audio_path,
-        verses=verses,
-        extractor=CherokeeASRExtractor(asr_model, skip_vad=skip_vad),
-        audio_source=audio_path,
-        reconcile=reconcile,
+    extractor = CherokeeASRExtractor(model=asr_model, skip_vad=skip_vad)
+    engine = SlidingWindowDTWAligner.make_default(
+        reconciliation_strategy=(
+            CherokeeSyllabaryReconciliationStrategy() if reconcile else None
+        )
     )
 
-    print(f"[4/4] Exporting alignment results to '{output_dir}'...")
-    os.makedirs(output_dir, exist_ok=True)
-    manifest_path = os.path.join(output_dir, "alignment_manifest.json")
-    export_alignment_manifest(alignment, manifest_path)
-    print(f"      Saved manifest: {manifest_path}")
-
+    exporters = []
+    if export_manifest:
+        exporters.append((ManifestJsonAdapter(), "alignment_manifest.json"))
     if export_praat:
-        textgrid_path = os.path.join(output_dir, "alignment.TextGrid")
-        export_praat_textgrid(alignment, textgrid_path)
-        print(f"      Saved Praat TextGrid: {textgrid_path}")
-
+        exporters.append((PraatTextGridAdapter.make_default(), "alignment.TextGrid"))
     if debug_export:
-        debug_path = os.path.join(output_dir, "alignment_debug.json")
-        import json
+        exporters.append((DebugJsonAdapter(), "alignment_debug.json"))
 
-        with open(debug_path, "w", encoding="utf-8") as f:
-            json.dump(
-                {
-                    "audio_source": alignment.audio_source,
-                    "raw_tokens": alignment.raw_tokens,
-                    "verse_count": len(alignment.verses),
-                },
-                f,
-                indent=2,
-                ensure_ascii=False,
-            )
-        print(f"      Saved debug export: {debug_path}")
+    pipeline = AlignmentPipeline(
+        chunk_adapter=chunk_adapter,
+        extractor=extractor,
+        engine=engine,
+        exporters=exporters,
+    )
+
+    print(f"[4/4] Executing alignment and exporting artifacts to '{output_dir}'...")
+    alignment = pipeline.run(
+        audio_input=audio_path,
+        output_dir=output_dir,
+    )
 
     if alignment.metrics:
         m = alignment.metrics
         print("\n--- Alignment Metrics Summary ---")
         print(
-            f"  Matched GT Verses    : {m.matched_verses} / {m.total_verses} ({m.matched_verse_ratio*100:.1f}%)"
+            f"  Matched Chunks       : {m.matched_chunks} / {m.total_chunks} ({m.match_ratio*100:.1f}%)"
         )
-        print(
-            f"  Matched-Verse CER    : {m.overall_cer:.4f} ({m.overall_cer*100:.2f}%)"
-        )
-        print(f"  Mean Verse CER       : {m.mean_verse_cer:.4f}")
+        print(f"  Mean Distance Score  : {m.mean_distance_score:.4f}")
         print(
             f"  Matched GT vs Emitted: {m.total_ground_truth_chars} vs {m.total_emitted_chars} chars"
         )

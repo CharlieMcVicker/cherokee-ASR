@@ -73,7 +73,7 @@ class AlignmentMetrics:
 class AlignmentOutput:
     """Final domain output from alignment execution."""
 
-    source_id: str
     aligned_chunks: List[AlignedChunk]
+    source_id: str = ""
     raw_tokens: List[TokenEmission] = field(default_factory=list)
     metrics: Optional[AlignmentMetrics] = None

@@ -2,9 +2,45 @@
 Phonetic and syllabary preprocessor strategy implementations.
 """
 
+import re
 from typing import Optional
 from transcription.alignment.ports.protocols import PhoneticPreprocessor
 from transcription.utils.syllabary_map import CHEROKEE_SYLLABARY_MAP
+from transcription.utils.tone_normalization import respell_consonants
+
+
+def normalize_text_for_alignment(text: str) -> str:
+    """
+    Normalizes transliterated Cherokee text for ASR alignment matching:
+    1. Lowercase text and strip hyphens (e.g., A-da-le-ni-s-gv -> adalenisgv).
+    2. Convert 'qu' to 'gw'.
+    3. Apply consonant & aspiration respelling (t->th, d->t, k->kh, g->k, etc.).
+    4. Strip /h/ sound markers.
+    5. Remove punctuation and collapse extra whitespace.
+    """
+    if not text:
+        return ""
+
+    text = text.lower()
+    # Strip hyphens
+    text = text.replace("-", "")
+
+    # Convert qu -> gw
+    text = text.replace("qu", "gw")
+
+    # Respell consonants
+    text = respell_consonants(text)
+
+    # Drop all /h/ sound markers
+    text = text.replace("h", "")
+
+    # Strip punctuation
+    punctuation_regex = r"[\,\?\.\!\-\;\:\"\'\“\%\”\(\)\[\]\{\}«»…\’\‘\ʼ\ʻ\`\´\‛]"
+    text = re.sub(punctuation_regex, "", text)
+
+    # Collapse whitespace
+    text = re.sub(r"\s+", " ", text).strip()
+    return text
 
 
 class CherokeePhoneticPreprocessor:
@@ -18,25 +54,17 @@ class CherokeePhoneticPreprocessor:
     """
 
     def normalize(self, text: str) -> str:
-        from transcription.timestamping.prepare_ground_truth import (
-            normalize_text_for_alignment,
-        )
-
         return normalize_text_for_alignment(text)
 
 
 class SyllabaryToPhoneticPreprocessor:
     """
     Converts Cherokee syllabary characters to phonetic base using CHEROKEE_SYLLABARY_MAP,
-    then applies the injected PhoneticPreprocessor (or CherokeePhoneticPreprocessor by default).
+    then applies the injected PhoneticPreprocessor.
     """
 
-    def __init__(self, phonetic_cleaner: Optional[PhoneticPreprocessor] = None):
-        self.cleaner = (
-            phonetic_cleaner
-            if phonetic_cleaner is not None
-            else CherokeePhoneticPreprocessor()
-        )
+    def __init__(self, phonetic_cleaner: PhoneticPreprocessor):
+        self.cleaner = phonetic_cleaner
 
     def normalize(self, text: str) -> str:
         if not text:
@@ -44,3 +72,11 @@ class SyllabaryToPhoneticPreprocessor:
         # Convert syllabary characters to base phonetic representations
         converted = "".join(CHEROKEE_SYLLABARY_MAP.get(ch, ch) for ch in text)
         return self.cleaner.normalize(converted)
+
+    @classmethod
+    def make_default(
+        cls,
+        phonetic_cleaner: Optional[PhoneticPreprocessor] = None,
+    ) -> "SyllabaryToPhoneticPreprocessor":
+        """Factory method creating a SyllabaryToPhoneticPreprocessor with default CherokeePhoneticPreprocessor."""
+        return cls(phonetic_cleaner=phonetic_cleaner or CherokeePhoneticPreprocessor())

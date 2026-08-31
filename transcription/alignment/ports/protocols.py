@@ -59,3 +59,21 @@ class ChunkAlignmentEngine(Protocol):
     ) -> AlignmentOutput:
         """Aligns text chunks against sequence of token emissions."""
         ...
+
+
+@runtime_checkable
+class InboundChunkAdapter(Protocol):
+    """Port for loading TextChunk entities from external sources."""
+
+    def load_chunks(self) -> List[TextChunk]:
+        """Loads and returns a list of TextChunk domain entities."""
+        ...
+
+
+@runtime_checkable
+class OutboundAlignmentAdapter(Protocol):
+    """Port for exporting domain AlignmentOutput to external target paths."""
+
+    def export(self, alignment: AlignmentOutput, output_path: str) -> None:
+        """Exports domain AlignmentOutput to the specified output path."""
+        ...
