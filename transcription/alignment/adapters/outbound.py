@@ -19,8 +19,13 @@ class PraatTextGridAdapter:
     - Final Tier: Raw ASR Emissions (if present)
     """
 
-    def __init__(self, pad_sec: float):
+    def __init__(
+        self,
+        pad_sec: float = 0.10,
+        filename: str = "alignment.TextGrid",
+    ):
         self.pad_sec = pad_sec
+        self.filename = filename
 
     def _build_contiguous_intervals(
         self, raw_intervals: List[Dict[str, Any]], total_end: float
@@ -98,11 +103,12 @@ class PraatTextGridAdapter:
 
         return self._build_contiguous_intervals(fused, total_end)
 
-    def export(self, alignment: AlignmentOutput, output_path: str) -> None:
+    def export(self, alignment: AlignmentOutput, output_dir: str) -> None:
         """
-        Writes Praat .TextGrid file from AlignmentOutput.
+        Writes Praat .TextGrid file into output_dir.
         """
-        os.makedirs(os.path.dirname(os.path.abspath(output_path)), exist_ok=True)
+        os.makedirs(output_dir, exist_ok=True)
+        output_path = os.path.join(output_dir, self.filename)
 
         total_end = 0.0
         if alignment.aligned_chunks:
@@ -285,22 +291,21 @@ class PraatTextGridAdapter:
         with open(output_path, "w", encoding="utf-8") as f:
             f.write("\n".join(lines) + "\n")
 
-    @classmethod
-    def make_default(cls, pad_sec: float = 0.10) -> "PraatTextGridAdapter":
-        """Factory method creating a PraatTextGridAdapter with default padding."""
-        return cls(pad_sec=pad_sec)
-
 
 class ManifestJsonAdapter:
     """
     Adapter for exporting AlignmentOutput to alignment_manifest.json format.
     """
 
-    def export(self, alignment: AlignmentOutput, output_path: str) -> None:
+    def __init__(self, filename: str = "alignment_manifest.json"):
+        self.filename = filename
+
+    def export(self, alignment: AlignmentOutput, output_dir: str) -> None:
         """
-        Writes alignment manifest JSON matching project schema.
+        Writes alignment manifest JSON matching project schema into output_dir.
         """
-        os.makedirs(os.path.dirname(os.path.abspath(output_path)), exist_ok=True)
+        os.makedirs(output_dir, exist_ok=True)
+        output_path = os.path.join(output_dir, self.filename)
 
         manifest_lines = []
         for c in alignment.aligned_chunks:
@@ -359,11 +364,15 @@ class DebugJsonAdapter:
     Adapter for exporting AlignmentOutput raw tokens, chunks count, and metrics to debug JSON.
     """
 
-    def export(self, alignment: AlignmentOutput, output_path: str) -> None:
+    def __init__(self, filename: str = "alignment_debug.json"):
+        self.filename = filename
+
+    def export(self, alignment: AlignmentOutput, output_dir: str) -> None:
         """
-        Writes debug alignment JSON.
+        Writes debug alignment JSON into output_dir.
         """
-        os.makedirs(os.path.dirname(os.path.abspath(output_path)), exist_ok=True)
+        os.makedirs(output_dir, exist_ok=True)
+        output_path = os.path.join(output_dir, self.filename)
         raw_toks = [
             {
                 "word": t.word,

@@ -48,10 +48,10 @@ def run_alignment_pipeline(
         print(
             f"[1/4] Ingesting Bible ground-truth metadata from '{bible_metadata_path}'..."
         )
-        chunk_adapter = BibleMetadataVerseAdapter.make_default(path=bible_metadata_path)
+        chunk_adapter = BibleMetadataVerseAdapter(path=bible_metadata_path)
     elif chunk_list_path:
         print(f"[1/4] Ingesting ground-truth chunk list from '{chunk_list_path}'...")
-        chunk_adapter = GenericChunkListAdapter.make_default(path=chunk_list_path)
+        chunk_adapter = GenericChunkListAdapter(path=chunk_list_path)
     else:
         raise ValueError("Either --bible-metadata or --chunk-list must be provided.")
 
@@ -88,7 +88,7 @@ def run_alignment_pipeline(
         )
 
     extractor = CherokeeASRExtractor(model=asr_model, skip_vad=skip_vad)
-    engine = SlidingWindowDTWAligner.make_default(
+    engine = SlidingWindowDTWAligner(
         reconciliation_strategy=(
             CherokeeSyllabaryReconciliationStrategy() if reconcile else None
         )
@@ -96,11 +96,11 @@ def run_alignment_pipeline(
 
     exporters = []
     if export_manifest:
-        exporters.append((ManifestJsonAdapter(), "alignment_manifest.json"))
+        exporters.append(ManifestJsonAdapter())
     if export_praat:
-        exporters.append((PraatTextGridAdapter.make_default(), "alignment.TextGrid"))
+        exporters.append(PraatTextGridAdapter())
     if debug_export:
-        exporters.append((DebugJsonAdapter(), "alignment_debug.json"))
+        exporters.append(DebugJsonAdapter())
 
     pipeline = AlignmentPipeline(
         chunk_adapter=chunk_adapter,

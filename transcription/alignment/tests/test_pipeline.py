@@ -57,11 +57,11 @@ def test_alignment_pipeline_basic_execution(tmp_path):
 
     adapter = MockChunkAdapter(chunks)
     extractor = PrecomputedEmissionsExtractor(emissions)
-    engine = SlidingWindowDTWAligner.make_default()
+    engine = SlidingWindowDTWAligner()
     exporters = [
-        (ManifestJsonAdapter(), "alignment_manifest.json"),
-        (PraatTextGridAdapter.make_default(), "alignment.TextGrid"),
-        (DebugJsonAdapter(), "alignment_debug.json"),
+        ManifestJsonAdapter(),
+        PraatTextGridAdapter(),
+        DebugJsonAdapter(),
     ]
 
     pipeline = AlignmentPipeline(
@@ -138,7 +138,7 @@ def test_alignment_pipeline_with_custom_engine_and_exporter(tmp_path):
         chunk_adapter=mock_adapter,
         extractor=mock_extractor,
         engine=mock_engine,
-        exporters=[(mock_custom_exporter, "custom_alignment.txt")],
+        exporters=[mock_custom_exporter],
     )
 
     out_dir = str(tmp_path / "custom_out")
@@ -149,9 +149,7 @@ def test_alignment_pipeline_with_custom_engine_and_exporter(tmp_path):
 
     assert res == mock_output
     mock_engine.align_chunks.assert_called_once()
-    mock_custom_exporter.export.assert_called_once_with(
-        mock_output, os.path.join(out_dir, "custom_alignment.txt")
-    )
+    mock_custom_exporter.export.assert_called_once_with(mock_output, out_dir)
 
     # Praat and Manifest shouldn't exist since not in exporters
     assert not os.path.exists(os.path.join(out_dir, "alignment.TextGrid"))

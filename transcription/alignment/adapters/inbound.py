@@ -25,11 +25,11 @@ class BibleMetadataVerseAdapter:
 
     def __init__(
         self,
-        preprocessor: PhoneticPreprocessor,
         path: Optional[str] = None,
+        preprocessor: Optional[PhoneticPreprocessor] = None,
     ):
-        self.preprocessor = preprocessor
         self.path = path
+        self.preprocessor = preprocessor or CherokeePhoneticPreprocessor()
 
     def load_chunks(self) -> List[TextChunk]:
         """
@@ -147,18 +147,6 @@ class BibleMetadataVerseAdapter:
 
         return chunks
 
-    @classmethod
-    def make_default(
-        cls,
-        path: Optional[str] = None,
-        preprocessor: Optional[PhoneticPreprocessor] = None,
-    ) -> "BibleMetadataVerseAdapter":
-        """Factory method creating a BibleMetadataVerseAdapter with default preprocessor."""
-        return cls(
-            preprocessor=preprocessor or CherokeePhoneticPreprocessor(),
-            path=path,
-        )
-
 
 class GenericChunkListAdapter:
     """
@@ -167,11 +155,11 @@ class GenericChunkListAdapter:
 
     def __init__(
         self,
-        preprocessor: PhoneticPreprocessor,
         path: Optional[str] = None,
+        preprocessor: Optional[PhoneticPreprocessor] = None,
     ):
-        self.preprocessor = preprocessor
         self.path = path
+        self.preprocessor = preprocessor or CherokeePhoneticPreprocessor()
 
     def load_chunks(self) -> List[TextChunk]:
         """
@@ -250,15 +238,3 @@ class GenericChunkListAdapter:
             )
 
         return chunks
-
-    @classmethod
-    def make_default(
-        cls,
-        path: Optional[str] = None,
-        preprocessor: Optional[PhoneticPreprocessor] = None,
-    ) -> "GenericChunkListAdapter":
-        """Factory method creating a GenericChunkListAdapter with default preprocessor."""
-        return cls(
-            preprocessor=preprocessor or CherokeePhoneticPreprocessor(),
-            path=path,
-        )

@@ -23,7 +23,7 @@ from transcription.alignment.strategies.preprocessors import (
 
 
 def test_word_aligner_exact_match():
-    aligner = NeedlemanWunschWordAligner.make_default()
+    aligner = NeedlemanWunschWordAligner()
     raw_words = ["osiyo", "tohiju"]
     tokens = [
         TokenEmission(word="osiyo", start_sec=0.1, end_sec=0.6, confidence=0.9),
@@ -42,7 +42,7 @@ def test_word_aligner_exact_match():
 
 
 def test_word_aligner_fusion_gt_and_asr():
-    aligner = NeedlemanWunschWordAligner.make_default()
+    aligner = NeedlemanWunschWordAligner()
     # 1 ASR token corresponds to 2 GT words: "o si" -> "osi"
     raw_words = ["o", "si", "yo"]
     tokens = [
@@ -65,9 +65,9 @@ def test_word_aligner_fusion_gt_and_asr():
 
 
 def test_word_aligner_with_custom_metric_and_preprocessor():
-    custom_metric = PhonologicalDistanceMetric.make_default()
+    custom_metric = PhonologicalDistanceMetric()
     custom_prep = CherokeePhoneticPreprocessor()
-    aligner = NeedlemanWunschWordAligner.make_default(
+    aligner = NeedlemanWunschWordAligner(
         distance_metric=custom_metric,
         preprocessor=custom_prep,
     )
@@ -80,12 +80,12 @@ def test_word_aligner_with_custom_metric_and_preprocessor():
 
 
 def test_sliding_window_dtw_aligner_protocol():
-    aligner = SlidingWindowDTWAligner.make_default()
+    aligner = SlidingWindowDTWAligner()
     assert isinstance(aligner, ChunkAlignmentEngine)
 
 
 def test_sliding_window_dtw_alignment_flow():
-    aligner = SlidingWindowDTWAligner.make_default()
+    aligner = SlidingWindowDTWAligner()
 
     chunks = [
         TextChunk(
@@ -136,7 +136,7 @@ def test_sliding_window_dtw_alignment_flow():
 
 
 def test_sliding_window_empty_inputs():
-    aligner = SlidingWindowDTWAligner.make_default()
+    aligner = SlidingWindowDTWAligner()
     chunks = [TextChunk(chunk_id="c1", raw_text="osiyo")]
 
     # Empty emissions
@@ -162,9 +162,7 @@ def test_sliding_window_reconciliation_mock():
         def reconcile(self, syllabary_text: str, emitted_text: str):
             return f"reconciled_{emitted_text}", [(syllabary_text, emitted_text)]
 
-    aligner = SlidingWindowDTWAligner.make_default(
-        reconciliation_strategy=DummyReconciliation()
-    )
+    aligner = SlidingWindowDTWAligner(reconciliation_strategy=DummyReconciliation())
     chunks = [
         TextChunk(
             chunk_id="c1",

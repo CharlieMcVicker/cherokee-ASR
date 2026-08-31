@@ -22,19 +22,34 @@ class NeedlemanWunschWordAligner:
 
     def __init__(
         self,
-        distance_metric: DistanceMetric,
-        preprocessor: PhoneticPreprocessor,
-        gap_cost: float,
-        max_fuse_gt: int,
-        max_fuse_asr: int,
-        fuse_penalty: float,
+        distance_metric: Optional[DistanceMetric] = None,
+        preprocessor: Optional[PhoneticPreprocessor] = None,
+        gap_cost: float = 0.8,
+        max_fuse_gt: int = 4,
+        max_fuse_asr: int = 3,
+        fuse_penalty: float = 0.15,
     ):
-        self.distance_metric = distance_metric
-        self.preprocessor = preprocessor
+        self.distance_metric = distance_metric or DefaultCERDistanceMetric()
+        self.preprocessor = preprocessor or CherokeePhoneticPreprocessor()
         self.gap_cost = gap_cost
         self.max_fuse_gt = max_fuse_gt
         self.max_fuse_asr = max_fuse_asr
         self.fuse_penalty = fuse_penalty
+
+    def normalize(self, text: str) -> str:
+        """Normalizes text using the injected phonetic preprocessor."""
+        return self.preprocessor.normalize(text)
+
+    def compute_cost(
+        self, hypothesis: str, reference: str, pre_normalized: bool = False
+    ) -> float:
+        """
+        Computes phonetic edit distance cost between hypothesis and reference strings.
+        If pre_normalized is False, both strings are normalized via self.preprocessor first.
+        """
+        hyp = hypothesis if pre_normalized else self.preprocessor.normalize(hypothesis)
+        ref = reference if pre_normalized else self.preprocessor.normalize(reference)
+        return self.distance_metric.compute_cost(hypothesis=hyp, reference=ref)
 
     def align_words(
         self,
@@ -195,23 +210,3 @@ class NeedlemanWunschWordAligner:
                 )
 
         return fused_intervals
-
-    @classmethod
-    def make_default(
-        cls,
-        distance_metric: Optional[DistanceMetric] = None,
-        preprocessor: Optional[PhoneticPreprocessor] = None,
-        gap_cost: float = 0.8,
-        max_fuse_gt: int = 4,
-        max_fuse_asr: int = 3,
-        fuse_penalty: float = 0.15,
-    ) -> "NeedlemanWunschWordAligner":
-        """Factory method creating a NeedlemanWunschWordAligner with default strategies and parameters."""
-        return cls(
-            distance_metric=distance_metric or DefaultCERDistanceMetric(),
-            preprocessor=preprocessor or CherokeePhoneticPreprocessor(),
-            gap_cost=gap_cost,
-            max_fuse_gt=max_fuse_gt,
-            max_fuse_asr=max_fuse_asr,
-            fuse_penalty=fuse_penalty,
-        )

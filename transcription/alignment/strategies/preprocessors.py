@@ -63,8 +63,8 @@ class SyllabaryToPhoneticPreprocessor:
     then applies the injected PhoneticPreprocessor.
     """
 
-    def __init__(self, phonetic_cleaner: PhoneticPreprocessor):
-        self.cleaner = phonetic_cleaner
+    def __init__(self, phonetic_cleaner: Optional[PhoneticPreprocessor] = None):
+        self.cleaner = phonetic_cleaner or CherokeePhoneticPreprocessor()
 
     def normalize(self, text: str) -> str:
         if not text:
@@ -72,11 +72,3 @@ class SyllabaryToPhoneticPreprocessor:
         # Convert syllabary characters to base phonetic representations
         converted = "".join(CHEROKEE_SYLLABARY_MAP.get(ch, ch) for ch in text)
         return self.cleaner.normalize(converted)
-
-    @classmethod
-    def make_default(
-        cls,
-        phonetic_cleaner: Optional[PhoneticPreprocessor] = None,
-    ) -> "SyllabaryToPhoneticPreprocessor":
-        """Factory method creating a SyllabaryToPhoneticPreprocessor with default CherokeePhoneticPreprocessor."""
-        return cls(phonetic_cleaner=phonetic_cleaner or CherokeePhoneticPreprocessor())

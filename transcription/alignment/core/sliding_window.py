@@ -15,13 +15,7 @@ from transcription.alignment.domain.models import (
 )
 from transcription.alignment.ports.protocols import (
     ChunkAlignmentEngine,
-    DistanceMetric,
-    PhoneticPreprocessor,
     ReconciliationStrategy,
-)
-from transcription.alignment.strategies.distance_metrics import DefaultCERDistanceMetric
-from transcription.alignment.strategies.preprocessors import (
-    CherokeePhoneticPreprocessor,
 )
 
 
@@ -34,16 +28,12 @@ class SlidingWindowDTWAligner:
 
     def __init__(
         self,
-        word_aligner: NeedlemanWunschWordAligner,
-        distance_metric: DistanceMetric,
-        preprocessor: PhoneticPreprocessor,
-        reconciliation_strategy: Optional[ReconciliationStrategy],
-        max_preamble_skip: int,
-        max_normal_skip: int,
+        word_aligner: Optional[NeedlemanWunschWordAligner] = None,
+        reconciliation_strategy: Optional[ReconciliationStrategy] = None,
+        max_preamble_skip: int = 30,
+        max_normal_skip: int = 5,
     ):
-        self.word_aligner = word_aligner
-        self.distance_metric = distance_metric
-        self.preprocessor = preprocessor
+        self.word_aligner = word_aligner or NeedlemanWunschWordAligner()
         self.reconciliation_strategy = reconciliation_strategy
         self.max_preamble_skip = max_preamble_skip
         self.max_normal_skip = max_normal_skip
@@ -75,10 +65,10 @@ class SlidingWindowDTWAligner:
         matched_gt = []
         matched_emitted = []
         for c in matched_chunk_list:
-            gt_norm = c.chunk.normalized_text or self.preprocessor.normalize(
+            gt_norm = c.chunk.normalized_text or self.word_aligner.normalize(
                 c.chunk.raw_text
             )
-            em_norm = self.preprocessor.normalize(c.emitted_text)
+            em_norm = self.word_aligner.normalize(c.emitted_text)
             if gt_norm:
                 matched_gt.append(gt_norm)
                 matched_emitted.append(em_norm)
@@ -104,8 +94,6 @@ class SlidingWindowDTWAligner:
         """
         Aligns text chunks against sequence of token emissions.
         """
-        metric = self.distance_metric
-        prep = self.preprocessor
         reconciliation_strategy = self.reconciliation_strategy
 
         aligned_chunks: List[AlignedChunk] = []
@@ -136,7 +124,9 @@ class SlidingWindowDTWAligner:
         normalized_chunks_info = []
         for c in chunks:
             norm_txt = (
-                c.normalized_text if c.normalized_text else prep.normalize(c.raw_text)
+                c.normalized_text
+                if c.normalized_text
+                else self.word_aligner.normalize(c.raw_text)
             )
             raw_words = [w for w in c.raw_text.split() if w]
             if not raw_words:
@@ -193,14 +183,16 @@ class SlidingWindowDTWAligner:
                             break
                         candidate_tokens = emissions[curr_start : curr_start + k]
                         tok_words = [t.word for t in candidate_tokens]
-                        candidate_norm_spaced = prep.normalize(" ".join(tok_words))
-                        candidate_norm_concat = prep.normalize("".join(tok_words))
 
-                        cost_spaced = metric.compute_cost(
-                            hypothesis=candidate_norm_spaced, reference=norm_txt
+                        cost_spaced = self.word_aligner.compute_cost(
+                            hypothesis=" ".join(tok_words),
+                            reference=norm_txt,
+                            pre_normalized=False,
                         )
-                        cost_concat = metric.compute_cost(
-                            hypothesis=candidate_norm_concat, reference=norm_txt
+                        cost_concat = self.word_aligner.compute_cost(
+                            hypothesis="".join(tok_words),
+                            reference=norm_txt,
+                            pre_normalized=False,
                         )
                         cost = min(cost_spaced, cost_concat)
 
@@ -215,9 +207,10 @@ class SlidingWindowDTWAligner:
                 chunk_start = matched_tokens[0].start_sec
                 chunk_end = matched_tokens[-1].end_sec
                 emitted_text = " ".join([t.word for t in matched_tokens])
-                emitted_norm = prep.normalize(emitted_text)
-                chunk_score = metric.compute_cost(
-                    hypothesis=emitted_norm, reference=norm_txt
+                chunk_score = self.word_aligner.compute_cost(
+                    hypothesis=emitted_text,
+                    reference=norm_txt,
+                    pre_normalized=False,
                 )
 
                 raw_syllabary_words = (
@@ -274,30 +267,4 @@ class SlidingWindowDTWAligner:
             aligned_chunks=aligned_chunks,
             raw_tokens=list(emissions),
             metrics=metrics,
-        )
-
-    @classmethod
-    def make_default(
-        cls,
-        word_aligner: Optional[NeedlemanWunschWordAligner] = None,
-        distance_metric: Optional[DistanceMetric] = None,
-        preprocessor: Optional[PhoneticPreprocessor] = None,
-        reconciliation_strategy: Optional[ReconciliationStrategy] = None,
-        max_preamble_skip: int = 30,
-        max_normal_skip: int = 5,
-    ) -> "SlidingWindowDTWAligner":
-        """Factory method creating a SlidingWindowDTWAligner with default strategies and parameters."""
-        metric = distance_metric or DefaultCERDistanceMetric()
-        prep = preprocessor or CherokeePhoneticPreprocessor()
-        aligner = word_aligner or NeedlemanWunschWordAligner.make_default(
-            distance_metric=metric,
-            preprocessor=prep,
-        )
-        return cls(
-            word_aligner=aligner,
-            distance_metric=metric,
-            preprocessor=prep,
-            reconciliation_strategy=reconciliation_strategy,
-            max_preamble_skip=max_preamble_skip,
-            max_normal_skip=max_normal_skip,
         )

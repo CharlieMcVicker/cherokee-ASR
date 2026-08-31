@@ -116,16 +116,14 @@ def test_default_cer_distance_metric():
 
 def test_phonological_distance_metric():
     # Test standard edit distance with default weights
-    metric = PhonologicalDistanceMetric.make_default()
+    metric = PhonologicalDistanceMetric()
     assert isinstance(metric, DistanceMetric)
     assert metric.compute_cost("osiyo", "osiyo") == 0.0
     assert metric.compute_cost("", "") == 0.0
 
     # Test with custom phonological substitution penalty
     # Suppose 'k' and 'g' have a low substitution penalty of 0.2 instead of 1.0
-    custom_metric = PhonologicalDistanceMetric.make_default(
-        substitution_weights={("k", "g"): 0.2}
-    )
+    custom_metric = PhonologicalDistanceMetric(substitution_weights={("k", "g"): 0.2})
     # reference: "ka", hyp: "ga" (1 sub: k->g with cost 0.2, len 2 -> 0.2/2 = 0.1)
     cost_kg = custom_metric.compute_cost(hypothesis="ga", reference="ka")
     assert pytest.approx(cost_kg, 0.001) == 0.1
@@ -163,7 +161,7 @@ def test_syllabary_to_phonetic_preprocessor():
     assert "osiyo" in norm or "osyo" in norm or len(norm) > 0
 
     # Test default cleaner constructor
-    default_syllabary = SyllabaryToPhoneticPreprocessor.make_default()
+    default_syllabary = SyllabaryToPhoneticPreprocessor()
     norm_def = default_syllabary.normalize("ᎣᏏᏲ")
     assert norm_def == norm
 
@@ -173,7 +171,7 @@ def test_precomputed_emissions_extractor():
         {"word": "osiyo", "start_time": 0.5, "end_time": 1.2, "confidence": 0.95},
         TokenEmission(word="tohiju", start_sec=1.3, end_sec=2.0, confidence=0.90),
     ]
-    extractor = PrecomputedEmissionsExtractor.make_default(raw_tokens)
+    extractor = PrecomputedEmissionsExtractor(raw_tokens)
     assert isinstance(extractor, ASREmissionsExtractor)
 
     emissions = extractor.extract(audio_input=None)
@@ -199,7 +197,7 @@ def test_callback_emissions_extractor():
             TokenEmission(word="tohiju", start_sec=0.6, end_sec=0.9, confidence=0.92),
         ]
 
-    extractor = CallbackEmissionsExtractor.make_default(callback=mock_cb, skip_vad=True)
+    extractor = CallbackEmissionsExtractor(callback=mock_cb, skip_vad=True)
     assert isinstance(extractor, ASREmissionsExtractor)
 
     emissions = extractor.extract(dummy_audio)
@@ -236,7 +234,7 @@ def test_cherokee_asr_extractor_with_mock_model():
         },
     ]
 
-    extractor = CherokeeASRExtractor.make_default(model=mock_model, skip_vad=True)
+    extractor = CherokeeASRExtractor(model=mock_model, skip_vad=True)
     assert isinstance(extractor, ASREmissionsExtractor)
 
     emissions = extractor.extract(dummy_audio)

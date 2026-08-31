@@ -22,16 +22,9 @@ class CherokeeASRExtractor(ASREmissionsExtractor):
     extracts logits and word confidences via CherokeeASRModel; produces List[TokenEmission].
     """
 
-    def __init__(self, model: CherokeeASRModel, skip_vad: bool):
+    def __init__(self, model: CherokeeASRModel, skip_vad: bool = False):
         self.model = model
         self.skip_vad = skip_vad
-
-    @classmethod
-    def make_default(
-        cls, model: CherokeeASRModel, skip_vad: bool = False
-    ) -> "CherokeeASRExtractor":
-        """Factory method creating a CherokeeASRExtractor."""
-        return cls(model=model, skip_vad=skip_vad)
 
     def _prepare_chunks(self, audio_input: Any) -> List[AudioChunk]:
         if self.skip_vad:
@@ -114,16 +107,9 @@ class CallbackEmissionsExtractor(ASREmissionsExtractor):
     ASREmissionsExtractor adapter wrapping a callable/callback function.
     """
 
-    def __init__(self, callback: Callable[..., Any], skip_vad: bool):
+    def __init__(self, callback: Callable[..., Any], skip_vad: bool = False):
         self.callback = callback
         self.skip_vad = skip_vad
-
-    @classmethod
-    def make_default(
-        cls, callback: Callable[..., Any], skip_vad: bool = False
-    ) -> "CallbackEmissionsExtractor":
-        """Factory method creating a CallbackEmissionsExtractor."""
-        return cls(callback=callback, skip_vad=skip_vad)
 
     def _prepare_chunks(self, audio_input: Any) -> List[AudioChunk]:
         if self.skip_vad:
@@ -225,9 +211,14 @@ class PrecomputedEmissionsExtractor(ASREmissionsExtractor):
     ASREmissionsExtractor adapter for pre-computed token emissions.
     """
 
-    def __init__(self, token_emissions: Sequence[Union[TokenEmission, Dict[str, Any]]]):
+    def __init__(
+        self,
+        token_emissions: Optional[
+            Sequence[Union[TokenEmission, Dict[str, Any]]]
+        ] = None,
+    ):
         parsed: List[TokenEmission] = []
-        for t in token_emissions:
+        for t in token_emissions or []:
             if isinstance(t, TokenEmission):
                 parsed.append(t)
             elif isinstance(t, dict):
@@ -251,16 +242,6 @@ class PrecomputedEmissionsExtractor(ASREmissionsExtractor):
                     )
                 )
         self.token_emissions = parsed
-
-    @classmethod
-    def make_default(
-        cls,
-        token_emissions: Optional[
-            Sequence[Union[TokenEmission, Dict[str, Any]]]
-        ] = None,
-    ) -> "PrecomputedEmissionsExtractor":
-        """Factory method creating a PrecomputedEmissionsExtractor."""
-        return cls(token_emissions=token_emissions or [])
 
     def extract(self, audio_input: Any = None) -> List[TokenEmission]:
         """Returns precomputed token emissions."""

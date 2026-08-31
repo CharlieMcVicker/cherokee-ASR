@@ -26,7 +26,7 @@ from transcription.alignment.domain.models import (
 
 
 def test_bible_metadata_verse_adapter_dict():
-    adapter = BibleMetadataVerseAdapter.make_default()
+    adapter = BibleMetadataVerseAdapter()
     data = {
         "020101": {
             "phonetic": "A-da-le-ni-s-gv",
@@ -49,7 +49,7 @@ def test_bible_metadata_verse_adapter_dict():
 
 
 def test_bible_metadata_verse_adapter_file():
-    adapter = BibleMetadataVerseAdapter.make_default()
+    adapter = BibleMetadataVerseAdapter()
     data = {
         "020101": {
             "phonetic": "A-da-le-ni-s-gv",
@@ -68,7 +68,7 @@ def test_bible_metadata_verse_adapter_file():
 
 
 def test_generic_chunk_list_adapter():
-    adapter = GenericChunkListAdapter.make_default()
+    adapter = GenericChunkListAdapter()
     items = [
         {
             "id": "c1",
@@ -101,7 +101,7 @@ def test_generic_chunk_list_adapter():
 
 
 def test_praat_textgrid_adapter_export():
-    adapter = PraatTextGridAdapter.make_default()
+    adapter = PraatTextGridAdapter()
     chunk = TextChunk(
         chunk_id="chunk_01",
         raw_text="A-da-le-ni-s-gv",
@@ -126,8 +126,8 @@ def test_praat_textgrid_adapter_export():
     )
 
     with tempfile.TemporaryDirectory() as tmpdir:
-        tg_path = os.path.join(tmpdir, "test.TextGrid")
-        adapter.export(output, tg_path)
+        adapter.export(output, tmpdir)
+        tg_path = os.path.join(tmpdir, "alignment.TextGrid")
         assert os.path.exists(tg_path)
 
         with open(tg_path, "r", encoding="utf-8") as f:
@@ -181,8 +181,8 @@ def test_manifest_json_adapter_export():
     )
 
     with tempfile.TemporaryDirectory() as tmpdir:
+        adapter.export(output, tmpdir)
         json_path = os.path.join(tmpdir, "alignment_manifest.json")
-        adapter.export(output, json_path)
         assert os.path.exists(json_path)
 
         with open(json_path, "r", encoding="utf-8") as f:
@@ -212,7 +212,7 @@ def test_inbound_adapters_implement_protocol():
         with open(json_path, "w", encoding="utf-8") as f:
             json.dump(data, f)
 
-        bible_adapter = BibleMetadataVerseAdapter.make_default(path=json_path)
+        bible_adapter = BibleMetadataVerseAdapter(path=json_path)
         assert isinstance(bible_adapter, InboundChunkAdapter)
         chunks = bible_adapter.load_chunks()
         assert len(chunks) == 1
@@ -222,7 +222,7 @@ def test_inbound_adapters_implement_protocol():
         with open(chunk_json_path, "w", encoding="utf-8") as f:
             json.dump(generic_items, f)
 
-        generic_adapter = GenericChunkListAdapter.make_default(path=chunk_json_path)
+        generic_adapter = GenericChunkListAdapter(path=chunk_json_path)
         assert isinstance(generic_adapter, InboundChunkAdapter)
         generic_chunks = generic_adapter.load_chunks()
         assert len(generic_chunks) == 1
@@ -231,7 +231,7 @@ def test_inbound_adapters_implement_protocol():
 def test_outbound_adapters_implement_protocol():
     from transcription.alignment.ports.protocols import OutboundAlignmentAdapter
 
-    praat_adapter = PraatTextGridAdapter.make_default()
+    praat_adapter = PraatTextGridAdapter()
     manifest_adapter = ManifestJsonAdapter()
 
     assert isinstance(praat_adapter, OutboundAlignmentAdapter)

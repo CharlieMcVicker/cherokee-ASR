@@ -72,8 +72,8 @@ class InboundChunkAdapter(Protocol):
 
 @runtime_checkable
 class OutboundAlignmentAdapter(Protocol):
-    """Port for exporting domain AlignmentOutput to external target paths."""
+    """Port for exporting domain AlignmentOutput into target output directories."""
 
-    def export(self, alignment: AlignmentOutput, output_path: str) -> None:
-        """Exports domain AlignmentOutput to the specified output path."""
+    def export(self, alignment: AlignmentOutput, output_dir: str) -> None:
+        """Exports domain AlignmentOutput artifacts into the specified output directory."""
         ...

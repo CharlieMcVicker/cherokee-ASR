@@ -27,12 +27,12 @@ class AlignmentPipeline:
         chunk_adapter: InboundChunkAdapter,
         extractor: ASREmissionsExtractor,
         engine: ChunkAlignmentEngine,
-        exporters: Sequence[Tuple[OutboundAlignmentAdapter, str]],
+        exporters: Optional[Sequence[OutboundAlignmentAdapter]] = None,
     ):
         self.chunk_adapter = chunk_adapter
         self.extractor = extractor
         self.engine = engine
-        self.exporters = list(exporters)
+        self.exporters = list(exporters) if exporters else []
 
     def run(
         self,
@@ -58,8 +58,7 @@ class AlignmentPipeline:
 
         if output_dir:
             os.makedirs(output_dir, exist_ok=True)
-            for exporter, filename in self.exporters:
-                custom_path = os.path.join(output_dir, filename)
-                exporter.export(alignment, custom_path)
+            for exporter in self.exporters:
+                exporter.export(alignment, output_dir)
 
         return alignment
