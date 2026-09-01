@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Unit tests for CLI runner in transcription.alignment.cli.
 """
@@ -9,14 +10,7 @@ import pytest
 from unittest.mock import MagicMock, patch
 
 from transcription.alignment.cli import main, run_alignment_pipeline
-from transcription.alignment.domain.models import (
-    AlignedChunk,
-    AlignmentMetrics,
-    AlignmentOutput,
-    TextChunk,
-    TokenEmission,
-    WordInterval,
-)
+from transcription.alignment.models import AlignmentOutput
 
 
 @pytest.fixture
@@ -50,9 +44,7 @@ def test_run_alignment_pipeline_with_bible_metadata(tmp_path, mock_asr_model):
 
     out_dir = str(tmp_path / "output")
 
-    with patch(
-        "transcription.alignment.strategies.extractors.segment_long_audio"
-    ) as mock_segment:
+    with patch("transcription.alignment.extractors.segment_long_audio") as mock_segment:
         from pydub import AudioSegment
         from transcription.audio.segment import AudioChunk
 
@@ -98,9 +90,7 @@ def test_run_alignment_pipeline_with_chunk_list(tmp_path, mock_asr_model):
 
     out_dir = str(tmp_path / "output_chunks")
 
-    with patch(
-        "transcription.alignment.strategies.extractors.segment_long_audio"
-    ) as mock_segment:
+    with patch("transcription.alignment.extractors.segment_long_audio") as mock_segment:
         from pydub import AudioSegment
         from transcription.audio.segment import AudioChunk
 
@@ -122,6 +112,14 @@ def test_run_alignment_pipeline_with_chunk_list(tmp_path, mock_asr_model):
     assert isinstance(result, AlignmentOutput)
     assert len(result.aligned_chunks) == 1
     assert result.aligned_chunks[0].chunk_id == "c1"
+
+
+def test_run_alignment_pipeline_missing_args(tmp_path):
+    with pytest.raises(ValueError):
+        run_alignment_pipeline(
+            audio_path="audio.wav",
+            output_dir=str(tmp_path),
+        )
 
 
 def test_cli_main_argument_parsing(tmp_path):

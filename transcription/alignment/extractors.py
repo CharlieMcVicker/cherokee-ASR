@@ -2,17 +2,72 @@
 """
 extractors.py
 
-Concrete ASREmissionsExtractor implementations.
+Concrete ASREmissionsExtractor implementations and audio chunk preparation helper.
 """
 
-from typing import Any, Callable, Dict, List, Optional, Sequence, Union
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    List,
+    Optional,
+    Protocol,
+    Sequence,
+    Union,
+    runtime_checkable,
+)
 import numpy as np
 from pydub import AudioSegment
 
-from transcription.alignment.domain.models import TokenEmission
-from transcription.alignment.ports.protocols import ASREmissionsExtractor
+from transcription.alignment.models import TokenEmission
 from transcription.models.asr_model import CherokeeASRModel, WordConfidence
 from transcription.audio.segment import segment_long_audio, AudioChunk
+
+
+def prepare_audio_chunks(audio_input: Any, skip_vad: bool = False) -> List[AudioChunk]:
+    """
+    Prepares audio chunks from various audio input types (path str, AudioSegment, ndarray),
+    either bypassing VAD (skip_vad=True) or using segment_long_audio VAD segmentation (skip_vad=False).
+    """
+    if skip_vad:
+        if isinstance(audio_input, str):
+            audio_seg = AudioSegment.from_file(audio_input)
+        elif isinstance(audio_input, AudioSegment):
+            audio_seg = audio_input
+        elif isinstance(audio_input, np.ndarray):
+            samples = audio_input
+            if samples.dtype in (np.float32, np.float64):
+                samples = (samples * 32767).astype(np.int16)
+            audio_seg = AudioSegment(
+                samples.tobytes(),
+                frame_rate=16000,
+                sample_width=2,
+                channels=1,
+            )
+        else:
+            audio_seg = audio_input
+
+        if isinstance(audio_seg, AudioSegment):
+            return [
+                AudioChunk(
+                    chunk_index=0,
+                    audio=audio_seg,
+                    start_sec=0.0,
+                    end_sec=round(len(audio_seg) / 1000.0, 3),
+                )
+            ]
+        return []
+    else:
+        return segment_long_audio(audio_input)
+
+
+@runtime_checkable
+class ASREmissionsExtractor(Protocol):
+    """Protocol / base interface for extracting token emissions from audio input."""
+
+    def extract(self, audio_input: Any = None) -> List[TokenEmission]:
+        """Extracts token emissions with timestamps from audio input."""
+        ...
 
 
 class CherokeeASRExtractor(ASREmissionsExtractor):
@@ -26,41 +81,11 @@ class CherokeeASRExtractor(ASREmissionsExtractor):
         self.model = model
         self.skip_vad = skip_vad
 
-    def _prepare_chunks(self, audio_input: Any) -> List[AudioChunk]:
-        if self.skip_vad:
-            if isinstance(audio_input, str):
-                audio_seg = AudioSegment.from_file(audio_input)
-            elif isinstance(audio_input, AudioSegment):
-                audio_seg = audio_input
-            elif isinstance(audio_input, np.ndarray):
-                samples = audio_input
-                if samples.dtype in (np.float32, np.float64):
-                    samples = (samples * 32767).astype(np.int16)
-                audio_seg = AudioSegment(
-                    samples.tobytes(),
-                    frame_rate=16000,
-                    sample_width=2,
-                    channels=1,
-                )
-            else:
-                audio_seg = audio_input
-
-            if isinstance(audio_seg, AudioSegment):
-                return [
-                    AudioChunk(
-                        chunk_index=0,
-                        audio=audio_seg,
-                        start_sec=0.0,
-                        end_sec=round(len(audio_seg) / 1000.0, 3),
-                    )
-                ]
-            return []
-        else:
-            return segment_long_audio(audio_input)
-
-    def extract(self, audio_input: Any) -> List[TokenEmission]:
+    def extract(self, audio_input: Any = None) -> List[TokenEmission]:
         """Extracts token emissions with timestamps from audio input."""
-        chunks = self._prepare_chunks(audio_input)
+        if audio_input is None:
+            return []
+        chunks = prepare_audio_chunks(audio_input, skip_vad=self.skip_vad)
         emissions: List[TokenEmission] = []
 
         for c in chunks:
@@ -111,41 +136,11 @@ class CallbackEmissionsExtractor(ASREmissionsExtractor):
         self.callback = callback
         self.skip_vad = skip_vad
 
-    def _prepare_chunks(self, audio_input: Any) -> List[AudioChunk]:
-        if self.skip_vad:
-            if isinstance(audio_input, str):
-                audio_seg = AudioSegment.from_file(audio_input)
-            elif isinstance(audio_input, AudioSegment):
-                audio_seg = audio_input
-            elif isinstance(audio_input, np.ndarray):
-                samples = audio_input
-                if samples.dtype in (np.float32, np.float64):
-                    samples = (samples * 32767).astype(np.int16)
-                audio_seg = AudioSegment(
-                    samples.tobytes(),
-                    frame_rate=16000,
-                    sample_width=2,
-                    channels=1,
-                )
-            else:
-                audio_seg = audio_input
-
-            if isinstance(audio_seg, AudioSegment):
-                return [
-                    AudioChunk(
-                        chunk_index=0,
-                        audio=audio_seg,
-                        start_sec=0.0,
-                        end_sec=round(len(audio_seg) / 1000.0, 3),
-                    )
-                ]
-            return []
-        else:
-            return segment_long_audio(audio_input)
-
-    def extract(self, audio_input: Any) -> List[TokenEmission]:
+    def extract(self, audio_input: Any = None) -> List[TokenEmission]:
         """Extracts token emissions with timestamps from audio input using callback."""
-        chunks = self._prepare_chunks(audio_input)
+        if audio_input is None:
+            return []
+        chunks = prepare_audio_chunks(audio_input, skip_vad=self.skip_vad)
         emissions: List[TokenEmission] = []
 
         for c in chunks:

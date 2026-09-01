@@ -1,9 +1,30 @@
 """
-Distance metric strategy implementations.
+Distance metric implementations for alignment.
 """
 
-from typing import Dict, Optional, Tuple
+from typing import Callable, Dict, Optional, Protocol, Tuple, runtime_checkable
 from jiwer import cer
+
+
+@runtime_checkable
+class DistanceMetric(Protocol):
+    """Protocol for distance cost evaluation between hypothesis and reference."""
+
+    def compute_cost(self, hypothesis: str, reference: str) -> float:
+        """Computes distance / error cost between hypothesis and reference."""
+        ...
+
+
+def calculate_cer(hypothesis: str, reference: str) -> float:
+    """Computes Character Error Rate (CER) between hypothesis and reference strings."""
+    if not reference and not hypothesis:
+        return 0.0
+    if not reference or not hypothesis:
+        return 1.0
+    try:
+        return float(cer(reference, hypothesis))
+    except Exception:
+        return 1.0
 
 
 class DefaultCERDistanceMetric:
@@ -14,14 +35,11 @@ class DefaultCERDistanceMetric:
         Computes Character Error Rate between reference and hypothesis strings.
         Returns 0.0 if both are empty, or 1.0 if one is empty and the other is not.
         """
-        if not reference and not hypothesis:
-            return 0.0
-        if not reference or not hypothesis:
-            return 1.0
-        try:
-            return float(cer(reference, hypothesis))
-        except Exception:
-            return 1.0
+        return calculate_cer(hypothesis, reference)
+
+
+# CharacterErrorRateMetric is an alias for DefaultCERDistanceMetric
+CharacterErrorRateMetric = DefaultCERDistanceMetric
 
 
 class PhonologicalDistanceMetric:
@@ -84,3 +102,17 @@ class PhonologicalDistanceMetric:
 
         raw_distance = dp[m][n]
         return float(raw_distance / m)
+
+
+# LevenshteinDistanceMetric is an alias for PhonologicalDistanceMetric
+LevenshteinDistanceMetric = PhonologicalDistanceMetric
+
+
+class CustomCallableDistanceMetric:
+    """DistanceMetric wrapping a custom callable (hyp, ref) -> float."""
+
+    def __init__(self, fn: Callable[[str, str], float]):
+        self.fn = fn
+
+    def compute_cost(self, hypothesis: str, reference: str) -> float:
+        return float(self.fn(hypothesis, reference))

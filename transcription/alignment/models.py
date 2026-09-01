@@ -1,12 +1,11 @@
 """
 Core domain models for transcription and timestamping alignment.
 
-Pure dataclasses with generic chunk semantics, decoupled from dataset-specific
-abstractions (such as Bible verses or chapter numbers).
+Pure dataclasses with generic chunk semantics.
 """
 
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
+from typing import List, Optional
 
 
 @dataclass(frozen=True)
@@ -19,15 +18,12 @@ class TokenEmission:
     confidence: float = 1.0
 
 
-@dataclass
+@dataclass(frozen=True)
 class TextChunk:
     """Generic text unit to be aligned against audio/emissions."""
 
     chunk_id: str
-    raw_text: str
-    normalized_text: str = ""
-    syllabary_text: Optional[str] = None
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    text: str
 
 
 @dataclass
@@ -39,9 +35,8 @@ class WordInterval:
     end_sec: float
     confidence: float = 1.0
     flagged: bool = False
-    syllabary: Optional[str] = None
-    reconciled_word: Optional[str] = None
     emitted_word: Optional[str] = None
+    reconciled_word: Optional[str] = None
 
 
 @dataclass
@@ -49,7 +44,6 @@ class AlignedChunk:
     """A matched segment with bounded timestamps and aligned words."""
 
     chunk_id: str
-    chunk: TextChunk
     start_sec: float
     end_sec: float
     words: List[WordInterval] = field(default_factory=list)
@@ -71,7 +65,7 @@ class AlignmentMetrics:
 
 @dataclass
 class AlignmentOutput:
-    """Final domain output from alignment execution."""
+    """Final output from alignment execution."""
 
     aligned_chunks: List[AlignedChunk]
     source_id: str = ""

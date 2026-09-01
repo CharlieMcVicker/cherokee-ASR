@@ -13,22 +13,20 @@ from typing import Any, Optional
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
 
-from transcription.alignment.adapters.inbound import (
-    BibleMetadataVerseAdapter,
-    GenericChunkListAdapter,
+from transcription.alignment.aligner import (
+    NeedlemanWunschWordAligner,
+    SlidingWindowDTWAligner,
 )
-from transcription.alignment.adapters.outbound import (
-    DebugJsonAdapter,
-    ManifestJsonAdapter,
-    PraatTextGridAdapter,
+from transcription.alignment.exporters import (
+    export_debug_json as write_debug_json,
+    export_manifest as write_manifest_json,
+    export_textgrid as write_textgrid_file,
 )
-from transcription.alignment.core.sliding_window import SlidingWindowDTWAligner
-from transcription.alignment.domain.models import AlignmentOutput
-from transcription.alignment.pipeline import AlignmentPipeline
-from transcription.alignment.strategies.extractors import CherokeeASRExtractor
-from transcription.alignment.strategies.reconciliation import (
-    CherokeeSyllabaryReconciliationStrategy,
-)
+from transcription.alignment.extractors import CherokeeASRExtractor
+from transcription.alignment.ingestion import load_bible_chunks, load_generic_chunks
+from transcription.alignment.models import AlignmentOutput
+from transcription.alignment.normalizers import normalize_text_for_alignment
+from transcription.alignment.reconciliation import reconcile_alignment
 
 
 def run_alignment_pipeline(
@@ -43,15 +41,15 @@ def run_alignment_pipeline(
     debug_export: bool = False,
     reconcile: bool = False,
 ) -> AlignmentOutput:
-    """Prepares ports, strategies, and adapters, and runs the AlignmentPipeline."""
+    """Runs the streamlined Cherokee alignment pipeline and exports artifacts."""
     if bible_metadata_path:
         print(
             f"[1/4] Ingesting Bible ground-truth metadata from '{bible_metadata_path}'..."
         )
-        chunk_adapter = BibleMetadataVerseAdapter(path=bible_metadata_path)
+        chunks, source_lookup = load_bible_chunks(bible_metadata_path)
     elif chunk_list_path:
         print(f"[1/4] Ingesting ground-truth chunk list from '{chunk_list_path}'...")
-        chunk_adapter = GenericChunkListAdapter(path=chunk_list_path)
+        chunks, source_lookup = load_generic_chunks(chunk_list_path)
     else:
         raise ValueError("Either --bible-metadata or --chunk-list must be provided.")
 
@@ -88,32 +86,45 @@ def run_alignment_pipeline(
         )
 
     extractor = CherokeeASRExtractor(model=asr_model, skip_vad=skip_vad)
-    engine = SlidingWindowDTWAligner(
-        reconciliation_strategy=(
-            CherokeeSyllabaryReconciliationStrategy() if reconcile else None
-        )
-    )
+    emissions = extractor.extract(audio_path)
 
-    exporters = []
-    if export_manifest:
-        exporters.append(ManifestJsonAdapter())
-    if export_praat:
-        exporters.append(PraatTextGridAdapter())
-    if debug_export:
-        exporters.append(DebugJsonAdapter())
-
-    pipeline = AlignmentPipeline(
-        chunk_adapter=chunk_adapter,
-        extractor=extractor,
-        engine=engine,
-        exporters=exporters,
+    word_aligner = NeedlemanWunschWordAligner(
+        chunk_normalizer=normalize_text_for_alignment,
+        emission_normalizer=normalize_text_for_alignment,
     )
+    aligner = SlidingWindowDTWAligner(word_aligner=word_aligner)
+
+    alignment = aligner.align(emissions=emissions, chunks=chunks, source_id=audio_path)
+
+    if reconcile:
+        syllabary_lookup = {
+            cid: meta.get("cherokee", meta.get("cherokee_syllabary", ""))
+            for cid, meta in source_lookup.items()
+        }
+        alignment = reconcile_alignment(alignment, syllabary_lookup)
 
     print(f"[4/4] Executing alignment and exporting artifacts to '{output_dir}'...")
-    alignment = pipeline.run(
-        audio_input=audio_path,
-        output_dir=output_dir,
-    )
+    os.makedirs(output_dir, exist_ok=True)
+
+    if export_manifest:
+        write_manifest_json(
+            alignment=alignment,
+            output_dir=output_dir,
+            source_metadata=source_lookup,
+        )
+
+    if export_praat:
+        write_textgrid_file(
+            alignment=alignment,
+            output_dir=output_dir,
+            source_metadata=source_lookup,
+        )
+
+    if debug_export:
+        write_debug_json(
+            alignment=alignment,
+            output_dir=output_dir,
+        )
 
     if alignment.metrics:
         m = alignment.metrics
