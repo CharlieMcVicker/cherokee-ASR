@@ -2,19 +2,19 @@
 """
 test_audio_segmenter.py
 
-Unit tests for audio_segmenter.py
+Unit tests for audio segmentation in transcription.audio.segment.
 """
 
 import unittest
 from pydub import AudioSegment
 from pydub.generators import Sine
 
-from transcription.timestamping.audio_segmenter import segment_long_audio, AudioChunk
+from transcription.audio.segment import segment_long_audio, AudioChunk
 
 
 class TestAudioSegmenter(unittest.TestCase):
     def test_segment_synthetic_audio(self):
-        # Generate 15 seconds of audio with silence in the middle
+        # Generate 12 seconds of audio with silence in the middle
         tone1 = Sine(440).to_audio_segment(duration=5000)
         silence = AudioSegment.silent(duration=2000)
         tone2 = Sine(880).to_audio_segment(duration=5000)

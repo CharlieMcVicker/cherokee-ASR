@@ -9,28 +9,23 @@ characters against emitted ASR text using character level alignment (transcripti
 Results are persisted to disk cache manifest JSON by default with a --force-recompute flag to reload existing caches.
 """
 
+import argparse
+import csv
+import glob
+import json
+import multiprocessing
 import os
 import sys
-
-os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
-os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
-
-import json
-import argparse
 import time
-import glob
-import multiprocessing
-from typing import List, Dict, Any, Optional
+from typing import Any, Dict, List, Optional
 
 
 import torch
 import soundfile as sf
 import numpy as np
 from tqdm import tqdm
-from transcription.utils.model_utils import (
-    get_best_model_config,
-    get_model,
-)
+from transcription.models.asr_model import CherokeeASRModel
+from transcription.utils.model_utils import get_best_model_config
 
 
 from transcription.inference.infer import (
@@ -68,8 +63,6 @@ def load_manifest(manifest_path: str) -> List[Dict[str, Any]]:
                             f"Error parsing JSONL at line {line_idx + 1}: {e}"
                         )
     elif manifest_path.endswith(".csv"):
-        import csv
-
         with open(manifest_path, "r", encoding="utf-8") as f:
             reader = csv.DictReader(f)
             records = list(reader)
@@ -151,9 +144,7 @@ def run_batch_inference(
         or os.environ.get("HUGGING_FACE_HUB_TOKEN")
     )
 
-    model: Any
-    processor: Any
-    model, processor, device = get_model(
+    asr_model = CherokeeASRModel.from_pretrained(
         path_or_repo=checkpoint,
         revision=revision,
         processor_path=processor_path,
@@ -265,48 +256,47 @@ def run_batch_inference(
                 item["speech"] = speech
                 speech_list.append(speech)
 
-        inputs = processor(
+        inputs = asr_model.processor(
             speech_list,
             sampling_rate=TARGET_SAMPLE_RATE,
             padding=True,
             return_tensors="pt",
         )
-        input_values = inputs.input_values.to(device)
+        input_values = inputs.input_values.to(asr_model.device)
         attention_mask = getattr(inputs, "attention_mask", None)
         if attention_mask is not None:
-            attention_mask = attention_mask.to(device)
+            attention_mask = attention_mask.to(asr_model.device)
 
         try:
             with torch.no_grad():
                 if attention_mask is not None:
-                    batch_logits = model(
+                    batch_logits = asr_model.model(
                         input_values, attention_mask=attention_mask
                     ).logits
                 else:
-                    batch_logits = model(input_values).logits
+                    batch_logits = asr_model.model(input_values).logits
         except Exception as e:
             err_str = str(e).lower()
             if "out of memory" in err_str or "mps" in err_str:
                 # MPS or OOM fallback to CPU/sequential
-                if device == "mps":
-                    device = "cpu"
-                    model.to(device)
-                input_values = input_values.to(device)
+                if asr_model.device == "mps":
+                    asr_model.to("cpu")
+                input_values = input_values.to(asr_model.device)
                 if attention_mask is not None:
-                    attention_mask = attention_mask.to(device)
+                    attention_mask = attention_mask.to(asr_model.device)
                 with torch.no_grad():
                     if attention_mask is not None:
-                        batch_logits = model(
+                        batch_logits = asr_model.model(
                             input_values, attention_mask=attention_mask
                         ).logits
                     else:
-                        batch_logits = model(input_values).logits
+                        batch_logits = asr_model.model(input_values).logits
             else:
                 raise e
 
         for item_idx, item in enumerate(batch):
             input_len = len(item["speech"])
-            logit_len = int(model._get_feat_extract_output_lengths(input_len))
+            logit_len = int(asr_model.model._get_feat_extract_output_lengths(input_len))
             logits_np = batch_logits[item_idx, :logit_len].detach().cpu().numpy().copy()
             item_data = (
                 item["record_idx"],
@@ -483,4 +473,6 @@ def main():
 
 
 if __name__ == "__main__":
+    os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
+    os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
     main()

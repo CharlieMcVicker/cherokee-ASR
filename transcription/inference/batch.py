@@ -7,53 +7,42 @@ Runs speech-to-text inference on a directory of WAV files using the fine-tuned W
 Optimized using batched GPU inference and multiprocessed CPU CTC decoding with detailed confidence scores.
 """
 
-import os
-
-# Enable fallback to CPU for unsupported MPS operations
-os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
-
-from typing import Any
 import argparse
-import sys
-import glob
 import csv
-
-import torch
-import soundfile as sf
-import numpy as np
-import time
-
-
+import glob
+import json
 import multiprocessing
+import os
+import sys
+import threading
+import time
+from typing import Any
+
+import numpy as np
+import soundfile as sf
+import torch
 from tqdm import tqdm
 
 
-from transcription.utils.model_utils import (
-    get_best_model_config,
-    get_model,
-)
+from transcription.models.asr_model import CherokeeASRModel, WordConfidence
+from transcription.utils.model_utils import get_best_model_config
 
-from transcription.inference.infer import (
-    TARGET_SAMPLE_RATE,
-    load_and_preprocess_audio,
-    calculate_word_confidences,
-    greedy_inference,
-)
+from transcription.inference.infer import TARGET_SAMPLE_RATE
 
-# Global variables in the worker processes to avoid serializing the processor objects
-global_processor = None
+# Global variables in the worker processes to avoid serializing the model/processor objects
+global_asr_model: CherokeeASRModel | None = None
 
 
 def init_worker(processor_path, token, revision):
     """
-    Initialize global processor in worker processes once.
+    Initialize global CherokeeASRModel in worker processes once.
     This avoids pickle serialization overhead.
     """
-    global global_processor
+    global global_asr_model
     # Restrict internal Torch threading in workers to prevent CPU oversubscription
     torch.set_num_threads(1)
 
-    _, global_processor, _ = get_model(
+    global_asr_model = CherokeeASRModel.from_pretrained(
         path_or_repo=processor_path,
         revision=revision,
         token=token,
@@ -66,28 +55,20 @@ def decode_worker(item_data):
     Worker function to decode logits and compute detailed confidences.
     item_data is a tuple: (index, filename, audio_path, logits_np)
     """
-    global global_processor
-    import numpy as np
-    import torch
-    import json
-    from transcription.inference.infer import (
-        calculate_word_confidences,
-        greedy_inference,
-    )
+    global global_asr_model
 
     idx, filename, audio_path, logits_np = item_data
 
     logits_tensor = torch.tensor(logits_np)
-    res = greedy_inference(logits_tensor, global_processor)
-    if isinstance(res, list):
-        res = res[0]
-    greedy_raw = str(res["text"])
-    greedy_confidence = float(res["confidence"])
+    assert global_asr_model is not None
+    result = global_asr_model.decode(logits_tensor, compute_word_confidences=True)
+    greedy_raw = str(result.text)
+    greedy_confidence = float(result.confidence)
 
-    # Calculate detailed character/word confidences
-    probs = torch.nn.functional.softmax(logits_tensor, dim=-1).numpy()
-    pred_ids = np.argmax(probs, axis=-1)
-    words_details = calculate_word_confidences(probs, pred_ids, global_processor)
+    # Convert word confidences to json
+    words_details = [
+        w.to_dict() if isinstance(w, WordConfidence) else w for w in result.words
+    ]
     word_confidences_json = json.dumps(words_details, ensure_ascii=False)
 
     return {
@@ -183,16 +164,14 @@ def main():
         or os.environ.get("HUGGING_FACE_HUB_TOKEN")
     )
 
-    model: Any
-    processor: Any
-    model, processor, device = get_model(
+    asr_model = CherokeeASRModel.from_pretrained(
         path_or_repo=args.checkpoint,
         revision=args.revision,
         processor_path=args.processor,
         token=token,
     )
 
-    print(f"Using device: {device}", flush=True)
+    print(f"Using device: {asr_model.device}", flush=True)
 
     # Read audio metadata for sorting (lazy loading to minimize VRAM/RAM)
     loaded_audios = []
@@ -260,8 +239,6 @@ def main():
         writer = csv.writer(f)
         writer.writerow(headers)
 
-    import threading
-
     csv_lock = threading.Lock()
 
     # Bounded semaphore to prevent IPC queue explosion and system OOM/segfault
@@ -296,7 +273,7 @@ def main():
         speech_list = []
         for item in batch:
             try:
-                speech = load_and_preprocess_audio(
+                speech = CherokeeASRModel.preprocess_audio(
                     item["audio_path"], TARGET_SAMPLE_RATE
                 )
                 item["speech"] = speech
@@ -310,25 +287,25 @@ def main():
                 item["speech"] = speech
                 speech_list.append(speech)
 
-        inputs = processor(
+        inputs = asr_model.processor(
             speech_list,
             sampling_rate=TARGET_SAMPLE_RATE,
             padding=True,
             return_tensors="pt",
         )
-        input_values = inputs.input_values.to(device)
+        input_values = inputs.input_values.to(asr_model.device)
         attention_mask = getattr(inputs, "attention_mask", None)
         if attention_mask is not None:
-            attention_mask = attention_mask.to(device)
+            attention_mask = attention_mask.to(asr_model.device)
 
         try:
             with torch.no_grad():
                 if attention_mask is not None:
-                    batch_logits = model(
+                    batch_logits = asr_model.model(
                         input_values, attention_mask=attention_mask
                     ).logits
                 else:
-                    batch_logits = model(input_values).logits
+                    batch_logits = asr_model.model(input_values).logits
         except Exception as e:
             err_str = str(e).lower()
             is_oom = "out of memory" in err_str or (
@@ -351,33 +328,39 @@ def main():
                 if torch.cuda.is_available():
                     torch.cuda.empty_cache()
                 for item_idx, item in enumerate(batch):
-                    single_inputs = processor(
+                    single_inputs = asr_model.processor(
                         [item["speech"]],
                         sampling_rate=TARGET_SAMPLE_RATE,
                         padding=True,
                         return_tensors="pt",
                     )
-                    single_input_values = single_inputs.input_values.to(device)
+                    single_input_values = single_inputs.input_values.to(
+                        asr_model.device
+                    )
                     single_attention_mask = getattr(
                         single_inputs, "attention_mask", None
                     )
                     if single_attention_mask is not None:
-                        single_attention_mask = single_attention_mask.to(device)
+                        single_attention_mask = single_attention_mask.to(
+                            asr_model.device
+                        )
 
                     try:
                         with torch.no_grad():
                             with torch.backends.cudnn.flags(enabled=False):
                                 if single_attention_mask is not None:
-                                    single_logits = model(
+                                    single_logits = asr_model.model(
                                         single_input_values,
                                         attention_mask=single_attention_mask,
                                     ).logits
                                 else:
-                                    single_logits = model(single_input_values).logits
+                                    single_logits = asr_model.model(
+                                        single_input_values
+                                    ).logits
 
                         input_len = len(item["speech"])
                         logit_len = int(
-                            model._get_feat_extract_output_lengths(input_len)
+                            asr_model.model._get_feat_extract_output_lengths(input_len)
                         )
                         logits_np = (
                             single_logits[0, :logit_len].detach().cpu().numpy().copy()
@@ -427,30 +410,29 @@ def main():
                 locals().pop("speech_list", None)
 
                 continue
-            elif isinstance(e, NotImplementedError) and device == "mps":
+            elif isinstance(e, NotImplementedError) and asr_model.device == "mps":
                 print(
                     "  MPS execution failed. Falling back to CPU backend for this batch...",
                     flush=True,
                 )
-                device = "cpu"
-                model.to(device)  # type: ignore
-                input_values = input_values.to(device)
+                asr_model.to("cpu")
+                input_values = input_values.to(asr_model.device)
                 if attention_mask is not None:
-                    attention_mask = attention_mask.to(device)
+                    attention_mask = attention_mask.to(asr_model.device)
                 with torch.no_grad():
                     if attention_mask is not None:
-                        batch_logits = model(
+                        batch_logits = asr_model.model(
                             input_values, attention_mask=attention_mask
                         ).logits
                     else:
-                        batch_logits = model(input_values).logits
+                        batch_logits = asr_model.model(input_values).logits
             else:
                 raise e
 
         # Extract and unpad logits for each item
         for item_idx, item in enumerate(batch):
             input_len = len(item["speech"])
-            logit_len = int(model._get_feat_extract_output_lengths(input_len))
+            logit_len = int(asr_model.model._get_feat_extract_output_lengths(input_len))
             logits_np = batch_logits[item_idx, :logit_len].detach().cpu().numpy().copy()
             item_data = (global_idx, item["filename"], item["audio_path"], logits_np)
             max_queue.acquire()

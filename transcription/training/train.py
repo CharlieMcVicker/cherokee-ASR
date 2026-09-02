@@ -5,39 +5,39 @@ Local adaptation of the Wav2Vec2 training script.
 Supports local CSV files, configurable local paths, and subprocess/OS-based calls.
 """
 
+import argparse
+import datetime
+import glob
+import json
 import os
 import re
-import sys
-
-# Prevent OpenMP duplicate initialization crash on macOS conda environments
-os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
-# Enable CPU fallback for ops missing native MPS implementation
-os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
-
-
-import json
 import shutil
 import subprocess
+import sys
 import unicodedata
-import pandas as pd
-import numpy as np
-import torch
-import torchaudio
-import evaluate
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Union
 
+import evaluate
+import numpy as np
+import pandas as pd
+import soundfile as sf
+import torch
+import torchaudio
+from datasets import Audio, Dataset, Features, Value, interleave_datasets
+from huggingface_hub import snapshot_download
+from jiwer import cer as jiwer_cer, wer as jiwer_wer
 from transformers import (
+    Trainer,
+    TrainingArguments,
     Wav2Vec2CTCTokenizer,
     Wav2Vec2FeatureExtractor,
-    Wav2Vec2Processor,
     Wav2Vec2ForCTC,
-    TrainingArguments,
-    Trainer,
+    Wav2Vec2Processor,
 )
-from datasets import Dataset, Audio
-from jiwer import wer as jiwer_wer, cer as jiwer_cer
+
 from transcription.inference.infer import greedy_inference, strip_length
+from transcription.utils.evaluation import run_evaluation, yield_local_checkpoints
 
 TARGET_SAMPLE_RATE = 16000
 apostrophe_variants = r"[’‘ʼʻ`´‛]"  # curly, modifier letter, grave/acute, etc.
@@ -172,8 +172,6 @@ class DataCollatorCTCWithPadding:
 
 
 def parse_args():
-    import argparse
-
     parser = argparse.ArgumentParser(
         description="Train Wav2Vec2 on local or remote machine."
     )
@@ -300,8 +298,6 @@ def parse_args():
     )
 
     if CONFIG["push_to_hub"]:
-        import datetime
-
         run_start_time = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
         prefix = f"length-only-{run_start_time}"
         base_name = (
@@ -407,8 +403,6 @@ def build_vocabulary_and_processor(dfs, text_col, folder_model_files):
 
 def prepare_datasets(dfs, audio_col, text_col, processor):
     print("Preparing HuggingFace Datasets and interleaving train splits...")
-    import soundfile as sf
-    from datasets import Features, Value, interleave_datasets
 
     def df_to_ds(df):
         data_dict = {
@@ -551,8 +545,6 @@ def resolve_resume_checkpoint(args, folder_model_files):
         print(
             f"Downloading checkpoint from repository: {args.resume_from_repo} (revision: {args.resume_from_revision or 'main'})"
         )
-        from huggingface_hub import snapshot_download
-
         downloaded_dir = snapshot_download(
             repo_id=args.resume_from_repo,
             revision=args.resume_from_revision,
@@ -565,9 +557,6 @@ def resolve_resume_checkpoint(args, folder_model_files):
                 f"Using downloaded repository root as checkpoint: {resume_checkpoint}"
             )
         else:
-            import glob
-            import re
-
             ckpt_dirs = glob.glob(os.path.join(downloaded_dir, "checkpoint-*"))
             if ckpt_dirs:
 
@@ -593,9 +582,6 @@ def resolve_resume_checkpoint(args, folder_model_files):
                 resume_checkpoint = None
     elif args.resume_from_checkpoint:
         if args.resume_from_checkpoint.lower() == "latest":
-            import glob
-            import re
-
             ckpt_dirs = glob.glob(os.path.join(folder_model_files, "checkpoint-*"))
             if ckpt_dirs:
 
@@ -631,7 +617,6 @@ def evaluate_checkpoints_dual(
     print("\n==========================================")
     print("STARTING DISAGGREGATED POST-TRAINING EVALUATION")
     print("==========================================\n")
-    from transcription.utils.evaluation import yield_local_checkpoints, run_evaluation
 
     # Pass 1: Original Test Set (Baseline Progress & Forgetfulness Anchor)
     print("Evaluating checkpoints on ORIGINAL Test Set...")
@@ -832,4 +817,8 @@ def main():
 
 
 if __name__ == "__main__":
+    # Prevent OpenMP duplicate initialization crash on macOS conda environments
+    os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
+    # Enable CPU fallback for ops missing native MPS implementation
+    os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
     main()

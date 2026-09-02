@@ -8,12 +8,6 @@ FastAPI backend server and PyWebView API bridge for Syllabary Transcriber.
 import base64
 import os
 import struct
-
-os.environ["CUDA_VISIBLE_DEVICES"] = ""
-os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
-os.environ["OMP_NUM_THREADS"] = "1"
-os.environ["MKL_NUM_THREADS"] = "1"
-
 from typing import Any, List, Union
 
 from fastapi import FastAPI, HTTPException
@@ -21,7 +15,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from transcription.inference.infer import get_model, infer_pcm_array
+from transcription.models.asr_model import CherokeeASRModel
 
 
 import logging
@@ -33,14 +27,12 @@ class SyllabaryApi:
     """PyWebView API bridge class for webview integration."""
 
     def __init__(self, model_dir: str | None = None) -> None:
-        self.model = None
-        self.processor = None
-        self.device = None
+        self.asr_model: CherokeeASRModel | None = None
         self.model_dir = model_dir
 
     def _ensure_model_loaded(self) -> None:
-        if self.model is None or self.processor is None:
-            self.model, self.processor, self.device = get_model(
+        if self.asr_model is None:
+            self.asr_model = CherokeeASRModel.from_pretrained_or_best(
                 path_or_repo=self.model_dir
             )
 
@@ -79,16 +71,11 @@ class SyllabaryApi:
             sample_rate,
         )
 
-        result = infer_pcm_array(
-            pcm_data=pcm_array,
-            sample_rate=sample_rate,
-            model=self.model,
-            processor=self.processor,
-            device=self.device,
+        assert self.asr_model is not None
+        result = self.asr_model.transcribe(
+            audio_input=pcm_array, sample_rate=sample_rate
         )
-        if isinstance(result, list):
-            result = result[0]
-        res_dict = dict(result)
+        res_dict = result.to_dict()
         logger.info("transcribe_pcm result: %s", res_dict)
         return res_dict
 

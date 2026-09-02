@@ -22,13 +22,14 @@ from jiwer import wer as jiwer_wer, cer as jiwer_cer
 from tqdm import tqdm
 
 from transcription.inference.infer import (
+    TARGET_SAMPLE_RATE,
     greedy_inference,
     normalize_text,
-    strip_tones,
-    strip_length,
     strip_both,
-    TARGET_SAMPLE_RATE,
+    strip_length,
+    strip_tones,
 )
+from transcription.utils.evaluation import run_evaluation, yield_local_checkpoints
 
 
 def _try_read_csv(path):
@@ -138,8 +139,6 @@ def main():
     df_test[text_col] = df_test[text_col].apply(normalize_text)
     df_test.dropna(subset=[audio_col, text_col], inplace=True)
     print(f"Number of test items: {len(df_test)}")
-
-    from transcription.utils.evaluation import yield_local_checkpoints, run_evaluation
 
     # Prepare Dataset
     print("Preparing HuggingFace dataset...")

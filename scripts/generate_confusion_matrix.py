@@ -5,14 +5,12 @@ import argparse
 import pandas as pd
 import numpy as np
 import torch
-from datasets import Dataset, Audio, Features, Value
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 
 # Import normalization helpers from our codebase
-from transcription.utils.model_utils import get_best_model
+from transcription.models.asr_model import CherokeeASRModel
 from transcription.inference.infer import (
-    greedy_inference,
     normalize_text,
     strip_tones,
     TARGET_SAMPLE_RATE,
@@ -129,13 +127,9 @@ def plot_and_save_matrix(matrix, title, filepath):
 
 
 def main():
-    # Load best model config
-    with open("best_model.json", "r") as f:
-        best_model_config = json.load(f)
-
-    repo = best_model_config["repo"]
-    revision = best_model_config["revision"]
-    model, processor, device = get_best_model()
+    asr_model = CherokeeASRModel.from_pretrained_or_best()
+    processor = asr_model.processor
+    device = asr_model.device
     print(f"Using device: {device}")
 
     # Determine the alphabet from processor's vocabulary
@@ -190,39 +184,12 @@ def main():
         df["sentence"] = df["sentence"].apply(normalize_text)
         df.dropna(subset=["path", "sentence"], inplace=True)
 
-        data_dict = {"audio": df["path"].tolist(), "sentence": df["sentence"].tolist()}
-        features = Features(
-            {
-                "audio": Audio(sampling_rate=TARGET_SAMPLE_RATE),
-                "sentence": Value("string"),
-            }
-        )
-        ds = Dataset.from_dict(data_dict, features=features)
-
-        def prepare_batch(batch):
-            audio = batch["audio"]
-            batch["input_values"] = processor(
-                audio["array"], sampling_rate=audio["sampling_rate"]
-            ).input_values[0]
-            return batch
-
-        ds_prepared = ds.map(
-            prepare_batch,
-            remove_columns=[c for c in ds.column_names if c != "sentence"],
-            num_proc=1,
-        )
-
         # Run inference
         alignments = []
-        for idx, ex in enumerate(tqdm(ds_prepared, desc=f"Evaluating {name}")):
-            input_values = torch.tensor([ex["input_values"]]).to(device)
-            with torch.no_grad():
-                logits = model(input_values=input_values).logits
-
-            logits_np = logits.squeeze(0).cpu().numpy()
-            pred_ids = np.argmax(logits_np, axis=-1)
-            hyp = processor.decode(pred_ids).strip()
-            gold = ex["sentence"]
+        for _, row in tqdm(df.iterrows(), total=len(df), desc=f"Evaluating {name}"):
+            res = asr_model.transcribe(row["path"], compute_word_confidences=False)
+            hyp = res.text
+            gold = row["sentence"]
 
             gold_norm = normalize_text(gold)
             hyp_norm = normalize_text(hyp)

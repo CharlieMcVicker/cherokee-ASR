@@ -180,6 +180,13 @@ def greedy_inference(logits, processor):
     """
     Perform greedy decoding on logits and return texts with confidence scores.
     Accepts 2D (sequence_len, vocab_size) or 3D (batch_size, sequence_len, vocab_size) logits.
+
+    Note on architecture:
+        The core CTC acoustic model outputs phonetic text hypotheses.
+        The 'syllabary' key in the returned dictionary is provided for legacy compatibility
+        with older callers. Downstream Cherokee Syllabary transliteration and phonetic
+        rule reconciliation logically belong to `transcription.syllabary_enrichment` and
+        `transcription.utils.syllabary_map.phonetics_to_syllabary`.
     """
     if isinstance(logits, np.ndarray):
         logits = torch.tensor(logits)

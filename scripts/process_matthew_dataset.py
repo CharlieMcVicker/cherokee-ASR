@@ -17,7 +17,8 @@ import numpy as np
 from pathlib import Path
 from pydub import AudioSegment
 
-from transcription.new_testament.pipeline import align_chapter
+from transcription.alignment.reconciliation import reconcile_word_intervals
+from transcription.new_testament.pipeline import align_chapter, load_chapter_transcript
 
 BASE_DIR = Path("/Users/julietmcvicker/code/workshop-transcription")
 NT_DIR = BASE_DIR / "cherokee_new_testament"
@@ -61,8 +62,9 @@ def main():
         )
 
         full_audio = AudioSegment.from_file(audio_path)
+        transcript_data = load_chapter_transcript(transcript_path)
 
-        for v_idx, v in enumerate(alignment.verses, 1):
+        for v_idx, v in enumerate(alignment.aligned_chunks, 1):
             if not v.words or v.end_sec <= v.start_sec:
                 continue
 
@@ -80,15 +82,12 @@ def main():
             clip.export(wav_path, format="wav")
 
             # Extract reconciled sentence string across verse words
-            reconciled_words = []
-            for w in v.words:
-                rec_w = getattr(w, "reconciled_word", "") or w.word
-                if rec_w:
-                    reconciled_words.append(rec_w)
+            syll_text = transcript_data.get(v.chunk_id, {}).get("cherokee", "")
+            rec_word_intervals = reconcile_word_intervals(v.words, syll_text)
 
-            sentence = " ".join(reconciled_words).strip()
+            sentence = " ".join(w.word for w in rec_word_intervals if w.word).strip()
             if not sentence:
-                sentence = v.raw_phonetic
+                sentence = transcript_data.get(v.chunk_id, {}).get("phonetic", "")
 
             # Store relative path for training CSV
             rel_path = f"cherokee_new_testament/split_audio/{wav_filename}"
