@@ -27,7 +27,12 @@ def test_export_textgrid():
         word="word1",
         start_sec=1.0,
         end_sec=1.5,
-        reconciled_word="rec_word1",
+        emitted_word="word1",
+    )
+    rec_w1 = WordInterval(
+        word="rec_word1",
+        start_sec=1.0,
+        end_sec=1.5,
     )
     aligned = AlignedChunk(
         chunk_id="chunk_01",
@@ -48,6 +53,7 @@ def test_export_textgrid():
             alignment=output,
             output_dir=tmpdir,
             source_metadata={"chunk_01": {"text": "A-da-le-ni-s-gv"}},
+            additional_word_tiers={"Reconciled Words": [rec_w1]},
         )
         assert os.path.exists(tg_path)
 
@@ -70,7 +76,7 @@ def test_export_manifest():
         end_sec=1.5,
         confidence=0.98,
         flagged=False,
-        reconciled_word="adalenisgv_rec",
+        emitted_word="adalenisgv_emit",
     )
     aligned = AlignedChunk(
         chunk_id="chunk_01",
@@ -117,7 +123,7 @@ def test_export_manifest():
         assert data["lines"][0]["line_id"] == "chunk_01"
         assert data["lines"][0]["english"] == "The beginning"
         assert data["lines"][0]["cherokee_syllabary"] == "ᎠᏓᎴᏂᏍᎬ"
-        assert data["lines"][0]["words"][0]["reconciled_word"] == "adalenisgv_rec"
+        assert data["lines"][0]["words"][0]["emitted_word"] == "adalenisgv_emit"
 
 
 def test_export_debug_json():

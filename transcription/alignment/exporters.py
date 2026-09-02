@@ -8,9 +8,9 @@ and alignment_debug.json formats.
 
 import json
 import os
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
 
-from transcription.alignment.models import AlignmentOutput
+from transcription.alignment.models import AlignmentOutput, WordInterval
 
 
 def _build_contiguous_intervals(
@@ -126,9 +126,10 @@ def export_textgrid(
     filename: str = "alignment.TextGrid",
     pad_sec: float = 0.10,
     source_metadata: Optional[Dict[str, Dict[str, Any]]] = None,
+    additional_word_tiers: Optional[Mapping[str, Sequence[WordInterval]]] = None,
 ) -> str:
     """
-    Generates Praat TextGrid with Chunks, Words, Padded Words, and optional Reconciled / Emissions tiers.
+    Generates Praat TextGrid with Chunks, Words, Padded Words, custom additional word tiers, and optional Emissions tiers.
 
     Args:
         alignment: AlignmentOutput object.
@@ -136,6 +137,7 @@ def export_textgrid(
         filename: Name of the TextGrid output file.
         pad_sec: Padding seconds added to words for the Padded Words tier.
         source_metadata: Optional chunk metadata dictionary.
+        additional_word_tiers: Optional mapping of tier name to Sequence of WordIntervals.
 
     Returns:
         Absolute or relative path to the generated TextGrid file.
@@ -148,6 +150,10 @@ def export_textgrid(
         total_end = max(c.end_sec for c in alignment.aligned_chunks)
     if alignment.raw_tokens:
         total_end = max(total_end, max(t.end_sec for t in alignment.raw_tokens))
+    if additional_word_tiers:
+        for word_seq in additional_word_tiers.values():
+            if word_seq:
+                total_end = max(total_end, max(w.end_sec for w in word_seq))
     if total_end <= 0.0:
         total_end = 1.0
 
@@ -169,24 +175,27 @@ def export_textgrid(
 
     # Tier 2: Words
     word_raw = []
-    reconciled_raw = []
-    has_reconciled = False
     for c in alignment.aligned_chunks:
         for w in c.words:
             word_raw.append(
                 {"start_sec": w.start_sec, "end_sec": w.end_sec, "text": w.word}
-            )
-            rec_text = w.reconciled_word or w.word
-            if w.reconciled_word:
-                has_reconciled = True
-            reconciled_raw.append(
-                {"start_sec": w.start_sec, "end_sec": w.end_sec, "text": rec_text}
             )
 
     word_intervals = _build_contiguous_intervals(word_raw, total_end)
     padded_word_intervals = _build_padded_word_intervals(
         word_raw, total_end, pad_sec=pad_sec
     )
+
+    # Build additional custom tiers
+    extra_tiers_formatted: List[Tuple[str, List[Tuple[float, float, str]]]] = []
+    if additional_word_tiers:
+        for tier_name, word_seq in additional_word_tiers.items():
+            tier_raw = [
+                {"start_sec": w.start_sec, "end_sec": w.end_sec, "text": w.word}
+                for w in word_seq
+            ]
+            tier_intervals = _build_contiguous_intervals(tier_raw, total_end)
+            extra_tiers_formatted.append((tier_name, tier_intervals))
 
     raw_token_items = [
         {
@@ -198,9 +207,7 @@ def export_textgrid(
     ]
     has_raw_tokens = bool(raw_token_items)
 
-    tier_count = 3
-    if has_reconciled:
-        tier_count += 1
+    tier_count = 3 + len(extra_tiers_formatted)
     if has_raw_tokens:
         tier_count += 1
 
@@ -227,11 +234,8 @@ def export_textgrid(
     )
     tier_idx += 1
 
-    if has_reconciled:
-        reconciled_intervals = _build_contiguous_intervals(reconciled_raw, total_end)
-        lines.extend(
-            _format_tier(tier_idx, "Reconciled Words", reconciled_intervals, total_end)
-        )
+    for tier_name, intervals in extra_tiers_formatted:
+        lines.extend(_format_tier(tier_idx, tier_name, intervals, total_end))
         tier_idx += 1
 
     if has_raw_tokens:
@@ -281,8 +285,8 @@ def export_manifest(
                 "confidence": w.confidence,
                 "flagged": w.flagged,
             }
-            if w.reconciled_word:
-                w_dict["reconciled_word"] = w.reconciled_word
+            if w.emitted_word:
+                w_dict["emitted_word"] = w.emitted_word
             word_objs.append(w_dict)
 
         chunk_meta = meta_lookup.get(c.chunk_id, {})

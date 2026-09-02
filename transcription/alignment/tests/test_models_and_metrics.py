@@ -41,10 +41,9 @@ def test_models_instantiation():
         confidence=0.95,
         flagged=False,
         emitted_word="osiyo",
-        reconciled_word="osiyo",
     )
     assert word_interval.word == "osiyo"
-    assert word_interval.reconciled_word == "osiyo"
+    assert word_interval.emitted_word == "osiyo"
 
     aligned_chunk = AlignedChunk(
         chunk_id="chunk_01",

@@ -28,7 +28,7 @@ class TextChunk:
 
 @dataclass
 class WordInterval:
-    """Aligned word token with start/end bounds and reconciliation details."""
+    """Aligned word token with start/end bounds and emitted token details."""
 
     word: str
     start_sec: float
@@ -36,7 +36,6 @@ class WordInterval:
     confidence: float = 1.0
     flagged: bool = False
     emitted_word: Optional[str] = None
-    reconciled_word: Optional[str] = None
 
 
 @dataclass

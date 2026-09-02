@@ -26,7 +26,7 @@ from transcription.alignment.extractors import CherokeeASRExtractor
 from transcription.alignment.ingestion import load_bible_chunks, load_generic_chunks
 from transcription.alignment.models import AlignmentOutput
 from transcription.alignment.normalizers import normalize_text_for_alignment
-from transcription.alignment.reconciliation import reconcile_alignment
+from transcription.alignment.reconciliation import reconcile_alignment_words
 
 
 def run_alignment_pipeline(
@@ -96,12 +96,14 @@ def run_alignment_pipeline(
 
     alignment = aligner.align(emissions=emissions, chunks=chunks, source_id=audio_path)
 
+    additional_word_tiers = None
     if reconcile:
         syllabary_lookup = {
             cid: meta.get("cherokee", meta.get("cherokee_syllabary", ""))
             for cid, meta in source_lookup.items()
         }
-        alignment = reconcile_alignment(alignment, syllabary_lookup)
+        reconciled_words = reconcile_alignment_words(alignment, syllabary_lookup)
+        additional_word_tiers = {"Reconciled Words": reconciled_words}
 
     print(f"[4/4] Executing alignment and exporting artifacts to '{output_dir}'...")
     os.makedirs(output_dir, exist_ok=True)
@@ -118,6 +120,7 @@ def run_alignment_pipeline(
             alignment=alignment,
             output_dir=output_dir,
             source_metadata=source_lookup,
+            additional_word_tiers=additional_word_tiers,
         )
 
     if debug_export:

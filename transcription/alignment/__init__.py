@@ -42,7 +42,11 @@ from transcription.alignment.models import (
     WordInterval,
 )
 from transcription.alignment.normalizers import normalize_text_for_alignment
-from transcription.alignment.reconciliation import reconcile_alignment
+from transcription.alignment.reconciliation import (
+    reconcile_alignment_by_chunk,
+    reconcile_alignment_words,
+    reconcile_word_intervals,
+)
 
 __all__ = [
     # Models
@@ -55,7 +59,6 @@ __all__ = [
     # Ingestion
     "load_bible_chunks",
     "load_generic_chunks",
-    # Normalizers
     "normalize_text_for_alignment",
     # Extractors
     "ASREmissionsExtractor",
@@ -74,7 +77,9 @@ __all__ = [
     "NeedlemanWunschWordAligner",
     "SlidingWindowDTWAligner",
     # Reconciliation
-    "reconcile_alignment",
+    "reconcile_word_intervals",
+    "reconcile_alignment_words",
+    "reconcile_alignment_by_chunk",
     # Exporters
     "export_textgrid",
     "export_manifest",
