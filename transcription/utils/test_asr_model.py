@@ -49,7 +49,6 @@ class TestDataStructures(unittest.TestCase):
         result = ASRResult(
             text="osiyo",
             transcription="osiyo",
-            syllabary="ᎣᏏᏲ",
             confidence=0.98,
             words=[wc],
         )
@@ -57,14 +56,12 @@ class TestDataStructures(unittest.TestCase):
         # Attribute access
         self.assertEqual(result.text, "osiyo")
         self.assertEqual(result.transcription, "osiyo")
-        self.assertEqual(result.syllabary, "ᎣᏏᏲ")
         self.assertEqual(result.confidence, 0.98)
         self.assertEqual(len(result.words), 1)
 
         # Dict item access
         self.assertEqual(result["text"], "osiyo")
         self.assertEqual(result["transcription"], "osiyo")
-        self.assertEqual(result["syllabary"], "ᎣᏏᏲ")
         self.assertEqual(result["confidence"], 0.98)
         self.assertEqual(result["words"], [wc])
 
@@ -76,7 +73,6 @@ class TestDataStructures(unittest.TestCase):
         res_dict = result.to_dict()
         self.assertIsInstance(res_dict, dict)
         self.assertEqual(res_dict["text"], "osiyo")
-        self.assertEqual(res_dict["syllabary"], "ᎣᏏᏲ")
         self.assertEqual(res_dict["words"][0]["word"], "osiyo")
 
 
@@ -299,6 +295,11 @@ class TestCherokeeASRModel(unittest.TestCase):
         logits = asr_model.get_logits(np.zeros(16000, dtype=np.float32))
         self.assertEqual(asr_model.device, "cpu")
         self.assertEqual(logits.shape, (5, 5))
+
+        # Test .to(device) method
+        asr_model.to("cpu")
+        self.assertEqual(asr_model.device, "cpu")
+        mock_model.to.assert_called_with("cpu")
 
     def test_transcribe_batch(
         self,

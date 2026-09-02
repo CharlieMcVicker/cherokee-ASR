@@ -21,7 +21,6 @@ import torchaudio
 from transformers import Wav2Vec2ForCTC, Wav2Vec2Processor
 
 from transcription.utils.model_utils import get_best_model_config, get_model
-from transcription.utils.syllabary_map import phonetics_to_syllabary
 
 logger = logging.getLogger(__name__)
 
@@ -44,7 +43,6 @@ class WordConfidence:
 class ASRResult:
     text: str
     transcription: str
-    syllabary: str
     confidence: float
     words: List[WordConfidence] = field(default_factory=list)
 
@@ -52,7 +50,6 @@ class ASRResult:
         return {
             "text": self.text,
             "transcription": self.transcription,
-            "syllabary": self.syllabary,
             "confidence": self.confidence,
             "words": [
                 w.to_dict() if isinstance(w, WordConfidence) else w for w in self.words
@@ -83,6 +80,14 @@ class CherokeeASRModel:
         self.device = str(device)
         self.model.to(self.device)
         self.model.eval()
+
+    def to(self, device: Union[str, torch.device]) -> CherokeeASRModel:
+        """
+        Move the underlying model to the specified device.
+        """
+        self.device = str(device)
+        self.model.to(self.device)
+        return self
 
     @classmethod
     def from_pretrained(
@@ -422,13 +427,11 @@ class CherokeeASRModel:
         else:
             confidence = float(np.mean(token_probs)) if len(token_probs) > 0 else 0.0
 
-        syllabary = phonetics_to_syllabary(decoded_text)
         words = self.get_word_confidences(probs) if compute_word_confidences else []
 
         return ASRResult(
             text=decoded_text,
             transcription=decoded_text,
-            syllabary=syllabary,
             confidence=confidence,
             words=words,
         )

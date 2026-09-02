@@ -8,7 +8,11 @@ import json
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
 
-from transcription.syllabary_enrichment import reconcile_phonetics
+from transcription.alignment.cli import run_alignment_pipeline
+from transcription.syllabary_enrichment import (
+    align_character_syllable,
+    reconcile_phonetics,
+)
 
 
 def load_chapter_transcript(
@@ -45,8 +49,6 @@ def align_chapter(
     performing VAD, ground-truth ingest, ASR CTC emissions extraction, DTW alignment,
     reconciliation, and automatic Praat TextGrid / alignment manifest export.
     """
-    from transcription.alignment.cli import run_alignment_pipeline
-
     return run_alignment_pipeline(
         audio_path=str(audio_path),
         output_dir=str(output_dir),
@@ -78,8 +80,6 @@ def reconcile_syllabary_asr(
     Returns:
         Tuple of (enriched_transcription, list_of_transformation_notes).
     """
-    from transcription.syllabary_enrichment import align_character_syllable
-
     alignment = align_character_syllable(syllabary_text, asr_hypothesis)
     base_trans = "".join([pair[0] for pair in alignment])
     enriched_text = reconcile_phonetics(
