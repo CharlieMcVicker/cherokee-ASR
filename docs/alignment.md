@@ -72,8 +72,8 @@ flowchart TD
 | Aligners | [`aligner.py`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/aligner.py) | `NeedlemanWunschWordAligner` (word DP) and `SlidingWindowDTWAligner` (chunk DTW). |
 | Extractors | [`extractors.py`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/extractors.py) | `ASREmissionsExtractor` protocol, `CherokeeASRExtractor`, `CallbackEmissionsExtractor`, `PrecomputedEmissionsExtractor`, `prepare_audio_chunks`. |
 | Metrics | [`distance_metrics.py`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/distance_metrics.py) | `DistanceMetric` protocol, `DefaultCERDistanceMetric`, `LevenshteinDistanceMetric`, `CustomCallableDistanceMetric`, `calculate_cer`. |
-| Normalizers | [`normalizers.py`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/normalizers.py) | `normalize_text_for_alignment` (Cherokee consonant/aspiration respelling and sanitization). |
-| Ingestion | [`ingestion.py`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/ingestion.py) | `load_bible_chunks` (key-value dict) and `load_generic_chunks` (array/dict format). |
+| Normalizers | [`normalizers.py`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/normalizers.py) | `normalize_syllabary_for_alignment` (aspiration stripped), `normalize_phonetics_for_alignment` (aspiration preserved), and `normalize_text_for_alignment` (compat alias). |
+| Ingestion | [`ingestion.py`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/ingestion.py) | `prepare_alignment_input` (sum-type dispatcher & normalizer resolver), `load_bible_chunks`, and `load_generic_chunks`. |
 | Reconciliation | [`reconciliation.py`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/reconciliation.py) | `reconcile_word_intervals`, `reconcile_alignment_words`, `reconcile_alignment_by_chunk`. |
 | Exporters | [`exporters.py`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/exporters.py) | `export_manifest`, `export_textgrid` (multi-tier Praat), `export_debug_json`. |
 | CLI / Pipeline | [`cli.py`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/cli.py) | `run_alignment_pipeline` orchestrator and `align-cherokee` CLI entrypoint. |
@@ -407,16 +407,27 @@ metric = CustomCallableDistanceMetric(fn=lambda hyp, ref: 0.0 if hyp == ref else
 
 ---
 
-### Phonetic Text Normalization (`normalize_text_for_alignment`)
+### Representation-Aware Text Normalization (`transcription.alignment.normalizers`)
 
-Located in [`transcription/alignment/normalizers.py`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/normalizers.py), [`normalize_text_for_alignment`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/normalizers.py#L9-L41) prepares transliterated Cherokee text for robust ASR acoustic matching:
+Located in [`transcription/alignment/normalizers.py`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/normalizers.py), normalization functions prepare text for robust acoustic DTW and dynamic programming alignment. Because Cherokee Syllabary orthography does not reliably differentiate aspiration, separate normalizers are provided based on the input representation:
 
+#### 1. `normalize_syllabary_for_alignment` (Syllabary Mode)
+Used when aligning Syllabary transliterations (such as Bible verse metadata). Because Syllabary orthography cannot be trusted to mark aspiration consistently, aspiration (`h`) is normalized away:
 1. **Lowercasing and Hyphen Stripping**: `A-da-le-ni-s-gv` $\rightarrow$ `adalenisgv`.
 2. **Digraph Normalization**: Replaces `qu` with `gw`.
 3. **Consonant Respelling**: Calls [`respell_consonants`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/utils/tone_normalization.py) (`t->th`, `d->t`, `k->kh`, `g->k`, etc.).
-4. **Aspiration Stripping**: Strips `/h/` markers (`text.replace("h", "")`) to avoid mismatch from unvoiced aspiration variants.
-5. **Punctuation Removal**: Strips all standard punctuation (`.,!?;:"'()[]{}` etc.).
-6. **Whitespace Normalization**: Collapses multiple whitespace into single spaces and strips ends.
+4. **Aspiration Stripping**: Strips `/h/` sound markers (`text.replace("h", "")`).
+5. **Punctuation Removal**: Strips standard punctuation (`.,!?;:"'()[]{}` etc.).
+6. **Whitespace Normalization**: Collapses whitespace into single spaces and strips ends.
+
+#### 2. `normalize_phonetics_for_alignment` (Phonetics Mode)
+Used when aligning phonetic transcripts against acoustic ASR token emissions (such as linguistic transcriptions or interview segments). Aspiration (`h`) is **preserved** because both the reference and the ASR emissions contain meaningful phonetic contrast:
+1. **Lowercasing and Hyphen Stripping**: `tsa-ni` $\rightarrow$ `tsani`.
+2. **Digraph Normalization**: Replaces `qu` with `gw`.
+3. **Consonant Respelling**: Applies phonetic consonant mappings without stripping `h`.
+4. **Punctuation Removal & Whitespace**: Sanitizes punctuation and normalizes spacing.
+
+*Note: [`normalize_text_for_alignment`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/normalizers.py) is retained as a backwards-compatible alias for `normalize_syllabary_for_alignment`.*
 
 ---
 
@@ -424,16 +435,35 @@ Located in [`transcription/alignment/normalizers.py`](file:///Users/julietmcvick
 
 Ingestion utilities load reference text from JSON files, dictionaries, or lists into standardized [`TextChunk`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/models.py#L21-L27) lists and source metadata lookup maps.
 
+### `prepare_alignment_input` (Sum-Type Dispatcher)
+
+The primary entrypoint for source ingestion. It accepts sum-type arguments (`bible_metadata` vs `chunk_list`), loads the chunks, and resolves the appropriate representation-aware normalizers:
+
+```python
+from transcription.alignment.ingestion import prepare_alignment_input
+
+chunks, source_lookup, chunk_normalizer, emissions_normalizer = prepare_alignment_input(
+    bible_metadata="data/book_transcripts/02_Mark/0201.json",
+    # OR: chunk_list="timestamping_test_data/fishing_story.json"
+)
+```
+
+- **When `bible_metadata` is supplied**: Returns `(chunks, source_lookup, normalize_syllabary_for_alignment, normalize_syllabary_for_alignment)`.
+- **When `chunk_list` is supplied**: Returns `(chunks, source_lookup, normalize_phonetics_for_alignment, normalize_phonetics_for_alignment)`.
+
+---
+
 ### `load_generic_chunks`
 
 Loads generic chunk lists (story segments, dialogues, sentences):
 
 ```python
 from transcription.alignment.ingestion import load_generic_chunks
+from transcription.alignment.normalizers import normalize_phonetics_for_alignment
 
 chunks, source_lookup = load_generic_chunks(
     source="timestamping_test_data/fishing_story.json",
-    normalizer=None,  # Optional callable
+    normalizer=normalize_phonetics_for_alignment,
 )
 ```
 
@@ -464,11 +494,11 @@ Loads Bible verse metadata dictionaries:
 
 ```python
 from transcription.alignment.ingestion import load_bible_chunks
-from transcription.alignment.normalizers import normalize_text_for_alignment
+from transcription.alignment.normalizers import normalize_syllabary_for_alignment
 
 chunks, source_lookup = load_bible_chunks(
     source="data/book_transcripts/02_Mark/0201.json",
-    normalizer=normalize_text_for_alignment,  # Default
+    normalizer=normalize_syllabary_for_alignment,
 )
 ```
 
@@ -794,24 +824,25 @@ from transcription.alignment import (
     SlidingWindowDTWAligner,
     export_manifest,
     export_textgrid,
-    load_generic_chunks,
-    normalize_text_for_alignment,
+    prepare_alignment_input,
     reconcile_alignment_words,
 )
 from transcription.models.asr_model import CherokeeASRModel
 
-# Step 1: Ingest ground-truth chunks
-chunks, source_lookup = load_generic_chunks("timestamping_test_data/fishing_story.json")
+# Step 1: Ingest ground-truth chunks & resolve representation-aware normalizers
+chunks, source_lookup, chunk_norm, emission_norm = prepare_alignment_input(
+    chunk_list="timestamping_test_data/fishing_story.json"
+)
 
 # Step 2: Load ASR model and extract acoustic token emissions
-model = CherokeeASRModel.from_pretrained("charliemcvicker/asr-cherokee")
+model = CherokeeASRModel.from_pretrained_or_best("charliemcvicker/asr-cherokee")
 extractor = CherokeeASRExtractor(model=model, skip_vad=False)
 emissions = extractor.extract("timestamping_test_data/Cherokee Story-Our Fishing Trip.wav")
 
 # Step 3: Configure word and chunk DP alignment engines
 word_aligner = NeedlemanWunschWordAligner(
-    chunk_normalizer=normalize_text_for_alignment,
-    emission_normalizer=normalize_text_for_alignment,
+    chunk_normalizer=chunk_norm,
+    emission_normalizer=emission_norm,
     gap_cost=0.8,
     fuse_penalty=0.15,
 )
