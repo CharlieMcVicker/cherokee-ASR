@@ -27,6 +27,8 @@ from transcription.alignment.ingestion import load_bible_chunks, load_generic_ch
 from transcription.alignment.models import AlignmentOutput
 from transcription.alignment.normalizers import normalize_text_for_alignment
 from transcription.alignment.reconciliation import reconcile_alignment_words
+from transcription.models.asr_model import CherokeeASRModel
+from transcription.utils.model_utils import get_best_model_config
 
 
 def run_alignment_pipeline(
@@ -59,8 +61,6 @@ def run_alignment_pipeline(
         print(f"[2/4] Segmenting audio file '{audio_path}' with VAD...")
 
     print(f"[3/4] Running ASR emission extraction & alignment...")
-    from transcription.models.asr_model import CherokeeASRModel
-    from transcription.utils.model_utils import get_best_model_config
 
     token = os.environ.get("HF_TOKEN", None)
     model_revision: Optional[str] = None

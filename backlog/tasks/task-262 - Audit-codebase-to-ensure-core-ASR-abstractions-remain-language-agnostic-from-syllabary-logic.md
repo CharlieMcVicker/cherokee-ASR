@@ -3,10 +3,11 @@ id: TASK-262
 title: >-
   Audit codebase to ensure core ASR abstractions remain language-agnostic from
   syllabary logic
-status: To Do
-assignee: []
+status: Done
+assignee:
+  - '@agent-architecture'
 created_date: '2026-09-02 15:01'
-updated_date: '2026-09-02 15:05'
+updated_date: '2026-09-02 15:08'
 labels:
   - code-smell
   - architecture
@@ -35,10 +36,10 @@ Deliverables:
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 Audit all core model and inference classes for implicit Cherokee-specific syllabary assumptions
-- [ ] #2 Ensure syllabary conversion functions are cleanly exported and invoked only by downstream consumers who require Cherokee Syllabary
-- [ ] #3 Verify all documentation accurately distinguishes acoustic phonetic ASR decoding from downstream syllabary transliteration/enrichment
-- [ ] #4 Verify all tests pass and pyright typechecking succeeds
+- [x] #1 Audit all core model and inference classes for implicit Cherokee-specific syllabary assumptions
+- [x] #2 Ensure syllabary conversion functions are cleanly exported and invoked only by downstream consumers who require Cherokee Syllabary
+- [x] #3 Verify all documentation accurately distinguishes acoustic phonetic ASR decoding from downstream syllabary transliteration/enrichment
+- [x] #4 Verify all tests pass and pyright typechecking succeeds
 <!-- AC:END -->
 
 ## Implementation Plan
@@ -49,3 +50,9 @@ Deliverables:
 3. Run `pytest` and `pyright transcription`.
 4. Format and commit.
 <!-- SECTION:PLAN:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+Audited codebase to verify that core ASR acoustic modeling (CherokeeASRModel, ASRResult) remains strictly language-agnostic from Cherokee syllabary conversion. Updated greedy_inference in infer.py to document legacy compatibility for the syllabary key. Updated documentation in docs/models_and_inference.md and docs/alignment.md to clearly delineate the core acoustic CTC decoder from downstream Cherokee Syllabary transliteration and phonetic rule reconciliation modules.
+<!-- SECTION:FINAL_SUMMARY:END -->

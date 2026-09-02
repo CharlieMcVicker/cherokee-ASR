@@ -141,19 +141,21 @@ def run_evaluation(
     rows_by_ckpt = {}
     ranking = []
 
-    for label, asr_model_or_model, processor, path in model_generator:
+    for item in model_generator:
+        if len(item) == 4:
+            label, asr_model_or_model, processor, path = item
+        else:
+            label, asr_model_or_model, path = item
+            processor = None
+
         print(f"Evaluating model: {label} ({path})")
         if isinstance(asr_model_or_model, CherokeeASRModel):
             asr_model = asr_model_or_model
-            asr_model.device = device
-            if hasattr(asr_model.model, "to"):
-                asr_model.model.to(device)
+            asr_model.to(device)
         else:
             asr_model = CherokeeASRModel(asr_model_or_model, processor, device=device)
 
-        model = asr_model.model
-        processor = asr_model.processor
-        model.eval()
+        asr_model.model.eval()
 
         # If no data_collator provided, create one dynamically
         if data_collator is None:
@@ -170,7 +172,7 @@ def run_evaluation(
                         input_features, padding=True, return_tensors="pt"
                     )
 
-            curr_collator = SimpleDataCollator(processor)
+            curr_collator = SimpleDataCollator(asr_model.processor)
         else:
             curr_collator = data_collator
 
@@ -185,13 +187,13 @@ def run_evaluation(
 
         # We run inference in batches
         for batch in tqdm(test_loader, desc=f"Inference ({label})"):
-            input_values = batch["input_values"].to(device)
+            input_values = batch["input_values"].to(asr_model.device)
             attention_mask = batch.get("attention_mask", None)
             if attention_mask is not None:
-                attention_mask = attention_mask.to(device)
+                attention_mask = attention_mask.to(asr_model.device)
 
             with torch.no_grad():
-                outputs = model(
+                outputs = asr_model.model(
                     input_values=input_values, attention_mask=attention_mask
                 )
                 logits = outputs.logits
@@ -199,7 +201,7 @@ def run_evaluation(
             if attention_mask is not None:
                 input_lengths = attention_mask.sum(dim=-1)
                 feat_extractor = getattr(
-                    model, "_get_feat_extract_output_lengths", None
+                    asr_model.model, "_get_feat_extract_output_lengths", None
                 )
                 if callable(feat_extractor):
                     raw_lens: Any = feat_extractor(input_lengths)
@@ -262,49 +264,60 @@ def run_evaluation(
         golds = list(df["gold"])
         greedies = list(df["hyp_greedy"])
 
+        agg_wer_raw = jiwer_wer(
+            [safe(g) for g in all_gold], [safe(h) for h in greedies]
+        )
+        agg_cer_raw = jiwer_cer(
+            [safe(g) for g in all_gold], [safe(h) for h in greedies]
+        )
+        agg_wer_len_masked = jiwer_wer(
+            [safe(strip_length(g)) for g in all_gold],
+            [safe(strip_length(h)) for h in greedies],
+        )
+        agg_cer_len_masked = jiwer_cer(
+            [safe(strip_length(g)) for g in all_gold],
+            [safe(strip_length(h)) for h in greedies],
+        )
+        agg_wer_tone_masked = jiwer_wer(
+            [safe(strip_tones(g)) for g in all_gold],
+            [safe(strip_tones(h)) for h in greedies],
+        )
+        agg_cer_tone_masked = jiwer_cer(
+            [safe(strip_tones(g)) for g in all_gold],
+            [safe(strip_tones(h)) for h in greedies],
+        )
+        agg_wer_both_masked = jiwer_wer(
+            [safe(strip_both(g)) for g in all_gold],
+            [safe(strip_both(h)) for h in greedies],
+        )
+        agg_cer_both_masked = jiwer_cer(
+            [safe(strip_both(g)) for g in all_gold],
+            [safe(strip_both(h)) for h in greedies],
+        )
+
         ranking.append(
             {
                 "checkpoint": label,
                 "path": path,
                 "median_wer_greedy": float(np.median(df["wer_greedy"])),
-                "agg_wer_raw": jiwer_wer(
-                    [safe(g) for g in all_gold], [safe(h) for h in greedies]
-                ),
-                "agg_cer_raw": jiwer_cer(
-                    [safe(g) for g in all_gold], [safe(h) for h in greedies]
-                ),
-                "agg_wer_length_masked": jiwer_wer(
-                    [safe(strip_length(g)) for g in all_gold],
-                    [safe(strip_length(h)) for h in greedies],
-                ),
-                "agg_cer_length_masked": jiwer_cer(
-                    [safe(strip_length(g)) for g in all_gold],
-                    [safe(strip_length(h)) for h in greedies],
-                ),
-                "agg_wer_tone_masked": jiwer_wer(
-                    [safe(strip_tones(g)) for g in all_gold],
-                    [safe(strip_tones(h)) for h in greedies],
-                ),
-                "agg_cer_tone_masked": jiwer_cer(
-                    [safe(strip_tones(g)) for g in all_gold],
-                    [safe(strip_tones(h)) for h in greedies],
-                ),
-                "agg_wer_both_masked": jiwer_wer(
-                    [safe(strip_both(g)) for g in all_gold],
-                    [safe(strip_both(h)) for h in greedies],
-                ),
-                "agg_cer_both_masked": jiwer_cer(
-                    [safe(strip_both(g)) for g in all_gold],
-                    [safe(strip_both(h)) for h in greedies],
-                ),
+                "agg_wer_raw": agg_wer_raw,
+                "agg_cer_raw": agg_cer_raw,
+                "agg_wer_greedy": agg_wer_raw,
+                "agg_cer_greedy": agg_cer_raw,
+                "agg_wer_length_masked": agg_wer_len_masked,
+                "agg_cer_length_masked": agg_cer_len_masked,
+                "agg_wer_greedy_masked": agg_wer_len_masked,
+                "agg_cer_greedy_masked": agg_cer_len_masked,
+                "agg_wer_tone_masked": agg_wer_tone_masked,
+                "agg_cer_tone_masked": agg_cer_tone_masked,
+                "agg_wer_both_masked": agg_wer_both_masked,
+                "agg_cer_both_masked": agg_cer_both_masked,
             }
         )
 
         clean_eval_cache(device)
-        if hasattr(model, "to"):
-            model.to("cpu")
-        del model
-        clean_eval_cache(device)
+        asr_model.to("cpu")
+        del asr_model
         clean_eval_cache(device)
 
     ranking_df = pd.DataFrame(ranking)

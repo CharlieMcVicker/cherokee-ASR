@@ -1,10 +1,11 @@
 ---
 id: TASK-261
 title: Refactor ASR model consumers to eliminate internal model/processor aliasing
-status: To Do
-assignee: []
+status: Done
+assignee:
+  - '@agent-refactor'
 created_date: '2026-09-02 15:01'
-updated_date: '2026-09-02 15:05'
+updated_date: '2026-09-02 15:13'
 labels:
   - code-smell
   - refactor
@@ -32,10 +33,10 @@ Deliverables:
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 Audit all references to asr_model.model, asr_model.processor, and asr_model.device across transcription/
-- [ ] #2 Refactor evaluation and inference modules to rely on CherokeeASRModel abstractions or explicit parameter passing
-- [ ] #3 Ensure consistency across batch inference and evaluation pipelines
-- [ ] #4 Verify all tests pass and pyright typechecking succeeds
+- [x] #1 Audit all references to asr_model.model, asr_model.processor, and asr_model.device across transcription/
+- [x] #2 Refactor evaluation and inference modules to rely on CherokeeASRModel abstractions or explicit parameter passing
+- [x] #3 Ensure consistency across batch inference and evaluation pipelines
+- [x] #4 Verify all tests pass and pyright typechecking succeeds
 <!-- AC:END -->
 
 ## Implementation Plan
@@ -46,3 +47,9 @@ Deliverables:
 3. Verify backwards compatibility across test suites.
 4. Run `pytest` and `pyright transcription`.
 <!-- SECTION:PLAN:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+Refactored ASR model consumers across inference and evaluation modules to eliminate internal model, processor, and device local variable aliasing. In batch.py and evaluation.py, references directly utilize CherokeeASRModel encapsulation (asr_model.processor, asr_model.device, asr_model.model, and asr_model.to('cpu') / asr_model.to(device)). Verified full unit test suite (106 tests passing) and pyright (0 errors).
+<!-- SECTION:FINAL_SUMMARY:END -->

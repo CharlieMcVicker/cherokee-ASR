@@ -9,8 +9,11 @@ import sys
 import pytest
 from unittest.mock import MagicMock, patch
 
+from pydub import AudioSegment
+
 from transcription.alignment.cli import main, run_alignment_pipeline
 from transcription.alignment.models import AlignmentOutput
+from transcription.audio.segment import AudioChunk
 
 
 @pytest.fixture
@@ -45,9 +48,6 @@ def test_run_alignment_pipeline_with_bible_metadata(tmp_path, mock_asr_model):
     out_dir = str(tmp_path / "output")
 
     with patch("transcription.alignment.extractors.segment_long_audio") as mock_segment:
-        from pydub import AudioSegment
-        from transcription.audio.segment import AudioChunk
-
         dummy_chunk = AudioChunk(
             chunk_index=0,
             audio=AudioSegment.silent(duration=2000, frame_rate=16000),
@@ -91,9 +91,6 @@ def test_run_alignment_pipeline_with_chunk_list(tmp_path, mock_asr_model):
     out_dir = str(tmp_path / "output_chunks")
 
     with patch("transcription.alignment.extractors.segment_long_audio") as mock_segment:
-        from pydub import AudioSegment
-        from transcription.audio.segment import AudioChunk
-
         dummy_chunk = AudioChunk(
             chunk_index=0,
             audio=AudioSegment.silent(duration=1000, frame_rate=16000),

@@ -37,7 +37,7 @@ This guide provides an in-depth reference for model loading, procedural inferenc
 
 ## 1. Overview
 
-The Cherokee ASR system is built on fine-tuned [Wav2Vec 2.0](https://huggingface.co/docs/transformers/model_doc/wav2vec2) Connectionist Temporal Classification (CTC) acoustic models. The core pipeline maps continuous 16kHz audio waveforms into phonetic transcriptions and automatically transliterates them into authentic **Cherokee Syllabary** (ᏣᎳᎩ ᏗᎪᏪᎵ).
+The Cherokee ASR system is built on fine-tuned [Wav2Vec 2.0](https://huggingface.co/docs/transformers/model_doc/wav2vec2) Connectionist Temporal Classification (CTC) acoustic models. The core acoustic pipeline maps continuous 16kHz audio waveforms into phonetic transcriptions. Downstream modules provide transliteration into authentic **Cherokee Syllabary** (ᏣᎳᎩ ᏗᎪᏪᎵ) and phonetic rule reconciliation.
 
 ```
    Raw Audio (.wav / .mp3 / PCM buffer)
@@ -65,18 +65,18 @@ The Cherokee ASR system is built on fine-tuned [Wav2Vec 2.0](https://huggingface
                     ├──────────────────────────┐
                     ▼                          ▼
        ┌─────────────────────────┐  ┌─────────────────────────┐
-       │ Phonetic Transcription  │  │ Word & Char Confidences │
+       │ Phonetic ASRResult      │  │ Word & Char Confidences │
        │ (e.g. "tsalagi")        │  │ (Timestamps, Top-5 Alts)│
        └────────────┬────────────┘  └─────────────────────────┘
                     │
-                    ▼
+                    ▼ (Downstream Syllabary Enrichment)
        ┌─────────────────────────┐
-       │ Syllabary Transliteration│ (phonetics_to_syllabary)
+       │ Syllabary Transliteration│ (phonetics_to_syllabary / syllabary_enrichment)
        │ (e.g. "ᏣᎳᎩ")            │
        └─────────────────────────┘
 ```
 
-The system is encapsulated in `CherokeeASRModel` (`transcription/models/asr_model.py`), providing a tiered, decoupled architecture where each layer can be invoked independently or as part of a high-level end-to-end pipeline.
+The system is encapsulated in `CherokeeASRModel` (`transcription/models/asr_model.py`), providing a tiered, decoupled architecture where each layer can be invoked independently or as part of a high-level end-to-end pipeline. The core model and `ASRResult` abstractions remain strictly language-agnostic (producing phonetic hypotheses), leaving Cherokee syllabary conversion and reconciliation to downstream libraries (`transcription.syllabary_enrichment` and `transcription.utils.syllabary_map`).
 
 ---
 
@@ -244,14 +244,13 @@ class WordConfidence:
 ```
 
 #### `ASRResult`
-Encapsulates complete transcription output, syllabary transliteration, and word breakdown.
+Encapsulates complete acoustic model transcription output and word breakdown.
 
 ```python
 @dataclass
 class ASRResult:
     text: str                          # Decoded phonetic transcript
     transcription: str                 # Alias for text
-    syllabary: str                     # Cherokee Syllabary transliteration
     confidence: float                  # Average non-PAD token confidence (0.0 to 1.0)
     words: List[WordConfidence]        # Detailed word list (empty if compute_word_confidences=False)
 
@@ -261,6 +260,8 @@ class ASRResult:
 ```
 
 > **Note**: `ASRResult` implements `__getitem__` and `.get()`, enabling backwards-compatible dictionary-style indexing (`result["transcription"]`, `result["confidence"]`) as well as attribute access (`result.transcription`).
+
+> **Language-Agnostic Abstraction**: `ASRResult` purposefully does not contain language-specific fields such as `syllabary`. The acoustic CTC decoder produces phonetic text hypotheses. Transliteration to Cherokee Syllabary and phonetic reconciliation are explicitly performed downstream by `transcription.utils.syllabary_map.phonetics_to_syllabary` or `transcription.syllabary_enrichment`.
 
 ---
 
@@ -334,8 +335,8 @@ Performs greedy CTC decoding on 2D or 3D logit/probability tensors:
 1. Calculates $\text{argmax}$ across the vocabulary dimension for each time frame.
 2. Decodes token IDs to phonetic text via `processor.batch_decode` or `processor.decode`.
 3. Calculates sequence confidence by averaging probabilities over non-PAD tokens.
-4. Transliterates phonetic text into Cherokee Syllabary via `phonetics_to_syllabary(decoded_text)`.
-5. Optionally attaches word-level timestamp structures.
+4. Returns an `ASRResult` containing decoded phonetic text and sequence confidence (keeping core acoustic decoding language-agnostic).
+5. Optionally attaches word-level timestamp structures (`WordConfidence`).
 
 ---
 
@@ -534,19 +535,23 @@ Open `http://localhost:8000` in your web browser.
 
 ### Basic Transcription
 
-Transcribing an audio file and accessing both phonetic text and Cherokee Syllabary:
+Transcribing an audio file to phonetic text and performing optional downstream Cherokee Syllabary transliteration:
 
 ```python
 from transcription.models.asr_model import CherokeeASRModel
+from transcription.utils.syllabary_map import phonetics_to_syllabary
 
 # 1. Load the recommended model checkpoint
 asr = CherokeeASRModel.get_best_model()
 
-# 2. Transcribe audio file
+# 2. Transcribe audio file (returns language-agnostic ASRResult)
 result = asr.transcribe("data/raw/sample.wav")
 
+# 3. Downstream Cherokee Syllabary transliteration
+syllabary_text = phonetics_to_syllabary(result.transcription)
+
 print("Phonetic Transcript :", result.transcription)
-print("Cherokee Syllabary  :", result.syllabary)
+print("Cherokee Syllabary  :", syllabary_text)
 print(f"Overall Confidence  : {result.confidence:.2%}")
 ```
 
@@ -565,9 +570,9 @@ asr = CherokeeASRModel.get_best_model()
 # Example: 1-second 16kHz float32 audio buffer
 pcm_samples = np.random.uniform(-0.1, 0.1, size=16000).astype(np.float32)
 
-# Transcribe array directly
+# Transcribe array directly to ASRResult
 result = asr.transcribe(pcm_samples, sample_rate=16000)
-print("Transcription:", result.syllabary)
+print("Transcription:", result.transcription)
 ```
 
 ---
@@ -619,5 +624,5 @@ results = asr.transcribe_batch(
 )
 
 for path, res in zip(audio_files, results):
-    print(f"[{path}] -> {res.syllabary} (conf: {res.confidence:.4f})")
+    print(f"[{path}] -> {res.transcription} (conf: {res.confidence:.4f})")
 ```

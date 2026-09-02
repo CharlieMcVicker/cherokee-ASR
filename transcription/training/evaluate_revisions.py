@@ -16,19 +16,19 @@ from datasets import Dataset, Audio, Features, Value
 from jiwer import wer as jiwer_wer, cer as jiwer_cer
 from tqdm import tqdm
 
-# Import helper functions from evaluate_checkpoint and infer
-from transcription.training.evaluate_checkpoint import (
-    _try_read_csv,
-    _detect_columns,
-    _resolve_audio_path,
-)
 from transcription.inference.infer import (
+    TARGET_SAMPLE_RATE,
     greedy_inference,
     normalize_text,
-    strip_tones,
     strip_length,
-    TARGET_SAMPLE_RATE,
+    strip_tones,
 )
+from transcription.training.evaluate_checkpoint import (
+    _detect_columns,
+    _resolve_audio_path,
+    _try_read_csv,
+)
+from transcription.utils.evaluation import run_evaluation, yield_hf_revisions
 
 
 def safe(s):
@@ -115,8 +115,6 @@ def main():
     df_test[text_col] = df_test[text_col].apply(normalize_text)
     df_test.dropna(subset=[audio_col, text_col], inplace=True)
     print(f"Number of test items: {len(df_test)}")
-
-    from transcription.utils.evaluation import yield_hf_revisions, run_evaluation
 
     print("Preparing HuggingFace dataset...")
     data_dict = {

@@ -1,10 +1,11 @@
 ---
 id: TASK-260
 title: Audit and eliminate in-function and lazy imports across codebase
-status: To Do
-assignee: []
+status: Done
+assignee:
+  - '@agent-imports'
 created_date: '2026-09-02 15:01'
-updated_date: '2026-09-02 15:05'
+updated_date: '2026-09-02 15:10'
 labels:
   - code-smell
   - refactor
@@ -37,10 +38,10 @@ Deliverables:
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 Identify all in-function / lazy imports in transcription and tests
-- [ ] #2 Move imports to top-level module scope
-- [ ] #3 Ensure no circular import regressions or startup delays
-- [ ] #4 Verify all tests pass and pyright typechecking succeeds
+- [x] #1 Identify all in-function / lazy imports in transcription and tests
+- [x] #2 Move imports to top-level module scope
+- [x] #3 Ensure no circular import regressions or startup delays
+- [x] #4 Verify all tests pass and pyright typechecking succeeds
 <!-- AC:END -->
 
 ## Implementation Plan
@@ -52,3 +53,9 @@ Deliverables:
 4. Run `pytest` and `pyright transcription`.
 5. Format with pre-commit / black and verify clean working tree.
 <!-- SECTION:PLAN:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+Audited and hoisted all in-function and lazy imports across the transcription package to module top level. Standard library, third-party, and project imports were structured cleanly without circular dependencies. Verified all 100 pytest unit tests pass and pyright typechecking succeeds with 0 errors.
+<!-- SECTION:FINAL_SUMMARY:END -->

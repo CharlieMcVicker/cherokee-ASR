@@ -1,15 +1,24 @@
-from typing import Any
 import argparse
-import os
 import glob
+import os
+import warnings
+from typing import Any
+
+import librosa
 import numpy as np
 import torch
-import librosa
-import warnings
-
 
 from transcription.models.asr_model import CherokeeASRModel
 from transcription.utils.model_utils import get_best_model_config
+
+VAD_class = None
+try:
+    from speechbrain.inference.VAD import VAD as VAD_class  # type: ignore
+except ImportError:
+    try:
+        from speechbrain.pretrained import VAD as VAD_class  # type: ignore
+    except ImportError:
+        pass
 
 warnings.filterwarnings("ignore")
 
@@ -72,16 +81,6 @@ def main():
         print(f"TRANSCRIPTION: {final_text}")
 
     elif args.mode == "long":
-        # Load VAD model
-        VAD_class = None
-        try:
-            from speechbrain.inference.VAD import VAD as VAD_class  # type: ignore
-        except ImportError:
-            try:
-                from speechbrain.pretrained import VAD as VAD_class  # type: ignore
-            except ImportError:
-                pass
-
         if VAD_class is None:
             print("SpeechBrain VAD is not available.")
             return

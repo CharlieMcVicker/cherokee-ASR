@@ -1,18 +1,20 @@
-import os
 import argparse
+import json
+import os
 import pandas as pd
 import torch
-from transformers import Wav2Vec2Processor, Wav2Vec2ForCTC
-from datasets import Dataset, Audio, Features, Value
-from jiwer import wer as jiwer_wer, cer as jiwer_cer
+from datasets import Audio, Dataset, Features, Value
+from jiwer import cer as jiwer_cer, wer as jiwer_wer
 from tqdm import tqdm
 
 from transcription.inference.infer import (
+    TARGET_SAMPLE_RATE,
     greedy_inference,
     normalize_text,
     strip_tones,
-    TARGET_SAMPLE_RATE,
 )
+from transcription.utils.evaluation import run_evaluation, yield_single_checkpoint
+from transformers import Wav2Vec2ForCTC, Wav2Vec2Processor
 
 
 def _try_read_csv(path):
@@ -125,8 +127,6 @@ def main():
     if not checkpoint_path:
         best_model_path = "best_model.json"
         if os.path.exists(best_model_path):
-            import json
-
             with open(best_model_path, "r") as f:
                 best_model = json.load(f)
             checkpoint_path = best_model["repo"]
@@ -152,8 +152,6 @@ def main():
     df_test.dropna(subset=[audio_col, text_col], inplace=True)
 
     print(f"Number of test items: {len(df_test)}")
-
-    from transcription.utils.evaluation import yield_single_checkpoint, run_evaluation
 
     # Prepare Dataset
     print("Preparing HuggingFace dataset...")
