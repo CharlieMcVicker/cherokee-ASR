@@ -324,9 +324,9 @@ class CherokeeASRModel:
         """
         Layer 2: Obtains softmax probabilities [sequence_length, vocab_size] from logits or audio.
         """
-        if isinstance(logits_or_audio, torch.Tensor):
+        if isinstance(logits_or_audio, torch.Tensor) and logits_or_audio.ndim >= 2:
             logits = logits_or_audio
-        elif isinstance(logits_or_audio, np.ndarray) and logits_or_audio.ndim == 2:
+        elif isinstance(logits_or_audio, np.ndarray) and logits_or_audio.ndim >= 2:
             logits = torch.tensor(logits_or_audio)
         else:
             logits = self.get_logits(logits_or_audio, sample_rate=sample_rate)

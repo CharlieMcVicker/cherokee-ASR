@@ -11,6 +11,7 @@ from transcription.alignment.aligner import (
 from transcription.alignment.cli import run_alignment_pipeline
 from transcription.alignment.distance_metrics import (
     CharacterErrorRateMetric,
+    ConfusionMatrixCostMetric,
     CustomCallableDistanceMetric,
     DefaultCERDistanceMetric,
     DistanceMetric,
@@ -78,6 +79,7 @@ __all__ = [
     "DistanceMetric",
     "DefaultCERDistanceMetric",
     "CharacterErrorRateMetric",
+    "ConfusionMatrixCostMetric",
     "LevenshteinDistanceMetric",
     "CustomCallableDistanceMetric",
     "calculate_cer",

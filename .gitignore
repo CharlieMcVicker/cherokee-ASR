@@ -128,3 +128,7 @@ cherokee_new_testament/audio_source
 
 transcriber_build
 transcriber_dist
+
+# Large streaming evaluation cache
+*.jsonl
+runs/**/*.jsonl
