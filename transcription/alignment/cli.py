@@ -10,25 +10,20 @@ import os
 import sys
 from typing import Any, Optional
 
-os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
-os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
-
 from transcription.alignment.aligner import (
     NeedlemanWunschWordAligner,
     SlidingWindowDTWAligner,
 )
 from transcription.alignment.exporters import (
-    export_debug_json as write_debug_json,
-    export_manifest as write_manifest_json,
-    export_textgrid as write_textgrid_file,
+    export_debug_json,
+    export_manifest,
+    export_textgrid,
 )
 from transcription.alignment.extractors import CherokeeASRExtractor
-from transcription.alignment.ingestion import load_bible_chunks, load_generic_chunks
+from transcription.alignment.ingestion import prepare_alignment_input
 from transcription.alignment.models import AlignmentOutput
-from transcription.alignment.normalizers import normalize_text_for_alignment
 from transcription.alignment.reconciliation import reconcile_alignment_words
 from transcription.models.asr_model import CherokeeASRModel
-from transcription.utils.model_utils import get_best_model_config
 
 
 def run_alignment_pipeline(
@@ -36,24 +31,29 @@ def run_alignment_pipeline(
     output_dir: str,
     bible_metadata_path: Optional[str] = None,
     chunk_list_path: Optional[str] = None,
+    model_path: Optional[str] = None,
     export_praat: bool = True,
     export_manifest: bool = True,
-    model_path: Optional[str] = None,
     skip_vad: bool = False,
     debug_export: bool = False,
     reconcile: bool = False,
 ) -> AlignmentOutput:
-    """Runs the streamlined Cherokee alignment pipeline and exports artifacts."""
+    """
+    High-level programmatic runner executing the end-to-end alignment pipeline.
+    """
+    os.makedirs(output_dir, exist_ok=True)
+
     if bible_metadata_path:
         print(
-            f"[1/4] Ingesting Bible ground-truth metadata from '{bible_metadata_path}'..."
+            f"[1/4] Ingesting Bible verse chunks from metadata '{bible_metadata_path}'..."
         )
-        chunks, source_lookup = load_bible_chunks(bible_metadata_path)
     elif chunk_list_path:
         print(f"[1/4] Ingesting ground-truth chunk list from '{chunk_list_path}'...")
-        chunks, source_lookup = load_generic_chunks(chunk_list_path)
-    else:
-        raise ValueError("Either --bible-metadata or --chunk-list must be provided.")
+
+    chunks, source_lookup, chunk_norm, emission_norm = prepare_alignment_input(
+        bible_metadata=bible_metadata_path,
+        chunk_list=chunk_list_path,
+    )
 
     if skip_vad:
         print(f"[2/4] Skipping VAD audio segmentation (skip_vad=True)...")
@@ -63,34 +63,17 @@ def run_alignment_pipeline(
     print(f"[3/4] Running ASR emission extraction & alignment...")
 
     token = os.environ.get("HF_TOKEN", None)
-    model_revision: Optional[str] = None
-    if model_path is None:
-        model_config = get_best_model_config()
-        model_path = str(model_config.get("repo", "facebook/wav2vec2-base-960h"))
-        model_revision = model_config.get("revision", None)
-
-    try:
-        asr_model = CherokeeASRModel.from_pretrained(
-            path_or_repo=model_path,
-            revision=model_revision,
-            token=token,
-        )
-    except Exception as e:
-        fallback_repo = "facebook/wav2vec2-base-960h"
-        print(
-            f"      [Warning] Could not load '{model_path}' ({e}). Falling back to public model '{fallback_repo}'..."
-        )
-        asr_model = CherokeeASRModel.from_pretrained(
-            path_or_repo=fallback_repo,
-            token=token,
-        )
+    asr_model = CherokeeASRModel.from_pretrained_or_best(
+        path_or_repo=model_path,
+        token=token,
+    )
 
     extractor = CherokeeASRExtractor(model=asr_model, skip_vad=skip_vad)
     emissions = extractor.extract(audio_path)
 
     word_aligner = NeedlemanWunschWordAligner(
-        chunk_normalizer=normalize_text_for_alignment,
-        emission_normalizer=normalize_text_for_alignment,
+        chunk_normalizer=chunk_norm,
+        emission_normalizer=emission_norm,
     )
     aligner = SlidingWindowDTWAligner(word_aligner=word_aligner)
 
@@ -109,14 +92,15 @@ def run_alignment_pipeline(
     os.makedirs(output_dir, exist_ok=True)
 
     if export_manifest:
-        write_manifest_json(
+        globals()["export_manifest"](
             alignment=alignment,
             output_dir=output_dir,
             source_metadata=source_lookup,
+            additional_word_tiers=additional_word_tiers,
         )
 
     if export_praat:
-        write_textgrid_file(
+        export_textgrid(
             alignment=alignment,
             output_dir=output_dir,
             source_metadata=source_lookup,
@@ -124,7 +108,7 @@ def run_alignment_pipeline(
         )
 
     if debug_export:
-        write_debug_json(
+        export_debug_json(
             alignment=alignment,
             output_dir=output_dir,
         )

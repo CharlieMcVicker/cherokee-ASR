@@ -18,9 +18,6 @@ import threading
 import time
 from typing import Any
 
-# Enable fallback to CPU for unsupported MPS operations
-os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
-
 import numpy as np
 import soundfile as sf
 import torch

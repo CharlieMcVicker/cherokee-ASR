@@ -132,7 +132,7 @@ class SyllabaryApi:
 ```
 
 #### Environment Isolation for GUI Stability
-Desktop GUI applications running embedded PyTorch can encounter OpenMP conflicts or thread deadlocks with webview GUI event loops. `syllabary_transcriber/app.py` enforces strict CPU single-threading and environment isolation:
+Desktop GUI applications running embedded PyTorch can encounter OpenMP conflicts or thread deadlocks with webview GUI event loops. `syllabary_transcriber/__main__.py` enforces strict CPU single-threading and environment isolation at launch:
 
 ```python
 os.environ["CUDA_VISIBLE_DEVICES"] = ""       # Enforce CPU execution for desktop stability

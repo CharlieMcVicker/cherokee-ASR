@@ -18,11 +18,6 @@ import unicodedata
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Union
 
-# Prevent OpenMP duplicate initialization crash on macOS conda environments
-os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
-# Enable CPU fallback for ops missing native MPS implementation
-os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
-
 import evaluate
 import numpy as np
 import pandas as pd
@@ -822,4 +817,8 @@ def main():
 
 
 if __name__ == "__main__":
+    # Prevent OpenMP duplicate initialization crash on macOS conda environments
+    os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
+    # Enable CPU fallback for ops missing native MPS implementation
+    os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
     main()

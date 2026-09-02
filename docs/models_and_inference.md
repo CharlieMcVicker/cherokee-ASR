@@ -103,7 +103,7 @@ The model instance holds references to:
 
 ### Factory Methods & Checkpoint Resolution
 
-`CherokeeASRModel` provides three factory methods for instantiation:
+`CherokeeASRModel` provides four factory methods for instantiation:
 
 #### 1. `CherokeeASRModel.from_pretrained`
 Loads an explicit model checkpoint from a Hugging Face Hub repository ID or local filesystem path.
@@ -170,6 +170,27 @@ def get_best_model(
 ```
 
 The underlying loader (`get_best_model_config` in `transcription/utils/model_utils.py`) searches upward through directory hierarchies to find `best_model.json`. If no file is found, it falls back to default checkpoint configuration: `{"repo": "charliemcvicker/asr-cherokee", "revision": "5464d15"}`.
+
+#### 4. `CherokeeASRModel.from_pretrained_or_best`
+Unified factory method that resolves checkpoints dynamically and provides automatic graceful fallback to public baseline models (default `facebook/wav2vec2-base-960h`).
+
+```python
+@classmethod
+def from_pretrained_or_best(
+    cls,
+    path_or_repo: Optional[str] = None,
+    revision: Optional[str] = None,
+    token: Optional[str] = None,
+    fallback_repo: str = "facebook/wav2vec2-base-960h",
+    eval_mode: bool = True,
+    use_cache: bool = True,
+    device: Optional[Union[str, torch.device]] = None,
+    processor_path: Optional[str] = None,
+) -> CherokeeASRModel
+```
+
+- If `path_or_repo` is provided, attempts to load via `from_pretrained`. If loading fails with an Exception, logs a warning and loads `fallback_repo`.
+- If `path_or_repo` is `None`, attempts to load the best model configuration via `get_best_model`. If loading fails, logs a warning and loads `fallback_repo`.
 
 ### Hardware Acceleration & Device Fallbacks
 

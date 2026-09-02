@@ -9,12 +9,6 @@ characters against emitted ASR text using character level alignment (transcripti
 Results are persisted to disk cache manifest JSON by default with a --force-recompute flag to reload existing caches.
 """
 
-import os
-import sys
-
-os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
-os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
-
 import argparse
 import csv
 import glob
@@ -479,4 +473,6 @@ def main():
 
 
 if __name__ == "__main__":
+    os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
+    os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
     main()

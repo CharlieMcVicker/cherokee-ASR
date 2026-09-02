@@ -161,6 +161,73 @@ class CherokeeASRModel:
             use_cache=use_cache,
         )
 
+    @classmethod
+    def from_pretrained_or_best(
+        cls,
+        path_or_repo: Optional[str] = None,
+        revision: Optional[str] = None,
+        token: Optional[str] = None,
+        fallback_repo: str = "facebook/wav2vec2-base-960h",
+        eval_mode: bool = True,
+        use_cache: bool = True,
+        device: Optional[Union[str, torch.device]] = None,
+        processor_path: Optional[str] = None,
+    ) -> CherokeeASRModel:
+        """
+        Unified factory method that instantiates CherokeeASRModel with automatic resolution and fallback.
+
+        - If path_or_repo is provided, attempts to load via `from_pretrained`. If loading fails with Exception,
+          logs a warning and falls back to `fallback_repo`.
+        - If path_or_repo is None, attempts to resolve the best model via `get_best_model`. If that fails,
+          logs a warning and falls back to `fallback_repo`.
+        """
+        if path_or_repo is not None:
+            try:
+                return cls.from_pretrained(
+                    path_or_repo=path_or_repo,
+                    revision=revision,
+                    processor_path=processor_path,
+                    device=device,
+                    token=token,
+                    eval_mode=eval_mode,
+                    use_cache=use_cache,
+                )
+            except Exception as e:
+                logger.warning(
+                    "Failed to load model from '%s' (%s). Falling back to '%s'.",
+                    path_or_repo,
+                    e,
+                    fallback_repo,
+                )
+                return cls.from_pretrained(
+                    path_or_repo=fallback_repo,
+                    device=device,
+                    token=token,
+                    eval_mode=eval_mode,
+                    use_cache=use_cache,
+                )
+        else:
+            try:
+                return cls.get_best_model(
+                    device=device,
+                    token=token,
+                    eval_mode=eval_mode,
+                    use_cache=use_cache,
+                )
+            except Exception as e:
+                logger.warning(
+                    "Failed to load best model (%s). Falling back to '%s'.",
+                    e,
+                    fallback_repo,
+                )
+                return cls.from_pretrained(
+                    path_or_repo=fallback_repo,
+                    device=device,
+                    token=token,
+                    eval_mode=eval_mode,
+                    use_cache=use_cache,
+                )
+
     # -------------------------------------------------------------------------
     # Audio Preprocessing Helpers
     # -------------------------------------------------------------------------

@@ -68,8 +68,12 @@ def test_run_alignment_pipeline_with_bible_metadata(tmp_path, mock_asr_model):
 
     assert isinstance(result, AlignmentOutput)
     assert len(result.aligned_chunks) == 1
-    assert result.aligned_chunks[0].chunk_id == "001001"
-    assert os.path.exists(os.path.join(out_dir, "alignment_manifest.json"))
+    manifest_path = os.path.join(out_dir, "alignment_manifest.json")
+    assert os.path.exists(manifest_path)
+    with open(manifest_path, "r", encoding="utf-8") as f:
+        manifest_data = json.load(f)
+    assert "reconciled_words" in manifest_data
+    assert "reconciled_words" in manifest_data["lines"][0]
     assert os.path.exists(os.path.join(out_dir, "alignment.TextGrid"))
     assert os.path.exists(os.path.join(out_dir, "alignment_debug.json"))
 

@@ -6,15 +6,21 @@ import argparse
 import os
 import subprocess
 import sys
+import threading
 from pathlib import Path
 from typing import Any, Optional
 
-os.environ["CUDA_VISIBLE_DEVICES"] = ""
-os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
-os.environ["OMP_NUM_THREADS"] = "1"
-os.environ["MKL_NUM_THREADS"] = "1"
+import uvicorn
 
 from syllabary_transcriber.app import SyllabaryApi, app
+
+
+def configure_desktop_environment() -> None:
+    """Configure environment variables for desktop GUI stability."""
+    os.environ["CUDA_VISIBLE_DEVICES"] = ""
+    os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
+    os.environ["OMP_NUM_THREADS"] = "1"
+    os.environ["MKL_NUM_THREADS"] = "1"
 
 
 def ensure_ui_built(ui_dir: Path, dist_dir: Path) -> None:
@@ -27,16 +33,10 @@ def ensure_ui_built(ui_dir: Path, dist_dir: Path) -> None:
 
 def run_dev_server(port: int) -> None:
     """Run uvicorn dev server."""
-    import uvicorn  # type: ignore
-
     print(f"Starting dev server on port {port}...")
     uvicorn.run(
         "syllabary_transcriber.app:app", host="127.0.0.1", port=port, reload=True
     )
-
-
-import threading
-import uvicorn
 
 
 def run_webview_app(dist_dir: Path) -> None:
@@ -62,6 +62,7 @@ def run_webview_app(dist_dir: Path) -> None:
 
 
 def main() -> None:
+    configure_desktop_environment()
     parser = argparse.ArgumentParser(description="Cherokee Syllabary Transcriber")
     parser.add_argument(
         "--dev", action="store_true", help="Run uvicorn dev server mode"

@@ -20,7 +20,11 @@ from transcription.alignment.distance_metrics import (
     LevenshteinDistanceMetric,
     calculate_cer,
 )
-from transcription.alignment.normalizers import normalize_text_for_alignment
+from transcription.alignment.normalizers import (
+    normalize_phonetics_for_alignment,
+    normalize_syllabary_for_alignment,
+    normalize_text_for_alignment,
+)
 
 
 def test_models_instantiation():
@@ -140,3 +144,13 @@ def test_normalize_text_for_alignment():
     # qu -> gw / kw
     qu_res = normalize_text_for_alignment("quana")
     assert "qu" not in qu_res
+
+
+def test_normalize_syllabary_and_phonetics():
+    # Syllabary strips 'h'
+    assert normalize_syllabary_for_alignment("ho-wa") == "owa"
+    assert normalize_syllabary_for_alignment("hi-la") == "ila"
+
+    # Phonetics preserves 'h'
+    assert normalize_phonetics_for_alignment("ho-wa") == "howa"
+    assert normalize_phonetics_for_alignment("hi-la") == "hila"

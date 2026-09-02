@@ -221,97 +221,65 @@ def run_evaluation(
 
         all_gold = [ex["sentence"] for ex in test_ds_prepared]
 
+        transforms = [
+            ("raw", lambda x: x),
+            ("len_masked", strip_length),
+            ("tone_masked", strip_tones),
+            ("both_masked", strip_both),
+        ]
+
         ckpt_rows = []
         for idx, logits in enumerate(all_logits):
             ref = all_gold[idx]
             res = asr_model.decode(logits, compute_word_confidences=False)
             hyp = res.text
 
-            ref_safe, hyp_safe = safe(ref), safe(hyp)
+            row = {
+                "checkpoint": label,
+                "index": idx,
+                "gold": ref,
+                "hyp_greedy": hyp,
+            }
+            for name, transform_fn in transforms:
+                ref_t = safe(transform_fn(ref))
+                hyp_t = safe(transform_fn(hyp))
+                wer_val = jiwer_wer(ref_t, hyp_t)
+                cer_val = jiwer_cer(ref_t, hyp_t)
+                row[f"wer_{name}"] = wer_val
+                row[f"cer_{name}"] = cer_val
+                if name == "raw":
+                    row["wer_greedy"] = wer_val
+                    row["cer_greedy"] = cer_val
+                elif name == "len_masked":
+                    row["wer_greedy_masked"] = wer_val
+                    row["cer_greedy_masked"] = cer_val
 
-            # Vowel length masked (used in train.py / local eval)
-            ref_len_masked = safe(strip_length(ref))
-            hyp_len_masked = safe(strip_length(hyp))
-
-            # Tone masked
-            ref_tone_masked = safe(strip_tones(ref))
-            hyp_tone_masked = safe(strip_tones(hyp))
-
-            # Both masked
-            ref_both_masked = safe(strip_both(ref))
-            hyp_both_masked = safe(strip_both(hyp))
-
-            ckpt_rows.append(
-                {
-                    "checkpoint": label,
-                    "index": idx,
-                    "gold": ref,
-                    "hyp_greedy": hyp,
-                    "wer_greedy": jiwer_wer(ref_safe, hyp_safe),
-                    "cer_greedy": jiwer_cer(ref_safe, hyp_safe),
-                    "wer_greedy_masked": jiwer_wer(ref_len_masked, hyp_len_masked),
-                    "cer_greedy_masked": jiwer_cer(ref_len_masked, hyp_len_masked),
-                    "wer_tone_masked": jiwer_wer(ref_tone_masked, hyp_tone_masked),
-                    "cer_tone_masked": jiwer_cer(ref_tone_masked, hyp_tone_masked),
-                    "wer_both_masked": jiwer_wer(ref_both_masked, hyp_both_masked),
-                    "cer_both_masked": jiwer_cer(ref_both_masked, hyp_both_masked),
-                }
-            )
+            ckpt_rows.append(row)
 
         rows_by_ckpt[label] = ckpt_rows
 
         df = pd.DataFrame(ckpt_rows)
-        golds = list(df["gold"])
         greedies = list(df["hyp_greedy"])
 
-        agg_wer_raw = jiwer_wer(
-            [safe(g) for g in all_gold], [safe(h) for h in greedies]
-        )
-        agg_cer_raw = jiwer_cer(
-            [safe(g) for g in all_gold], [safe(h) for h in greedies]
-        )
-        agg_wer_len_masked = jiwer_wer(
-            [safe(strip_length(g)) for g in all_gold],
-            [safe(strip_length(h)) for h in greedies],
-        )
-        agg_cer_len_masked = jiwer_cer(
-            [safe(strip_length(g)) for g in all_gold],
-            [safe(strip_length(h)) for h in greedies],
-        )
-        agg_wer_tone_masked = jiwer_wer(
-            [safe(strip_tones(g)) for g in all_gold],
-            [safe(strip_tones(h)) for h in greedies],
-        )
-        agg_cer_tone_masked = jiwer_cer(
-            [safe(strip_tones(g)) for g in all_gold],
-            [safe(strip_tones(h)) for h in greedies],
-        )
-        agg_wer_both_masked = jiwer_wer(
-            [safe(strip_both(g)) for g in all_gold],
-            [safe(strip_both(h)) for h in greedies],
-        )
-        agg_cer_both_masked = jiwer_cer(
-            [safe(strip_both(g)) for g in all_gold],
-            [safe(strip_both(h)) for h in greedies],
-        )
+        agg_metrics = {}
+        for name, transform_fn in transforms:
+            ref_list = [safe(transform_fn(g)) for g in all_gold]
+            hyp_list = [safe(transform_fn(h)) for h in greedies]
+            agg_metrics[f"agg_wer_{name}"] = jiwer_wer(ref_list, hyp_list)
+            agg_metrics[f"agg_cer_{name}"] = jiwer_cer(ref_list, hyp_list)
 
         ranking.append(
             {
                 "checkpoint": label,
                 "path": path,
                 "median_wer_greedy": float(np.median(df["wer_greedy"])),
-                "agg_wer_raw": agg_wer_raw,
-                "agg_cer_raw": agg_cer_raw,
-                "agg_wer_greedy": agg_wer_raw,
-                "agg_cer_greedy": agg_cer_raw,
-                "agg_wer_length_masked": agg_wer_len_masked,
-                "agg_cer_length_masked": agg_cer_len_masked,
-                "agg_wer_greedy_masked": agg_wer_len_masked,
-                "agg_cer_greedy_masked": agg_cer_len_masked,
-                "agg_wer_tone_masked": agg_wer_tone_masked,
-                "agg_cer_tone_masked": agg_cer_tone_masked,
-                "agg_wer_both_masked": agg_wer_both_masked,
-                "agg_cer_both_masked": agg_cer_both_masked,
+                **agg_metrics,
+                "agg_wer_greedy": agg_metrics["agg_wer_raw"],
+                "agg_cer_greedy": agg_metrics["agg_cer_raw"],
+                "agg_wer_length_masked": agg_metrics["agg_wer_len_masked"],
+                "agg_cer_length_masked": agg_metrics["agg_cer_len_masked"],
+                "agg_wer_greedy_masked": agg_metrics["agg_wer_len_masked"],
+                "agg_cer_greedy_masked": agg_metrics["agg_cer_len_masked"],
             }
         )
 

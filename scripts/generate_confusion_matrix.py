@@ -127,7 +127,7 @@ def plot_and_save_matrix(matrix, title, filepath):
 
 
 def main():
-    asr_model = CherokeeASRModel.get_best_model()
+    asr_model = CherokeeASRModel.from_pretrained_or_best()
     processor = asr_model.processor
     device = asr_model.device
     print(f"Using device: {device}")

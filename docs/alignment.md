@@ -62,7 +62,7 @@ flowchart TD
 2. **Pluggable Normalization & Distance Metrics**: Word and chunk distance scoring are parameterized via the [`DistanceMetric`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/distance_metrics.py#L9-L16) protocol, allowing Character Error Rate (CER), Levenshtein edit distance with custom substitution weights, or arbitrary callables.
 3. **Multi-to-Multi DP Fusion**: The word aligner dynamically solves $1$-to-$N$ and $M$-to-$1$ ASR token-to-word grouping discrepancies with configurable fusion penalties and gap costs.
 4. **Isolated Outbound Exporters**: Exporters receive pure [`AlignmentOutput`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/models.py#L65-L73) objects and output directories, generating Praat TextGrids and JSON manifests without coupling to alignment execution.
-5. **Language-Agnostic Acoustic Extraction**: Core ASR acoustic model inference (`CherokeeASRModel`) extracts language-agnostic phonetic token emissions (`TokenEmission`). Downstream Cherokee Syllabary transliteration and phonetic rule reconciliation are explicitly performed by `transcription.syllabary_enrichment` and `transcription.utils.syllabary_map`.
+5. **Language-Agnostic Extraction Schemas & Protocols**: While `CherokeeASRModel` is the dedicated Cherokee acoustic model, the output schemas and alignment protocols ([`TokenEmission`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/models.py#L11-L19), [`ASRResult`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/models/asr_model.py#L21-L32), [`SlidingWindowDTWAligner`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/aligner.py#L129-L232)) are language-agnostic. Downstream Cherokee Syllabary transliteration and phonetic rule reconciliation are explicitly performed by `transcription.syllabary_enrichment` and `transcription.utils.syllabary_map`.
 
 ### Module Map
 
@@ -552,7 +552,7 @@ from transcription.alignment.exporters import (
 
 ### 1. `export_manifest` (`alignment_manifest.json`)
 
-Generates a JSON manifest file containing chunk and word timestamps, metadata, and quality metrics:
+Generates a JSON manifest file containing chunk and word timestamps, metadata, quality metrics, and optional additional word tiers (such as reconciled words):
 
 ```python
 manifest_path = export_manifest(
@@ -560,6 +560,7 @@ manifest_path = export_manifest(
     output_dir="output/alignment_run",
     filename="alignment_manifest.json",
     source_metadata=source_lookup,
+    additional_word_tiers={"Reconciled Words": reconciled_words},
 )
 ```
 
@@ -575,6 +576,26 @@ manifest_path = export_manifest(
     "total_ground_truth_chars": 850,
     "total_emitted_chars": 842
   },
+  "additional_word_tiers": {
+    "Reconciled Words": [
+      {
+        "word": "tsáni",
+        "start": 0.45,
+        "end": 1.10,
+        "confidence": 0.98,
+        "flagged": false
+      }
+    ]
+  },
+  "reconciled_words": [
+    {
+      "word": "tsáni",
+      "start": 0.45,
+      "end": 1.10,
+      "confidence": 0.98,
+      "flagged": false
+    }
+  ],
   "lines": [
     {
       "line_id": "chunk_001",
@@ -592,7 +613,28 @@ manifest_path = export_manifest(
           "end": 1.10,
           "confidence": 0.98,
           "flagged": false,
-          "emitted_word": "tsani"
+          "emitted_word": "tsani",
+          "reconciled_word": "tsáni"
+        }
+      ],
+      "additional_word_tiers": {
+        "Reconciled Words": [
+          {
+            "word": "tsáni",
+            "start": 0.45,
+            "end": 1.10,
+            "confidence": 0.98,
+            "flagged": false
+          }
+        ]
+      },
+      "reconciled_words": [
+        {
+          "word": "tsáni",
+          "start": 0.45,
+          "end": 1.10,
+          "confidence": 0.98,
+          "flagged": false
         }
       ]
     }
@@ -799,6 +841,7 @@ export_manifest(
     alignment=alignment,
     output_dir=output_dir,
     source_metadata=source_lookup,
+    additional_word_tiers={"Reconciled Words": reconciled_words},
 )
 export_textgrid(
     alignment=alignment,

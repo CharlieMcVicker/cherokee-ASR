@@ -32,6 +32,7 @@ from transcription.alignment.extractors import (
 from transcription.alignment.ingestion import (
     load_bible_chunks,
     load_generic_chunks,
+    prepare_alignment_input,
 )
 from transcription.alignment.models import (
     AlignedChunk,
@@ -41,7 +42,11 @@ from transcription.alignment.models import (
     TokenEmission,
     WordInterval,
 )
-from transcription.alignment.normalizers import normalize_text_for_alignment
+from transcription.alignment.normalizers import (
+    normalize_phonetics_for_alignment,
+    normalize_syllabary_for_alignment,
+    normalize_text_for_alignment,
+)
 from transcription.alignment.reconciliation import (
     reconcile_alignment_by_chunk,
     reconcile_alignment_words,
@@ -56,9 +61,12 @@ __all__ = [
     "TextChunk",
     "TokenEmission",
     "WordInterval",
-    # Ingestion
+    # Ingestion & Normalizers
     "load_bible_chunks",
     "load_generic_chunks",
+    "prepare_alignment_input",
+    "normalize_syllabary_for_alignment",
+    "normalize_phonetics_for_alignment",
     "normalize_text_for_alignment",
     # Extractors
     "ASREmissionsExtractor",

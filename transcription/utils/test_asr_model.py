@@ -138,6 +138,104 @@ class TestCherokeeASRModel(unittest.TestCase):
         model = CherokeeASRModel.get_best_model(device="cpu")
         self.assertIsInstance(model, CherokeeASRModel)
 
+    @patch("transformers.Wav2Vec2ForCTC.from_pretrained")
+    @patch("transformers.Wav2Vec2Processor.from_pretrained")
+    def test_factory_from_pretrained_or_best_explicit_repo(
+        self, mock_proc_load, mock_model_load
+    ):
+        mock_proc = MagicMock()
+        mock_model = MagicMock()
+        mock_proc_load.return_value = mock_proc
+        mock_model_load.return_value = mock_model
+
+        model = CherokeeASRModel.from_pretrained_or_best(
+            path_or_repo="test/custom-repo", revision="rev1", device="cpu"
+        )
+        self.assertIsInstance(model, CherokeeASRModel)
+        self.assertEqual(model.model, mock_model)
+        self.assertEqual(model.processor, mock_proc)
+        mock_model_load.assert_called_with("test/custom-repo", revision="rev1")
+
+    @patch("transformers.Wav2Vec2ForCTC.from_pretrained")
+    @patch("transformers.Wav2Vec2Processor.from_pretrained")
+    def test_factory_from_pretrained_or_best_none_repo(
+        self, mock_proc_load, mock_model_load
+    ):
+        mock_proc = MagicMock()
+        mock_model = MagicMock()
+        mock_proc_load.return_value = mock_proc
+        mock_model_load.return_value = mock_model
+
+        model = CherokeeASRModel.from_pretrained_or_best(
+            path_or_repo=None, device="cpu"
+        )
+        self.assertIsInstance(model, CherokeeASRModel)
+        self.assertEqual(model.model, mock_model)
+        self.assertEqual(model.processor, mock_proc)
+
+    @patch("transformers.Wav2Vec2ForCTC.from_pretrained")
+    @patch("transformers.Wav2Vec2Processor.from_pretrained")
+    def test_factory_from_pretrained_or_best_fallback_on_explicit_failure(
+        self, mock_proc_load, mock_model_load
+    ):
+        mock_proc = MagicMock()
+        mock_model = MagicMock()
+        mock_proc_load.return_value = mock_proc
+        mock_model_load.side_effect = [
+            RuntimeError("Network or checkpoint error"),
+            mock_model,
+        ]
+
+        model = CherokeeASRModel.from_pretrained_or_best(
+            path_or_repo="invalid/missing-repo",
+            fallback_repo="facebook/wav2vec2-base-960h",
+            device="cpu",
+        )
+        self.assertIsInstance(model, CherokeeASRModel)
+        self.assertEqual(mock_model_load.call_count, 2)
+        mock_model_load.assert_called_with("facebook/wav2vec2-base-960h")
+
+    @patch("transformers.Wav2Vec2ForCTC.from_pretrained")
+    @patch("transformers.Wav2Vec2Processor.from_pretrained")
+    def test_factory_from_pretrained_or_best_fallback_on_none_failure(
+        self, mock_proc_load, mock_model_load
+    ):
+        mock_proc = MagicMock()
+        mock_model = MagicMock()
+        mock_proc_load.return_value = mock_proc
+        mock_model_load.side_effect = [
+            RuntimeError("Best model unreachable"),
+            mock_model,
+        ]
+
+        model = CherokeeASRModel.from_pretrained_or_best(
+            path_or_repo=None,
+            fallback_repo="facebook/wav2vec2-base-960h",
+            device="cpu",
+        )
+        self.assertIsInstance(model, CherokeeASRModel)
+        self.assertEqual(mock_model_load.call_count, 2)
+        mock_model_load.assert_called_with("facebook/wav2vec2-base-960h")
+
+    @patch("transformers.Wav2Vec2ForCTC.from_pretrained")
+    @patch("transformers.Wav2Vec2Processor.from_pretrained")
+    def test_factory_from_pretrained_or_best_fallback_failure_raises(
+        self, mock_proc_load, mock_model_load
+    ):
+        mock_proc = MagicMock()
+        mock_proc_load.return_value = mock_proc
+        mock_model_load.side_effect = [
+            RuntimeError("Primary load failed"),
+            RuntimeError("Fallback load failed"),
+        ]
+
+        with self.assertRaises(RuntimeError):
+            CherokeeASRModel.from_pretrained_or_best(
+                path_or_repo="invalid/repo",
+                fallback_repo="facebook/wav2vec2-base-960h",
+                device="cpu",
+            )
+
     def test_preprocess_audio_types(self):
         # 1D numpy array
         np_1d = np.zeros(16000, dtype=np.float32)

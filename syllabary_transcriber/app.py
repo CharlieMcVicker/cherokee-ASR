@@ -8,12 +8,6 @@ FastAPI backend server and PyWebView API bridge for Syllabary Transcriber.
 import base64
 import os
 import struct
-
-os.environ["CUDA_VISIBLE_DEVICES"] = ""
-os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
-os.environ["OMP_NUM_THREADS"] = "1"
-os.environ["MKL_NUM_THREADS"] = "1"
-
 from typing import Any, List, Union
 
 from fastapi import FastAPI, HTTPException
@@ -38,12 +32,9 @@ class SyllabaryApi:
 
     def _ensure_model_loaded(self) -> None:
         if self.asr_model is None:
-            if self.model_dir:
-                self.asr_model = CherokeeASRModel.from_pretrained(
-                    path_or_repo=self.model_dir
-                )
-            else:
-                self.asr_model = CherokeeASRModel.get_best_model()
+            self.asr_model = CherokeeASRModel.from_pretrained_or_best(
+                path_or_repo=self.model_dir
+            )
 
     def transcribe_pcm(
         self, pcm_data: Union[List[float], str], sample_rate: int = 16000

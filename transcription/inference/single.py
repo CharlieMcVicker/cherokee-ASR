@@ -7,12 +7,8 @@ Runs speech-to-text inference on a single audio file using the fine-tuned Wav2Ve
 Uses centralized greedy decoding.
 """
 
-import os
-
-# Enable fallback to CPU for unsupported MPS operations
-os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
-
 import argparse
+import os
 import sys
 import torch
 from transcription.models.asr_model import CherokeeASRModel
@@ -88,4 +84,5 @@ def main():
 
 
 if __name__ == "__main__":
+    os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
     main()

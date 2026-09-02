@@ -7,12 +7,16 @@ import os
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 from transcription.alignment.models import TextChunk
-from transcription.alignment.normalizers import normalize_text_for_alignment
+from transcription.alignment.normalizers import (
+    normalize_phonetics_for_alignment,
+    normalize_syllabary_for_alignment,
+    normalize_text_for_alignment,
+)
 
 
 def load_bible_chunks(
     source: Union[str, Dict[str, Any], List[Dict[str, Any]]],
-    normalizer: Callable[[str], str] = normalize_text_for_alignment,
+    normalizer: Callable[[str], str] = normalize_syllabary_for_alignment,
 ) -> Tuple[List[TextChunk], Dict[str, Dict[str, Any]]]:
     """
     Loads Bible verse metadata into TextChunks and a source lookup dictionary.
@@ -138,3 +142,65 @@ def load_generic_chunks(
         )
 
     return chunks, source_lookup
+
+
+def prepare_alignment_input(
+    bible_metadata: Optional[Union[str, Dict[str, Any], List[Dict[str, Any]]]] = None,
+    chunk_list: Optional[Union[str, List[Dict[str, Any]], Dict[str, Any]]] = None,
+) -> Tuple[
+    List[TextChunk],
+    Dict[str, Dict[str, Any]],
+    Callable[[str], str],
+    Callable[[str], str],
+]:
+    """
+    Ingests alignment input from either Bible verse metadata or generic chunk list sources,
+    resolving the appropriate representation-aware text normalizers for chunks and emissions.
+
+    Args:
+        bible_metadata: Path to Bible metadata JSON, or dictionary/list of Bible verse metadata items.
+        chunk_list: Path to generic chunk list JSON, or list/dictionary of chunk items.
+
+    Returns:
+        A tuple of (chunks, source_lookup, chunk_normalizer, emissions_normalizer):
+            chunks: List[TextChunk] loaded and normalized for alignment.
+            source_lookup: Dict[str, Dict[str, Any]] mapping chunk IDs to raw metadata dictionaries.
+            chunk_normalizer: Callable[[str], str] normalizer strategy for ground-truth chunks.
+            emissions_normalizer: Callable[[str], str] normalizer strategy for ASR token emissions.
+
+    Raises:
+        ValueError: If neither or both input sources are provided.
+    """
+    if bible_metadata is not None and chunk_list is not None:
+        raise ValueError("Cannot provide both bible_metadata and chunk_list.")
+
+    if bible_metadata is not None:
+        chunks, source_lookup = load_bible_chunks(
+            bible_metadata, normalizer=normalize_syllabary_for_alignment
+        )
+        return (
+            chunks,
+            source_lookup,
+            normalize_syllabary_for_alignment,
+            normalize_syllabary_for_alignment,
+        )
+
+    if chunk_list is not None:
+        chunks, source_lookup = load_generic_chunks(
+            chunk_list, normalizer=normalize_phonetics_for_alignment
+        )
+        return (
+            chunks,
+            source_lookup,
+            normalize_phonetics_for_alignment,
+            normalize_phonetics_for_alignment,
+        )
+
+    raise ValueError("Either bible_metadata or chunk_list must be provided.")
+
+
+__all__ = [
+    "load_bible_chunks",
+    "load_generic_chunks",
+    "prepare_alignment_input",
+]

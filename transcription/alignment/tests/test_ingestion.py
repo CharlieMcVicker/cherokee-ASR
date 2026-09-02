@@ -11,8 +11,13 @@ import pytest
 from transcription.alignment.ingestion import (
     load_bible_chunks,
     load_generic_chunks,
+    prepare_alignment_input,
 )
 from transcription.alignment.models import TextChunk
+from transcription.alignment.normalizers import (
+    normalize_phonetics_for_alignment,
+    normalize_syllabary_for_alignment,
+)
 
 
 def test_load_bible_chunks_dict():
@@ -164,3 +169,65 @@ def test_load_generic_chunks_errors():
 
     with pytest.raises(ValueError):
         load_generic_chunks(12345)  # type: ignore[arg-type]
+
+
+def test_prepare_alignment_input_bible_metadata():
+    bible_meta = {
+        "020101": {
+            "phonetic": "A-da-le-ni-s-gv",
+            "cherokee": "ᎠᏓᎴᏂᏍᎬ",
+        }
+    }
+    chunks, source_lookup, chunk_norm, emission_norm = prepare_alignment_input(
+        bible_metadata=bible_meta
+    )
+    assert len(chunks) == 1
+    assert chunks[0].chunk_id == "020101"
+    # Syllabary normalization strips 'h'
+    assert chunks[0].text == "ataleniskv"
+    assert "020101" in source_lookup
+
+    assert chunk_norm is normalize_syllabary_for_alignment
+    assert emission_norm is normalize_syllabary_for_alignment
+    assert chunk_norm("ho-wa") == "owa"
+    assert emission_norm("ho-wa") == "owa"
+
+
+def test_prepare_alignment_input_chunk_list():
+    chunk_list = [
+        {
+            "id": "c1",
+            "raw_text": "A-da-le-ni-s-gv",
+            "speaker": "spk1",
+        }
+    ]
+    chunks, source_lookup, chunk_norm, emission_norm = prepare_alignment_input(
+        chunk_list=chunk_list
+    )
+    assert len(chunks) == 1
+    assert chunks[0].chunk_id == "c1"
+    # Phonetics normalization preserves 'h'
+    assert chunks[0].text == "atalenihskv"
+    assert "c1" in source_lookup
+
+    assert chunk_norm is normalize_phonetics_for_alignment
+    assert emission_norm is normalize_phonetics_for_alignment
+    assert chunk_norm("ho-wa") == "howa"
+    assert emission_norm("ho-wa") == "howa"
+
+
+def test_prepare_alignment_input_errors():
+    # Neither provided
+    with pytest.raises(
+        ValueError, match="Either bible_metadata or chunk_list must be provided"
+    ):
+        prepare_alignment_input()
+
+    # Both provided
+    with pytest.raises(
+        ValueError, match="Cannot provide both bible_metadata and chunk_list"
+    ):
+        prepare_alignment_input(
+            bible_metadata={"0101": "test"},
+            chunk_list=[{"id": "1", "text": "test"}],
+        )
