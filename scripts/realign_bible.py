@@ -34,9 +34,12 @@ from transcription.alignment.extractors import (
     CachedASREmissionsExtractor,
     CherokeeASRExtractor,
 )
-from transcription.alignment.reconciliation import reconcile_word_intervals
 from transcription.models.asr_model import CherokeeASRModel
-from transcription.new_testament.pipeline import align_chapter, load_chapter_transcript
+from transcription.new_testament.pipeline import (
+    align_chapter,
+    load_chapter_transcript,
+    reconcile_syllabary_asr,
+)
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 NT_DIR = BASE_DIR / "cherokee_new_testament"
@@ -156,20 +159,28 @@ def realign_book(
         )
 
         audio_seg = AudioSegment.from_file(str(audio_path))
-        num_verses_aligned = len(res.aligned_segments)
+        num_verses_aligned = len(res.aligned_chunks)
         print(f"    Aligned {num_verses_aligned} verses.")
 
-        for seg in res.aligned_segments:
-            verse_id = seg.word
-            start_sec = round(seg.start_sec, 3)
-            end_sec = round(seg.end_sec, 3)
+        for chunk in res.aligned_chunks:
+            verse_id = chunk.chunk_id
+            start_sec = round(chunk.start_sec, 3)
+            end_sec = round(chunk.end_sec, 3)
             dur = round(end_sec - start_sec, 3)
             durations_sec.append(dur)
 
-            # Export sliced wav
-            split_filename = f"{book_key}_{ch_str}_{verse_id}.wav"
+            # Determine verse index & filename
+            if verse_id.isdigit() and len(verse_id) == 6:
+                v_num = int(verse_id[4:6])
+                verse_idx = v_num
+                split_filename = f"{book_key}_{ch:02d}_{v_num:02d}.wav"
+            else:
+                verse_idx = len(records) + 1
+                split_filename = f"{book_key}_{ch_str}_{verse_id}.wav"
+
             split_out_path = SPLIT_AUDIO_DIR / split_filename
 
+            # Slicing audio
             start_ms = int(start_sec * 1000)
             end_ms = int(end_sec * 1000)
             verse_audio = audio_seg[start_ms:end_ms]
@@ -188,41 +199,48 @@ def realign_book(
             english_text = verse_info.get("english", "")
 
             # Reconcile syllabary & ASR tokens
-            asr_hyp = seg.asr_hypothesis or ""
-            reconciled = reconcile_word_intervals(
-                reference_text=cherokee_text,
+            asr_hyp = chunk.emitted_text or ""
+            reconciled_syllabary, _ = reconcile_syllabary_asr(
+                syllabary_text=cherokee_text,
                 asr_hypothesis=asr_hyp,
-                ref_start_sec=start_sec,
-                ref_end_sec=end_sec,
             )
 
+            words_list = [
+                {
+                    "word": w.word,
+                    "start_sec": round(w.start_sec, 3),
+                    "end_sec": round(w.end_sec, 3),
+                    "confidence": w.confidence,
+                    "flagged": w.flagged,
+                    "emitted_word": w.emitted_word or "",
+                }
+                for w in chunk.words
+            ]
+
             record = {
+                "verse_id": verse_id,
                 "book": book_key,
                 "chapter": ch,
-                "verse": verse_id,
-                "audio_file": split_filename,
-                "audio_path": str(split_out_path.resolve()),
+                "verse_idx": verse_idx,
+                "audio_path": f"cherokee_new_testament/split_audio/{split_filename}",
                 "start_sec": start_sec,
                 "end_sec": end_sec,
                 "duration_sec": dur,
-                "distance_cost": seg.distance_cost,
+                "reference_sentence": cherokee_text,
+                "reconciled_phonetics": reconciled_syllabary,
+                "asr_hypothesis": asr_hyp,
+                "cost": round(chunk.distance_score, 4),
+                "words": words_list,
                 "cherokee_syllabary": cherokee_text,
                 "phonetic": phonetic_text,
                 "english": english_text,
-                "asr_hypothesis": asr_hyp,
-                "reconciled_syllabary": reconciled.reconciled_syllabary,
-                "alignment_confidence": (
-                    reconciled.confidence if hasattr(reconciled, "confidence") else 1.0
-                ),
             }
             records.append(record)
 
             csv_rows.append(
                 {
-                    "audio_file": split_filename,
-                    "syllabary": cherokee_text,
-                    "phonetic": phonetic_text,
-                    "duration": f"{dur:.3f}",
+                    "path": f"cherokee_new_testament/split_audio/{split_filename}",
+                    "sentence": reconciled_syllabary or phonetic_text,
                 }
             )
 
@@ -235,11 +253,18 @@ def realign_book(
     )
 
     # Export training CSV
-    train_csv_path = TRAIN_CSVS_DIR / f"{book_key}_train.csv"
+    train_csv_path = TRAIN_CSVS_DIR / f"{book_key}.csv"
     with open(train_csv_path, "w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(
-            f, fieldnames=["audio_file", "syllabary", "phonetic", "duration"]
-        )
+        writer = csv.DictWriter(f, fieldnames=["path", "sentence"])
+        writer.writeheader()
+        writer.writerows(csv_rows)
+    print(
+        f"[Artifact] Saved training CSV with {len(csv_rows)} rows to '{train_csv_path}'"
+    )
+
+    train_csv_alt = TRAIN_CSVS_DIR / f"{book_key}_train.csv"
+    with open(train_csv_alt, "w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=["path", "sentence"])
         writer.writeheader()
         writer.writerows(csv_rows)
     print(
