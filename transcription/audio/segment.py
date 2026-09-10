@@ -3,6 +3,7 @@ import os
 import sys
 import time
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any, Dict, List, Union, cast
 import numpy as np
 from numpy.typing import NDArray
@@ -487,8 +488,8 @@ def segment_long_audio(
     Returns:
         List of AudioChunk objects containing segment audio and global start/end offsets (in seconds).
     """
-    if isinstance(audio_or_path, str):
-        audio = AudioSegment.from_file(audio_or_path)
+    if isinstance(audio_or_path, (str, Path)):
+        audio = AudioSegment.from_file(str(audio_or_path))
     else:
         audio = audio_or_path
 

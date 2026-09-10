@@ -74,10 +74,12 @@ class CherokeeASRModel:
         model: Any,
         processor: Any,
         device: Union[str, torch.device] = "cpu",
+        model_name: Optional[str] = None,
     ):
         self.model: Any = model
         self.processor: Any = processor
         self.device = str(device)
+        self.model_name = model_name
         self.model.to(self.device)
         self.model.eval()
 
@@ -112,7 +114,13 @@ class CherokeeASRModel:
             eval_mode=eval_mode,
             use_cache=use_cache,
         )
-        return cls(model=model, processor=processor, device=resolved_device)
+        resolved_name = f"{path_or_repo}_{revision}" if revision else str(path_or_repo)
+        return cls(
+            model=model,
+            processor=processor,
+            device=resolved_device,
+            model_name=resolved_name,
+        )
 
     @classmethod
     def from_config(
@@ -315,6 +323,126 @@ class CherokeeASRModel:
                 raise e
 
         return logits.squeeze(0)
+
+    def get_logits_batch(
+        self,
+        audio_inputs: Sequence[
+            Union[str, bytes, List[float], np.ndarray, torch.Tensor]
+        ],
+        sample_rate: int = TARGET_SAMPLE_RATE,
+        batch_size: int = 16,
+    ) -> List[torch.Tensor]:
+        """
+        Batched procedural pipeline for extracting raw logits tensors for multiple audio inputs.
+        Applies dynamic padding and returns unpadded sliced logits tensors [seq_len_i, vocab_size].
+        """
+        results: List[torch.Tensor] = []
+        if not audio_inputs:
+            return results
+
+        for i in range(0, len(audio_inputs), batch_size):
+            batch = audio_inputs[i : i + batch_size]
+            batch_speech = []
+            for item in batch:
+                try:
+                    speech = self.preprocess_audio(item, sample_rate=sample_rate)
+                    batch_speech.append(speech)
+                except Exception as e:
+                    logger.warning("Error preprocessing batch item: %s", e)
+                    batch_speech.append(np.zeros(TARGET_SAMPLE_RATE, dtype=np.float32))
+
+            inputs = self.processor(
+                batch_speech,
+                sampling_rate=TARGET_SAMPLE_RATE,
+                padding=True,
+                return_tensors="pt",
+            )
+            input_values = inputs.input_values.to(self.device)
+            attention_mask = getattr(inputs, "attention_mask", None)
+            if attention_mask is not None:
+                attention_mask = attention_mask.to(self.device)
+
+            try:
+                with torch.no_grad():
+                    if attention_mask is not None:
+                        batch_logits = self.model(
+                            input_values, attention_mask=attention_mask
+                        ).logits
+                    else:
+                        batch_logits = self.model(input_values).logits
+            except Exception as e:
+                err_str = str(e).lower()
+                is_oom = "out of memory" in err_str or (
+                    hasattr(torch.cuda, "OutOfMemoryError")
+                    and isinstance(e, torch.cuda.OutOfMemoryError)
+                )
+                if is_oom or "cudnn" in err_str:
+                    logger.warning(
+                        "OOM or cuDNN error in batch. Falling back to sequential."
+                    )
+                    del input_values
+                    if attention_mask is not None:
+                        del attention_mask
+                    if torch.cuda.is_available():
+                        torch.cuda.empty_cache()
+                    elif torch.backends.mps.is_available():
+                        torch.mps.empty_cache()
+
+                    for sp in batch_speech:
+                        results.append(
+                            self.get_logits(sp, sample_rate=TARGET_SAMPLE_RATE)
+                        )
+                    continue
+                elif isinstance(e, NotImplementedError) and self.device == "mps":
+                    logger.warning("MPS error in batch. Falling back to CPU.")
+                    self.device = "cpu"
+                    self.model.to(self.device)
+                    input_values = input_values.to(self.device)
+                    if attention_mask is not None:
+                        attention_mask = attention_mask.to(self.device)
+                    with torch.no_grad():
+                        if attention_mask is not None:
+                            batch_logits = self.model(
+                                input_values, attention_mask=attention_mask
+                            ).logits
+                        else:
+                            batch_logits = self.model(input_values).logits
+                else:
+                    raise e
+
+            if attention_mask is not None:
+                input_lengths = attention_mask.sum(dim=-1)
+                feat_extractor = getattr(
+                    self.model, "_get_feat_extract_output_lengths", None
+                )
+                if callable(feat_extractor):
+                    raw_lengths: Any = feat_extractor(input_lengths)
+                    if hasattr(raw_lengths, "detach"):
+                        output_lengths = raw_lengths.detach().cpu().numpy()
+                    elif isinstance(raw_lengths, np.ndarray):
+                        output_lengths = raw_lengths
+                    else:
+                        output_lengths = np.array(raw_lengths)
+                else:
+                    output_lengths = [batch_logits.shape[1]] * batch_logits.shape[0]
+            else:
+                output_lengths = [batch_logits.shape[1]] * batch_logits.shape[0]
+
+            for idx in range(batch_logits.shape[0]):
+                actual_len = int(output_lengths[idx])
+                sliced_logits = batch_logits[idx, :actual_len, :]
+                results.append(sliced_logits)
+
+            # Cleanup batch GPU memory
+            del batch_logits, inputs, input_values
+            if attention_mask is not None:
+                del attention_mask
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
+            elif torch.backends.mps.is_available():
+                torch.mps.empty_cache()
+
+        return results
 
     def get_probabilities(
         self,

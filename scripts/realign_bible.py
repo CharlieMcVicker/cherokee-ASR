@@ -50,7 +50,8 @@ DEFAULT_COST_MATRIX_PATH = (
     BASE_DIR / "runs" / "evaluation" / "confusion_cost_matrix_prebible.json"
 )
 DEFAULT_CACHE_DIR = BASE_DIR / "runs" / "cache" / "emissions"
-DEFAULT_REVISION = "5464d15"
+DEFAULT_MODEL_REPO = "charliemcvicker/length-only-20260704-155307-asr-cherokee-colon"
+DEFAULT_REVISION = "76e62140955f4738abdab345ea34068b02d8d2a2"
 
 BOOK_CONFIGS = {
     "mark": {"chapters": 16, "name": "Mark"},
@@ -59,21 +60,27 @@ BOOK_CONFIGS = {
 
 
 def get_default_extractor_and_metric(
+    model_repo: str = DEFAULT_MODEL_REPO,
     model_revision: str = DEFAULT_REVISION,
     cache_dir: Path = DEFAULT_CACHE_DIR,
     cost_matrix_path: Path = DEFAULT_COST_MATRIX_PATH,
 ) -> Tuple[CachedASREmissionsExtractor, DistanceMetric]:
     token = os.environ.get("HF_TOKEN", None)
     asr_model = CherokeeASRModel.from_pretrained_or_best(
-        path_or_repo="charliemcvicker/asr-cherokee",
+        path_or_repo=model_repo,
         revision=model_revision,
         token=token,
     )
     base_extractor = CherokeeASRExtractor(model=asr_model, skip_vad=False)
+    prefix_slug = (
+        f"{model_repo.replace('/', '_')}_{model_revision}"
+        if model_revision
+        else model_repo.replace("/", "_")
+    )
     cached_extractor = CachedASREmissionsExtractor(
         extractor=base_extractor,
         cache_dir=cache_dir,
-        cache_key_prefix=f"charliemcvicker_asr-cherokee_{model_revision}",
+        cache_key_prefix=prefix_slug,
     )
 
     if cost_matrix_path.exists():
@@ -91,6 +98,7 @@ def realign_book(
     book: str,
     distance_metric: Optional[DistanceMetric] = None,
     emissions_extractor: Optional[ASREmissionsExtractor] = None,
+    model_repo: str = DEFAULT_MODEL_REPO,
     model_revision: str = DEFAULT_REVISION,
     export_praat: bool = True,
 ) -> Tuple[List[Dict[str, Any]], List[Dict[str, str]]]:
@@ -110,7 +118,8 @@ def realign_book(
 
     if emissions_extractor is None or distance_metric is None:
         def_extractor, def_metric = get_default_extractor_and_metric(
-            model_revision=model_revision
+            model_repo=model_repo,
+            model_revision=model_revision,
         )
         emissions_extractor = emissions_extractor or def_extractor
         distance_metric = distance_metric or def_metric
@@ -132,121 +141,118 @@ def realign_book(
             print(f"[Warning] Audio file not found: {audio_path}, skipping.")
             continue
         if not transcript_path.exists():
-            print(f"[Warning] Transcript JSON not found: {transcript_path}, skipping.")
+            print(f"[Warning] Transcript not found: {transcript_path}, skipping.")
             continue
 
-        print(f"\n--- Aligning {book_display} Chapter {ch_str}/{num_chapters:02d} ---")
-        out_praat_ch = PRAAT_OUT_DIR / f"{book_key}_{ch_str}"
-
-        alignment = align_chapter(
+        print(f"\n>>> Realigning {book_display} Chapter {ch} ...")
+        res = align_chapter(
             audio_path=audio_path,
             transcript_path=transcript_path,
-            output_dir=out_praat_ch,
+            output_dir=PRAAT_OUT_DIR,
             export_praat=export_praat,
-            reconcile=True,
             distance_metric=distance_metric,
             emissions_extractor=emissions_extractor,
             model_revision=model_revision,
         )
 
-        full_audio = AudioSegment.from_file(audio_path)
-        transcript_data = load_chapter_transcript(transcript_path)
+        audio_seg = AudioSegment.from_file(str(audio_path))
+        num_verses_aligned = len(res.aligned_segments)
+        print(f"    Aligned {num_verses_aligned} verses.")
 
-        for v_idx, v in enumerate(alignment.aligned_chunks, 1):
-            if not v.words or v.end_sec <= v.start_sec:
-                continue
+        for seg in res.aligned_segments:
+            verse_id = seg.word
+            start_sec = round(seg.start_sec, 3)
+            end_sec = round(seg.end_sec, 3)
+            dur = round(end_sec - start_sec, 3)
+            durations_sec.append(dur)
 
-            verse_num_str = f"{v_idx:02d}"
-            wav_filename = f"{book_key}_{ch_str}_{verse_num_str}.wav"
-            wav_path = SPLIT_AUDIO_DIR / wav_filename
+            # Export sliced wav
+            split_filename = f"{book_key}_{ch_str}_{verse_id}.wav"
+            split_out_path = SPLIT_AUDIO_DIR / split_filename
 
-            # Extract audio clip
-            start_ms = int(v.start_sec * 1000)
-            end_ms = int(v.end_sec * 1000)
-            clip = full_audio[start_ms:end_ms]
+            start_ms = int(start_sec * 1000)
+            end_ms = int(end_sec * 1000)
+            verse_audio = audio_seg[start_ms:end_ms]
+            verse_audio = verse_audio.set_frame_rate(16000).set_channels(1)
+            verse_audio.export(str(split_out_path), format="wav")
 
-            # Resample to 16kHz Mono 16-bit WAV
-            clip = clip.set_frame_rate(16000).set_channels(1).set_sample_width(2)
-            clip.export(wav_path, format="wav")
+            # Load verse transcript text
+            ch_data = load_chapter_transcript(transcript_path)
+            verse_info = ch_data.get(verse_id, {})
+            cherokee_text = (
+                verse_info.get("cherokee")
+                or verse_info.get("text")
+                or verse_info.get("syllabary", "")
+            )
+            phonetic_text = verse_info.get("phonetic", "")
+            english_text = verse_info.get("english", "")
 
-            # Extract reconciled sentence string and word intervals
-            syll_text = transcript_data.get(v.chunk_id, {}).get("cherokee", "")
-            rec_word_intervals = reconcile_word_intervals(v.words, syll_text)
-
-            rec_sentence = " ".join(
-                w.word for w in rec_word_intervals if w.word
-            ).strip()
-            if not rec_sentence:
-                rec_sentence = transcript_data.get(v.chunk_id, {}).get("phonetic", "")
-
-            ref_sentence = (
-                syll_text
-                if syll_text
-                else transcript_data.get(v.chunk_id, {}).get("phonetic", "")
+            # Reconcile syllabary & ASR tokens
+            asr_hyp = seg.asr_hypothesis or ""
+            reconciled = reconcile_word_intervals(
+                reference_text=cherokee_text,
+                asr_hypothesis=asr_hyp,
+                ref_start_sec=start_sec,
+                ref_end_sec=end_sec,
             )
 
-            words_data = [
-                {
-                    "word": w.word,
-                    "start_sec": w.start_sec,
-                    "end_sec": w.end_sec,
-                    "confidence": w.confidence,
-                    "flagged": w.flagged,
-                    "emitted_word": w.emitted_word,
-                }
-                for w in rec_word_intervals
-            ]
-
-            dur_sec = round(v.end_sec - v.start_sec, 3)
-            durations_sec.append(dur_sec)
-
-            rel_audio_path = f"cherokee_new_testament/split_audio/{wav_filename}"
-
-            record: Dict[str, Any] = {
-                "verse_id": v.chunk_id,
+            record = {
                 "book": book_key,
                 "chapter": ch,
-                "verse_idx": v_idx,
-                "audio_path": rel_audio_path,
-                "start_sec": round(v.start_sec, 3),
-                "end_sec": round(v.end_sec, 3),
-                "duration_sec": dur_sec,
-                "reference_sentence": ref_sentence,
-                "reconciled_phonetics": rec_sentence,
-                "asr_hypothesis": v.emitted_text,
-                "cost": float(v.distance_score),
-                "words": words_data,
+                "verse": verse_id,
+                "audio_file": split_filename,
+                "audio_path": str(split_out_path.resolve()),
+                "start_sec": start_sec,
+                "end_sec": end_sec,
+                "duration_sec": dur,
+                "distance_cost": seg.distance_cost,
+                "cherokee_syllabary": cherokee_text,
+                "phonetic": phonetic_text,
+                "english": english_text,
+                "asr_hypothesis": asr_hyp,
+                "reconciled_syllabary": reconciled.reconciled_syllabary,
+                "alignment_confidence": (
+                    reconciled.confidence if hasattr(reconciled, "confidence") else 1.0
+                ),
             }
             records.append(record)
 
-            csv_rows.append({"path": rel_audio_path, "sentence": rec_sentence})
+            csv_rows.append(
+                {
+                    "audio_file": split_filename,
+                    "syllabary": cherokee_text,
+                    "phonetic": phonetic_text,
+                    "duration": f"{dur:.3f}",
+                }
+            )
 
-    # Save book-specific alignment records
-    records_out_path = ALIGNMENTS_DIR / f"{book_key}_alignment_records.json"
-    with open(records_out_path, "w", encoding="utf-8") as f:
+    # Export per-book alignment JSON
+    book_alignments_path = ALIGNMENTS_DIR / f"{book_key}_alignment_records.json"
+    with open(book_alignments_path, "w", encoding="utf-8") as f:
         json.dump(records, f, indent=2, ensure_ascii=False)
     print(
-        f"\n[Artifact] Saved {len(records)} alignment records to '{records_out_path}'"
+        f"\n[Artifact] Saved {len(records)} alignment records to '{book_alignments_path}'"
     )
 
-    # Save training CSV
-    csv_out_path = TRAIN_CSVS_DIR / f"{book_key}.csv"
-    with open(csv_out_path, "w", encoding="utf-8", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=["path", "sentence"])
+    # Export training CSV
+    train_csv_path = TRAIN_CSVS_DIR / f"{book_key}_train.csv"
+    with open(train_csv_path, "w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(
+            f, fieldnames=["audio_file", "syllabary", "phonetic", "duration"]
+        )
         writer.writeheader()
         writer.writerows(csv_rows)
-    print(f"[Artifact] Saved {len(csv_rows)} CSV rows to '{csv_out_path}'")
+    print(
+        f"[Artifact] Saved training CSV with {len(csv_rows)} rows to '{train_csv_path}'"
+    )
 
     if durations_sec:
-        min_len = min(durations_sec)
-        max_len = max(durations_sec)
-        median_len = float(np.median(durations_sec))
         total_sec = sum(durations_sec)
-
-        print(f"\n=== Audio Statistics for Book of {book_display} ===")
-        print(f"Total verse segments : {len(durations_sec)}")
-        print(f"Min verse length     : {min_len:.2f} seconds")
-        print(f"Max verse length     : {max_len:.2f} seconds")
+        mean_len = float(np.mean(durations_sec))
+        median_len = float(np.median(durations_sec))
+        print(f"\n--- {book_display} Audio Slicing Summary ---")
+        print(f"Total sliced segments: {len(durations_sec)}")
+        print(f"Mean verse length    : {mean_len:.2f} seconds")
         print(f"Median verse length  : {median_len:.2f} seconds")
         print(
             f"Total audio duration : {total_sec:.2f} seconds ({total_sec/60:.2f} minutes / {total_sec/3600:.2f} hours)"
@@ -256,11 +262,13 @@ def realign_book(
 
 
 def realign_all(
+    model_repo: str = DEFAULT_MODEL_REPO,
     model_revision: str = DEFAULT_REVISION,
     export_praat: bool = True,
 ) -> Dict[str, List[Dict[str, Any]]]:
     cached_extractor, distance_metric = get_default_extractor_and_metric(
-        model_revision=model_revision
+        model_repo=model_repo,
+        model_revision=model_revision,
     )
 
     all_records: List[Dict[str, Any]] = []
@@ -271,6 +279,7 @@ def realign_all(
             book=book,
             distance_metric=distance_metric,
             emissions_extractor=cached_extractor,
+            model_repo=model_repo,
             model_revision=model_revision,
             export_praat=export_praat,
         )
@@ -300,6 +309,11 @@ def main():
         help="Book to realign (default: all)",
     )
     parser.add_argument(
+        "--model-repo",
+        default=DEFAULT_MODEL_REPO,
+        help=f"HF model repository (default: {DEFAULT_MODEL_REPO})",
+    )
+    parser.add_argument(
         "--model-revision",
         default=DEFAULT_REVISION,
         help=f"HF model revision (default: {DEFAULT_REVISION})",
@@ -315,12 +329,14 @@ def main():
 
     if args.book == "all":
         realign_all(
+            model_repo=args.model_repo,
             model_revision=args.model_revision,
             export_praat=not args.no_praat,
         )
     else:
         records, _ = realign_book(
             book=args.book,
+            model_repo=args.model_repo,
             model_revision=args.model_revision,
             export_praat=not args.no_praat,
         )
