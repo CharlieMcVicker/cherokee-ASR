@@ -132,3 +132,4 @@ transcriber_dist
 # Large streaming evaluation cache
 *.jsonl
 runs/**/*.jsonl
+runs/cache/

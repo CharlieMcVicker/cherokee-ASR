@@ -76,6 +76,7 @@ flowchart TD
 | Ingestion | [`ingestion.py`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/ingestion.py) | `prepare_alignment_input` (sum-type dispatcher & normalizer resolver), `load_bible_chunks`, and `load_generic_chunks`. |
 | Reconciliation | [`reconciliation.py`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/reconciliation.py) | `reconcile_word_intervals`, `reconcile_alignment_words`, `reconcile_alignment_by_chunk`. |
 | Exporters | [`exporters.py`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/exporters.py) | `export_manifest`, `export_textgrid` (multi-tier Praat), `export_debug_json`. |
+| Thresholding | [`threshold_finder.py`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/threshold_finder.py) | `AlignmentThresholdFinder`, interactive binary search CLI, and threshold metrics exporter. |
 | CLI / Pipeline | [`cli.py`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/cli.py) | `run_alignment_pipeline` orchestrator and `align-cherokee` CLI entrypoint. |
 
 ---
@@ -946,4 +947,50 @@ aligner = SlidingWindowDTWAligner(word_aligner=NeedlemanWunschWordAligner())
 alignment = aligner.align(emissions=emissions, chunks=chunks, source_id="in_memory_sample")
 
 print(f"Aligned chunk start: {alignment.aligned_chunks[0].start_sec}s, end: {alignment.aligned_chunks[0].end_sec}s")
+```
+
+---
+
+## 10. Alignment Cost Thresholding (`AlignmentThresholdFinder`)
+
+The [`AlignmentThresholdFinder`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/threshold_finder.py) provides an interactive binary search tool to establish the optimal cost threshold $T^*$ over dataset alignment distributions.
+
+### Interactive CLI Usage
+
+```bash
+# Launch interactive binary search over Bible alignment manifests
+python scripts/find_alignment_threshold.py
+
+# Specify custom inputs, sample counts, and convergence tolerance
+python scripts/find_alignment_threshold.py \
+    --input output_praat/new_testament \
+    --samples 3 \
+    --tolerance 0.005 \
+    --output runs/evaluation/alignment_threshold.json
+```
+
+### Automated / Headless Usage
+
+```bash
+# Directly set a cost threshold and export distribution statistics
+python scripts/find_alignment_threshold.py --threshold 0.15
+
+# Set threshold by target dataset retention quantile (e.g. 90th percentile)
+python scripts/find_alignment_threshold.py --quantile 0.90
+```
+
+### Programmatic Python API
+
+```python
+from transcription.alignment import load_alignment_records, AlignmentThresholdFinder, find_threshold_bounds
+
+# 1. Ingest alignment records from directory, JSON manifest, or CSV
+records, source_files = load_alignment_records("output_praat/new_testament")
+
+# 2. Run interactive or callback search
+finder = AlignmentThresholdFinder(records, tolerance=0.005)
+metrics = finder.run(quantile=0.85)
+
+# 3. Export threshold summary configuration
+finder.export_results(metrics, "runs/evaluation/alignment_threshold.json")
 ```

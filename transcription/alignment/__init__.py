@@ -9,6 +9,9 @@ from transcription.alignment.aligner import (
     SlidingWindowDTWAligner,
 )
 from transcription.alignment.cli import run_alignment_pipeline
+from transcription.alignment.calibrated_distance_metrics import (
+    PhonologicalConfusionCostMetric,
+)
 from transcription.alignment.distance_metrics import (
     CharacterErrorRateMetric,
     ConfusionMatrixCostMetric,
@@ -25,6 +28,7 @@ from transcription.alignment.exporters import (
 )
 from transcription.alignment.extractors import (
     ASREmissionsExtractor,
+    CachedASREmissionsExtractor,
     CallbackEmissionsExtractor,
     CherokeeASRExtractor,
     PrecomputedEmissionsExtractor,
@@ -53,6 +57,15 @@ from transcription.alignment.reconciliation import (
     reconcile_alignment_words,
     reconcile_word_intervals,
 )
+from transcription.alignment.threshold_finder import (
+    AlignmentRecord,
+    AlignmentThresholdFinder,
+    ThresholdMetrics,
+    ThresholdSearchStep,
+    find_threshold_bounds,
+    load_alignment_records,
+    parse_verse_reference,
+)
 
 __all__ = [
     # Models
@@ -71,6 +84,7 @@ __all__ = [
     "normalize_text_for_alignment",
     # Extractors
     "ASREmissionsExtractor",
+    "CachedASREmissionsExtractor",
     "CherokeeASRExtractor",
     "CallbackEmissionsExtractor",
     "PrecomputedEmissionsExtractor",
@@ -80,6 +94,7 @@ __all__ = [
     "DefaultCERDistanceMetric",
     "CharacterErrorRateMetric",
     "ConfusionMatrixCostMetric",
+    "PhonologicalConfusionCostMetric",
     "LevenshteinDistanceMetric",
     "CustomCallableDistanceMetric",
     "calculate_cer",
@@ -96,4 +111,12 @@ __all__ = [
     "export_debug_json",
     # Pipeline / CLI
     "run_alignment_pipeline",
+    # Threshold Finder
+    "AlignmentRecord",
+    "AlignmentThresholdFinder",
+    "ThresholdMetrics",
+    "ThresholdSearchStep",
+    "find_threshold_bounds",
+    "load_alignment_records",
+    "parse_verse_reference",
 ]

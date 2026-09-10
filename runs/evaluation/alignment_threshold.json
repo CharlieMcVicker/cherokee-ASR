@@ -1,0 +1,23 @@
+{
+  "threshold": 0.09835,
+  "total_verses": 678,
+  "accepted_count": 631,
+  "rejected_count": 47,
+  "acceptance_rate": 0.9307,
+  "percentile": 93.07,
+  "cost_min": 0.0,
+  "cost_max": 0.1967,
+  "cost_mean": 0.0594,
+  "cost_median": 0.0571,
+  "mean_accepted_cost": 0.0551,
+  "mean_rejected_cost": 0.1174,
+  "t_low": 0.0,
+  "t_high": 0.1967,
+  "tolerance": 0.005,
+  "iterations": 0,
+  "timestamp": "2026-09-10T20:03:05.378291+00:00",
+  "source_files": [
+    "cherokee_new_testament/alignments/mark_alignment_records.json"
+  ],
+  "history": []
+}

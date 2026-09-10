@@ -16,6 +16,16 @@ from typing import Any, Optional
 import numpy as np
 
 
+def probability_to_normalized_cost(prob: float, epsilon: float = 1e-5) -> float:
+    """
+    Convert conditional probability into clamped normalized logarithmic cost.
+    """
+    if not (0.0 < epsilon < 1.0):
+        raise ValueError(f"epsilon must be strictly between 0 and 1, got {epsilon}")
+    val = float(np.log(prob + epsilon) / np.log(epsilon))
+    return float(np.clip(val, 0.0, 1.0))
+
+
 class ConfusionCostEngine:
     """
     Transforms conditional confusion probabilities into clamped normalized log costs.
@@ -29,6 +39,8 @@ class ConfusionCostEngine:
                 val = ln(P[i, j] + epsilon) / ln(epsilon)
                 cost = clip(val, 0.0, 1.0)
     """
+
+    probability_to_normalized_cost = staticmethod(probability_to_normalized_cost)
 
     def __init__(self) -> None:
         pass

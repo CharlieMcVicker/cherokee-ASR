@@ -406,3 +406,22 @@ def test_end_to_end_confusion_and_cost_pipeline(tmp_path: Path) -> None:
     assert reloaded["vocabulary"] == vocab
     for ch in vocab:
         assert reloaded["unigram_costs"][ch][ch] == 0.0
+
+
+def test_probability_to_normalized_cost():
+    from transcription.evaluation.cost_engine import probability_to_normalized_cost
+
+    # Boundary conditions
+    assert pytest.approx(probability_to_normalized_cost(1.0), 0.001) == 0.0
+    assert pytest.approx(probability_to_normalized_cost(0.0), 0.001) == 1.0
+
+    # Intermediate values with standard epsilon=1e-5
+    cost_half = probability_to_normalized_cost(0.5, epsilon=1e-5)
+    assert 0.0 < cost_half < 1.0
+    assert pytest.approx(cost_half, 0.01) == 0.06
+
+    # Invalid epsilon raises ValueError
+    with pytest.raises(ValueError):
+        probability_to_normalized_cost(0.5, epsilon=0.0)
+    with pytest.raises(ValueError):
+        probability_to_normalized_cost(0.5, epsilon=1.0)

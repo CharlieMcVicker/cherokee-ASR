@@ -9,7 +9,10 @@ from transcription.evaluation.confusion import (
     ConfusionAccumulator,
     character_levenshtein_align,
 )
-from transcription.evaluation.cost_engine import ConfusionCostEngine
+from transcription.evaluation.cost_engine import (
+    ConfusionCostEngine,
+    probability_to_normalized_cost,
+)
 from transcription.evaluation.evaluator import (
     EvaluationRecord,
     NoisyEvaluator,
@@ -32,6 +35,7 @@ __all__ = [
     "ConfusionAccumulator",
     "character_levenshtein_align",
     "ConfusionCostEngine",
+    "probability_to_normalized_cost",
     "PhoneticManifoldAnalyzer",
     "ManifoldVisualizer",
     "AudioTransform",

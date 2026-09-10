@@ -16,10 +16,13 @@ from transcription.alignment.aligner import (
 )
 from transcription.alignment.exporters import (
     export_debug_json,
-    export_manifest,
+    export_manifest as export_manifest_file,
     export_textgrid,
 )
-from transcription.alignment.extractors import CherokeeASRExtractor
+from transcription.alignment.extractors import (
+    ASREmissionsExtractor,
+    CherokeeASRExtractor,
+)
 from transcription.alignment.ingestion import prepare_alignment_input
 from transcription.alignment.models import AlignmentOutput
 from transcription.alignment.reconciliation import reconcile_alignment_words
@@ -37,6 +40,8 @@ def run_alignment_pipeline(
     skip_vad: bool = False,
     debug_export: bool = False,
     reconcile: bool = False,
+    distance_metric: Optional[Any] = None,
+    emissions_extractor: Optional[ASREmissionsExtractor] = None,
 ) -> AlignmentOutput:
     """
     High-level programmatic runner executing the end-to-end alignment pipeline.
@@ -62,16 +67,20 @@ def run_alignment_pipeline(
 
     print(f"[3/4] Running ASR emission extraction & alignment...")
 
-    token = os.environ.get("HF_TOKEN", None)
-    asr_model = CherokeeASRModel.from_pretrained_or_best(
-        path_or_repo=model_path,
-        token=token,
-    )
+    if emissions_extractor is not None:
+        extractor = emissions_extractor
+    else:
+        token = os.environ.get("HF_TOKEN", None)
+        asr_model = CherokeeASRModel.from_pretrained_or_best(
+            path_or_repo=model_path,
+            token=token,
+        )
+        extractor = CherokeeASRExtractor(model=asr_model, skip_vad=skip_vad)
 
-    extractor = CherokeeASRExtractor(model=asr_model, skip_vad=skip_vad)
     emissions = extractor.extract(audio_path)
 
     word_aligner = NeedlemanWunschWordAligner(
+        distance_metric=distance_metric,
         chunk_normalizer=chunk_norm,
         emission_normalizer=emission_norm,
     )
@@ -92,7 +101,7 @@ def run_alignment_pipeline(
     os.makedirs(output_dir, exist_ok=True)
 
     if export_manifest:
-        globals()["export_manifest"](
+        export_manifest_file(
             alignment=alignment,
             output_dir=output_dir,
             source_metadata=source_lookup,

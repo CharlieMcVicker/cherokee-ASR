@@ -5,6 +5,9 @@ extractors.py
 Concrete ASREmissionsExtractor implementations and audio chunk preparation helper.
 """
 
+import hashlib
+import json
+from pathlib import Path
 from typing import (
     Any,
     Callable,
@@ -241,3 +244,150 @@ class PrecomputedEmissionsExtractor(ASREmissionsExtractor):
     def extract(self, audio_input: Any = None) -> List[TokenEmission]:
         """Returns precomputed token emissions."""
         return list(self.token_emissions)
+
+
+class CachedASREmissionsExtractor(ASREmissionsExtractor):
+    """
+    Caching ASREmissionsExtractor wrapper that persists TokenEmission lists to disk.
+    Bypasses wrapped ASR model inference on cache hits using deterministic cache keys.
+    """
+
+    def __init__(
+        self,
+        extractor: ASREmissionsExtractor,
+        cache_dir: Optional[Union[str, Path]] = None,
+        cache_key_prefix: Optional[str] = None,
+    ):
+        self.extractor = extractor
+        self.cache_dir = (
+            Path(cache_dir) if cache_dir is not None else Path(".cache/emissions")
+        )
+        self.cache_key_prefix = cache_key_prefix
+
+    def _resolve_prefix(self) -> str:
+        if self.cache_key_prefix is not None:
+            return str(self.cache_key_prefix)
+        extractor = self.extractor
+        if hasattr(extractor, "model"):
+            model = getattr(extractor, "model")
+            if hasattr(model, "model_name") and model.model_name:
+                return str(model.model_name)
+            name_attr = getattr(model, "name", None)
+            if name_attr:
+                return str(name_attr)
+        ext_name = getattr(extractor, "name", None)
+        if ext_name:
+            return str(ext_name)
+        return extractor.__class__.__name__
+
+    def _get_cache_key(self, audio_input: Any) -> Optional[str]:
+        if audio_input is None:
+            return None
+
+        prefix = self._resolve_prefix()
+
+        if isinstance(audio_input, (str, Path)):
+            p = Path(audio_input)
+            if p.exists() and p.is_file():
+                try:
+                    stat = p.stat()
+                    raw_id = f"{prefix}|{p.resolve()}|{stat.st_mtime_ns}|{stat.st_size}"
+                except OSError:
+                    raw_id = f"{prefix}|{p.resolve()}"
+            else:
+                raw_id = f"{prefix}|{str(audio_input)}"
+            return hashlib.sha256(raw_id.encode("utf-8")).hexdigest()
+
+        if isinstance(audio_input, AudioSegment):
+            hasher = hashlib.sha256()
+            hasher.update(prefix.encode("utf-8"))
+            hasher.update(
+                f"|channels:{audio_input.channels}|frame_rate:{audio_input.frame_rate}|sample_width:{audio_input.sample_width}|".encode(
+                    "utf-8"
+                )
+            )
+            raw = getattr(audio_input, "raw_data", None)
+            if isinstance(raw, (bytes, bytearray, memoryview)):
+                hasher.update(raw)
+            return hasher.hexdigest()
+
+        if isinstance(audio_input, np.ndarray):
+            hasher = hashlib.sha256()
+            hasher.update(prefix.encode("utf-8"))
+            hasher.update(
+                f"|dtype:{audio_input.dtype}|shape:{audio_input.shape}|".encode("utf-8")
+            )
+            hasher.update(audio_input.tobytes())
+            return hasher.hexdigest()
+
+        if isinstance(audio_input, (bytes, bytearray)):
+            hasher = hashlib.sha256()
+            hasher.update(prefix.encode("utf-8"))
+            hasher.update(b"|bytes|")
+            hasher.update(bytes(audio_input))
+            return hasher.hexdigest()
+
+        raw_id = f"{prefix}|{repr(audio_input)}"
+        return hashlib.sha256(raw_id.encode("utf-8")).hexdigest()
+
+    def _get_cache_path(self, cache_key: str) -> Path:
+        return self.cache_dir / f"{cache_key}.json"
+
+    def _load_from_cache(self, cache_path: Path) -> Optional[List[TokenEmission]]:
+        if not cache_path.exists():
+            return None
+        try:
+            with open(cache_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            if not isinstance(data, list):
+                return None
+            return [
+                TokenEmission(
+                    word=str(item["word"]),
+                    start_sec=float(item["start_sec"]),
+                    end_sec=float(item["end_sec"]),
+                    confidence=float(item.get("confidence", 1.0)),
+                )
+                for item in data
+                if isinstance(item, dict)
+                and "word" in item
+                and "start_sec" in item
+                and "end_sec" in item
+            ]
+        except Exception:
+            return None
+
+    def _save_to_cache(self, cache_path: Path, emissions: List[TokenEmission]) -> None:
+        self.cache_dir.mkdir(parents=True, exist_ok=True)
+        data = [
+            {
+                "word": t.word,
+                "start_sec": t.start_sec,
+                "end_sec": t.end_sec,
+                "confidence": t.confidence,
+            }
+            for t in emissions
+        ]
+        temp_path = cache_path.with_suffix(".tmp")
+        with open(temp_path, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+        temp_path.replace(cache_path)
+
+    def extract(self, audio_input: Any = None) -> List[TokenEmission]:
+        """Extracts token emissions with timestamps from audio input, utilizing disk caching."""
+        if audio_input is None:
+            return []
+
+        cache_key = self._get_cache_key(audio_input)
+        if cache_key is not None:
+            cache_path = self._get_cache_path(cache_key)
+            cached_emissions = self._load_from_cache(cache_path)
+            if cached_emissions is not None:
+                return cached_emissions
+
+        emissions = self.extractor.extract(audio_input)
+        if cache_key is not None:
+            cache_path = self._get_cache_path(cache_key)
+            self._save_to_cache(cache_path, emissions)
+
+        return emissions

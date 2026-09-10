@@ -5,10 +5,25 @@ Imports and integrates VAD segmentation, timestamp/character alignment, and syll
 """
 
 import json
+import os
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 from transcription.alignment.cli import run_alignment_pipeline
+from transcription.alignment.calibrated_distance_metrics import (
+    PhonologicalConfusionCostMetric,
+)
+from transcription.alignment.distance_metrics import (
+    ConfusionMatrixCostMetric,
+    DistanceMetric,
+)
+from transcription.alignment.extractors import (
+    ASREmissionsExtractor,
+    CachedASREmissionsExtractor,
+    CherokeeASRExtractor,
+)
+from transcription.alignment.models import AlignmentOutput
+from transcription.models.asr_model import CherokeeASRModel
 from transcription.syllabary_enrichment import (
     align_character_syllable,
     reconcile_phonetics,
@@ -41,7 +56,11 @@ def align_chapter(
     model_path: Optional[str] = None,
     skip_vad: bool = False,
     reconcile: bool = True,
-) -> Any:
+    distance_metric: Optional[DistanceMetric] = None,
+    emissions_extractor: Optional[ASREmissionsExtractor] = None,
+    model_revision: Optional[str] = None,
+    cache_dir: Optional[Union[str, Path]] = None,
+) -> AlignmentOutput:
     """
     Align a New Testament audio recording with its syllabary transcript end-to-end.
 
@@ -49,6 +68,39 @@ def align_chapter(
     performing VAD, ground-truth ingest, ASR CTC emissions extraction, DTW alignment,
     reconciliation, and automatic Praat TextGrid / alignment manifest export.
     """
+    if distance_metric is None:
+        cost_matrix_path = Path("runs/evaluation/confusion_cost_matrix_prebible.json")
+        if not cost_matrix_path.exists():
+            repo_root = Path(__file__).resolve().parent.parent.parent
+            candidate = (
+                repo_root / "runs/evaluation/confusion_cost_matrix_prebible.json"
+            )
+            if candidate.exists():
+                cost_matrix_path = candidate
+        if cost_matrix_path.exists():
+            base_metric = ConfusionMatrixCostMetric.from_json(cost_matrix_path)
+            distance_metric = PhonologicalConfusionCostMetric(base_metric=base_metric)
+
+    if emissions_extractor is None:
+        rev = model_revision or "5464d15"
+        repo = model_path or "charliemcvicker/asr-cherokee"
+        token = os.environ.get("HF_TOKEN", None)
+        asr_model = CherokeeASRModel.from_pretrained_or_best(
+            path_or_repo=repo,
+            revision=rev,
+            token=token,
+        )
+        base_extractor = CherokeeASRExtractor(model=asr_model, skip_vad=skip_vad)
+        c_dir = (
+            Path(cache_dir) if cache_dir is not None else Path("runs/cache/emissions")
+        )
+        c_prefix = f"charliemcvicker_asr-cherokee_{rev}"
+        emissions_extractor = CachedASREmissionsExtractor(
+            extractor=base_extractor,
+            cache_dir=c_dir,
+            cache_key_prefix=c_prefix,
+        )
+
     return run_alignment_pipeline(
         audio_path=str(audio_path),
         output_dir=str(output_dir),
@@ -57,6 +109,8 @@ def align_chapter(
         model_path=model_path,
         skip_vad=skip_vad,
         reconcile=reconcile,
+        distance_metric=distance_metric,
+        emissions_extractor=emissions_extractor,
     )
 
 

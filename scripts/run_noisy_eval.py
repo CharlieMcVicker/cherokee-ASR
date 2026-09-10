@@ -175,6 +175,37 @@ def parse_args() -> argparse.Namespace:
         help="Path or HuggingFace repo ID of the model checkpoint to evaluate.",
     )
     parser.add_argument(
+        "--revision",
+        type=str,
+        default=None,
+        help="Git commit hash, branch name, or tag of the HuggingFace model checkpoint.",
+    )
+    parser.add_argument(
+        "--output-suffix",
+        "--suffix",
+        type=str,
+        default=None,
+        help="Optional suffix to append to output file names (e.g. '_prebible' or 'prebible').",
+    )
+    parser.add_argument(
+        "--eval-records-filename",
+        type=str,
+        default=None,
+        help="Explicit filename for evaluation records JSONL (overrides default/suffix).",
+    )
+    parser.add_argument(
+        "--confusion-matrix-filename",
+        type=str,
+        default=None,
+        help="Explicit filename for confusion matrix CSV (overrides default/suffix).",
+    )
+    parser.add_argument(
+        "--cost-matrix-filename",
+        type=str,
+        default=None,
+        help="Explicit filename for confusion cost matrix JSON (overrides default/suffix).",
+    )
+    parser.add_argument(
         "--device",
         type=str,
         default=None,
@@ -303,12 +334,14 @@ def main() -> None:
         evaluator = NoisyEvaluator(model=mock_model, top_k=args.top_k)
     else:
         logger.info(
-            "Instantiating CherokeeASRModel (checkpoint: %s, device: %s)...",
+            "Instantiating CherokeeASRModel (checkpoint: %s, revision: %s, device: %s)...",
             args.checkpoint,
+            args.revision,
             args.device,
         )
         model = CherokeeASRModel.from_pretrained_or_best(
             path_or_repo=args.checkpoint,
+            revision=args.revision,
             device=args.device,
         )
         evaluator = NoisyEvaluator(model=model, top_k=args.top_k)
@@ -320,8 +353,26 @@ def main() -> None:
             transform = AdditiveNoise(snr_db=snr, noise_type=ntype)
             perturbations_by_tier.append((float(snr), str(ntype), transform))
 
+    # Resolve output artifact filenames
+    suffix = f"_{args.output_suffix.lstrip('_')}" if args.output_suffix else ""
+    eval_jsonl_filename = args.eval_records_filename or f"eval_records{suffix}.jsonl"
+    eval_jsonl_path = out_dir / eval_jsonl_filename
+
+    confusion_csv_filename = (
+        args.confusion_matrix_filename or f"confusion_matrix{suffix}.csv"
+    )
+    confusion_csv_path = out_dir / confusion_csv_filename
+
+    cost_json_filename = (
+        args.cost_matrix_filename or f"confusion_cost_matrix{suffix}.json"
+    )
+    cost_json_path = out_dir / cost_json_filename
+
+    heatmap_path = out_dir / f"confusion_vs_cost_heatmap{suffix}.png"
+    mesh_path = out_dir / f"confusion_manifold_3d{suffix}.png"
+    drift_path = out_dir / f"snr_drift{suffix}.png"
+
     # 4. Run stream evaluation
-    eval_jsonl_path = out_dir / "eval_records.jsonl"
     logger.info(
         "Streaming evaluation across %d conditions to %s...",
         len(perturbations_by_tier),
@@ -353,7 +404,6 @@ def main() -> None:
     )
 
     # Export confusion matrix CSV
-    confusion_csv_path = out_dir / "confusion_matrix.csv"
     with open(confusion_csv_path, "w", encoding="utf-8") as f:
         f.write("," + ",".join(labels) + "\n")
         for i, ref in enumerate(labels):
@@ -372,7 +422,6 @@ def main() -> None:
         labels=labels,
         raw_counts=raw_counts,
     )
-    cost_json_path = out_dir / "confusion_cost_matrix.json"
     cost_engine.save_cost_artifact(cost_dict, cost_json_path)
     logger.info("Saved cost matrix artifact JSON to %s", cost_json_path)
 
@@ -393,7 +442,6 @@ def main() -> None:
         perm_cost = cost_matrix[np.ix_(permuted_indices, permuted_indices)]
 
         # 8. Render Visualizations
-        heatmap_path = out_dir / "confusion_vs_cost_heatmap.png"
         logger.info(
             "Rendering side-by-side confusion & cost heatmaps to %s...", heatmap_path
         )
@@ -406,7 +454,6 @@ def main() -> None:
             title="Phonetic Confusion Probabilities vs. Substitution Costs",
         )
 
-        mesh_path = out_dir / "confusion_manifold_3d.png"
         logger.info("Rendering 3D confusion manifold mesh to %s...", mesh_path)
         ManifoldVisualizer.plot_3d_confusion_mesh(
             perm_conf,
@@ -443,7 +490,6 @@ def main() -> None:
             n_comp = 1
         snr_comp_counts.append(n_comp)
 
-    drift_path = out_dir / "snr_drift.png"
     logger.info("Rendering SNR drift diagnostics to %s...", drift_path)
     ManifoldVisualizer.plot_snr_drift(
         snr_levels=unique_snrs,
@@ -479,9 +525,9 @@ def main() -> None:
     print(f"  • Eval Records JSONL: {eval_jsonl_path}")
     print(f"  • Confusion Matrix:   {confusion_csv_path}")
     print(f"  • Cost Matrix JSON:   {cost_json_path}")
-    print(f"  • Heatmaps Plot:      {out_dir / 'confusion_vs_cost_heatmap.png'}")
+    print(f"  • Heatmaps Plot:      {heatmap_path}")
     print(f"  • SNR Drift Plot:     {drift_path}")
-    print(f"  • 3D Manifold Plot:   {out_dir / 'confusion_manifold_3d.png'}")
+    print(f"  • 3D Manifold Plot:   {mesh_path}")
     print("=" * 60 + "\n")
 
 

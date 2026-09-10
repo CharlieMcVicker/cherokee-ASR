@@ -93,3 +93,35 @@ def test_reconcile_alignment_words_and_by_chunk(monkeypatch):
     assert chunk_map["c1"][0].word == "osiyo_reconciled"
     assert len(chunk_map["c2"]) == 1
     assert chunk_map["c2"][0].word == "tohiju"
+
+
+def test_reconcile_word_intervals_with_fused_words(monkeypatch):
+    # Fused words interval "tsisa kalonetv" (2 words) matching "tsi33hsa2ka2lo22ne23ta"
+    monkeypatch.setattr(
+        "transcription.alignment.reconciliation.align_character_syllable",
+        lambda s, e: [(s, e)],
+    )
+    monkeypatch.setattr(
+        "transcription.alignment.reconciliation.reconcile_phonetics",
+        lambda syllabary_text, base_transliteration, emitted_text, aligned_pairs: f"rec_{syllabary_text}",
+    )
+
+    intervals = [
+        WordInterval(
+            word="ataleniskv", start_sec=0.0, end_sec=1.0, emitted_word="adalenisgv"
+        ),
+        WordInterval(
+            word="tsisa kalonetv",
+            start_sec=1.0,
+            end_sec=2.5,
+            emitted_word="tsisagaloneda",
+        ),
+        WordInterval(word="uwetsi", start_sec=2.5, end_sec=3.0, emitted_word="uwetsi"),
+    ]
+    syll_text = "ᎠᏓᎴᏂᏍᎬ ᏥᏌ ᎦᎶᏁᏛ ᎤᏪᏥ"
+    out = reconcile_word_intervals(intervals, syllabary_text=syll_text)
+
+    assert len(out) == 3
+    assert out[0].word == "rec_ᎠᏓᎴᏂᏍᎬ"
+    assert out[1].word == "rec_ᏥᏌ ᎦᎶᏁᏛ"
+    assert out[2].word == "rec_ᎤᏪᏥ"
