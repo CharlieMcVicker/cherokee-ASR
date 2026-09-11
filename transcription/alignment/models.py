@@ -49,6 +49,14 @@ class AlignedChunk:
     distance_score: float = 1.0
     emitted_text: str = ""
 
+    @property
+    def has_anomalies(self) -> bool:
+        return any(w.flagged for w in self.words)
+
+    @property
+    def flagged_words(self) -> List[WordInterval]:
+        return [w for w in self.words if w.flagged]
+
 
 @dataclass
 class AlignmentMetrics:
@@ -60,6 +68,7 @@ class AlignmentMetrics:
     mean_distance_score: float
     total_ground_truth_chars: int
     total_emitted_chars: int
+    flagged_words_count: int = 0
 
 
 @dataclass

@@ -8,6 +8,9 @@ from transcription.alignment.aligner import (
     NeedlemanWunschWordAligner,
     SlidingWindowDTWAligner,
 )
+from transcription.alignment.ctc_aligner import (
+    CTCSegmentationAligner,
+)
 from transcription.alignment.cli import run_alignment_pipeline
 from transcription.alignment.calibrated_distance_metrics import (
     PhonologicalConfusionCostMetric,
@@ -101,6 +104,7 @@ __all__ = [
     # Aligners
     "NeedlemanWunschWordAligner",
     "SlidingWindowDTWAligner",
+    "CTCSegmentationAligner",
     # Reconciliation
     "reconcile_word_intervals",
     "reconcile_alignment_words",
