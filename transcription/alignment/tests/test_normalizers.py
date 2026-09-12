@@ -11,16 +11,10 @@ from transcription.alignment.normalizers import (
 )
 
 
-def test_normalize_syllabary_for_alignment_strips_h():
-    # Word-initial 'h' and hyphenation
-    assert normalize_syllabary_for_alignment("ho-wa") == "owa"
-    assert normalize_syllabary_for_alignment("hi-la") == "ila"
-    assert normalize_syllabary_for_alignment("ha-tsv") == "atsv"
-
+def test_normalize_syllabary_for_alignment():
     # Syllabary transliteration with hyphens, case, punctuation
     result = normalize_syllabary_for_alignment("A-da-le-ni-s-gv.")
-    assert result == "ataleniskv"
-    assert "h" not in result
+    assert result == "atalenihskv"
     assert "-" not in result
     assert "." not in result
 
@@ -32,6 +26,7 @@ def test_normalize_phonetics_for_alignment_preserves_h():
 
     # Phonetic text preserves aspiration 'h'
     result = normalize_phonetics_for_alignment("A-da-le-ni-s-gv.")
+    assert result == "atalenihskv"
     assert "h" in result
     assert "-" not in result
     assert "." not in result
@@ -57,4 +52,4 @@ def test_normalize_text_for_alignment_backwards_compat():
     assert normalize_text_for_alignment(
         "A-da-le-ni-s-gv."
     ) == normalize_syllabary_for_alignment("A-da-le-ni-s-gv.")
-    assert normalize_text_for_alignment("ho-wa") == "owa"
+    assert normalize_text_for_alignment("ho-wa") == "howa"

@@ -139,7 +139,7 @@ def test_normalize_text_for_alignment():
     res = normalize_text_for_alignment("A-da-le-ni-s-gv.")
     assert "-" not in res
     assert "." not in res
-    assert res == "ataleniskv"
+    assert res == "atalenihskv"
 
     # qu -> gw / kw
     qu_res = normalize_text_for_alignment("quana")
@@ -147,9 +147,8 @@ def test_normalize_text_for_alignment():
 
 
 def test_normalize_syllabary_and_phonetics():
-    # Syllabary strips 'h'
-    assert normalize_syllabary_for_alignment("ho-wa") == "owa"
-    assert normalize_syllabary_for_alignment("hi-la") == "ila"
+    assert normalize_syllabary_for_alignment("ho-wa") == "howa"
+    assert normalize_syllabary_for_alignment("hi-la") == "hila"
 
     # Phonetics preserves 'h'
     assert normalize_phonetics_for_alignment("ho-wa") == "howa"

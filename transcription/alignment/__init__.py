@@ -10,6 +10,7 @@ from transcription.alignment.aligner import (
 )
 from transcription.alignment.ctc_aligner import (
     CTCSegmentationAligner,
+    get_logits_cached,
 )
 from transcription.alignment.cli import run_alignment_pipeline
 from transcription.alignment.calibrated_distance_metrics import (
@@ -105,6 +106,7 @@ __all__ = [
     "NeedlemanWunschWordAligner",
     "SlidingWindowDTWAligner",
     "CTCSegmentationAligner",
+    "get_logits_cached",
     # Reconciliation
     "reconcile_word_intervals",
     "reconcile_alignment_words",

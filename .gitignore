@@ -10,6 +10,7 @@ data/processed/sentence_audio
 archive/sentence_audio.zip
 
 .DS_Store
+.cache/
 .venv/
 __pycache__/
 */__pycache__/

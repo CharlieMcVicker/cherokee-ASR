@@ -6,6 +6,7 @@ CTC Segmentation Aligner adapter integrating syncope-aware forward DP trellis
 segmentation with workshop-transcription alignment domain models and pipelines.
 """
 
+import hashlib
 import logging
 import os
 from pathlib import Path
@@ -38,6 +39,9 @@ from transcription.models.asr_model import CherokeeASRModel
 logger = logging.getLogger(__name__)
 
 DEFAULT_SYNCOPE_TOKENS = ("a", "e", "i", "o", "u", "v")
+DEFAULT_CACHE_DIR = (
+    Path(__file__).resolve().parent.parent.parent / ".cache" / "ctc_emissions"
+)
 
 
 class CTCSegmentationAligner:
@@ -62,6 +66,8 @@ class CTCSegmentationAligner:
         intrusive_penalty: float = 0.1,
         flag_min_confidence: float = 0.0002,
         flag_min_char_duration_sec: float = 0.03,
+        cache: bool = False,
+        cache_dir: Optional[Union[str, Path]] = None,
     ):
         self.model = model
         self.syncope_tokens = list(syncope_tokens)
@@ -76,6 +82,8 @@ class CTCSegmentationAligner:
         self.max_window_size = max_window_size
         self.buffer_trail_ms = buffer_trail_ms
         self.buffer_lead_ms = buffer_lead_ms
+        self.cache = cache
+        self.cache_dir = Path(cache_dir) if cache_dir is not None else DEFAULT_CACHE_DIR
 
     def _get_char_list_and_blank(
         self, asr_model: CherokeeASRModel
@@ -155,6 +163,130 @@ class CTCSegmentationAligner:
 
         return lpz, total_audio_sec, lead_offset_sec
 
+    def _compute_cache_key(
+        self,
+        audio_input: Union[str, Path, AudioSegment, np.ndarray],
+        asr_model: Optional[CherokeeASRModel] = None,
+        chunk_seconds: float = 30.0,
+        apply_buffers: bool = True,
+    ) -> str:
+        model = asr_model or self.model
+        model_name = getattr(model, "model_name", None) or "cherokee_asr"
+
+        stem = "audio"
+        if isinstance(audio_input, (str, Path)):
+            path_obj = Path(audio_input)
+            stem = path_obj.stem
+            resolved = str(path_obj.resolve()) if path_obj.exists() else str(path_obj)
+            if os.path.exists(resolved):
+                st = os.stat(resolved)
+                input_id = f"file:{resolved}:{st.st_size}:{st.st_mtime}"
+            else:
+                input_id = f"file:{resolved}"
+        elif isinstance(audio_input, AudioSegment):
+            raw_bytes = bytes(audio_input.raw_data or b"")
+            content_hash = hashlib.sha256(raw_bytes).hexdigest()[:16]
+            input_id = f"audioseg:{audio_input.frame_rate}:{audio_input.channels}:{audio_input.sample_width}:{len(audio_input)}:{content_hash}"
+        elif isinstance(audio_input, np.ndarray):
+            content_hash = hashlib.sha256(audio_input.tobytes()).hexdigest()[:16]
+            input_id = f"ndarray:{audio_input.shape}:{audio_input.dtype}:{content_hash}"
+        else:
+            input_id = f"custom:{repr(audio_input)}"
+
+        lead = self.buffer_lead_ms if apply_buffers else 0
+        trail = self.buffer_trail_ms if apply_buffers else 0
+        buf_str = f"lead={lead}:trail={trail}:chunk={chunk_seconds}"
+        full_key = f"{model_name}|{input_id}|{buf_str}"
+        cache_hash = hashlib.sha256(full_key.encode("utf-8")).hexdigest()
+        return f"{stem}_{cache_hash[:16]}"
+
+    def get_logits_cached(
+        self,
+        audio_input: Union[str, Path, AudioSegment, np.ndarray],
+        asr_model: Optional[CherokeeASRModel] = None,
+        chunk_seconds: float = 30.0,
+        apply_buffers: bool = True,
+        cache: Optional[bool] = None,
+        cache_dir: Optional[Union[str, Path]] = None,
+    ) -> Tuple[np.ndarray, float, float]:
+        """
+        Extract log-probability matrix (T, V) from audio input using ASR model,
+        or load cached result from disk if caching is enabled.
+
+        Parameters
+        ----------
+        audio_input : Union[str, Path, AudioSegment, np.ndarray]
+            Audio input to extract logits for.
+        asr_model : Optional[CherokeeASRModel]
+            ASR model to use. If None, uses self.model.
+        chunk_seconds : float
+            Chunk length for batched audio processing.
+        apply_buffers : bool
+            Whether to pad audio with lead/trail context buffers.
+        cache : Optional[bool]
+            Whether to use disk caching. If None, defaults to self.cache.
+        cache_dir : Optional[Union[str, Path]]
+            Directory to store/load cache files. If None, defaults to self.cache_dir.
+
+        Returns
+        -------
+        Tuple[np.ndarray, float, float]
+            (lpz, total_audio_sec, lead_offset_sec)
+        """
+        use_cache = self.cache if cache is None else bool(cache)
+        target_cache_dir = Path(cache_dir) if cache_dir is not None else self.cache_dir
+
+        if not use_cache:
+            return self.extract_logits(
+                audio_input=audio_input,
+                asr_model=asr_model,
+                chunk_seconds=chunk_seconds,
+                apply_buffers=apply_buffers,
+            )
+
+        target_cache_dir.mkdir(parents=True, exist_ok=True)
+        cache_key = self._compute_cache_key(
+            audio_input=audio_input,
+            asr_model=asr_model,
+            chunk_seconds=chunk_seconds,
+            apply_buffers=apply_buffers,
+        )
+        cache_path = target_cache_dir / f"{cache_key}.npz"
+
+        if cache_path.exists():
+            try:
+                with np.load(cache_path) as data:
+                    lpz = data["lpz"]
+                    dur_sec = float(data["total_audio_sec"])
+                    lead_offset_sec = float(data["lead_offset_sec"])
+                return lpz, dur_sec, lead_offset_sec
+            except Exception as e:
+                logger.warning(
+                    "Failed to read cached CTC logits from %s (%s). Recomputing...",
+                    cache_path,
+                    e,
+                )
+
+        # Cache miss: compute forward pass
+        lpz, dur_sec, lead_offset_sec = self.extract_logits(
+            audio_input=audio_input,
+            asr_model=asr_model,
+            chunk_seconds=chunk_seconds,
+            apply_buffers=apply_buffers,
+        )
+
+        try:
+            np.savez_compressed(
+                cache_path,
+                lpz=lpz.astype(np.float32),
+                total_audio_sec=np.array(dur_sec, dtype=np.float64),
+                lead_offset_sec=np.array(lead_offset_sec, dtype=np.float64),
+            )
+        except Exception as e:
+            logger.warning("Failed to write CTC logits cache to %s (%s)", cache_path, e)
+
+        return lpz, dur_sec, lead_offset_sec
+
     def align_verse_slice(
         self,
         audio_input: Union[str, Path, AudioSegment, np.ndarray],
@@ -162,6 +294,7 @@ class CTCSegmentationAligner:
         phonetic_text: str,
         syllabary_text: str = "",
         asr_model: Optional[CherokeeASRModel] = None,
+        cache: Optional[bool] = None,
     ) -> AlignedChunk:
         """
         Performs intra-verse CTC segmentation on a pre-cut verse audio slice,
@@ -171,8 +304,11 @@ class CTCSegmentationAligner:
         if model is None:
             raise ValueError("ASR model must be provided.")
 
-        lpz, dur_sec, lead_offset_sec = self.extract_logits(
-            audio_input, asr_model=model, apply_buffers=True
+        lpz, dur_sec, lead_offset_sec = self.get_logits_cached(
+            audio_input,
+            asr_model=model,
+            apply_buffers=True,
+            cache=cache,
         )
         char_list, pad_id = self._get_char_list_and_blank(model)
 
@@ -287,6 +423,7 @@ class CTCSegmentationAligner:
         chunks: Sequence[TextChunk],
         source_id: str = "",
         asr_model: Optional[CherokeeASRModel] = None,
+        cache: Optional[bool] = None,
     ) -> AlignmentOutput:
         """
         Full chapter/recording alignment:
@@ -297,8 +434,8 @@ class CTCSegmentationAligner:
         if model is None:
             raise ValueError("ASR model must be provided.")
 
-        lpz, dur_sec, _ = self.extract_logits(
-            audio_input, asr_model=model, apply_buffers=False
+        lpz, dur_sec, _ = self.get_logits_cached(
+            audio_input, asr_model=model, apply_buffers=False, cache=cache
         )
         char_list, pad_id = self._get_char_list_and_blank(model)
 
@@ -420,3 +557,57 @@ class CTCSegmentationAligner:
             raw_tokens=[],
             metrics=metrics,
         )
+
+
+def get_logits_cached(
+    audio_input: Union[str, Path, AudioSegment, np.ndarray],
+    asr_model: Optional[CherokeeASRModel] = None,
+    chunk_seconds: float = 30.0,
+    apply_buffers: bool = True,
+    cache: bool = True,
+    cache_dir: Optional[Union[str, Path]] = None,
+    buffer_lead_ms: int = 100,
+    buffer_trail_ms: int = 300,
+) -> Tuple[np.ndarray, float, float]:
+    """
+    Convenience function to extract or load cached CTC acoustic log-probabilities (lpz).
+
+    Parameters
+    ----------
+    audio_input : Union[str, Path, AudioSegment, np.ndarray]
+        Audio input (file path, AudioSegment, or ndarray).
+    asr_model : Optional[CherokeeASRModel]
+        ASR model instance. Required if cache is False or on cache miss.
+    chunk_seconds : float
+        Audio chunk size in seconds for batched model forward passes.
+    apply_buffers : bool
+        Whether to pad lead/trail acoustic context buffers.
+    cache : bool
+        Whether to check and write to disk cache (default True).
+    cache_dir : Optional[Union[str, Path]]
+        Custom directory to store cache files (default: .cache/ctc_emissions).
+    buffer_lead_ms : int
+        Lead buffer in milliseconds (default 100).
+    buffer_trail_ms : int
+        Trail buffer in milliseconds (default 300).
+
+    Returns
+    -------
+    Tuple[np.ndarray, float, float]
+        (lpz, total_audio_sec, lead_offset_sec)
+    """
+    aligner = CTCSegmentationAligner(
+        model=asr_model,
+        buffer_lead_ms=buffer_lead_ms,
+        buffer_trail_ms=buffer_trail_ms,
+        cache=cache,
+        cache_dir=cache_dir,
+    )
+    return aligner.get_logits_cached(
+        audio_input=audio_input,
+        asr_model=asr_model,
+        chunk_seconds=chunk_seconds,
+        apply_buffers=apply_buffers,
+        cache=cache,
+        cache_dir=cache_dir,
+    )

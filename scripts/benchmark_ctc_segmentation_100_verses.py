@@ -93,6 +93,8 @@ def run_benchmark(
     model_repo: str = DEFAULT_MODEL_REPO,
     model_revision: str = DEFAULT_REVISION,
     output_json_path: Optional[Path] = None,
+    cache: bool = True,
+    cache_dir: Optional[Path] = None,
 ) -> Dict[str, Any]:
     print(f"Loading ASR Model: {model_repo} (rev: {model_revision})...")
     token = os.environ.get("HF_TOKEN", None)
@@ -106,6 +108,8 @@ def run_benchmark(
 
     aligner = CTCSegmentationAligner(
         model=asr_model,
+        cache=cache,
+        cache_dir=cache_dir,
     )
 
     # Load existing baseline alignment records
@@ -301,4 +305,41 @@ def run_benchmark(
 
 
 if __name__ == "__main__":
-    run_benchmark(target_verse_count=100)
+    import argparse
+
+    parser = argparse.ArgumentParser(
+        description="Benchmark CTC segmentation on Bible verses with disk-cached emissions."
+    )
+    parser.add_argument(
+        "--target-verse-count",
+        "-n",
+        type=int,
+        default=100,
+        help="Number of verses to benchmark (default: 100)",
+    )
+    parser.add_argument(
+        "--cache",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Enable or disable acoustic emissions disk caching (default: True)",
+    )
+    parser.add_argument(
+        "--cache-dir",
+        type=Path,
+        default=None,
+        help="Custom directory for caching emissions",
+    )
+    parser.add_argument(
+        "--output-json",
+        type=Path,
+        default=None,
+        help="Path to output comparison report JSON",
+    )
+    args = parser.parse_args()
+
+    run_benchmark(
+        target_verse_count=args.target_verse_count,
+        cache=args.cache,
+        cache_dir=args.cache_dir,
+        output_json_path=args.output_json,
+    )
