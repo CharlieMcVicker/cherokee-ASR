@@ -13,7 +13,10 @@ from transcription.alignment.cli import run_alignment_pipeline
 from transcription.alignment.calibrated_distance_metrics import (
     PhonologicalConfusionCostMetric,
 )
-from transcription.alignment.ctc_aligner import CTCSegmentationAligner
+from transcription.alignment.ctc_aligner import (
+    CTCSegmentationAligner,
+    DEFAULT_CACHE_DIR,
+)
 from transcription.alignment.distance_metrics import (
     ConfusionMatrixCostMetric,
     DistanceMetric,
@@ -126,11 +129,7 @@ def align_chapter(
                     revision=rev,
                     token=token,
                 )
-            c_dir = (
-                Path(cache_dir)
-                if cache_dir is not None
-                else Path("runs/cache/ctc_emissions")
-            )
+            c_dir = Path(cache_dir) if cache_dir is not None else DEFAULT_CACHE_DIR
             aligner = CTCSegmentationAligner(
                 model=model,
                 cache=cache,

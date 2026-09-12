@@ -24,7 +24,7 @@ def load_bible_chunks(
 
     Args:
         source: File path to JSON, or a pre-parsed dictionary / list of verse items.
-        normalizer: Function to normalize raw phonetic text. Defaults to normalize_text_for_alignment.
+        normalizer: Function to normalize raw phonetic text. Defaults to normalize_syllabary_for_alignment.
 
     Returns:
         A tuple of (chunks, source_lookup) where:

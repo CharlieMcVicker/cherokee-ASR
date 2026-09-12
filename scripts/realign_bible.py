@@ -203,7 +203,11 @@ def realign_book(
             cache=cache,
         )
 
-        audio_seg = AudioSegment.from_file(str(audio_path))
+        audio_seg = (
+            AudioSegment.from_file(str(audio_path))
+            .set_frame_rate(16000)
+            .set_channels(1)
+        )
         num_verses_aligned = len(res.aligned_chunks)
         print(f"    Aligned {num_verses_aligned} verses.")
 
@@ -230,9 +234,13 @@ def realign_book(
             # Slicing unclipped verse audio using natural inter-verse boundary partition points
             start_ms = int(start_sec * 1000)
             end_ms = int(end_sec * 1000)
-            verse_audio = audio_seg[start_ms:end_ms]
-            verse_audio = verse_audio.set_frame_rate(16000).set_channels(1)
-            verse_audio.export(str(split_out_path), format="wav")
+            if end_ms <= start_ms:
+                print(
+                    f"    [Warning] Skipping zero or negative duration audio slice for {verse_id}: [{start_sec}s - {end_sec}s]"
+                )
+            else:
+                verse_audio = audio_seg[start_ms:end_ms]
+                verse_audio.export(str(split_out_path), format="wav")
 
             # Load verse transcript text
             verse_info = ch_data.get(verse_id, {})

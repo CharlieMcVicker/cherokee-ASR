@@ -8,7 +8,7 @@ and get_logits_cached helper.
 
 from pathlib import Path
 from typing import Any, cast
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 import numpy as np
 from pydub import AudioSegment
 import pytest
@@ -390,3 +390,133 @@ def test_ctc_aligner_continuous_chapter_multi_verse_monotonicity():
     assert out.metrics.total_chunks == 3
     assert out.metrics.matched_chunks >= 1
     assert out.metrics.match_ratio > 0.0
+
+
+def test_ctc_aligner_zero_start_timing_preserved(dummy_audio_file: Path):
+    """
+    Assert that when ctc_segmentation returns 0.0s for the first token,
+    it is not dropped by a strict > 0.0 timing filter.
+    """
+    model = DummyASRModel()
+    aligner = CTCSegmentationAligner(
+        model=cast(Any, model),
+        buffer_lead_ms=0,
+        buffer_trail_ms=0,
+    )
+
+    # Ground truth trellis for 1 word has length 4; word index slice is [1:3]
+    fake_timings = np.array([-1.0, 0.0, -1.0, -1.0], dtype=np.float32)
+    fake_char_probs = np.full(100, -0.1, dtype=np.float32)
+    fake_state_list = ["a"] * 100
+
+    with patch(
+        "transcription.alignment.ctc_aligner.ctc_segmentation",
+        return_value=(fake_timings, fake_char_probs, fake_state_list),
+    ):
+        aligned_slice = aligner.align_verse_slice(
+            audio_input=dummy_audio_file,
+            chunk_id="001",
+            phonetic_text="a",
+            cache=False,
+        )
+
+        assert len(aligned_slice.words) == 1
+        w = aligned_slice.words[0]
+        assert w.start_sec == 0.0
+        assert w.end_sec == 0.02
+        assert w.emitted_word == "a"
+        assert w.confidence > 0.0
+
+
+def test_ctc_aligner_unaligned_word_emissions_and_confidence(dummy_audio_file: Path):
+    """
+    Assert that an unaligned word (empty w_timings / negative timings)
+    emits an empty string and 0.0 confidence without reading frame 0.
+    """
+    model = DummyASRModel()
+    aligner = CTCSegmentationAligner(
+        model=cast(Any, model),
+        buffer_lead_ms=0,
+        buffer_trail_ms=0,
+    )
+
+    # Word 1 aligns at 0.1s (trellis slice [1:3]), Word 2 unaligned (slice [3:5])
+    fake_timings = np.array([-1.0, 0.1, -1.0, -1.0, -1.0, -1.0], dtype=np.float32)
+    fake_char_probs = np.full(100, -0.05, dtype=np.float32)
+    fake_state_list = ["a"] * 100
+
+    with patch(
+        "transcription.alignment.ctc_aligner.ctc_segmentation",
+        return_value=(fake_timings, fake_char_probs, fake_state_list),
+    ):
+        aligned_slice = aligner.align_verse_slice(
+            audio_input=dummy_audio_file,
+            chunk_id="001",
+            phonetic_text="a a",
+            cache=False,
+        )
+
+        assert len(aligned_slice.words) == 2
+        w1, w2 = aligned_slice.words
+        assert w1.word == "a"
+        assert w1.emitted_word == "a"
+        assert w1.confidence > 0.0
+
+        # Unaligned word 2
+        assert w2.word == "a"
+        assert w2.emitted_word == ""
+        assert w2.confidence == 0.0
+        assert w2.flagged is True
+        assert w2.start_sec == w1.end_sec
+        assert w2.end_sec == w1.end_sec
+
+
+def test_ctc_aligner_align_unaligned_word_and_window_size():
+    from transcription.alignment.models import TextChunk
+
+    model = DummyASRModel()
+    aligner = CTCSegmentationAligner(
+        model=cast(Any, model),
+        min_window_size=5000,
+        max_window_size=20000,
+        buffer_lead_ms=0,
+        buffer_trail_ms=0,
+    )
+
+    audio = np.zeros(16000 * 2, dtype=np.float32)
+    chunks = [TextChunk(chunk_id="v1", text="a a")]
+
+    # Word 1 aligns at 0.0s (slice [1:3]), Word 2 unaligned (slice [3:5])
+    fake_timings = np.array([-1.0, 0.0, -1.0, -1.0, -1.0, -1.0], dtype=np.float32)
+    fake_char_probs = np.full(100, -0.1, dtype=np.float32)
+    fake_state_list = ["a"] * 100
+    fake_segments = [(0.0, 0.5, 0.1)]
+
+    with (
+        patch(
+            "transcription.alignment.ctc_aligner.ctc_segmentation",
+            return_value=(fake_timings, fake_char_probs, fake_state_list),
+        ) as mock_seg,
+        patch(
+            "transcription.alignment.ctc_aligner.determine_utterance_segments",
+            return_value=fake_segments,
+        ),
+    ):
+        out = aligner.align(audio, chunks=chunks, cache=False)
+
+        # Verify CtcSegmentationParameters received aligner's window sizes
+        passed_config = mock_seg.call_args[0][0]
+        assert passed_config.min_window_size == 5000
+        assert passed_config.max_window_size == 20000
+
+        assert len(out.aligned_chunks) == 1
+        c = out.aligned_chunks[0]
+        assert len(c.words) == 2
+        assert c.words[0].start_sec == 0.0
+        assert c.words[0].emitted_word == "a"
+        assert c.words[0].confidence > 0.0
+
+        # Unaligned word
+        assert c.words[1].emitted_word == ""
+        assert c.words[1].confidence == 0.0
+        assert c.words[1].flagged is True

@@ -404,7 +404,7 @@ class CTCSegmentationAligner:
         for w_idx, raw_w in enumerate(words):
             start_idx = utt_indices[w_idx]
             end_idx = utt_indices[w_idx + 1]
-            w_timings = [t for t in timings[start_idx:end_idx] if t > 0.0]
+            w_timings = [t for t in timings[start_idx:end_idx] if t >= 0.0]
 
             if w_timings:
                 raw_w_start = min(w_timings)
@@ -413,39 +413,37 @@ class CTCSegmentationAligner:
                 w_end = max(
                     w_start, min(dur_sec, round(raw_w_end - lead_offset_sec, 3))
                 )
+                # Extract emitted word tokens from state_list across raw slice
+                start_f = int(round(min(w_timings) / self.index_duration))
+                end_f = int(
+                    round((max(w_timings) + self.index_duration) / self.index_duration)
+                )
+                emitted_chars = [
+                    s
+                    for s in state_list[start_f : max(start_f + 1, end_f)]
+                    if s and s != "ε" and s != "[PAD]"
+                ]
+                emitted_w = "".join(emitted_chars) or raw_w
+
+                # Word confidence from acoustic character state log-probabilities
+                char_state_lps = [
+                    char_probs[f]
+                    for f in range(start_f, max(start_f + 1, end_f))
+                    if state_list[f] and state_list[f] not in ("ε", "[PAD]")
+                ]
+                if char_state_lps:
+                    mean_logprob = float(np.mean(char_state_lps))
+                    word_conf = float(np.exp(mean_logprob))
+                else:
+                    word_conf = 0.0
             else:
                 w_start = prev_end
                 w_end = prev_end
-
-            # Extract emitted word tokens from state_list across raw slice
-            start_f = (
-                int(round(min(w_timings) / self.index_duration)) if w_timings else 0
-            )
-            end_f = (
-                int(round((max(w_timings) + self.index_duration) / self.index_duration))
-                if w_timings
-                else 0
-            )
-            emitted_chars = [
-                s
-                for s in state_list[start_f : max(start_f + 1, end_f)]
-                if s and s != "ε" and s != "[PAD]"
-            ]
-            emitted_w = "".join(emitted_chars) or raw_w
-
-            w_dur = max(0.0, w_end - w_start)
-            # Word confidence from acoustic character state log-probabilities
-            char_state_lps = [
-                char_probs[f]
-                for f in range(start_f, max(start_f + 1, end_f))
-                if state_list[f] and state_list[f] not in ("ε", "[PAD]")
-            ]
-            if w_timings and char_state_lps:
-                mean_logprob = float(np.mean(char_state_lps))
-                word_conf = float(np.exp(mean_logprob))
-            else:
+                emitted_chars = []
+                emitted_w = ""
                 word_conf = 0.0
 
+            w_dur = max(0.0, w_end - w_start)
             is_low_conf = bool(word_conf < self.flag_min_confidence)
             is_unaligned = bool(len(w_timings) == 0 or len(emitted_chars) == 0)
             is_flagged = bool(is_low_conf or is_unaligned)
@@ -533,8 +531,8 @@ class CTCSegmentationAligner:
             intrusive_tokens=valid_intrusive,
             intrusive_penalty=self.intrusive_penalty,
             index_duration=self.index_duration,
-            min_window_size=max(self.min_window_size, lpz.shape[0]),
-            max_window_size=max(self.max_window_size, lpz.shape[0] * 2),
+            min_window_size=self.min_window_size,
+            max_window_size=max(self.max_window_size, self.min_window_size * 2),
             score_min_mean_over_L=2,
             replace_spaces_with_blanks=False,
         )
@@ -609,43 +607,39 @@ class CTCSegmentationAligner:
                 global_w_i = w_start_idx + local_w_i
                 start_idx = utt_indices[global_w_i]
                 end_idx = utt_indices[global_w_i + 1]
-                w_timings = [t for t in timings[start_idx:end_idx] if t > 0.0]
+                w_timings = [t for t in timings[start_idx:end_idx] if t >= 0.0]
 
                 if w_timings:
                     w_start = max(0.0, min(dur_sec, round(min(w_timings), 3)))
                     w_end = min(dur_sec, round(max(w_timings) + self.index_duration, 3))
-                else:
-                    w_start = prev_end
-                    w_end = prev_end
-
-                start_f = (
-                    int(round(min(w_timings) / self.index_duration)) if w_timings else 0
-                )
-                end_f = (
-                    int(
+                    start_f = int(round(min(w_timings) / self.index_duration))
+                    end_f = int(
                         round(
                             (max(w_timings) + self.index_duration) / self.index_duration
                         )
                     )
-                    if w_timings
-                    else 0
-                )
-                emitted_chars = [
-                    s
-                    for s in state_list[start_f : max(start_f + 1, end_f)]
-                    if s and s != "ε" and s != "[PAD]"
-                ]
-                emitted_w = "".join(emitted_chars) or raw_w
+                    emitted_chars = [
+                        s
+                        for s in state_list[start_f : max(start_f + 1, end_f)]
+                        if s and s != "ε" and s != "[PAD]"
+                    ]
+                    emitted_w = "".join(emitted_chars) or raw_w
 
-                char_state_lps = [
-                    char_probs[f]
-                    for f in range(start_f, max(start_f + 1, end_f))
-                    if state_list[f] and state_list[f] not in ("ε", "[PAD]")
-                ]
-                if w_timings and char_state_lps:
-                    mean_logprob = float(np.mean(char_state_lps))
-                    word_conf = float(np.exp(mean_logprob))
+                    char_state_lps = [
+                        char_probs[f]
+                        for f in range(start_f, max(start_f + 1, end_f))
+                        if state_list[f] and state_list[f] not in ("ε", "[PAD]")
+                    ]
+                    if char_state_lps:
+                        mean_logprob = float(np.mean(char_state_lps))
+                        word_conf = float(np.exp(mean_logprob))
+                    else:
+                        word_conf = 0.0
                 else:
+                    w_start = prev_end
+                    w_end = prev_end
+                    emitted_chars = []
+                    emitted_w = ""
                     word_conf = 0.0
 
                 is_low_conf = bool(word_conf < self.flag_min_confidence)
