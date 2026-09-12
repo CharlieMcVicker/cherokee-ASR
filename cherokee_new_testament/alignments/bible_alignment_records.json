@@ -5,13 +5,13 @@
     "chapter": 1,
     "verse_idx": 1,
     "audio_path": "cherokee_new_testament/split_audio/mark_01_01.wav",
-    "start_sec": 8.26,
-    "end_sec": 14.86,
-    "duration_sec": 6.6,
+    "start_sec": 7.76,
+    "end_sec": 14.85,
+    "duration_sec": 7.09,
     "reference_sentence": "ᎠᏓᎴᏂᏍᎬ ᏱᏍᏛ ᎧᏃᎮᏛ, ᏥᏌ ᎦᎶᏁᏛ ᎤᏁᎳᏅᎯ ᎤᏪᏥ ᎤᏤᎵᎦ.",
-    "reconciled_phonetics": "athalenihskhv yhsth khanohethv, tsihsa khaloneth unelhanvhi uwetsi utselikh.",
-    "asr_hypothesis": "athalenihskhv yhsth khhanohethv tsihsa khaloneth unelhanvhi uwetsi utselikh",
-    "cost": -10000000000.0,
+    "reconciled_phonetics": "athalenihskhv yihsth khhanohethv tsihsa khalonethv unelanvhi uwetsi utselikha",
+    "asr_hypothesis": "athalenihskhv yihsth khhanohethv tsihsa khalonethv unelanvhi uwetsi utselikha",
+    "cost": -10.6779,
     "words": [
       {
         "word": "athalenihskhv",
@@ -23,11 +23,11 @@
       },
       {
         "word": "yihsthv",
-        "start_sec": 9.34,
+        "start_sec": 9.2,
         "end_sec": 9.7,
-        "confidence": 0.00348,
+        "confidence": 0.00092,
         "flagged": true,
-        "emitted_word": "yhsth"
+        "emitted_word": "yihsth"
       },
       {
         "word": "khhanohethv",
@@ -48,18 +48,18 @@
       {
         "word": "khalonethv",
         "start_sec": 11.48,
-        "end_sec": 12.12,
-        "confidence": 0.069051,
+        "end_sec": 12.18,
+        "confidence": 0.023443,
         "flagged": false,
-        "emitted_word": "khaloneth"
+        "emitted_word": "khalonethv"
       },
       {
         "word": "unelanvhi",
         "start_sec": 12.28,
         "end_sec": 12.96,
-        "confidence": 0.649269,
+        "confidence": 0.641914,
         "flagged": false,
-        "emitted_word": "unelhanvhi"
+        "emitted_word": "unelanvhi"
       },
       {
         "word": "uwetsi",
@@ -73,9 +73,9 @@
         "word": "utselikha",
         "start_sec": 14.1,
         "end_sec": 14.86,
-        "confidence": 0.195348,
+        "confidence": 0.160372,
         "flagged": false,
-        "emitted_word": "utselikh"
+        "emitted_word": "utselikha"
       }
     ],
     "cherokee_syllabary": "ᎠᏓᎴᏂᏍᎬ ᏱᏍᏛ ᎧᏃᎮᏛ, ᏥᏌ ᎦᎶᏁᏛ ᎤᏁᎳᏅᎯ ᎤᏪᏥ ᎤᏤᎵᎦ.",
@@ -89,21 +89,21 @@
     "chapter": 1,
     "verse_idx": 2,
     "audio_path": "cherokee_new_testament/split_audio/mark_01_02.wav",
-    "start_sec": 16.34,
-    "end_sec": 33.88,
-    "duration_sec": 17.54,
+    "start_sec": 15.84,
+    "end_sec": 33.87,
+    "duration_sec": 18.03,
     "reference_sentence": "ᎾᏍᎩᏯ ᎯᎠ ᏥᏂᎬᏅ ᏥᎪᏪᎳ ᎠᎾᏙᎴᎰᏍᎩᏱ; ᎬᏂᏳᏉ, ᏥᏅᎵ ᏥᏅᏏᏓᏍᏗ ᏣᎧᏛ ᎢᎬᏱᏗᏢ, ᎾᏍᎩ ᏓᏣᏛᏅᎢᏍᏓᏁᎵ ᏣᎶᎯᏍᏗᏱ ᎢᎬᏱᏗᏢ.",
-    "reconciled_phonetics": "nahskhya hi'a tsinikhvnhv tsikhowhela anathlehohskhiyi; khvnhiyukw, tsinvli tsinvhsithsthi tsakhathv ikhvyithilh, nahskhi thtsathvnv'ihsthaneli tsalohihsthiyi ikhvyithilh.",
-    "asr_hypothesis": "nahskhya hi'a tsinikhvnhv tsikhowhela anathlehohskhiyi khvnhiyukwh tsinvli tsinvhsithhsthi tsakhhathv ikhvyithitlhh nahskhi thtsathvnv'ihsthaneli tsalohihsthiyi ikhvyithitlhh",
-    "cost": -10000000000.0,
+    "reconciled_phonetics": "nahskhiya hi'a tsinikhvnhv tsikhowhela anatholehohskhiyi khvnhiyukwho tsinvli tsinvhsithahsthi tsakhhathv ikhvyithitlhhv nahskhi thatsathvnv'ihsthaneli tsalohihsthiyi ikhvyithitlhhv",
+    "asr_hypothesis": "nahskhiya hi'a tsinikhvnhv tsikhowhela anatholehohskhiyi khvnhiyukwho tsinvli tsinvhsithahsthi tsakhhathv ikhvyithitlhhv nahskhi thatsathvnv'ihsthaneli tsalohihsthiyi ikhvyithitlhhv",
+    "cost": -10.1929,
     "words": [
       {
         "word": "nahskhiya",
         "start_sec": 16.34,
         "end_sec": 16.84,
-        "confidence": 0.06199,
+        "confidence": 0.060159,
         "flagged": false,
-        "emitted_word": "nahskhya"
+        "emitted_word": "nahskhiya"
       },
       {
         "word": "hia",
@@ -133,17 +133,17 @@
         "word": "anatholehohskhiyi",
         "start_sec": 19.58,
         "end_sec": 20.96,
-        "confidence": 0.128924,
+        "confidence": 0.126041,
         "flagged": false,
-        "emitted_word": "anathlehohskhiyi"
+        "emitted_word": "anatholehohskhiyi"
       },
       {
         "word": "khvniyukwho",
         "start_sec": 22.14,
         "end_sec": 22.92,
-        "confidence": 0.274008,
+        "confidence": 0.077681,
         "flagged": false,
-        "emitted_word": "khvnhiyukwh"
+        "emitted_word": "khvnhiyukwho"
       },
       {
         "word": "tsinvli",
@@ -157,9 +157,9 @@
         "word": "tsinvhsithahsthi",
         "start_sec": 24.48,
         "end_sec": 25.52,
-        "confidence": 0.397819,
+        "confidence": 0.150146,
         "flagged": false,
-        "emitted_word": "tsinvhsithhsthi"
+        "emitted_word": "tsinvhsithahsthi"
       },
       {
         "word": "tsakhhathv",
@@ -173,9 +173,9 @@
         "word": "ikhvyithitlhhv",
         "start_sec": 27.04,
         "end_sec": 27.92,
-        "confidence": 0.012187,
-        "flagged": false,
-        "emitted_word": "ikhvyithitlhh"
+        "confidence": 0.00921,
+        "flagged": true,
+        "emitted_word": "ikhvyithitlhhv"
       },
       {
         "word": "nahskhi",
@@ -187,11 +187,11 @@
       },
       {
         "word": "thatsathvnvihsthaneli",
-        "start_sec": 29.62,
+        "start_sec": 29.28,
         "end_sec": 31.2,
-        "confidence": 0.132553,
+        "confidence": 0.075859,
         "flagged": false,
-        "emitted_word": "thtsathvnv'ihsthaneli"
+        "emitted_word": "thatsathvnv'ihsthaneli"
       },
       {
         "word": "tsalohihsthiyi",
@@ -205,15 +205,15 @@
         "word": "ikhvyithitlhhv",
         "start_sec": 32.94,
         "end_sec": 33.88,
-        "confidence": 0.025893,
+        "confidence": 0.013879,
         "flagged": false,
-        "emitted_word": "ikhvyithitlhh"
+        "emitted_word": "ikhvyithitlhhv"
       }
     ],
     "cherokee_syllabary": "ᎾᏍᎩᏯ ᎯᎠ ᏥᏂᎬᏅ ᏥᎪᏪᎳ ᎠᎾᏙᎴᎰᏍᎩᏱ; ᎬᏂᏳᏉ, ᏥᏅᎵ ᏥᏅᏏᏓᏍᏗ ᏣᎧᏛ ᎢᎬᏱᏗᏢ, ᎾᏍᎩ ᏓᏣᏛᏅᎢᏍᏓᏁᎵ ᏣᎶᎯᏍᏗᏱ ᎢᎬᏱᏗᏢ.",
     "phonetic": "Na-s-gi-ya hi-a tsi-ni-gv-nv tsi-go-we-la a-na-do-le-ho-s-gi-yi; Gv-ni-yu-quo, tsi-nv-li tsi-nv-si-da-s-di tsa-ka-dv i-gv-yi-di-tlv, na-s-gi da-tsa-dv-nv-i-s-da-ne-li tsa-lo-hi-s-di-yi i-gv-yi-di-tlv.",
     "english": "As it is written in the prophets, Behold, I send my messenger before thy face, which shall prepare thy way before thee.",
-    "has_anomalies": false
+    "has_anomalies": true
   },
   {
     "verse_id": "020103",
@@ -225,17 +225,17 @@
     "end_sec": 46.11,
     "duration_sec": 11.53,
     "reference_sentence": "ᎤᏪᎷᎦ ᎩᎶ ᎢᎾᎨᎢ, ᎯᎠ ᏂᎦᏪᎭ; ᎡᏣᏛᏅᎢᏍᏓᏏ ᏱᎰᏩ ᎤᎶᎯᏍᏗᏱ, ᏚᏅᏅ ᏗᏥᏥᏃᎯᏍᏓ.",
-    "reconciled_phonetics": "uwelhuhkha khilo inakhe'i, hi'a nikhweha; etsathvnhv'ihsthahsi yihowa ulohihsthiyi, thunvnhv thitsitshinohihstha.",
-    "asr_hypothesis": "uwelhuhkha khilo inakhe'i hi'a nikhweha etsathvnhv'ihsthahsi yihowa ulohihsthiyi thunvnhv thitsitshinohihstha",
+    "reconciled_phonetics": "uwelhukha khilo inakhei hi'a nikhaweha etsathvnhv'ihsthahsi yihowa ulohihsthiyi thunvnhv thitsitshinohihstha",
+    "asr_hypothesis": "uwelhukha khilo inakhei hi'a nikhaweha etsathvnhv'ihsthahsi yihowa ulohihsthiyi thunvnhv thitsitshinohihstha",
     "cost": -10.2324,
     "words": [
       {
         "word": "uwelukha",
         "start_sec": 35.08,
         "end_sec": 35.7,
-        "confidence": 0.405916,
+        "confidence": 0.377065,
         "flagged": false,
-        "emitted_word": "uwelhuhkha"
+        "emitted_word": "uwelhukha"
       },
       {
         "word": "khilo",
@@ -249,9 +249,9 @@
         "word": "inakhei",
         "start_sec": 36.32,
         "end_sec": 36.84,
-        "confidence": 0.199611,
+        "confidence": 0.161369,
         "flagged": false,
-        "emitted_word": "inakhe'i"
+        "emitted_word": "inakhei"
       },
       {
         "word": "hia",
@@ -265,9 +265,9 @@
         "word": "nikhaweha",
         "start_sec": 37.72,
         "end_sec": 38.26,
-        "confidence": 0.33093,
+        "confidence": 0.275023,
         "flagged": false,
-        "emitted_word": "nikhweha"
+        "emitted_word": "nikhaweha"
       },
       {
         "word": "etsathvnvihsthahsi",
@@ -325,8 +325,8 @@
     "end_sec": 64.19,
     "duration_sec": 17.55,
     "reference_sentence": "ᏣᏂ ᏓᏓᏬᏍᎨ ᎢᎾᎨᎢ, ᎠᎴ ᎠᎵᏥᏙᎲᏍᎨ ᎧᏃᎮᏍᎨ ᏗᏓᏪᏍᏗ ᎨᏒ ᎦᏁᏟᏴᏍᏗᏱ ᎣᏓᏅᏛ ᎤᎬᏩᎵ ᎾᏍᎩ ᎦᏴᏓᏘᏁᏗᏱ ᎠᏍᎦᏅᏨᎢ.",
-    "reconciled_phonetics": "tsani thathawohskhe inakhe'i, ale alihtsthohvhskhe khanohehskhe thithawehsthi khsv khanelhiyvhsthiyi othanvhthv ukhvwalhi nahskhi khayvththinethiyi ahskhanvtsv'i.",
-    "asr_hypothesis": "tsani thathawohskhe inakhe'i ale alihtsthohvhskhe khhanohehskhe thithawehsthi khhsv khanetlhhiyvhsthiyi othanvhthv ukhvwalhi nahskhi khayvththhinethiyi ahskhanvtsv'i",
+    "reconciled_phonetics": "tsani thathawohskhe inakhei ale alihtsithohvhskhe khhanohehskhe thithawehsthi khehsv khanetlhhiyvhsthiyi othanvhthv ukhvwalhi nahskhi khayvthathhinethiyi ahskhanvtsv'i",
+    "asr_hypothesis": "tsani thathawohskhe inakhei ale alihtsithohvhskhe khhanohehskhe thithawehsthi khehsv khanetlhhiyvhsthiyi othanvhthv ukhvwalhi nahskhi khayvthathhinethiyi ahskhanvtsv'i",
     "cost": -12.0108,
     "words": [
       {
@@ -349,9 +349,9 @@
         "word": "inakhei",
         "start_sec": 48.96,
         "end_sec": 49.5,
-        "confidence": 0.190626,
+        "confidence": 0.155208,
         "flagged": false,
-        "emitted_word": "inakhe'i"
+        "emitted_word": "inakhei"
       },
       {
         "word": "ale",
@@ -365,9 +365,9 @@
         "word": "alitsithohvhskhe",
         "start_sec": 51.42,
         "end_sec": 52.44,
-        "confidence": 0.110458,
+        "confidence": 0.054765,
         "flagged": false,
-        "emitted_word": "alihtsthohvhskhe"
+        "emitted_word": "alihtsithohvhskhe"
       },
       {
         "word": "khhanohehskhe",
@@ -389,9 +389,9 @@
         "word": "khehsv",
         "start_sec": 56.3,
         "end_sec": 56.7,
-        "confidence": 0.998428,
+        "confidence": 0.189354,
         "flagged": false,
-        "emitted_word": "khhsv"
+        "emitted_word": "khehsv"
       },
       {
         "word": "khanetlhhiyvhsthiyi",
@@ -429,9 +429,9 @@
         "word": "khayvthathhinethiyi",
         "start_sec": 61.8,
         "end_sec": 63.1,
-        "confidence": 0.244065,
+        "confidence": 0.229561,
         "flagged": false,
-        "emitted_word": "khayvththhinethiyi"
+        "emitted_word": "khayvthathhinethiyi"
       },
       {
         "word": "ahskhanvtsvi",
@@ -457,8 +457,8 @@
     "end_sec": 80.5,
     "duration_sec": 15.62,
     "reference_sentence": "ᎠᎴ ᏫᎬᏩᎷᏤᎴ ᏂᎬᎾᏛ ᏧᏗᏱ ᎠᎴ ᏥᎷᏏᎵᎻ ᎠᏁᎯ, ᎠᎴ ᏂᎦᏛ ᎾᏍᎩ ᏚᎾᏬᎡ ᏦᏓᏂ ᎤᏪᏴᎢ, ᎤᏂᏍᎦᏅᏨ ᎠᏂᏃᎲᏍᎨᎢ.",
-    "reconciled_phonetics": "ale wikhvwaluhtshele nikhvnathv tsuthiyi ale tsiluhslmi anehi, al nikhathv nhskhi thunhawo'e tsothani uweyv'i, unihskhanvtsv aninhohvhskhe'i.",
-    "asr_hypothesis": "ale wikhvwaluhtshele nikhvnathv tsuthiyi ale tsiluhslmi anehi al nikhathv nhskhi thunhawo'e tsothani uweyv'i unihskhanvtsv aninhohvhskhe'i",
+    "reconciled_phonetics": "ale wikhvwaluhtsele nikhvnathv tsuthiyi ale tsiluhsilmi anehi ale nikhathv nahskhi thunawo'e tsothani uweyv'i unihskhanvtsv aninhohvhskhe'i",
+    "asr_hypothesis": "ale wikhvwaluhtsele nikhvnathv tsuthiyi ale tsiluhsilmi anehi ale nikhathv nahskhi thunawo'e tsothani uweyv'i unihskhanvtsv aninhohvhskhe'i",
     "cost": -10.7154,
     "words": [
       {
@@ -473,9 +473,9 @@
         "word": "wikhvwalutsele",
         "start_sec": 65.6,
         "end_sec": 66.7,
-        "confidence": 0.477653,
+        "confidence": 0.459456,
         "flagged": false,
-        "emitted_word": "wikhvwaluhtshele"
+        "emitted_word": "wikhvwaluhtsele"
       },
       {
         "word": "nikhvnathv",
@@ -505,9 +505,9 @@
         "word": "tsiluhsilimi",
         "start_sec": 69.78,
         "end_sec": 70.52,
-        "confidence": 0.537587,
+        "confidence": 0.240651,
         "flagged": false,
-        "emitted_word": "tsiluhslmi"
+        "emitted_word": "tsiluhsilmi"
       },
       {
         "word": "anehi",
@@ -520,10 +520,10 @@
       {
         "word": "ale",
         "start_sec": 72.46,
-        "end_sec": 72.54,
-        "confidence": 0.992755,
+        "end_sec": 72.6,
+        "confidence": 0.187665,
         "flagged": false,
-        "emitted_word": "al"
+        "emitted_word": "ale"
       },
       {
         "word": "nikhathv",
@@ -537,17 +537,17 @@
         "word": "nahskhi",
         "start_sec": 73.36,
         "end_sec": 73.74,
-        "confidence": 0.162798,
+        "confidence": 0.067912,
         "flagged": false,
-        "emitted_word": "nhskhi"
+        "emitted_word": "nahskhi"
       },
       {
         "word": "thunawoe",
         "start_sec": 74.66,
         "end_sec": 75.36,
-        "confidence": 0.234205,
+        "confidence": 0.202047,
         "flagged": false,
-        "emitted_word": "thunhawo'e"
+        "emitted_word": "thunawo'e"
       },
       {
         "word": "tsothani",
@@ -597,7 +597,7 @@
     "end_sec": 94.21,
     "duration_sec": 12.99,
     "reference_sentence": "ᏣᏂᏃ ᎤᏄᏪ ᎨᎻᎵ ᎤᏍᏗᏰᏅᎯ, ᎦᏃᏥᏃ ᎤᏓᏠᏍᏕᎢ; ᎥᎴᏃ ᎠᎴ ᏩᏚᎵᏏ ᎢᎾᎨ ᎡᎯ ᎠᎵᏍᏓᏴᏗᏍᎨᎢ.",
-    "reconciled_phonetics": "tsaninho unhuwe khemili uhsthiyenhvhi, khanotsinho uthalhohsthe'i; vlenho ale wathulihsi inakhe ehi alihsthayvhthihskhe'i.",
+    "reconciled_phonetics": "tsaninho unhuwe khemili uhsthiyenhvhi khanotsinho uthatlhhohsthe'i vlenho ale wathulihsi inakhe ehi alihsthayvhthihskhe'i",
     "asr_hypothesis": "tsaninho unhuwe khemili uhsthiyenhvhi khanotsinho uthatlhhohsthe'i vlenho ale wathulihsi inakhe ehi alihsthayvhthihskhe'i",
     "cost": -9.4514,
     "words": [
@@ -713,9 +713,9 @@
     "end_sec": 114.31,
     "duration_sec": 19.77,
     "reference_sentence": "ᎠᎵᏥᏙᎲᏍᎨᏃ ᎯᎠ ᏂᎦᏪᏍᎨᎢ; ᎤᏟ ᎤᎵᏂᎩᏗᏳ ᎡᏍᎦᏉ ᎠᏴ ᎣᏂ ᏓᏯᎢ, ᎾᏍᎩ ᏧᎳᏑᎶᎩᎯ ᏓᎧᏁᏌᏛ ᎥᏝ ᏰᎵ ᏱᏂᎪᎢ ᎠᏆᏗᏌᏓᏗᏍᏗᏱ ᎠᎴ ᏗᎩᎧᏁᏴᏗᏱ.",
-    "reconciled_phonetics": "alhitsithohvhskhenho hi'a nikhawehskhe'i; ulhi ulhinikhthiyu ehskhakw ayv onhi thya'i, nahskhi tsulahsulokhihi thakhanehsa'thv vlha yeli yinikho'i akwathihsaththsthiy ale thikhikhaneyhvhthiyi.",
-    "asr_hypothesis": "alhitsithohvhskhenho hi'a nikhawehskhe'i utlhhi ulhinikhthiyu ehskhakwh ayv onhi thya'i nahskhi tsulahsulokhihi thakhhanehsa'thv vtlhha yeli yinikho'i akwhathihsaththhsthiy ale thikhikhhaneyhvhthiyi",
-    "cost": -13.6513,
+    "reconciled_phonetics": "alhitsithohvhskhenho hi'a nikhawehskhe'i utlhhi ulhinikhthiyu ehskhakwh ayv onhi thaya'i nahskhi tsulahsulokhihi thakhhanehsa'thv vtlhha yeli yinikho'i akwhathihsthathihsthiyi ale thikhikhhaneyhvhthiyi",
+    "asr_hypothesis": "alhitsithohvhskhenho hi'a nikhawehskhe'i utlhhi ulhinikhthiyu ehskhakwh ayv onhi thaya'i nahskhi tsulahsulokhihi thakhhanehsa'thv vtlhha yeli yinikho'i akwhathihsthathihsthiyi ale thikhikhhaneyhvhthiyi",
+    "cost": -10.2743,
     "words": [
       {
         "word": "alitsithohvhskheno",
@@ -785,9 +785,9 @@
         "word": "thayai",
         "start_sec": 102.62,
         "end_sec": 103.26,
-        "confidence": 0.129628,
+        "confidence": 0.020396,
         "flagged": false,
-        "emitted_word": "thya'i"
+        "emitted_word": "thaya'i"
       },
       {
         "word": "nahskhi",
@@ -840,10 +840,10 @@
       {
         "word": "akwhathihsathathihsthiyi",
         "start_sec": 110.36,
-        "end_sec": 111.7,
-        "confidence": 0.045847,
+        "end_sec": 111.78,
+        "confidence": 0.044741,
         "flagged": false,
-        "emitted_word": "akwhathihsaththhsthiy"
+        "emitted_word": "akwhathihsthathihsthiyi"
       },
       {
         "word": "ale",
@@ -877,8 +877,8 @@
     "end_sec": 123.86,
     "duration_sec": 9.08,
     "reference_sentence": "ᎠᏴ ᎤᏙᎯᏳᎯ ᎠᎹ ᏕᏨᏯᏬᏍᏔᏅ, ᎾᏍᎩᏍᎩᏂ ᎦᎸᏉᏗᏳ ᎠᏓᏅᏙ ᏙᏓᏣᏬᏍᏔᏂ.",
-    "reconciled_phonetics": "ayv uthohiyuhi ama thetsvyawohsthanv, nahskhihskhini khalvkwthiyu athantho thothatsawohsthani.",
-    "asr_hypothesis": "ayv uthohiyuhi ama thetsvyawohsthhanv nahskhihskhini khalvkwhthiyu athantho thothatsawohsthhani",
+    "reconciled_phonetics": "ayv uthohiyuhi ama thetsvyawohsthhanv nahskhihskhini khalvkwhthiyu athanvhtho thothatsawohsthhani",
+    "asr_hypothesis": "ayv uthohiyuhi ama thetsvyawohsthhanv nahskhihskhini khalvkwhthiyu athanvhtho thothatsawohsthhani",
     "cost": -10.0894,
     "words": [
       {
@@ -933,9 +933,9 @@
         "word": "athanvtho",
         "start_sec": 121.96,
         "end_sec": 122.54,
-        "confidence": 0.059572,
+        "confidence": 0.035366,
         "flagged": false,
-        "emitted_word": "athantho"
+        "emitted_word": "athanvhtho"
       },
       {
         "word": "thothatsawohsthhani",
@@ -958,12 +958,12 @@
     "verse_idx": 9,
     "audio_path": "cherokee_new_testament/split_audio/mark_01_09.wav",
     "start_sec": 124.12,
-    "end_sec": 136.7,
-    "duration_sec": 12.58,
+    "end_sec": 136.65,
+    "duration_sec": 12.53,
     "reference_sentence": "ᎾᎯᏳᏃ ᎯᎠ ᏄᎵᏍᏔᏁᎢ, ᏥᏌ ᎾᏎᎵᏗ ᏧᎶᏎ ᎾᏍᎩ ᎨᎵᎵ ᏥᎦᏚᎭ, ᎠᎴ ᏣᏂ ᎤᏓᏬᎡ ᏦᏓᏂ.",
-    "reconciled_phonetics": "nahiyunho hi'a nulhsthane'i, tsihsa nahselith tsulohse nahskhi khelili tsikhathuha, ale tsani uthawo'e tsothani.",
-    "asr_hypothesis": "nahiyunho hi'a nulhsthhane'i tsihsa nahselith tsulohse nahskhi khelili tsikhathuha ale tsani uthawo'e tsothani",
-    "cost": -11.342,
+    "reconciled_phonetics": "nahiyunho hi'a nulhsthhane'i tsihsa nahselithi tsulohse nahskhi khelili tsikhathuha ale tsani uthawo'e tsothani",
+    "asr_hypothesis": "nahiyunho hi'a nulhsthhane'i tsihsa nahselithi tsulohse nahskhi khelili tsikhathuha ale tsani uthawo'e tsothani",
+    "cost": -11.151,
     "words": [
       {
         "word": "nahiyuno",
@@ -1001,9 +1001,9 @@
         "word": "nahselithi",
         "start_sec": 127.94,
         "end_sec": 128.92,
-        "confidence": 0.219231,
+        "confidence": 0.080974,
         "flagged": false,
-        "emitted_word": "nahselith"
+        "emitted_word": "nahselithi"
       },
       {
         "word": "tsulohse",
@@ -1082,20 +1082,20 @@
     "verse_idx": 10,
     "audio_path": "cherokee_new_testament/split_audio/mark_01_10.wav",
     "start_sec": 137.48,
-    "end_sec": 154.7,
-    "duration_sec": 17.22,
+    "end_sec": 154.29,
+    "duration_sec": 16.81,
     "reference_sentence": "ᎩᎳᏉᏃ ᎢᏴᏛ ᏧᎿᎭᎷᏒ ᎠᎹᏱ ᏧᏓᏅᏒ, ᎤᎪᎮ ᎦᎸᎶᎢ ᎤᎵᏍᏚᎢᏛ ᎨᏎᎢ, ᎠᎴ ᎠᏓᏅᏙ ᎫᎴᏗᏍᎪᏂᎯ ᎾᏍᎩᏯᎢ, ᏧᏠᎠᏏᏗᏎ ᎾᏍᎩ ᎤᏪᏯᎸᏤᎢ.",
-    "reconciled_phonetics": "khilakwnho iyvth tsunhahluhsv amayi tsutha'nvhsv, ukhhe khalvlohi ulhsthu'ith khse'i, ale athantho khulethskhonhi nahskhyi, tsulho'hsithihse nhskhi uweyalvtse'i.",
-    "asr_hypothesis": "khilakwhnho iyvth tsunhaluhsv amayi tsutha'nvhsv ukhhe khalvlohi ulhsthu'ith khhse'i ale athantho khulethhskhonhi nahskhya tsutlh'hohsithihse nhskhi uweyalvtse'i",
+    "reconciled_phonetics": "khilakwhono iyvth tsunhaluhsv amayi tsutha'nvhsv ukhohe khalvlohi ulhsthu'ith khehse'i ale athanvtho khulethihskhonhi nahskhiyai tsutlhhohsithihse nahskhi uweyalvtse'i",
+    "asr_hypothesis": "khilakwhono iyvth tsunhaluhsv amayi tsutha'nvhsv ukhohe khalvlohi ulhsthu'ith khehse'i ale athanvtho khulethihskhonhi nahskhiyai tsutlhhohsithihse nahskhi uweyalvtse'i",
     "cost": -9.5082,
     "words": [
       {
         "word": "khilakwhono",
         "start_sec": 137.98,
         "end_sec": 138.46,
-        "confidence": 0.307756,
+        "confidence": 0.190566,
         "flagged": false,
-        "emitted_word": "khilakwhnho"
+        "emitted_word": "khilakwhono"
       },
       {
         "word": "iyvthv",
@@ -1133,9 +1133,9 @@
         "word": "ukhohe",
         "start_sec": 143.08,
         "end_sec": 143.56,
-        "confidence": 0.994799,
+        "confidence": 0.124632,
         "flagged": false,
-        "emitted_word": "ukhhe"
+        "emitted_word": "ukhohe"
       },
       {
         "word": "khalvloi",
@@ -1157,9 +1157,9 @@
         "word": "khehsei",
         "start_sec": 146.1,
         "end_sec": 146.68,
-        "confidence": 0.957331,
+        "confidence": 0.162806,
         "flagged": false,
-        "emitted_word": "khhse'i"
+        "emitted_word": "khehse'i"
       },
       {
         "word": "ale",
@@ -1173,41 +1173,41 @@
         "word": "athanvtho",
         "start_sec": 147.64,
         "end_sec": 148.42,
-        "confidence": 0.11766,
+        "confidence": 0.086038,
         "flagged": false,
-        "emitted_word": "athantho"
+        "emitted_word": "athanvtho"
       },
       {
         "word": "khulethihskhonihi",
         "start_sec": 148.66,
         "end_sec": 149.64,
-        "confidence": 0.077627,
+        "confidence": 0.036078,
         "flagged": false,
-        "emitted_word": "khulethhskhonhi"
+        "emitted_word": "khulethihskhonhi"
       },
       {
         "word": "nahskhiyai",
         "start_sec": 150.3,
-        "end_sec": 150.86,
-        "confidence": 0.047653,
+        "end_sec": 151.1,
+        "confidence": 0.017864,
         "flagged": false,
-        "emitted_word": "nahskhya"
+        "emitted_word": "nahskhiyai"
       },
       {
         "word": "tsutlhhoahsithihse",
         "start_sec": 151.3,
         "end_sec": 152.44,
-        "confidence": 0.091968,
+        "confidence": 0.079731,
         "flagged": false,
-        "emitted_word": "tsutlh'hohsithihse"
+        "emitted_word": "tsutlhhohsithihse"
       },
       {
         "word": "nahskhi",
         "start_sec": 152.88,
         "end_sec": 153.22,
-        "confidence": 0.104408,
+        "confidence": 0.029226,
         "flagged": false,
-        "emitted_word": "nhskhi"
+        "emitted_word": "nahskhi"
       },
       {
         "word": "uweyalvtsei",
@@ -1229,21 +1229,21 @@
     "chapter": 1,
     "verse_idx": 11,
     "audio_path": "cherokee_new_testament/split_audio/mark_01_11.wav",
-    "start_sec": 155.16,
-    "end_sec": 164.86,
-    "duration_sec": 9.7,
+    "start_sec": 154.6,
+    "end_sec": 164.71,
+    "duration_sec": 10.11,
     "reference_sentence": "ᎠᎴ ᎯᎠ ᏅᏧᏪᏎ ᎦᎸᎳᏗ, ᏂᎯ ᎬᎨᏳᎢ ᎠᏇᏥ, ᎾᏍᎩ ᎣᏏᏳ ᎬᏰᎸᎢ ᏥᎩ.",
-    "reconciled_phonetics": "ale hi'a ntsuwehse khalvlath, nihi khvkheyu'i akwetsi, nahskhi ohsiyu khvyelv'i tsikh.",
-    "asr_hypothesis": "le hi'a ntsuwehse khalvlath nihi khvkheyu'i akwhetsi nahskhi ohsiyu khvyelv'i tsikh",
-    "cost": -10000000000.0,
+    "reconciled_phonetics": "ale hi'a nvtsuwehse khalvlathi nihi khvkheyu'i akwhetsi nahskhi ohsiyu khvyelvi tsikhi",
+    "asr_hypothesis": "ale hi'a nvtsuwehse khalvlathi nihi khvkheyu'i akwhetsi nahskhi ohsiyu khvyelvi tsikhi",
+    "cost": -9.5438,
     "words": [
       {
         "word": "ale",
-        "start_sec": 155.16,
+        "start_sec": 155.1,
         "end_sec": 155.26,
-        "confidence": 0.969792,
+        "confidence": 0.273615,
         "flagged": false,
-        "emitted_word": "le"
+        "emitted_word": "ale"
       },
       {
         "word": "hia",
@@ -1257,17 +1257,17 @@
         "word": "nvtsuwehse",
         "start_sec": 155.64,
         "end_sec": 156.38,
-        "confidence": 0.964864,
+        "confidence": 0.245721,
         "flagged": false,
-        "emitted_word": "ntsuwehse"
+        "emitted_word": "nvtsuwehse"
       },
       {
         "word": "khalvlathi",
         "start_sec": 156.64,
-        "end_sec": 157.34,
-        "confidence": 0.042163,
+        "end_sec": 157.24,
+        "confidence": 0.05543,
         "flagged": false,
-        "emitted_word": "khalvlath"
+        "emitted_word": "khalvlathi"
       },
       {
         "word": "nihi",
@@ -1313,17 +1313,17 @@
         "word": "khvyelvi",
         "start_sec": 163.34,
         "end_sec": 164.08,
-        "confidence": 0.225508,
+        "confidence": 0.201735,
         "flagged": false,
-        "emitted_word": "khvyelv'i"
+        "emitted_word": "khvyelvi"
       },
       {
         "word": "tsikhi",
         "start_sec": 164.48,
-        "end_sec": 164.86,
-        "confidence": 0.412472,
+        "end_sec": 164.72,
+        "confidence": 0.097668,
         "flagged": false,
-        "emitted_word": "tsikh"
+        "emitted_word": "tsikhi"
       }
     ],
     "cherokee_syllabary": "ᎠᎴ ᎯᎠ ᏅᏧᏪᏎ ᎦᎸᎳᏗ, ᏂᎯ ᎬᎨᏳᎢ ᎠᏇᏥ, ᎾᏍᎩ ᎣᏏᏳ ᎬᏰᎸᎢ ᏥᎩ.",
@@ -1341,17 +1341,17 @@
     "end_sec": 170.13,
     "duration_sec": 4.77,
     "reference_sentence": "ᎩᎳᏉᏃ ᎢᏴᏛ ᎠᏓᏅᏙ ᎢᎾᎨ ᏭᏘᏅᏍᏔᏁᎢ.",
-    "reconciled_phonetics": "khilakwno iyvth athantho inakhe wuthinhvhsthane'i.",
-    "asr_hypothesis": "khilakwhno yvth athantho inakhe wuthhinhvhsthhane'i",
+    "reconciled_phonetics": "khilakwhono yvth athanvtho inakhe wuthhinhvhsthhane'i",
+    "asr_hypothesis": "khilakwhono yvth athanvtho inakhe wuthhinhvhsthhane'i",
     "cost": -8.2032,
     "words": [
       {
         "word": "khilakwhono",
         "start_sec": 165.86,
         "end_sec": 166.26,
-        "confidence": 0.210983,
+        "confidence": 0.18545,
         "flagged": false,
-        "emitted_word": "khilakwhno"
+        "emitted_word": "khilakwhono"
       },
       {
         "word": "iyvthv",
@@ -1365,9 +1365,9 @@
         "word": "athanvtho",
         "start_sec": 167.18,
         "end_sec": 167.88,
-        "confidence": 0.05196,
+        "confidence": 0.037279,
         "flagged": false,
-        "emitted_word": "athantho"
+        "emitted_word": "athanvtho"
       },
       {
         "word": "inakhe",
@@ -1401,8 +1401,8 @@
     "end_sec": 186.59,
     "duration_sec": 15.57,
     "reference_sentence": "ᎾᎿᎭᏃ ᎢᎾᎨ ᎡᏙᎮ ᏅᎦᏍᎪᎯ ᏧᏒᎯᏛ, ᏎᏓᏂ ᎤᎪᎵᏰᏍᎨᎢ; ᎠᎴ ᎢᎾᎨ ᎡᎿᎭᎢ ᏕᎨᎳᏗᏙᎮᎢ; ᎠᎴ ᏗᏂᎧᎿᎭᏩᏗᏙᎯ ᎬᏩᏍᏕᎸᎯᏙᎮᎢ.",
-    "reconciled_phonetics": "nanhahnho inakhe ethohe nvkhskhohi tsuhsvhith, hsethani ukholiyehskhei; al inakh enhhi thekhelathithohe'i; ale thinikhanhahwathithhi khvwahsthelvhithohe'i.",
-    "asr_hypothesis": "nanhanho inakhe ethohe nvkhhskhohi tsuhsvhith hsethani ukholiyehskhei al inakh enhi thekhelathithohe'i ale thinikhhanhawathithhi khvwahsthelvhithohe'i",
+    "reconciled_phonetics": "nanhanho inakhe ethohe nvkhhskhohi tsuhsvhithv hsethani ukholiyehskhei al inakh enhi thekhelathithohe'i ale thinikhhanhawathithohi khvwahsthelvhithohe'i",
+    "asr_hypothesis": "nanhanho inakhe ethohe nvkhhskhohi tsuhsvhithv hsethani ukholiyehskhei al inakh enhi thekhelathithohe'i ale thinikhhanhawathithohi khvwahsthelvhithohe'i",
     "cost": -13.8947,
     "words": [
       {
@@ -1440,16 +1440,16 @@
       {
         "word": "tsuhsvhithv",
         "start_sec": 174.46,
-        "end_sec": 176.04,
-        "confidence": 0.979995,
+        "end_sec": 175.16,
+        "confidence": 0.116351,
         "flagged": false,
-        "emitted_word": "tsuhsvhith"
+        "emitted_word": "tsuhsvhithv"
       },
       {
         "word": "hsethani",
-        "start_sec": 176.04,
+        "start_sec": 176.02,
         "end_sec": 176.54,
-        "confidence": 0.201212,
+        "confidence": 0.201211,
         "flagged": false,
         "emitted_word": "hsethani"
       },
@@ -1505,9 +1505,9 @@
         "word": "thinikhhanhawathithohi",
         "start_sec": 183.18,
         "end_sec": 184.76,
-        "confidence": 0.124187,
+        "confidence": 0.080424,
         "flagged": false,
-        "emitted_word": "thinikhhanhawathithhi"
+        "emitted_word": "thinikhhanhawathithohi"
       },
       {
         "word": "khvwahsthelvhithohei",
@@ -1533,8 +1533,8 @@
     "end_sec": 199.92,
     "duration_sec": 12.9,
     "reference_sentence": "ᏣᏂᏃ ᏗᏓᏍᏚᏗᏱ ᎾᏥᏴᏔᏁᎢ, ᏥᏌ ᎨᎵᎵ ᎤᎷᏤᎢ, ᎠᎵᏥᏙᎲᏍᎨ ᎣᏍᏛ ᎧᏃᎮᏛ ᎤᏁᎳᏅᎯ ᎤᎬᏫᏳᎯ ᎨᏒ ᎤᎬᏩᎵ,",
-    "reconciled_phonetics": "tsaninho thithahsthuthiyi natsiyvthane'i, tsihsa khelili uluhtse'i, alihtsthohvhskh ohsth khanoheth unlanvhi ukhvwiyuhi khsv ukhvwalhi,",
-    "asr_hypothesis": "tsaninho thithahsthuthiyi natsiyvthhane'i tsihsa khelili uluhtse'i alihtsthohvhskh ohsth khhanoheth unlanvhi ukhvwiyuhi khhsv ukhvwalhi",
+    "reconciled_phonetics": "tsaninho thithahsthuthiyi natsiyvthhanei tsihsa khelili uluhtse'i alihtsthohvhskhe ohsthv khhanoheth unlanvhi ukhvwiyuhi khehsv ukhvwalhi",
+    "asr_hypothesis": "tsaninho thithahsthuthiyi natsiyvthhanei tsihsa khelili uluhtse'i alihtsthohvhskhe ohsthv khhanoheth unlanvhi ukhvwiyuhi khehsv ukhvwalhi",
     "cost": -10.8342,
     "words": [
       {
@@ -1557,9 +1557,9 @@
         "word": "natsiyvthhanei",
         "start_sec": 189.86,
         "end_sec": 190.88,
-        "confidence": 0.932515,
+        "confidence": 0.955927,
         "flagged": false,
-        "emitted_word": "natsiyvthhane'i"
+        "emitted_word": "natsiyvthhanei"
       },
       {
         "word": "tsihsa",
@@ -1589,17 +1589,17 @@
         "word": "alitsithohvhskhe",
         "start_sec": 194.2,
         "end_sec": 195.0,
-        "confidence": 0.07421,
+        "confidence": 0.064688,
         "flagged": false,
-        "emitted_word": "alihtsthohvhskh"
+        "emitted_word": "alihtsthohvhskhe"
       },
       {
         "word": "ohsthv",
         "start_sec": 195.16,
         "end_sec": 195.48,
-        "confidence": 0.07366,
+        "confidence": 0.052373,
         "flagged": false,
-        "emitted_word": "ohsth"
+        "emitted_word": "ohsthv"
       },
       {
         "word": "khhanohethv",
@@ -1629,9 +1629,9 @@
         "word": "khehsv",
         "start_sec": 198.66,
         "end_sec": 199.02,
-        "confidence": 0.983338,
+        "confidence": 0.151317,
         "flagged": false,
-        "emitted_word": "khhsv"
+        "emitted_word": "khehsv"
       },
       {
         "word": "ukhvwali",
@@ -1653,45 +1653,45 @@
     "chapter": 1,
     "verse_idx": 15,
     "audio_path": "cherokee_new_testament/split_audio/mark_01_15.wav",
-    "start_sec": 200.96,
-    "end_sec": 216.26,
-    "duration_sec": 15.3,
+    "start_sec": 200.46,
+    "end_sec": 216.25,
+    "duration_sec": 15.79,
     "reference_sentence": "ᎠᎴ ᎯᎠ ᏂᎦᏪᏍᎨᎢ, ᎿᎭᏉ ᎠᎵᏱᎶᎦ, ᎠᎴ ᎤᏁᎳᏅᎯ ᎤᎬᏫᏳᎯ ᎨᏒ ᎡᏍᎦᏂᏳ ᏓᏯᎢ; ᏗᏥᏁᏟᏴᎾ ᏕᏣᏓᏅᏛᎢ, ᎠᎴ ᎢᏦᎯᏳᎲᎦ ᎣᏍᏛ ᎧᏃᎮᏛ.",
-    "reconciled_phonetics": "al hi'a nikhawehskhi, nhahkw alyhilokha, ale unelhanvhi ukhvwiyuhi khsv ehskhanhiyu thaya'i; thtsinelhyvn thetsathnvhthv'i, ale itsohiyuhvkh ohsth khanoheth.",
-    "asr_hypothesis": "al hi'a nikhawehskhi nhakwh alyhilokha ale unelhanvhi ukhvwiyuhi khhsv ehskhanhiyu thaya'i thtsinetlhhyvn thetsathnvhthv'i ale itsohiyuhvkh ohsth khhanoheth",
-    "cost": -10000000000.0,
+    "reconciled_phonetics": "ale hia nikhawehskhei nhakwho alyhilokha ale unelanvhi ukhvwiyuhi khhsv ehskhanhiyu thaya'i thitsinetlhhiyvna thetsathanvhthvi ale itsohiyuhvkha ohsthv khhanohethv",
+    "asr_hypothesis": "ale hia nikhawehskhei nhakwho alyhilokha ale unelanvhi ukhvwiyuhi khhsv ehskhanhiyu thaya'i thitsinetlhhiyvna thetsathanvhthvi ale itsohiyuhvkha ohsthv khhanohethv",
+    "cost": -11.709,
     "words": [
       {
         "word": "ale",
         "start_sec": 200.96,
-        "end_sec": 201.02,
-        "confidence": 0.831274,
+        "end_sec": 201.08,
+        "confidence": 0.250252,
         "flagged": false,
-        "emitted_word": "al"
+        "emitted_word": "ale"
       },
       {
         "word": "hia",
         "start_sec": 201.16,
         "end_sec": 201.36,
-        "confidence": 0.910571,
+        "confidence": 0.907851,
         "flagged": false,
-        "emitted_word": "hi'a"
+        "emitted_word": "hia"
       },
       {
         "word": "nikhawehskhei",
         "start_sec": 201.44,
         "end_sec": 202.28,
-        "confidence": 0.147163,
+        "confidence": 0.143862,
         "flagged": false,
-        "emitted_word": "nikhawehskhi"
+        "emitted_word": "nikhawehskhei"
       },
       {
         "word": "nhakwho",
         "start_sec": 202.66,
         "end_sec": 203.34,
-        "confidence": 0.011394,
-        "flagged": false,
-        "emitted_word": "nhakwh"
+        "confidence": 0.002415,
+        "flagged": true,
+        "emitted_word": "nhakwho"
       },
       {
         "word": "aliyilokha",
@@ -1713,9 +1713,9 @@
         "word": "unelanvhi",
         "start_sec": 205.28,
         "end_sec": 205.96,
-        "confidence": 0.980718,
+        "confidence": 0.993674,
         "flagged": false,
-        "emitted_word": "unelhanvhi"
+        "emitted_word": "unelanvhi"
       },
       {
         "word": "ukhvwiyuhi",
@@ -1751,19 +1751,19 @@
       },
       {
         "word": "thitsinetlhhiyvna",
-        "start_sec": 210.14,
-        "end_sec": 211.06,
-        "confidence": 0.032331,
+        "start_sec": 209.0,
+        "end_sec": 211.12,
+        "confidence": 0.020105,
         "flagged": false,
-        "emitted_word": "thtsinetlhhyvn"
+        "emitted_word": "thitsinetlhhiyvna"
       },
       {
         "word": "thetsathanvthvi",
         "start_sec": 211.34,
         "end_sec": 212.4,
-        "confidence": 0.157947,
+        "confidence": 0.141804,
         "flagged": false,
-        "emitted_word": "thetsathnvhthv'i"
+        "emitted_word": "thetsathanvhthvi"
       },
       {
         "word": "ale",
@@ -1776,32 +1776,32 @@
       {
         "word": "itsohiyuhvkha",
         "start_sec": 213.54,
-        "end_sec": 214.8,
-        "confidence": 0.288316,
+        "end_sec": 214.68,
+        "confidence": 0.278069,
         "flagged": false,
-        "emitted_word": "itsohiyuhvkh"
+        "emitted_word": "itsohiyuhvkha"
       },
       {
         "word": "ohsthv",
         "start_sec": 214.98,
         "end_sec": 215.36,
-        "confidence": 0.116938,
+        "confidence": 0.069875,
         "flagged": false,
-        "emitted_word": "ohsth"
+        "emitted_word": "ohsthv"
       },
       {
         "word": "khhanohethv",
         "start_sec": 215.58,
         "end_sec": 216.26,
-        "confidence": 0.079343,
+        "confidence": 0.070709,
         "flagged": false,
-        "emitted_word": "khhanoheth"
+        "emitted_word": "khhanohethv"
       }
     ],
     "cherokee_syllabary": "ᎠᎴ ᎯᎠ ᏂᎦᏪᏍᎨᎢ, ᎿᎭᏉ ᎠᎵᏱᎶᎦ, ᎠᎴ ᎤᏁᎳᏅᎯ ᎤᎬᏫᏳᎯ ᎨᏒ ᎡᏍᎦᏂᏳ ᏓᏯᎢ; ᏗᏥᏁᏟᏴᎾ ᏕᏣᏓᏅᏛᎢ, ᎠᎴ ᎢᏦᎯᏳᎲᎦ ᎣᏍᏛ ᎧᏃᎮᏛ.",
     "phonetic": "A-le hi-a ni-ga-we-s-ge-i, Hna-quo a-li-yi-lo-ga, a-le U-ne-la-nv-hi u-gv-wi-yu-hi ge-sv e-s-ga-ni-yu da-ya-i; di-tsi-ne-tli-yv-na de-tsa-da-nv-dv-i, a-le i-tso-hi-yu-hv-ga o-s-dv ka-no-he-dv.",
     "english": "And saying, The time is fulfilled, and the kingdom of God is at hand: repent ye, and believe the gospel.",
-    "has_anomalies": false
+    "has_anomalies": true
   },
   {
     "verse_id": "020116",
@@ -1809,12 +1809,12 @@
     "chapter": 1,
     "verse_idx": 16,
     "audio_path": "cherokee_new_testament/split_audio/mark_01_16.wav",
-    "start_sec": 216.26,
+    "start_sec": 216.25,
     "end_sec": 233.22,
-    "duration_sec": 16.96,
+    "duration_sec": 16.97,
     "reference_sentence": "ᎨᎵᎵᏃ ᎥᏓᎵ ᎤᎶᏗ ᎠᎢᏒᎢ, ᏚᎪᎮ ᏌᏩᏂ ᎠᎴ ᎡᏂᏗ ᎾᏍᎩ ᏗᎾᏓᏅᏟ, ᎥᏓᎵ ᎠᏂᎦᏯᎷᎥᏍᎨᎢ; ᎠᏂᎦᏯᎷᎥᏍᎩᏰᏃ ᎨᏎᎢ.",
-    "reconciled_phonetics": "khelilinho vthali ulthi a'ihsv'i, thukhhe hsawani ale enith nhskhi thinathanhvlhi, vthali anikhyalu'vhskhe'i; anikhyalu'vhskhiyhenho khehse'i.",
-    "asr_hypothesis": "khelilinho vthali ulthi a'ihsv'i thukhhe hsawani ale enith nhskhi thinathanhvtlhhi vthali anikhyalu'vhskhe'i anikhyalu'vhskhiyhenho khehse'i",
+    "reconciled_phonetics": "khelilinho vthali ulthi a'ihsv'i thukhohe hsawani ale enithi nahskhi thinathanhvtlhhi vthali anikhayalu'vhskhe'i anikhayalu'vhskhiyhenho khehse'i",
+    "asr_hypothesis": "khelilinho vthali ulthi a'ihsv'i thukhohe hsawani ale enithi nahskhi thinathanhvtlhhi vthali anikhayalu'vhskhe'i anikhayalu'vhskhiyhenho khehse'i",
     "cost": -10.8438,
     "words": [
       {
@@ -1853,9 +1853,9 @@
         "word": "thukhohe",
         "start_sec": 221.5,
         "end_sec": 222.12,
-        "confidence": 0.136433,
+        "confidence": 0.039064,
         "flagged": false,
-        "emitted_word": "thukhhe"
+        "emitted_word": "thukhohe"
       },
       {
         "word": "hsawani",
@@ -1876,18 +1876,18 @@
       {
         "word": "enithi",
         "start_sec": 223.68,
-        "end_sec": 224.18,
-        "confidence": 0.008186,
-        "flagged": true,
-        "emitted_word": "enith"
+        "end_sec": 224.08,
+        "confidence": 0.016974,
+        "flagged": false,
+        "emitted_word": "enithi"
       },
       {
         "word": "nahskhi",
         "start_sec": 224.74,
         "end_sec": 225.0,
-        "confidence": 0.079671,
+        "confidence": 0.026283,
         "flagged": false,
-        "emitted_word": "nhskhi"
+        "emitted_word": "nahskhi"
       },
       {
         "word": "thinathanvtlhhi",
@@ -1909,17 +1909,17 @@
         "word": "anikhayaluvhskhei",
         "start_sec": 227.7,
         "end_sec": 229.24,
-        "confidence": 0.242796,
+        "confidence": 0.217349,
         "flagged": false,
-        "emitted_word": "anikhyalu'vhskhe'i"
+        "emitted_word": "anikhayalu'vhskhe'i"
       },
       {
         "word": "anikhayaluvhskhiyeno",
         "start_sec": 230.2,
         "end_sec": 232.0,
-        "confidence": 0.165507,
+        "confidence": 0.161173,
         "flagged": false,
-        "emitted_word": "anikhyalu'vhskhiyhenho"
+        "emitted_word": "anikhayalu'vhskhiyhenho"
       },
       {
         "word": "khehsei",
@@ -1933,7 +1933,7 @@
     "cherokee_syllabary": "ᎨᎵᎵᏃ ᎥᏓᎵ ᎤᎶᏗ ᎠᎢᏒᎢ, ᏚᎪᎮ ᏌᏩᏂ ᎠᎴ ᎡᏂᏗ ᎾᏍᎩ ᏗᎾᏓᏅᏟ, ᎥᏓᎵ ᎠᏂᎦᏯᎷᎥᏍᎨᎢ; ᎠᏂᎦᏯᎷᎥᏍᎩᏰᏃ ᎨᏎᎢ.",
     "phonetic": "Ge-li-li-no v-da-li u-lo-di a-i-sv-i, du-go-he Sa-wa-ni a-le E-ni-di na-s-gi di-na-da-nv-tli, v-da-li a-ni-ga-ya-lu-v-s-ge-i; a-ni-ga-ya-lu-v-s-gi-ye-no ge-se-i.",
     "english": "Now as he walked by the sea of Galilee, he saw Simon and Andrew his brother casting a net into the sea: for they were fishers.",
-    "has_anomalies": true
+    "has_anomalies": false
   },
   {
     "verse_id": "020117",
@@ -1945,8 +1945,8 @@
     "end_sec": 242.63,
     "duration_sec": 9.07,
     "reference_sentence": "ᏥᏌᏃ ᎯᎠ ᏂᏚᏪᏎᎴᎢ; ᏍᎩᏂᏍᏓᏩᏚᎦ, ᏴᏫᏃ ᏗᏍᏗᎦᏯᎷᎥᏍᎩ ᏅᏓᏍᏛᏴᏁᎵ.",
-    "reconciled_phonetics": "tsihsano ha nthuwehsele'i; hskhinihsthawathukha, yvwinho thsthikhyalu'vhskhi nthsthyvneli.",
-    "asr_hypothesis": "tsihsano hi nthuwehsele'i hskhinihsthawathukha yvwinho thhsthikhyalu'vhskhi nthhsthyvneli",
+    "reconciled_phonetics": "tsihsano hi'a nthuwehselei hskhinihsthawathukha yvwino thihsthikhyalu'vhskhi nvthhsthvyvneli",
+    "asr_hypothesis": "tsihsano hi'a nthuwehselei hskhinihsthawathukha yvwino thihsthikhyalu'vhskhi nvthhsthvyvneli",
     "cost": -9.965,
     "words": [
       {
@@ -1960,18 +1960,18 @@
       {
         "word": "hia",
         "start_sec": 234.78,
-        "end_sec": 234.82,
-        "confidence": 0.736697,
+        "end_sec": 234.94,
+        "confidence": 0.22721,
         "flagged": false,
-        "emitted_word": "hi"
+        "emitted_word": "hi'a"
       },
       {
         "word": "nithuwehselei",
-        "start_sec": 234.92,
+        "start_sec": 235.02,
         "end_sec": 235.94,
-        "confidence": 0.133543,
+        "confidence": 0.09966,
         "flagged": false,
-        "emitted_word": "nthuwehsele'i"
+        "emitted_word": "nthuwehselei"
       },
       {
         "word": "hskhinihsthawathukha",
@@ -1985,25 +1985,25 @@
         "word": "yvwino",
         "start_sec": 238.68,
         "end_sec": 239.22,
-        "confidence": 0.974957,
+        "confidence": 0.995166,
         "flagged": false,
-        "emitted_word": "yvwinho"
+        "emitted_word": "yvwino"
       },
       {
         "word": "thihsthikhayaluvhskhi",
         "start_sec": 239.44,
         "end_sec": 240.88,
-        "confidence": 0.161858,
+        "confidence": 0.0906,
         "flagged": false,
-        "emitted_word": "thhsthikhyalu'vhskhi"
+        "emitted_word": "thihsthikhyalu'vhskhi"
       },
       {
         "word": "nvthahsthvyvneli",
         "start_sec": 241.34,
         "end_sec": 242.64,
-        "confidence": 0.364608,
+        "confidence": 0.166752,
         "flagged": false,
-        "emitted_word": "nthhsthyvneli"
+        "emitted_word": "nvthhsthvyvneli"
       }
     ],
     "cherokee_syllabary": "ᏥᏌᏃ ᎯᎠ ᏂᏚᏪᏎᎴᎢ; ᏍᎩᏂᏍᏓᏩᏚᎦ, ᏴᏫᏃ ᏗᏍᏗᎦᏯᎷᎥᏍᎩ ᏅᏓᏍᏛᏴᏁᎵ.",
@@ -2021,17 +2021,17 @@
     "end_sec": 249.11,
     "duration_sec": 6.23,
     "reference_sentence": "ᎩᎳᏉᏃ ᎢᏴᏛ ᏚᏂᏲᏎ ᏧᏂᎦᏯᎷᏗ, ᎠᎴ ᎬᏩᏍᏓᏩᏛᏎᎢ.",
-    "reconciled_phonetics": "khilakwno iyvth thuniyohse tsunikhyaluthi, ale khvwhsthawathvhse'i.",
-    "asr_hypothesis": "khilakwhno iyvth thuniyohse tsunikhyaluthi ale khvwhsthawathvhse'i",
+    "reconciled_phonetics": "khilakwhono iyvth thuniyohse tsunikhyaluthi ale khvwhsthawathvhse'i",
+    "asr_hypothesis": "khilakwhono iyvth thuniyohse tsunikhyaluthi ale khvwhsthawathvhse'i",
     "cost": -7.3651,
     "words": [
       {
         "word": "khilakwhono",
         "start_sec": 243.38,
         "end_sec": 243.88,
-        "confidence": 0.161913,
+        "confidence": 0.132931,
         "flagged": false,
-        "emitted_word": "khilakwhno"
+        "emitted_word": "khilakwhono"
       },
       {
         "word": "iyvthv",
@@ -2089,17 +2089,17 @@
     "end_sec": 268.41,
     "duration_sec": 18.53,
     "reference_sentence": "ᎾᎿᎭᏃ ᏫᎤᏪᏅ ᎤᏍᏗᎩᏛ, ᏚᎪᎮ ᏥᎻ, ᏤᏈᏗ ᎤᏪᏥ, ᏣᏂᏃ ᎾᏍᎩ ᏗᎾᏓᏅᏟ, ᎾᏍᎩᏃ ᎾᏍᏉ ᎤᎾᏣᎡ ᏥᏳᎯ ᏓᏃᏢᎯᏏᏍᎨ ᏧᏂᎦᏯᎷᏗ.",
-    "reconciled_phonetics": "nanhahnho wi'uwenv uhsthikhith, thukhohe tsimi, tsekwith uwetsi, tsaninho nahskhi thinathanhvlhi, nahskhinho nahskw untsa'e tsiyuhi thanolhvhihsihskhe tsunikhyaluthi.",
-    "asr_hypothesis": "nanhanho wi'uwenv uhsthikhith thukhohe tsimi tsekwhith uwetsi tsaninho nahskhi thinathanhvtlhhi nahskhinho nahskwh untsa'e tsiyuhi thanotlhhvhihsihskhe tsunikhyaluthi",
-    "cost": -10.6313,
+    "reconciled_phonetics": "nanhano wi'uwenv uhsthikhithv thukhohe tsimi tsekwhith uwetsi tsaninho nahskhi thinathanhvtlhhi nahskhino nahskwh unatsa'e tsiyuhi thanotlhhvhihsihskhe tsunikhayaluthi",
+    "asr_hypothesis": "nanhano wi'uwenv uhsthikhithv thukhohe tsimi tsekwhith uwetsi tsaninho nahskhi thinathanhvtlhhi nahskhino nahskwh unatsa'e tsiyuhi thanotlhhvhihsihskhe tsunikhayaluthi",
+    "cost": -10.2512,
     "words": [
       {
         "word": "nanhano",
         "start_sec": 250.38,
-        "end_sec": 250.94,
-        "confidence": 0.199653,
+        "end_sec": 250.96,
+        "confidence": 0.35743,
         "flagged": false,
-        "emitted_word": "nanhanho"
+        "emitted_word": "nanhano"
       },
       {
         "word": "wiuwenv",
@@ -2113,9 +2113,9 @@
         "word": "uhsthikhithv",
         "start_sec": 252.94,
         "end_sec": 253.76,
-        "confidence": 0.07164,
+        "confidence": 0.037686,
         "flagged": false,
-        "emitted_word": "uhsthikhith"
+        "emitted_word": "uhsthikhithv"
       },
       {
         "word": "thukhohe",
@@ -2177,9 +2177,9 @@
         "word": "nahskhino",
         "start_sec": 261.08,
         "end_sec": 261.58,
-        "confidence": 0.14794,
+        "confidence": 0.123167,
         "flagged": false,
-        "emitted_word": "nahskhinho"
+        "emitted_word": "nahskhino"
       },
       {
         "word": "nahskwho",
@@ -2193,9 +2193,9 @@
         "word": "unatsae",
         "start_sec": 262.14,
         "end_sec": 264.1,
-        "confidence": 0.995807,
+        "confidence": 0.519335,
         "flagged": false,
-        "emitted_word": "untsa'e"
+        "emitted_word": "unatsa'e"
       },
       {
         "word": "tsiyuhi",
@@ -2217,9 +2217,9 @@
         "word": "tsunikhayaluthi",
         "start_sec": 267.44,
         "end_sec": 268.42,
-        "confidence": 0.219942,
+        "confidence": 0.177512,
         "flagged": false,
-        "emitted_word": "tsunikhyaluthi"
+        "emitted_word": "tsunikhayaluthi"
       }
     ],
     "cherokee_syllabary": "ᎾᎿᎭᏃ ᏫᎤᏪᏅ ᎤᏍᏗᎩᏛ, ᏚᎪᎮ ᏥᎻ, ᏤᏈᏗ ᎤᏪᏥ, ᏣᏂᏃ ᎾᏍᎩ ᏗᎾᏓᏅᏟ, ᎾᏍᎩᏃ ᎾᏍᏉ ᎤᎾᏣᎡ ᏥᏳᎯ ᏓᏃᏢᎯᏏᏍᎨ ᏧᏂᎦᏯᎷᏗ.",
@@ -2237,8 +2237,8 @@
     "end_sec": 284.81,
     "duration_sec": 15.93,
     "reference_sentence": "ᎩᎳᏉᏃ ᎢᏴᏛ ᎾᏍᎩ ᏫᏚᏯᏅᎮᎢ; ᎤᏅᏕᏨᏃ ᎤᏂᏙᏓ ᏤᏈᏗ ᎨᎦᎫᏴᎡᎯ ᏧᏂᏅᏏᏓᏍᏗ ᎢᏧᎳᎭ ᏥᏳᎯ ᎤᎾᏣᎥᎢ, ᎬᏩᏍᏓᏩᏛᏎᎢ.",
-    "reconciled_phonetics": "khilakwno iyvth nhskhi withuyhanvhe'i; unvthtsvnho unithotha tsekwith khekhakhuyv'ehi tsninvhsithahsthi itsulha tsiyuhi unatsa'v'i, khvwahsthawathse'i.",
-    "asr_hypothesis": "khilakwhno iyvth nhskhi withuyhanvhe'i nvthtsvnho unithotha tsekwhith khekhakhuyv'ehi tsninvhsithahsthi itsulha tsiyuhi unatsa'v'i khvwahsthawathhse'i",
+    "reconciled_phonetics": "khilakwhno iyvth nahskhi withuyanvhe'i unvthetsvnho unithotha tsekwhithi khekhakhuyv'ehi tsuninvhsithahsthi itsulaha tsiyuhi unatsa'v'i khvwahsthawathvhse'i",
+    "asr_hypothesis": "khilakwhno iyvth nahskhi withuyanvhe'i unvthetsvnho unithotha tsekwhithi khekhakhuyv'ehi tsuninvhsithahsthi itsulaha tsiyuhi unatsa'v'i khvwahsthawathvhse'i",
     "cost": -10.711,
     "words": [
       {
@@ -2261,25 +2261,25 @@
         "word": "nahskhi",
         "start_sec": 270.56,
         "end_sec": 270.94,
-        "confidence": 0.089174,
+        "confidence": 0.031656,
         "flagged": false,
-        "emitted_word": "nhskhi"
+        "emitted_word": "nahskhi"
       },
       {
         "word": "withuyanvhei",
         "start_sec": 271.02,
         "end_sec": 272.02,
-        "confidence": 0.382669,
+        "confidence": 0.357983,
         "flagged": false,
-        "emitted_word": "withuyhanvhe'i"
+        "emitted_word": "withuyanvhe'i"
       },
       {
         "word": "unvthetsvno",
-        "start_sec": 272.98,
+        "start_sec": 272.1,
         "end_sec": 273.74,
-        "confidence": 0.369947,
+        "confidence": 0.164107,
         "flagged": false,
-        "emitted_word": "nvthtsvnho"
+        "emitted_word": "unvthetsvnho"
       },
       {
         "word": "unithotha",
@@ -2293,9 +2293,9 @@
         "word": "tsekwhithi",
         "start_sec": 274.78,
         "end_sec": 275.26,
-        "confidence": 0.120527,
+        "confidence": 0.109765,
         "flagged": false,
-        "emitted_word": "tsekwhith"
+        "emitted_word": "tsekwhithi"
       },
       {
         "word": "khekhakhuyvehi",
@@ -2309,17 +2309,17 @@
         "word": "tsuninvhsithahsthi",
         "start_sec": 278.38,
         "end_sec": 279.6,
-        "confidence": 0.236684,
+        "confidence": 0.202547,
         "flagged": false,
-        "emitted_word": "tsninvhsithahsthi"
+        "emitted_word": "tsuninvhsithahsthi"
       },
       {
         "word": "itsulaha",
         "start_sec": 280.34,
         "end_sec": 280.86,
-        "confidence": 0.691435,
+        "confidence": 0.318089,
         "flagged": false,
-        "emitted_word": "itsulha"
+        "emitted_word": "itsulaha"
       },
       {
         "word": "tsiyuhi",
@@ -2341,9 +2341,9 @@
         "word": "khvwahsthawathvhsei",
         "start_sec": 283.5,
         "end_sec": 284.82,
-        "confidence": 0.287398,
+        "confidence": 0.154843,
         "flagged": false,
-        "emitted_word": "khvwahsthawathhse'i"
+        "emitted_word": "khvwahsthawathvhse'i"
       }
     ],
     "cherokee_syllabary": "ᎩᎳᏉᏃ ᎢᏴᏛ ᎾᏍᎩ ᏫᏚᏯᏅᎮᎢ; ᎤᏅᏕᏨᏃ ᎤᏂᏙᏓ ᏤᏈᏗ ᎨᎦᎫᏴᎡᎯ ᏧᏂᏅᏏᏓᏍᏗ ᎢᏧᎳᎭ ᏥᏳᎯ ᎤᎾᏣᎥᎢ, ᎬᏩᏍᏓᏩᏛᏎᎢ.",
@@ -2357,13 +2357,13 @@
     "chapter": 1,
     "verse_idx": 21,
     "audio_path": "cherokee_new_testament/split_audio/mark_01_21.wav",
-    "start_sec": 284.88,
-    "end_sec": 296.5,
-    "duration_sec": 11.62,
+    "start_sec": 284.81,
+    "end_sec": 296.49,
+    "duration_sec": 11.68,
     "reference_sentence": "ᎨᏆᏂᏃ ᏭᏂᏴᎴᎢ; ᎩᎳᏉᏃ ᎢᏴᏛ ᏗᎦᎳᏫᎢᏍᏗᏱ ᏭᏴᎸ ᏚᏕᏲᏁ ᎤᎾᏙᏓᏆᏍᎬ ᎢᎦ.",
-    "reconciled_phonetics": "khekwaninho wuniyvlhe'i; khilakwnho iyvth thkhalawi'ihsthiyi wuyvlhv thutheyhonhe unathothakwahskhv ikh.",
-    "asr_hypothesis": "khekwhaninho wuniyvlhe'i khilakwhnho iyvth thkhalawi'ihsthiyi wuyvlhv thutheyhonhe unathothakwhahskhv ikh",
-    "cost": -10000000000.0,
+    "reconciled_phonetics": "khekwhaninho wuniyvlhe'i khilakwhono iyvthv thikhlawi'ihsthiyi wuyvlhv thutheyhonhe unathothakwhahskhv ikha",
+    "asr_hypothesis": "khekwhaninho wuniyvlhe'i khilakwhono iyvthv thikhlawi'ihsthiyi wuyvlhv thutheyhonhe unathothakwhahskhv ikha",
+    "cost": -11.734,
     "words": [
       {
         "word": "khekwhanino",
@@ -2385,25 +2385,25 @@
         "word": "khilakwhono",
         "start_sec": 288.02,
         "end_sec": 289.52,
-        "confidence": 0.052318,
+        "confidence": 0.03565,
         "flagged": false,
-        "emitted_word": "khilakwhnho"
+        "emitted_word": "khilakwhono"
       },
       {
         "word": "iyvthv",
         "start_sec": 289.64,
-        "end_sec": 290.12,
-        "confidence": 0.199932,
+        "end_sec": 290.34,
+        "confidence": 0.025958,
         "flagged": false,
-        "emitted_word": "iyvth"
+        "emitted_word": "iyvthv"
       },
       {
         "word": "thikhalawiihsthiyi",
-        "start_sec": 290.3,
+        "start_sec": 290.56,
         "end_sec": 291.72,
-        "confidence": 0.016175,
+        "confidence": 0.059687,
         "flagged": false,
-        "emitted_word": "thkhalawi'ihsthiyi"
+        "emitted_word": "thikhlawi'ihsthiyi"
       },
       {
         "word": "wuyvlv",
@@ -2433,15 +2433,15 @@
         "word": "ikha",
         "start_sec": 296.04,
         "end_sec": 296.5,
-        "confidence": 0.017988,
-        "flagged": false,
-        "emitted_word": "ikh"
+        "confidence": 0.002915,
+        "flagged": true,
+        "emitted_word": "ikha"
       }
     ],
     "cherokee_syllabary": "ᎨᏆᏂᏃ ᏭᏂᏴᎴᎢ; ᎩᎳᏉᏃ ᎢᏴᏛ ᏗᎦᎳᏫᎢᏍᏗᏱ ᏭᏴᎸ ᏚᏕᏲᏁ ᎤᎾᏙᏓᏆᏍᎬ ᎢᎦ.",
     "phonetic": "Ge-qua-ni-no wu-ni-yv-le-i; gi-la-quo-no i-yv-dv di-ga-la-wi-i-s-di-yi wu-yv-lv du-de-yo-ne u-na-do-da-qua-s-gv i-ga.",
     "english": "And they went into Capernaum; and straightway on the sabbath day he entered into the synagogue, and taught.",
-    "has_anomalies": false
+    "has_anomalies": true
   },
   {
     "verse_id": "020122",
@@ -2453,17 +2453,17 @@
     "end_sec": 313.53,
     "duration_sec": 16.23,
     "reference_sentence": "ᎤᏂᏍᏆᏂᎪᏎᏃ ᏄᏍᏛ ᏓᏕᏲᎲᏍᎬᎢ, ᏚᏕᏲᏁᏰᏃ ᎤᎵᏂᎩᏛ ᏧᎰ ᎾᏍᎩᏯᎢ, ᎥᏝᏃ ᏗᏃᏪᎵᏍᎩ ᏓᎾᏕᏲᎲᏍᎬ ᎾᏍᎩᏯ ᏱᎨᏎᎢ.",
-    "reconciled_phonetics": "unihskwanikhsenho nuhsthv thatheyhohvhskhv'i, thuthyhonheyheno ulhinikhith tsuho nahskhiya'i, vlhanho thnowhelihskh thanatheyohvhskhv nahskhiya yikhehse'i.",
-    "asr_hypothesis": "unihskwhanikhhsenho nuhsthv thatheyhohvhskhv'i thuthyhonheyheno ulhinikhith tsuho nahskhiya'i vtlhhanho thnowhelihskh thanatheyohvhskhv nahskhiya yikhehse'i",
-    "cost": -9.6509,
+    "reconciled_phonetics": "unihskwhanikhohsenho nuhsthv thatheyhohvhskhv'i thutheyhoneyheno ulhinikhithv tsuho nahskhiya'i vtlhhano thnowhelihskhi thanatheyohvhskhv nahskhiya yikhehsei",
+    "asr_hypothesis": "unihskwhanikhohsenho nuhsthv thatheyhohvhskhv'i thutheyhoneyheno ulhinikhithv tsuho nahskhiya'i vtlhhano thnowhelihskhi thanatheyohvhskhv nahskhiya yikhehsei",
+    "cost": -8.9117,
     "words": [
       {
         "word": "unihskwhanikhohseno",
         "start_sec": 297.8,
         "end_sec": 299.24,
-        "confidence": 0.516367,
+        "confidence": 0.325676,
         "flagged": false,
-        "emitted_word": "unihskwhanikhhsenho"
+        "emitted_word": "unihskwhanikhohsenho"
       },
       {
         "word": "nuhsthv",
@@ -2485,17 +2485,17 @@
         "word": "thutheyoneyeno",
         "start_sec": 301.26,
         "end_sec": 303.76,
-        "confidence": 0.09772,
+        "confidence": 0.083304,
         "flagged": false,
-        "emitted_word": "thuthyhonheyheno"
+        "emitted_word": "thutheyhoneyheno"
       },
       {
         "word": "ulinikhithv",
         "start_sec": 304.24,
-        "end_sec": 305.02,
-        "confidence": 0.124788,
+        "end_sec": 305.14,
+        "confidence": 0.046731,
         "flagged": false,
-        "emitted_word": "ulhinikhith"
+        "emitted_word": "ulhinikhithv"
       },
       {
         "word": "tsuho",
@@ -2517,17 +2517,17 @@
         "word": "vtlhhano",
         "start_sec": 308.14,
         "end_sec": 308.58,
-        "confidence": 0.223446,
+        "confidence": 0.195914,
         "flagged": false,
-        "emitted_word": "vtlhhanho"
+        "emitted_word": "vtlhhano"
       },
       {
         "word": "thinowelihskhi",
         "start_sec": 308.74,
-        "end_sec": 309.88,
-        "confidence": 0.164428,
+        "end_sec": 309.8,
+        "confidence": 0.191793,
         "flagged": false,
-        "emitted_word": "thnowhelihskh"
+        "emitted_word": "thnowhelihskhi"
       },
       {
         "word": "thanatheyohvhskhv",
@@ -2549,9 +2549,9 @@
         "word": "yikhehsei",
         "start_sec": 312.78,
         "end_sec": 313.54,
-        "confidence": 0.210575,
+        "confidence": 0.182529,
         "flagged": false,
-        "emitted_word": "yikhehse'i"
+        "emitted_word": "yikhehsei"
       }
     ],
     "cherokee_syllabary": "ᎤᏂᏍᏆᏂᎪᏎᏃ ᏄᏍᏛ ᏓᏕᏲᎲᏍᎬᎢ, ᏚᏕᏲᏁᏰᏃ ᎤᎵᏂᎩᏛ ᏧᎰ ᎾᏍᎩᏯᎢ, ᎥᏝᏃ ᏗᏃᏪᎵᏍᎩ ᏓᎾᏕᏲᎲᏍᎬ ᎾᏍᎩᏯ ᏱᎨᏎᎢ.",
@@ -2569,8 +2569,8 @@
     "end_sec": 322.37,
     "duration_sec": 8.31,
     "reference_sentence": "ᏧᏂᎳᏫᎢᏍᏗᏱᏃ ᎠᏯᎡ ᎠᏍᎦᏯ ᎦᏓᎭ ᎠᏓᏅᏙ ᎤᏯᎢ, ᎠᎴ ᎤᏪᎷᏁ,",
-    "reconciled_phonetics": "tsunilawihsthiynho aye ahskhaya khathaha athanhvhtho uya'i, ale uwelhunhe,",
-    "asr_hypothesis": "tsunilawihsthiynho aya ahskhaya khathaha athanhvhtho uya'i ale uwelhunhe",
+    "reconciled_phonetics": "tsunilawihsthiynho ayae ahskhaya khathaha athanhvhtho uya'i ale uwelhunhe",
+    "asr_hypothesis": "tsunilawihsthiynho ayae ahskhaya khathaha athanhvhtho uya'i ale uwelhunhe",
     "cost": -10.9536,
     "words": [
       {
@@ -2584,10 +2584,10 @@
       {
         "word": "ayae",
         "start_sec": 316.48,
-        "end_sec": 316.76,
-        "confidence": 0.997231,
+        "end_sec": 316.92,
+        "confidence": 0.073419,
         "flagged": false,
-        "emitted_word": "aya"
+        "emitted_word": "ayae"
       },
       {
         "word": "ahskhaya",
@@ -2653,8 +2653,8 @@
     "end_sec": 343.55,
     "duration_sec": 21.18,
     "reference_sentence": "ᎯᎠ ᏄᏪᏎᎢ, ᎣᎦᏁᎳᎩ; ᎦᏙ ᏗᎦᏓᏛᏙᏗ ᏂᎯ, ᏥᏌ, ᎾᏎᎵᏗ ᎮᎯ?  ᏥᎪ ᏍᎩᏛᏔᏂᎸ?  ᎬᎦᏔᎭ, ᏂᎯ ᎾᏍᎩ ᎨᏒᎢ; ᎾᏍᎩ ᎠᏥᎸᏉᏗ ᎤᏁᎳᏅᎯ ᎤᏤᎵᎦ.",
-    "reconciled_phonetics": "hi'a nuwehse'i, okhanelakhi; khatho thikhathaththothi nihi, tsihsa, nahselithi hehi?  tsikh hskhithvhthanilhv?  khvkhathaha, nihi nahskhi khehshv'i; nhskhi atsilvkwothi unelhanvh utselikha.",
-    "asr_hypothesis": "hi'a nuwehse'i okhanelakhi khatho thikhathaththothi nihi tsihsa nahselithi hehi tsikh hskhithvhthhanilhv khvkhathhaha nihi nahskhi khehshv'i nhskhi atsilvkwhothi unelhanvh utselikha",
+    "reconciled_phonetics": "hi'a nuwehse'i okhanelakhi khatho thikhathaththothi nihi tsihsa nahselithi hehi tsikho hskhithvhthhanilhv khvkhathhaha nihi nahskhi khehsv'i nahskhi atsilvkwhothi unelhanvhi utselikha",
+    "asr_hypothesis": "hi'a nuwehse'i okhanelakhi khatho thikhathaththothi nihi tsihsa nahselithi hehi tsikho hskhithvhthhanilhv khvkhathhaha nihi nahskhi khehsv'i nahskhi atsilvkwhothi unelhanvhi utselikha",
     "cost": -11.141,
     "words": [
       {
@@ -2732,16 +2732,16 @@
       {
         "word": "tsikho",
         "start_sec": 333.46,
-        "end_sec": 335.18,
-        "confidence": 0.009481,
+        "end_sec": 334.76,
+        "confidence": 0.001745,
         "flagged": true,
-        "emitted_word": "tsikh"
+        "emitted_word": "tsikho"
       },
       {
         "word": "hskhithvthhanilv",
-        "start_sec": 335.18,
+        "start_sec": 335.16,
         "end_sec": 336.4,
-        "confidence": 0.279131,
+        "confidence": 0.279122,
         "flagged": false,
         "emitted_word": "hskhithvhthhanilhv"
       },
@@ -2773,17 +2773,17 @@
         "word": "khehsvi",
         "start_sec": 339.36,
         "end_sec": 339.88,
-        "confidence": 0.220021,
+        "confidence": 0.197373,
         "flagged": false,
-        "emitted_word": "khehshv'i"
+        "emitted_word": "khehsv'i"
       },
       {
         "word": "nahskhi",
         "start_sec": 340.42,
         "end_sec": 340.72,
-        "confidence": 0.091839,
+        "confidence": 0.027269,
         "flagged": false,
-        "emitted_word": "nhskhi"
+        "emitted_word": "nahskhi"
       },
       {
         "word": "atsilvkwhothi",
@@ -2796,10 +2796,10 @@
       {
         "word": "unelanvhi",
         "start_sec": 341.82,
-        "end_sec": 342.48,
-        "confidence": 0.46806,
+        "end_sec": 342.54,
+        "confidence": 0.328115,
         "flagged": false,
-        "emitted_word": "unelhanvh"
+        "emitted_word": "unelhanvhi"
       },
       {
         "word": "utselikha",
@@ -2825,7 +2825,7 @@
     "end_sec": 350.84,
     "duration_sec": 7.06,
     "reference_sentence": "ᏥᏌᏃ ᎤᏍᎦᏤᎢ, ᎯᎠ ᏄᏪᏎᎢ; ᎡᎳᏪ ᎲᎾ, ᎠᎴ ᎯᏄᎪᎢ.",
-    "reconciled_phonetics": "tsihsanho uhskhatse'i, hi'a nuwehse'i; elhawe hvna, ale hinukho'i.",
+    "reconciled_phonetics": "tsihsanho uhskhatse'i hi'a nuwehse'i elhawe hvna ale hinukho'i",
     "asr_hypothesis": "tsihsanho uhskhatse'i hi'a nuwehse'i elhawe hvna ale hinukho'i",
     "cost": -10.3303,
     "words": [
@@ -2909,7 +2909,7 @@
     "end_sec": 358.08,
     "duration_sec": 6.88,
     "reference_sentence": "ᎦᏓᎭᏃ ᎠᏓᏅᏙ ᎤᎸᏕᏍᏔᏅ, ᎠᎴ ᎠᏍᏓᏯ ᎤᏪᎷᏅ, ᎤᏄᎪᏤᎢ.",
-    "reconciled_phonetics": "khathahanho athantho ulvthehsthanv, ale ahsthaya uwelhunhv, unukhotse'i.",
+    "reconciled_phonetics": "khathahanho athantho lvthehsthhanv ale ahsthaya uwelhunhv unukhotse'i",
     "asr_hypothesis": "khathahanho athantho lvthehsthhanv ale ahsthaya uwelhunhv unukhotse'i",
     "cost": -9.5028,
     "words": [
@@ -2985,8 +2985,8 @@
     "end_sec": 381.99,
     "duration_sec": 23.53,
     "reference_sentence": "ᏂᎦᏛᏃ ᎤᏂᏍᏆᏂᎪᏎᎢ; ᎠᎴ ᎤᏅᏒ ᎨᏒ ᏚᎾᏓᏛᏛᏁᎢ, ᎯᎠ ᎾᏂᏪᏍᎨᎢ; ᎦᏙ ᎤᏰᎸᏗ ᎯᎠ?  ᎦᏙ ᎤᏍᏗ ᎯᎠ ᎢᏤ ᏗᏕᏲᏗ ᎨᏒᎢ?  ᎤᎵᏂᎩᏛᏰᏃ ᎤᎲ ᎬᏗ ᏕᎧᏁᏤᎰ ᎠᏂᎦᏓᎭ ᏗᏓᏅᏙ, ᎠᎴ ᎬᏬᎯᏳᎲᏍᎪᎢ.",
-    "reconciled_phonetics": "nikhathvnho unihskwanikhse'i; ale unvhsv khsv thunathathvthvnhe'i, hi'a naniwehskhe'i; khatho uyelhvhth hi'a?  khatho uhsthi hi'a itse thitheyhohthi khsv'i?  ulhinikhithvyhenho uhv khthi thekhanetsheho anikhathha thithanhvtho, ale khvwohiyuhvhskho'i.",
-    "asr_hypothesis": "nikhathvnho unihskwhanikhhse'i ale unvhsv khhsv thunathathvthvnhe'i hi'a naniwehskhe'i khatho uyelhvhth hi'a khatho uhsthi hi'a itse thitheyhohthi khhsv'i ulhinikhithvyhenho uhv khthi thekhhanetsheho anikhathha thithanhvtho ale khvwohiyuhvhskho'i",
+    "reconciled_phonetics": "nikhathvnho unihskwhanikhohse'i ale unvhsv khehsv thunathathvthvnhe'i hi'a naniwehskhe'i khatho uyelhvthi hi'a khatho uhsthi hi'a itse thitheyhohthi khhsv'i ulinikhithvyhenho uhv khthi thekhhanetseho anikhathha thithanvtho ale khvwohiyuhvhskho'i",
+    "asr_hypothesis": "nikhathvnho unihskwhanikhohse'i ale unvhsv khehsv thunathathvthvnhe'i hi'a naniwehskhe'i khatho uyelhvthi hi'a khatho uhsthi hi'a itse thitheyhohthi khhsv'i ulinikhithvyhenho uhv khthi thekhhanetseho anikhathha thithanvtho ale khvwohiyuhvhskho'i",
     "cost": -9.0609,
     "words": [
       {
@@ -3001,9 +3001,9 @@
         "word": "unihskwhanikhohsei",
         "start_sec": 359.68,
         "end_sec": 360.82,
-        "confidence": 0.463956,
+        "confidence": 0.24379,
         "flagged": false,
-        "emitted_word": "unihskwhanikhhse'i"
+        "emitted_word": "unihskwhanikhohse'i"
       },
       {
         "word": "ale",
@@ -3025,9 +3025,9 @@
         "word": "khehsv",
         "start_sec": 362.14,
         "end_sec": 362.48,
-        "confidence": 0.999577,
+        "confidence": 0.127569,
         "flagged": false,
-        "emitted_word": "khhsv"
+        "emitted_word": "khehsv"
       },
       {
         "word": "thunathathvthvnei",
@@ -3064,10 +3064,10 @@
       {
         "word": "uyelvthi",
         "start_sec": 366.58,
-        "end_sec": 367.56,
-        "confidence": 0.215124,
+        "end_sec": 367.4,
+        "confidence": 0.353595,
         "flagged": false,
-        "emitted_word": "uyelhvhth"
+        "emitted_word": "uyelhvthi"
       },
       {
         "word": "hia",
@@ -3121,7 +3121,7 @@
         "word": "khehsvi",
         "start_sec": 370.92,
         "end_sec": 371.5,
-        "confidence": 0.366608,
+        "confidence": 0.35453,
         "flagged": false,
         "emitted_word": "khhsv'i"
       },
@@ -3129,9 +3129,9 @@
         "word": "ulinikhithvyeno",
         "start_sec": 372.48,
         "end_sec": 373.68,
-        "confidence": 0.199492,
+        "confidence": 0.18296,
         "flagged": false,
-        "emitted_word": "ulhinikhithvyhenho"
+        "emitted_word": "ulinikhithvyhenho"
       },
       {
         "word": "uhv",
@@ -3153,9 +3153,9 @@
         "word": "thekhhanetseho",
         "start_sec": 376.32,
         "end_sec": 377.34,
-        "confidence": 0.39444,
+        "confidence": 0.383513,
         "flagged": false,
-        "emitted_word": "thekhhanetsheho"
+        "emitted_word": "thekhhanetseho"
       },
       {
         "word": "anikhathaha",
@@ -3169,9 +3169,9 @@
         "word": "thithanvtho",
         "start_sec": 378.72,
         "end_sec": 379.52,
-        "confidence": 0.041334,
+        "confidence": 0.031854,
         "flagged": false,
-        "emitted_word": "thithanhvtho"
+        "emitted_word": "thithanvtho"
       },
       {
         "word": "ale",
@@ -3205,8 +3205,8 @@
     "end_sec": 391.39,
     "duration_sec": 8.71,
     "reference_sentence": "ᎩᎳᏉᏃ ᎢᏴᏛ ᎾᏍᎩ ᏕᎦᏃᏣᎸ ᏚᏰᎵᏎ ᎨᎵᎵ ᎾᎿᎭᎬᏩᏚᏫᏛ ᎨᏒᎢ.",
-    "reconciled_phonetics": "khilakwon iyvth nahskhi thekhanotsalhv thuyelihse khelili nanhahkhvwhathuwithv khsv'i.",
-    "asr_hypothesis": "khilakwhon iyvth nahskhi thekhanotsalhv thuyelihse khelili nanha khvwhathuwithv khhsv'i",
+    "reconciled_phonetics": "khilakwhon iyvth nahskhi thekhanotsalv thuyelihse khelili nanha khvwathuwithv khehsv'i",
+    "asr_hypothesis": "khilakwhon iyvth nahskhi thekhanotsalv thuyelihse khelili nanha khvwathuwithv khehsv'i",
     "cost": -9.4218,
     "words": [
       {
@@ -3237,9 +3237,9 @@
         "word": "thekhanotsalv",
         "start_sec": 385.72,
         "end_sec": 386.58,
-        "confidence": 0.184342,
+        "confidence": 0.162973,
         "flagged": false,
-        "emitted_word": "thekhanotsalhv"
+        "emitted_word": "thekhanotsalv"
       },
       {
         "word": "thuyelihse",
@@ -3269,23 +3269,23 @@
         "word": "khvwathuwithv",
         "start_sec": 390.04,
         "end_sec": 390.76,
-        "confidence": 0.17051,
+        "confidence": 0.155183,
         "flagged": false,
-        "emitted_word": "khvwhathuwithv"
+        "emitted_word": "khvwathuwithv"
       },
       {
         "word": "khehsvi",
         "start_sec": 390.92,
         "end_sec": 391.4,
-        "confidence": 0.032928,
-        "flagged": false,
-        "emitted_word": "khhsv'i"
+        "confidence": 0.009616,
+        "flagged": true,
+        "emitted_word": "khehsv'i"
       }
     ],
     "cherokee_syllabary": "ᎩᎳᏉᏃ ᎢᏴᏛ ᎾᏍᎩ ᏕᎦᏃᏣᎸ ᏚᏰᎵᏎ ᎨᎵᎵ ᎾᎿᎭᎬᏩᏚᏫᏛ ᎨᏒᎢ.",
     "phonetic": "Gi-la-quo-no i-yv-dv na-s-gi de-ga-no-tsa-lv du-ye-li-se Ge-li-li na-hna gv-wa-du-wi-dv ge-sv-i.",
     "english": "And immediately his fame spread abroad throughout all the region round about Galilee.",
-    "has_anomalies": false
+    "has_anomalies": true
   },
   {
     "verse_id": "020129",
@@ -3297,8 +3297,8 @@
     "end_sec": 405.38,
     "duration_sec": 13.48,
     "reference_sentence": "ᎩᎳᏉᏃ ᎢᏴᏛ ᏗᎦᎳᏫᎢᏍᏗᏱ ᏧᏂᏄᎪᏨ, ᏌᏩᏂ ᎠᎴ ᎡᏂᏗ ᎠᏂᏁᎸ ᏭᏂᏴᎴᎢ, ᎠᏁᎮ ᏥᎻ ᎠᎴ ᏣᏂ.",
-    "reconciled_phonetics": "khilakwon iyvth thikhalawi'ihsthiyi tsuninukhotsv, hsawani ale enith aninelv wuniyvlhe'i, anehe tsimi ale tsani.",
-    "asr_hypothesis": "khilakwhon iyvth thikhalawi'ihsthiyi tsuninukhotsv hsawani ale enith aninelv wuniyvlhe'i anehe tsimi ale tsani",
+    "reconciled_phonetics": "khilakwhon iyvth thikhalawi'ihsthiyi tsuninukhotsv hsawani ale enithi aninelv wuniyvlhe'i anehe tsimi ale tsani",
+    "asr_hypothesis": "khilakwhon iyvth thikhalawi'ihsthiyi tsuninukhotsv hsawani ale enithi aninelv wuniyvlhe'i anehe tsimi ale tsani",
     "cost": -10.5435,
     "words": [
       {
@@ -3352,10 +3352,10 @@
       {
         "word": "enithi",
         "start_sec": 399.4,
-        "end_sec": 399.92,
-        "confidence": 0.048026,
+        "end_sec": 399.82,
+        "confidence": 0.114216,
         "flagged": false,
-        "emitted_word": "enith"
+        "emitted_word": "enithi"
       },
       {
         "word": "aninelv",
@@ -3421,8 +3421,8 @@
     "end_sec": 415.21,
     "duration_sec": 9.35,
     "reference_sentence": "ᏌᏩᏂᏃ ᎤᏓᎵᎢ ᎤᏥ ᎦᏅᎨ ᎤᏢᎨ ᎤᏗᎴᎲᏍᎨᎢ; ᎩᎳᏉᏃ ᎢᏴᏛ ᎬᏩᏃᏁᎴᎢ.",
-    "reconciled_phonetics": "sawaninho uthali'i utsi khankhe ulhkhe uthilhehvhskhe'i; khilakwno iyvth khvwanonhele'i.",
-    "asr_hypothesis": "sawaninho uthal'i utsi khankhe utlhhkhe uthilhehvhskhe'i khilakwhno iyvth khvwanonhele'i",
+    "reconciled_phonetics": "sawaninho uthali'i utsi khankhe utlhhvkhe uthilhehvhskhe'i khilakwhno iyvth khvwanonhele'i",
+    "asr_hypothesis": "sawaninho uthali'i utsi khankhe utlhhvkhe uthilhehvhskhe'i khilakwhno iyvth khvwanonhele'i",
     "cost": -9.9752,
     "words": [
       {
@@ -3437,9 +3437,9 @@
         "word": "uthalii",
         "start_sec": 407.16,
         "end_sec": 407.66,
-        "confidence": 0.113664,
+        "confidence": 0.084663,
         "flagged": false,
-        "emitted_word": "uthal'i"
+        "emitted_word": "uthali'i"
       },
       {
         "word": "utsi",
@@ -3461,9 +3461,9 @@
         "word": "utlhhvkhe",
         "start_sec": 409.46,
         "end_sec": 410.06,
-        "confidence": 0.029525,
+        "confidence": 0.030757,
         "flagged": false,
-        "emitted_word": "utlhhkhe"
+        "emitted_word": "utlhhvkhe"
       },
       {
         "word": "uthilehvhskhei",
@@ -3513,9 +3513,9 @@
     "end_sec": 426.71,
     "duration_sec": 11.33,
     "reference_sentence": "ᎤᎷᏨᏃ ᎠᎴ ᎤᏬᏯᏁᏒ, ᏚᎴᏔᏁᎢ; ᎤᏗᎴᎲᏍᎬᏃ ᎩᎳᏉ ᎢᏴᏛ ᎤᏗᏩᏎᎢ, ᎠᎴ ᏚᏍᏕᎸᎯᏙᎴᎢ.",
-    "reconciled_phonetics": "uluhtsvnho ale uwoyhanehsv, thulehthane'i; uthilhvhskhvnho khilakw iyvthv uthiwahse'i, ale thuhsthelvhithole'i.",
-    "asr_hypothesis": "uluhtsvnho ale uwoyhanehsv thulehthhane'i uthilhvhskhvnho khilakwh iyvthv uthiwahse'i ale thuhsthelvhithole'i",
-    "cost": -11.913,
+    "reconciled_phonetics": "uluhtsvnho ale uwoyhanehsv thulehthhane'i uthilhvhskhvnho khilakwho iyvthv uthiwahse'i ale thuhsthelvhithole'i",
+    "asr_hypothesis": "uluhtsvnho ale uwoyhanehsv thulehthhane'i uthilhvhskhvnho khilakwho iyvthv uthiwahse'i ale thuhsthelvhithole'i",
+    "cost": -11.9627,
     "words": [
       {
         "word": "ulutsvno",
@@ -3560,10 +3560,10 @@
       {
         "word": "khilakwho",
         "start_sec": 421.8,
-        "end_sec": 422.18,
-        "confidence": 0.135667,
+        "end_sec": 422.22,
+        "confidence": 0.035883,
         "flagged": false,
-        "emitted_word": "khilakwh"
+        "emitted_word": "khilakwho"
       },
       {
         "word": "iyvthv",
@@ -3613,23 +3613,23 @@
     "end_sec": 435.81,
     "duration_sec": 8.83,
     "reference_sentence": "ᎤᏒᏃ ᎿᎭᏉ ᏅᏙ ᏭᏕᎵᏨ, ᏕᎬᏩᏘᏃᎮᎴ ᏂᎦᏛ ᏧᏂᏢᎩ, ᎠᎴ ᎠᏂᏍᎩᎾ ᏗᎬᏩᏂᏯᎢ;",
-    "reconciled_phonetics": "uhsvn nhahkw nvth wuthelitsv, thkhvwahthinhohele nikhath tsunilhkhi, ale anihskhina thikhwaniya'i;",
-    "asr_hypothesis": "uhsvn nhakwh nvth wuthelitsv thkhvwahthhinhohele nikhath tsunitlhhkhi ale anihskhina thikhwaniya'i",
-    "cost": -9.5682,
+    "reconciled_phonetics": "uhsvnho nhakwh nvth wuthelitsv thekhvwathhinhohele nikhath tsunitlhhvkhi ale anihskhina thikhvwaniyai",
+    "asr_hypothesis": "uhsvnho nhakwh nvth wuthelitsv thekhvwathhinhohele nikhath tsunitlhhvkhi ale anihskhina thikhvwaniyai",
+    "cost": -9.4068,
     "words": [
       {
         "word": "uhsvno",
         "start_sec": 427.48,
-        "end_sec": 427.94,
-        "confidence": 0.997664,
+        "end_sec": 428.06,
+        "confidence": 0.982084,
         "flagged": false,
-        "emitted_word": "uhsvn"
+        "emitted_word": "uhsvnho"
       },
       {
         "word": "nhakwho",
-        "start_sec": 427.94,
+        "start_sec": 428.54,
         "end_sec": 429.04,
-        "confidence": 0.063432,
+        "confidence": 0.020569,
         "flagged": false,
         "emitted_word": "nhakwh"
       },
@@ -3653,9 +3653,9 @@
         "word": "thekhvwathhinohele",
         "start_sec": 430.76,
         "end_sec": 431.86,
-        "confidence": 0.253883,
+        "confidence": 0.213647,
         "flagged": false,
-        "emitted_word": "thkhvwahthhinhohele"
+        "emitted_word": "thekhvwathhinhohele"
       },
       {
         "word": "nikhathv",
@@ -3669,9 +3669,9 @@
         "word": "tsunitlhhvkhi",
         "start_sec": 432.64,
         "end_sec": 433.4,
-        "confidence": 0.067046,
+        "confidence": 0.070353,
         "flagged": false,
-        "emitted_word": "tsunitlhhkhi"
+        "emitted_word": "tsunitlhhvkhi"
       },
       {
         "word": "ale",
@@ -3693,9 +3693,9 @@
         "word": "thikhvwaniyai",
         "start_sec": 434.94,
         "end_sec": 435.82,
-        "confidence": 0.142527,
+        "confidence": 0.120534,
         "flagged": false,
-        "emitted_word": "thikhwaniya'i"
+        "emitted_word": "thikhvwaniyai"
       }
     ],
     "cherokee_syllabary": "ᎤᏒᏃ ᎿᎭᏉ ᏅᏙ ᏭᏕᎵᏨ, ᏕᎬᏩᏘᏃᎮᎴ ᏂᎦᏛ ᏧᏂᏢᎩ, ᎠᎴ ᎠᏂᏍᎩᎾ ᏗᎬᏩᏂᏯᎢ;",
@@ -3713,7 +3713,7 @@
     "end_sec": 441.83,
     "duration_sec": 5.65,
     "reference_sentence": "ᏂᎦᏛᏃ ᎦᏚᎲ ᎠᏁᎯ ᎤᎾᏓᏟᏌᎮ ᎦᎶᎯᏍᏗᏱ.",
-    "reconciled_phonetics": "nikhathvnho khathuhv anehi unathalhihsahe khalohihsthiyi.",
+    "reconciled_phonetics": "nikhathvnho khathuhv anehi unathatlhhihsahe khalohihsthiyi",
     "asr_hypothesis": "nikhathvnho khathuhv anehi unathatlhhihsahe khalohihsthiyi",
     "cost": -10.2308,
     "words": [
@@ -3773,9 +3773,9 @@
     "end_sec": 463.95,
     "duration_sec": 21.57,
     "reference_sentence": "ᎤᏂᏣᏘᏃ ᏕᎤᏅᏩᏁ ᏧᏂᏢᎩ ᏧᏓᎴᏅᏛ ᎥᏳᎩ ᎤᏁᎯ; ᎠᎴ ᎤᏂᏣᏘ ᎠᏂᏍᎩᎾ ᏚᏄᎪᏫᏎᎢ; ᎠᎴ ᎥᏝ ᏩᏂᏁᎩ ᏱᏕᎵᏎᎮ ᎠᏂᏍᎩᎾ, ᎤᏗᎦᎵᏍᏙᏗᏍᎨ ᎬᏬᎵᎬᎢ.",
-    "reconciled_phonetics": "unitsathinho theunhvwane tsunilhkhi tsuthalenhvthv vyukh unehi; ale unitsathi anihskhina thunkhowihse'i; ale vlha waninhekh ythelihsehe anihskhina, htikhalhsththihskhe khvwolkhv'i.",
-    "asr_hypothesis": "unitsathhinho theunhvwane tsunitlhhkhi tsuthalenhvthv vyukh unehi ale unitsathhi anihskhina thunkhowihse'i ale vtlhha waninhekh ythelihsehe anihskhina thikhalhsththihskhe khvwolkhv'i",
-    "cost": -10.5999,
+    "reconciled_phonetics": "unitsathhinho theunhvwane tsunitlhhvkhi tsuthalenhvthv vyukhi unehi ale unitsathhi anihskhina thunukhowihse'i ale vtlhha waninhekhi yithelihsehe anihskhina thikhalhsththihskhe khvwolkhvi",
+    "asr_hypothesis": "unitsathhinho theunhvwane tsunitlhhvkhi tsuthalenhvthv vyukhi unehi ale unitsathhi anihskhina thunukhowihse'i ale vtlhha waninhekhi yithelihsehe anihskhina thikhalhsththihskhe khvwolkhvi",
+    "cost": -10.4246,
     "words": [
       {
         "word": "unitsathhino",
@@ -3797,9 +3797,9 @@
         "word": "tsunitlhhvkhi",
         "start_sec": 446.0,
         "end_sec": 446.86,
-        "confidence": 0.057625,
+        "confidence": 0.058576,
         "flagged": false,
-        "emitted_word": "tsunitlhhkhi"
+        "emitted_word": "tsunitlhhvkhi"
       },
       {
         "word": "tsuthalenvthv",
@@ -3812,10 +3812,10 @@
       {
         "word": "vyukhi",
         "start_sec": 448.68,
-        "end_sec": 449.36,
-        "confidence": 0.077948,
+        "end_sec": 449.26,
+        "confidence": 0.075699,
         "flagged": false,
-        "emitted_word": "vyukh"
+        "emitted_word": "vyukhi"
       },
       {
         "word": "unehi",
@@ -3853,9 +3853,9 @@
         "word": "thunukhowihsei",
         "start_sec": 454.0,
         "end_sec": 454.98,
-        "confidence": 0.13744,
+        "confidence": 0.080753,
         "flagged": false,
-        "emitted_word": "thunkhowihse'i"
+        "emitted_word": "thunukhowihse'i"
       },
       {
         "word": "ale",
@@ -3877,17 +3877,17 @@
         "word": "waninekhi",
         "start_sec": 456.72,
         "end_sec": 457.66,
-        "confidence": 0.226766,
+        "confidence": 0.063998,
         "flagged": false,
-        "emitted_word": "waninhekh"
+        "emitted_word": "waninhekhi"
       },
       {
         "word": "yithelihsehe",
         "start_sec": 458.42,
         "end_sec": 459.4,
-        "confidence": 0.319503,
+        "confidence": 0.263279,
         "flagged": false,
-        "emitted_word": "ythelihsehe"
+        "emitted_word": "yithelihsehe"
       },
       {
         "word": "anihskhina",
@@ -3909,9 +3909,9 @@
         "word": "khvwolikhvi",
         "start_sec": 463.06,
         "end_sec": 463.96,
-        "confidence": 0.076185,
+        "confidence": 0.059533,
         "flagged": false,
-        "emitted_word": "khvwolkhv'i"
+        "emitted_word": "khvwolkhvi"
       }
     ],
     "cherokee_syllabary": "ᎤᏂᏣᏘᏃ ᏕᎤᏅᏩᏁ ᏧᏂᏢᎩ ᏧᏓᎴᏅᏛ ᎥᏳᎩ ᎤᏁᎯ; ᎠᎴ ᎤᏂᏣᏘ ᎠᏂᏍᎩᎾ ᏚᏄᎪᏫᏎᎢ; ᎠᎴ ᎥᏝ ᏩᏂᏁᎩ ᏱᏕᎵᏎᎮ ᎠᏂᏍᎩᎾ, ᎤᏗᎦᎵᏍᏙᏗᏍᎨ ᎬᏬᎵᎬᎢ.",
@@ -3929,8 +3929,8 @@
     "end_sec": 479.35,
     "duration_sec": 14.79,
     "reference_sentence": "ᏑᎾᎴᏃ, ᎠᏏ ᎪᎯᏗᏳ ᎬᏩᎩᏨᏗ ᎨᏒ ᎤᏗᏛᎮ ᎤᏄᎪᏤᎢ, ᎠᎴ ᎢᎾᎨ ᏭᎶᏎᎢ, ᎠᎴ ᎾᎿᎭᎤᏓᏙᎵᏍᏔᏁᎢ.",
-    "reconciled_phonetics": "sunalenho, ahsi khhithiyu khvwakhitsthi khsv uthithhe unukhotse'i, ale inakhe wulohse'i, ale nanhahuthatholihsthane'i.",
-    "asr_hypothesis": "sunalenho ahsi khhithiyu khvwakhitsthi khhsv uthithhe unukhotse'i ale inakhe wulohse'i ale nanha uthatholihsthhane'i",
+    "reconciled_phonetics": "sunalenho ahsi khohithiyu khvwakhitsthi khehsv uthithvhe unukhotse'i ale inakhe wulohse'i ale nanha uthatholihsthhanei",
+    "asr_hypothesis": "sunalenho ahsi khohithiyu khvwakhitsthi khehsv uthithvhe unukhotse'i ale inakhe wulohse'i ale nanha uthatholihsthhanei",
     "cost": -11.2345,
     "words": [
       {
@@ -3953,9 +3953,9 @@
         "word": "khohithiyu",
         "start_sec": 468.12,
         "end_sec": 468.76,
-        "confidence": 0.436857,
+        "confidence": 0.111691,
         "flagged": false,
-        "emitted_word": "khhithiyu"
+        "emitted_word": "khohithiyu"
       },
       {
         "word": "khvwakhitsvthi",
@@ -3969,17 +3969,17 @@
         "word": "khehsv",
         "start_sec": 470.44,
         "end_sec": 470.78,
-        "confidence": 0.94036,
+        "confidence": 0.132234,
         "flagged": false,
-        "emitted_word": "khhsv"
+        "emitted_word": "khehsv"
       },
       {
         "word": "uthithvhe",
         "start_sec": 471.76,
         "end_sec": 472.5,
-        "confidence": 0.257623,
+        "confidence": 0.084122,
         "flagged": false,
-        "emitted_word": "uthithhe"
+        "emitted_word": "uthithvhe"
       },
       {
         "word": "unukhotsei",
@@ -4033,9 +4033,9 @@
         "word": "uthatholihsthhanei",
         "start_sec": 478.0,
         "end_sec": 479.36,
-        "confidence": 0.246703,
+        "confidence": 0.229271,
         "flagged": false,
-        "emitted_word": "uthatholihsthhane'i"
+        "emitted_word": "uthatholihsthhanei"
       }
     ],
     "cherokee_syllabary": "ᏑᎾᎴᏃ, ᎠᏏ ᎪᎯᏗᏳ ᎬᏩᎩᏨᏗ ᎨᏒ ᎤᏗᏛᎮ ᎤᏄᎪᏤᎢ, ᎠᎴ ᎢᎾᎨ ᏭᎶᏎᎢ, ᎠᎴ ᎾᎿᎭᎤᏓᏙᎵᏍᏔᏁᎢ.",
@@ -4053,9 +4053,9 @@
     "end_sec": 484.74,
     "duration_sec": 5.04,
     "reference_sentence": "ᏌᏩᏂᏃ ᎠᎴ ᎾᏍᎩ ᎠᏁᎯ, ᎬᏩᏍᏓᏩᏛᏎᎢ.",
-    "reconciled_phonetics": "sawaninho ale nhskhi ane'hi, khvwahsthawathse'i.",
-    "asr_hypothesis": "sawaninho ale nhskhi ane'hi khvwahsthawathhse'i",
-    "cost": -8.7517,
+    "reconciled_phonetics": "sawaninho ale nahskhi anehi khvwahsthawathvhse'i",
+    "asr_hypothesis": "sawaninho ale nahskhi anehi khvwahsthawathvhse'i",
+    "cost": -10.1929,
     "words": [
       {
         "word": "sawanino",
@@ -4077,25 +4077,25 @@
         "word": "nahskhi",
         "start_sec": 481.4,
         "end_sec": 481.76,
-        "confidence": 0.084716,
+        "confidence": 0.019217,
         "flagged": false,
-        "emitted_word": "nhskhi"
+        "emitted_word": "nahskhi"
       },
       {
         "word": "anehi",
         "start_sec": 481.98,
         "end_sec": 482.42,
-        "confidence": 0.755481,
+        "confidence": 0.761473,
         "flagged": false,
-        "emitted_word": "ane'hi"
+        "emitted_word": "anehi"
       },
       {
         "word": "khvwahsthawathvhsei",
         "start_sec": 483.46,
         "end_sec": 484.74,
-        "confidence": 0.220363,
+        "confidence": 0.124495,
         "flagged": false,
-        "emitted_word": "khvwahsthawathhse'i"
+        "emitted_word": "khvwahsthawathvhse'i"
       }
     ],
     "cherokee_syllabary": "ᏌᏩᏂᏃ ᎠᎴ ᎾᏍᎩ ᎠᏁᎯ, ᎬᏩᏍᏓᏩᏛᏎᎢ.",
@@ -4109,13 +4109,13 @@
     "chapter": 1,
     "verse_idx": 37,
     "audio_path": "cherokee_new_testament/split_audio/mark_01_37.wav",
-    "start_sec": 485.86,
-    "end_sec": 493.54,
-    "duration_sec": 7.68,
+    "start_sec": 485.36,
+    "end_sec": 493.65,
+    "duration_sec": 8.29,
     "reference_sentence": "ᏫᎬᏩᏩᏛᎲᏃ, ᎯᎠ ᏂᎬᏩᏪᏎᎴᎢ, ᏂᎦᏛᏉ ᏴᏫ ᎨᏣᏲᏎ.",
-    "reconciled_phonetics": "wikhvwawhathvhvnho, hi'a nikhvwawehsele'i, nikhathkw yvwi khetsayhohs.",
-    "asr_hypothesis": "wikhvwawhathvhvnho hi'a nikhvwawehsele'i nikhathkwh yvwi khetsayhohs",
-    "cost": -10000000000.0,
+    "reconciled_phonetics": "wikhvwawhathvhvnho hi'a nikhvwawehselei nikhathvkwho yvwi khetsayhohse",
+    "asr_hypothesis": "wikhvwawhathvhvnho hi'a nikhvwawehselei nikhathvkwho yvwi khetsayhohse",
+    "cost": -10.6104,
     "words": [
       {
         "word": "wikhvwawathvhvno",
@@ -4137,17 +4137,17 @@
         "word": "nikhvwawehselei",
         "start_sec": 488.44,
         "end_sec": 489.6,
-        "confidence": 0.336167,
+        "confidence": 0.315304,
         "flagged": false,
-        "emitted_word": "nikhvwawehsele'i"
+        "emitted_word": "nikhvwawehselei"
       },
       {
         "word": "nikhathvkwho",
         "start_sec": 490.48,
         "end_sec": 491.42,
-        "confidence": 0.022683,
-        "flagged": false,
-        "emitted_word": "nikhathkwh"
+        "confidence": 0.007969,
+        "flagged": true,
+        "emitted_word": "nikhathvkwho"
       },
       {
         "word": "yvwi",
@@ -4160,16 +4160,16 @@
       {
         "word": "khetsayohse",
         "start_sec": 492.64,
-        "end_sec": 493.54,
-        "confidence": 0.032233,
+        "end_sec": 493.66,
+        "confidence": 0.012158,
         "flagged": false,
-        "emitted_word": "khetsayhohs"
+        "emitted_word": "khetsayhohse"
       }
     ],
     "cherokee_syllabary": "ᏫᎬᏩᏩᏛᎲᏃ, ᎯᎠ ᏂᎬᏩᏪᏎᎴᎢ, ᏂᎦᏛᏉ ᏴᏫ ᎨᏣᏲᏎ.",
     "phonetic": "Wi-gv-wa-wa-dv-hv-no, hi-a ni-gv-wa-we-se-le-i, ni-ga-dv-quo yv-wi ge-tsa-yo-se.",
     "english": "And when they had found him, they said unto him, All men seek for thee.",
-    "has_anomalies": false
+    "has_anomalies": true
   },
   {
     "verse_id": "020138",
@@ -4181,8 +4181,8 @@
     "end_sec": 505.86,
     "duration_sec": 11.6,
     "reference_sentence": "ᎯᎠᏃ ᏂᏚᏪᏎᎴᎢ, ᏗᏐᎢ ᏙᏗᎦᏚᎲ ᏫᏗᎶᎯ, ᎾᎿᎭᎾᏍᏉ ᎦᎵᏥᏙᏂᏙᎸᎭ; ᎾᏍᎩᏰᏃ ᎢᏳᏍᏗ ᎠᎩᎷᏥᎸ.",
-    "reconciled_phonetics": "hi'an nithwehsele'i, thihso'i thothkhathhv withilohi, nanhahnahskw khalitsthonitholvha; nahskhiynho iyuhsthi akhi'luhthsil.",
-    "asr_hypothesis": "hi'an nithwehsele'i thihso'i thothkhathhv withilohi nanha nahskwh khalitsthonitholvha nahskhiynho iyuhsthi akhi'luhthsil",
+    "reconciled_phonetics": "hi'an nithuwehsele'i thihso'i thothikhathuhv withilohi nanha nahskwh khalitsithonitholvha nahskhiyenho iyuhsthi akhiluhthsil",
+    "asr_hypothesis": "hi'an nithuwehsele'i thihso'i thothikhathuhv withilohi nanha nahskwh khalitsithonitholvha nahskhiyenho iyuhsthi akhiluhthsil",
     "cost": -10000000000.0,
     "words": [
       {
@@ -4197,9 +4197,9 @@
         "word": "nithuwehselei",
         "start_sec": 494.48,
         "end_sec": 495.42,
-        "confidence": 0.279211,
+        "confidence": 0.234102,
         "flagged": false,
-        "emitted_word": "nithwehsele'i"
+        "emitted_word": "nithuwehsele'i"
       },
       {
         "word": "thihsoi",
@@ -4213,9 +4213,9 @@
         "word": "thothikhathuhv",
         "start_sec": 497.16,
         "end_sec": 498.02,
-        "confidence": 0.021604,
+        "confidence": 0.010498,
         "flagged": false,
-        "emitted_word": "thothkhathhv"
+        "emitted_word": "thothikhathuhv"
       },
       {
         "word": "withilohi",
@@ -4245,17 +4245,17 @@
         "word": "khalitsithonitholvha",
         "start_sec": 500.98,
         "end_sec": 502.48,
-        "confidence": 0.122409,
+        "confidence": 0.067841,
         "flagged": false,
-        "emitted_word": "khalitsthonitholvha"
+        "emitted_word": "khalitsithonitholvha"
       },
       {
         "word": "nahskhiyeno",
         "start_sec": 503.58,
         "end_sec": 504.22,
-        "confidence": 0.298873,
+        "confidence": 0.166223,
         "flagged": false,
-        "emitted_word": "nahskhiynho"
+        "emitted_word": "nahskhiyenho"
       },
       {
         "word": "iyuhsthi",
@@ -4269,9 +4269,9 @@
         "word": "akhilutsilv",
         "start_sec": 504.94,
         "end_sec": 505.86,
-        "confidence": 0.196194,
+        "confidence": 0.172994,
         "flagged": false,
-        "emitted_word": "akhi'luhthsil"
+        "emitted_word": "akhiluhthsil"
       }
     ],
     "cherokee_syllabary": "ᎯᎠᏃ ᏂᏚᏪᏎᎴᎢ, ᏗᏐᎢ ᏙᏗᎦᏚᎲ ᏫᏗᎶᎯ, ᎾᎿᎭᎾᏍᏉ ᎦᎵᏥᏙᏂᏙᎸᎭ; ᎾᏍᎩᏰᏃ ᎢᏳᏍᏗ ᎠᎩᎷᏥᎸ.",
@@ -4289,17 +4289,17 @@
     "end_sec": 515.99,
     "duration_sec": 10.13,
     "reference_sentence": "ᎠᎵᏥᏙᏂᏙᎮᏃ ᏧᏂᎳᏫᎢᏍᏗᏱ ᏂᎬᎾᏛ ᎨᎵᎵ, ᎠᎴ ᎠᏂᏍᎩᎾ ᏕᎦᏄᎪᏫᏍᎨᎢ.",
-    "reconciled_phonetics": "alihtsthonhithohenho tsunilawiihsthiyi nikhvnathv khelili, ale anihskhina thekhanukhowhihskhe'i.",
-    "asr_hypothesis": "alihtsthonhithohenho tsunilawiihsthiyi nikhvnathv khelili ale anihskhina thekhanukhowhihskhe'i",
+    "reconciled_phonetics": "alihtsithonithohenho tsunilawiihsthiyi nikhvnathv khelili ale anihskhina thekhanukhowhihskhe'i",
+    "asr_hypothesis": "alihtsithonithohenho tsunilawiihsthiyi nikhvnathv khelili ale anihskhina thekhanukhowhihskhe'i",
     "cost": -9.9066,
     "words": [
       {
         "word": "alitsithonithoheno",
         "start_sec": 505.92,
         "end_sec": 508.9,
-        "confidence": 0.292401,
+        "confidence": 0.147997,
         "flagged": false,
-        "emitted_word": "alihtsthonhithohenho"
+        "emitted_word": "alihtsithonithohenho"
       },
       {
         "word": "tsunilawiihsthiyi",
@@ -4365,25 +4365,25 @@
     "end_sec": 530.7,
     "duration_sec": 14.32,
     "reference_sentence": "ᎠᏓᏰᏍᎩᏃ ᎤᏢᎩ ᎤᎷᏤᎴᎢ, ᎤᏓᏙᎵᏍᏓᏁᎴ ᏚᎵᏂᏆᏅᏁᎴᎢ, ᎠᎴ ᎯᎠ ᏄᏪᏎᎴᎢ, ᎢᏳᏃ ᎣᏏᏳ ᏱᏣᏰᎸᏅ, ᏰᎵᏉ ᏱᏍᎩᏅᎦᎸ.",
-    "reconciled_phonetics": "athayehskhinho ulhkhi uluhtsele'i, uthatholihsthanele thulhinikwanvnele'i, ale hi'a nuwehsele'i, iyunho ohsiy yitsayelvnhv, yelikw yihskhinvkhalv.",
-    "asr_hypothesis": "athayehskhinho utlhhkhi uluhtsele'i uthatholihsthanele thulhinikwhanvnele'i ale hi'a nuwehsele'i iyunho ohsiy yitsayelvnhv yelikwh yihskhinvkhalv",
+    "reconciled_phonetics": "athayehskhino utlhhvkhi uluhtsele'i uthatholihsthanele thulinikwhanvnele'i ale hi'a nuwehsele'i iyunho ohsiy yitsayelvnhv yelikwh yihskhinvkhalv",
+    "asr_hypothesis": "athayehskhino utlhhvkhi uluhtsele'i uthatholihsthanele thulinikwhanvnele'i ale hi'a nuwehsele'i iyunho ohsiy yitsayelvnhv yelikwh yihskhinvkhalv",
     "cost": -11.3708,
     "words": [
       {
         "word": "athayehskhino",
         "start_sec": 516.88,
         "end_sec": 517.82,
-        "confidence": 0.169231,
+        "confidence": 0.153679,
         "flagged": false,
-        "emitted_word": "athayehskhinho"
+        "emitted_word": "athayehskhino"
       },
       {
         "word": "utlhhvkhi",
         "start_sec": 517.96,
         "end_sec": 518.46,
-        "confidence": 0.025343,
+        "confidence": 0.024491,
         "flagged": false,
-        "emitted_word": "utlhhkhi"
+        "emitted_word": "utlhhvkhi"
       },
       {
         "word": "ulutselei",
@@ -4405,9 +4405,9 @@
         "word": "thulinikwhanvnelei",
         "start_sec": 522.24,
         "end_sec": 523.46,
-        "confidence": 0.147768,
+        "confidence": 0.137576,
         "flagged": false,
-        "emitted_word": "thulhinikwhanvnele'i"
+        "emitted_word": "thulinikwhanvnele'i"
       },
       {
         "word": "ale",
@@ -4489,9 +4489,9 @@
     "end_sec": 543.33,
     "duration_sec": 12.47,
     "reference_sentence": "ᏥᏌᏃ, ᎦᏙᎵᎬ ᎤᏙᏯᏅᎯᏕᎢ, ᎠᎴ ᎤᏒᏂᎴᎢ, ᎠᎴ ᎯᎠ ᏄᏪᏎᎴᎢ, ᎣᏏᏳ ᏥᏰᎸᏅ; ᏣᏓᏅᎦᎸᏛ ᎨᏎᏍᏗ.",
-    "reconciled_phonetics": "tsihsano, khtholikhv uthyhanvhithe'i, ale uhsvnhile'i, al hia nuwehsele'i, ohsiyu tsiyelvnv; tsathnvkhalvth khsehsthi.",
-    "asr_hypothesis": "tsihsano khtholikhv uthyhanvhithe'i ale uhsvnhile'i al hia nuwehsele'i ohsiyu tsiyelvnv tsathnvkhalvth khhsehsthi",
-    "cost": -8.4467,
+    "reconciled_phonetics": "tsihsano khatholikhv uthoyanvhithe'i ale uhsvnhile'i al hia nuwehsele'i ohsiyu tsiyelvnv tsathanvkhalvthv khehsehsthi",
+    "asr_hypothesis": "tsihsano khatholikhv uthoyanvhithe'i ale uhsvnhile'i al hia nuwehsele'i ohsiyu tsiyelvnv tsathanvkhalvthv khehsehsthi",
+    "cost": -11.7749,
     "words": [
       {
         "word": "tsihsano",
@@ -4503,19 +4503,19 @@
       },
       {
         "word": "khatholikhv",
-        "start_sec": 532.56,
+        "start_sec": 531.96,
         "end_sec": 533.3,
-        "confidence": 0.028663,
-        "flagged": false,
-        "emitted_word": "khtholikhv"
+        "confidence": 0.005373,
+        "flagged": true,
+        "emitted_word": "khatholikhv"
       },
       {
         "word": "uthoyanvhithei",
         "start_sec": 533.94,
         "end_sec": 535.2,
-        "confidence": 0.182824,
+        "confidence": 0.161866,
         "flagged": false,
-        "emitted_word": "uthyhanvhithe'i"
+        "emitted_word": "uthoyanvhithe'i"
       },
       {
         "word": "ale",
@@ -4576,24 +4576,24 @@
       {
         "word": "tsathanvkhalvthv",
         "start_sec": 541.56,
-        "end_sec": 542.44,
-        "confidence": 0.078342,
+        "end_sec": 542.58,
+        "confidence": 0.038174,
         "flagged": false,
-        "emitted_word": "tsathnvkhalvth"
+        "emitted_word": "tsathanvkhalvthv"
       },
       {
         "word": "khehsehsthi",
         "start_sec": 542.74,
         "end_sec": 543.34,
-        "confidence": 0.22924,
+        "confidence": 0.092301,
         "flagged": false,
-        "emitted_word": "khhsehsthi"
+        "emitted_word": "khehsehsthi"
       }
     ],
     "cherokee_syllabary": "ᏥᏌᏃ, ᎦᏙᎵᎬ ᎤᏙᏯᏅᎯᏕᎢ, ᎠᎴ ᎤᏒᏂᎴᎢ, ᎠᎴ ᎯᎠ ᏄᏪᏎᎴᎢ, ᎣᏏᏳ ᏥᏰᎸᏅ; ᏣᏓᏅᎦᎸᏛ ᎨᏎᏍᏗ.",
     "phonetic": "Tsi-sa-no, ga-do-li-gv u-do-ya-nv-hi-de-i, a-le u-sv-ni-le-i, a-le hi-a nu-we-se-le-i, O-si-yu tsi-ye-lv-nv; tsa-da-nv-ga-lv-dv ge-se-s-di.",
     "english": "And Jesus, moved with compassion, put forth his hand, and touched him, and saith unto him, I will; be thou clean.",
-    "has_anomalies": false
+    "has_anomalies": true
   },
   {
     "verse_id": "020142",
@@ -4605,17 +4605,17 @@
     "end_sec": 552.69,
     "duration_sec": 9.36,
     "reference_sentence": "ᎤᏁᏨᏉᏃ ᎩᎳᏉ ᎢᏴᏛ ᎠᏓᏰᏍᎩ ᎤᏢᎬ ᎤᎵᏛᏔᏁᎢ, ᎠᎴ ᎤᏓᏅᎦᎸᏛ ᎨᏎᎢ.",
-    "reconciled_phonetics": "hnetskwnho khilakw iyvth athayehskhi ulhvkhv ulihthvhthane'i, ale uthanvkhalvth khse'i.",
-    "asr_hypothesis": "nhetskwhnho khilakwh iyvth athayehskhi utlhhvkhv ulihthvhthhane'i ale uthanvkhalvth khhse'i",
-    "cost": -11.5523,
+    "reconciled_phonetics": "unhetsvkwhnho khilakwh iyvth athayehskhi utlhhvkhv ulihthvthhane'i ale uthanvkhalvthv khehse'i",
+    "asr_hypothesis": "unhetsvkwhnho khilakwh iyvth athayehskhi utlhhvkhv ulihthvthhane'i ale uthanvkhalvthv khehse'i",
+    "cost": -11.8667,
     "words": [
       {
         "word": "unetsvkwhono",
-        "start_sec": 544.42,
+        "start_sec": 543.42,
         "end_sec": 545.08,
-        "confidence": 0.240629,
+        "confidence": 0.070049,
         "flagged": false,
-        "emitted_word": "nhetskwhnho"
+        "emitted_word": "unhetsvkwhnho"
       },
       {
         "word": "khilakwho",
@@ -4653,9 +4653,9 @@
         "word": "ulithvthhanei",
         "start_sec": 548.82,
         "end_sec": 549.74,
-        "confidence": 0.887088,
+        "confidence": 0.460853,
         "flagged": false,
-        "emitted_word": "ulihthvhthhane'i"
+        "emitted_word": "ulihthvthhane'i"
       },
       {
         "word": "ale",
@@ -4668,18 +4668,18 @@
       {
         "word": "uthanvkhalvthv",
         "start_sec": 551.02,
-        "end_sec": 551.88,
-        "confidence": 0.047679,
+        "end_sec": 552.0,
+        "confidence": 0.024652,
         "flagged": false,
-        "emitted_word": "uthanvkhalvth"
+        "emitted_word": "uthanvkhalvthv"
       },
       {
         "word": "khehsei",
-        "start_sec": 552.22,
+        "start_sec": 552.2,
         "end_sec": 552.7,
-        "confidence": 0.991206,
+        "confidence": 0.224025,
         "flagged": false,
-        "emitted_word": "khhse'i"
+        "emitted_word": "khehse'i"
       }
     ],
     "cherokee_syllabary": "ᎤᏁᏨᏉᏃ ᎩᎳᏉ ᎢᏴᏛ ᎠᏓᏰᏍᎩ ᎤᏢᎬ ᎤᎵᏛᏔᏁᎢ, ᎠᎴ ᎤᏓᏅᎦᎸᏛ ᎨᏎᎢ.",
@@ -4697,17 +4697,17 @@
     "end_sec": 558.73,
     "duration_sec": 5.63,
     "reference_sentence": "ᎤᎵᏂᎩᏛᏃ ᎤᏁᏤᎸ, ᎩᎳᏉ ᎢᏴᏛ ᎤᏁᏤᎴ ᎤᏓᏅᏍᏗᏱ;",
-    "reconciled_phonetics": "ulhinikhthvn unhetshelv, khilakw iyvth unhetsele uthanvhsthiyi;",
-    "asr_hypothesis": "ulhinikhthvn unhetshelv khilakwh iyvth unhetsele uthanvhsthiyi",
-    "cost": -8.6359,
+    "reconciled_phonetics": "ulhinikhithvno unhetshelv khilakwh iyvthv unhetsele uthanvhsthiyi",
+    "asr_hypothesis": "ulhinikhithvno unhetshelv khilakwh iyvthv unhetsele uthanvhsthiyi",
+    "cost": -9.1229,
     "words": [
       {
         "word": "ulinikhithvno",
         "start_sec": 553.6,
-        "end_sec": 554.46,
-        "confidence": 0.140068,
+        "end_sec": 554.4,
+        "confidence": 0.122746,
         "flagged": false,
-        "emitted_word": "ulhinikhthvn"
+        "emitted_word": "ulhinikhithvno"
       },
       {
         "word": "unetselv",
@@ -4728,10 +4728,10 @@
       {
         "word": "iyvthv",
         "start_sec": 556.16,
-        "end_sec": 556.52,
-        "confidence": 0.083705,
+        "end_sec": 556.66,
+        "confidence": 0.012251,
         "flagged": false,
-        "emitted_word": "iyvth"
+        "emitted_word": "iyvthv"
       },
       {
         "word": "unetsele",
@@ -4765,8 +4765,8 @@
     "end_sec": 585.51,
     "duration_sec": 26.51,
     "reference_sentence": "ᎠᎴ ᎯᎠ ᏄᏪᏎᎴᎢ, ᎮᏯᏔᎮᏍᏗ ᏞᏍᏗ ᎩᎶ ᎪᎱᏍᏗ ᏥᎯᏃᏁᎵ; ᎮᎾᏉᏍᎩᏂ, ᎬᏂᎨᏒ ᏫᏂᏯᏛᏂᏏ ᎠᏥᎸᎨᎶᎯ, ᎠᎴ ᏩᎵᏍᎪᎸᏓ ᏣᏓᏅᎦᎸᎲ ᎤᎬᏩᎵ, ᎾᏍᎩ ᎼᏏ ᎤᏁᏨ ᎠᎵᏍᎪᎸᏙᏗᏱ, ᎾᏍᎩ ᎤᎾᏙᎯᏳᎾᏁᏗᏱ.",
-    "reconciled_phonetics": "ale hi'a nuwehsele'i, heyhahthahehsthi lhehsthi khilo khhuhsthi tsihinonheli; henakwskhini, khvnikhsv winiyathvnhihsi atsilvkhelhohi, ale walhskholtha tsathanvkhalvhv ukhvwalhi, nahskhi mohsi unhetsv alhskholhvhthohthiyi, nahskhi unathohiyunanhethiyi.",
-    "asr_hypothesis": "ale hi'a nuwehsele'i heyhahthhahehsthi tlhhehsthi khilo khhuhsthi tsihinonheli henakwhhskhini khvnikhhsv winiyathvnhihsi atsilvkhelhohi ale walhskholtha tsathanvkhalvhv ukhvwalhi nahskhi mohsi unhetsv alhskholhvhthohthiyi nahskhi unathohiyunanhethiyi",
+    "reconciled_phonetics": "ale hi'a nuwehsele'i heyhahthhahehsthi tlhhehsthi khilo khohuhsthi tsihinonheli henakwhhskhini khvnikhehsv winiyathvnhihsi atsilvkhelhohi ale walhskholvtha tsathanvkhalvhv ukhvwalhi nahskhi mohsi unhetsv alhskholvhthohthiyi nahskhi unathohiyunanhethiyi",
+    "asr_hypothesis": "ale hi'a nuwehsele'i heyhahthhahehsthi tlhhehsthi khilo khohuhsthi tsihinonheli henakwhhskhini khvnikhehsv winiyathvnhihsi atsilvkhelhohi ale walhskholvtha tsathanvkhalvhv ukhvwalhi nahskhi mohsi unhetsv alhskholvhthohthiyi nahskhi unathohiyunanhethiyi",
     "cost": -11.4835,
     "words": [
       {
@@ -4821,9 +4821,9 @@
         "word": "khohuhsthi",
         "start_sec": 563.9,
         "end_sec": 564.6,
-        "confidence": 0.270475,
+        "confidence": 0.087626,
         "flagged": false,
-        "emitted_word": "khhuhsthi"
+        "emitted_word": "khohuhsthi"
       },
       {
         "word": "tsihinoneli",
@@ -4845,9 +4845,9 @@
         "word": "khvnikhehsv",
         "start_sec": 568.9,
         "end_sec": 569.66,
-        "confidence": 0.388688,
+        "confidence": 0.13485,
         "flagged": false,
-        "emitted_word": "khvnikhhsv"
+        "emitted_word": "khvnikhehsv"
       },
       {
         "word": "winiyathvnihsi",
@@ -4877,9 +4877,9 @@
         "word": "walihskholvtha",
         "start_sec": 573.64,
         "end_sec": 574.64,
-        "confidence": 0.21576,
+        "confidence": 0.190416,
         "flagged": false,
-        "emitted_word": "walhskholtha"
+        "emitted_word": "walhskholvtha"
       },
       {
         "word": "tsathanvkhalvhv",
@@ -4925,9 +4925,9 @@
         "word": "alihskholvthothiyi",
         "start_sec": 580.72,
         "end_sec": 581.9,
-        "confidence": 0.139689,
+        "confidence": 0.129892,
         "flagged": false,
-        "emitted_word": "alhskholhvhthohthiyi"
+        "emitted_word": "alhskholvhthohthiyi"
       },
       {
         "word": "nahskhi",
@@ -4961,8 +4961,8 @@
     "end_sec": 615.48,
     "duration_sec": 29.04,
     "reference_sentence": "ᎠᏎᏃ ᎤᏄᎪᏨ, ᎤᎴᏅᎮ ᎤᏣᏘ ᏚᏰᎵᎯᏍᏔᏁᎢ, ᎠᎴ ᏚᏃᏣᎳᏁ ᎾᏍᎩ, ᎾᏍᎩᏃ ᎢᏳᏍᏗ ᏥᏌ ᎥᏝ ᎿᎭᏉ ᎬᏂᎨᏒ ᏫᎬᏩᏴᏍᏗ ᏱᎨᏎ ᎦᏚᎲᎢ, ᏙᏱᏗᏢᏉᏍᎩᏂ ᎢᎾᎨ ᏕᎨᏌᏗᏒ ᎡᏙᎮᎢ; ᏂᎬᎾᏛᏉᏃ ᏂᏙᏓᏳᏂᎶᏒᎯ ᎬᏩᎷᏤᎮᎢ.",
-    "reconciled_phonetics": "ahsenho unkhotsv, ulenvhe utsathi thuyelihsthane'i, ale thunhothslne nahskh, nahskhinho iyuhsthi tsihsa vlha nhahkw khvnikhsv wikhvwayvhsthi yikhse khathuhv'i, thoyithilhkwskhini inakh thkhsathihsv ethhe'i; nikhvnathvkwnho nithothayunilohsvhi khvwaluhtshehi.",
-    "asr_hypothesis": "ahsenho unkhotsv ulenvhe utsathhi thuyelihhsthhane'i ale thunhothslne nahskh nahskhinho iyuhsthi tsihsa vtlhha nhakwh khvnikhhsv wikhvwayvhsthi yikhhse khathuhv'i thoyithitlhhkwhhskhini inakh thkhhsathihsv ethhe'i nikhvnathvkwhnho nithothayunilohsvhi khvwaluhtshehe",
+    "reconciled_phonetics": "ahsenho unukhotsv ulenvhe utsathhi thuyelihhsthhane'i ale thunhotshalne nahskhi nahskhino iyuhsthi tsihsa vtlhha nhakwh khvnikhehsv wikhvwayvhsthi yikhehse khathuhv'i thoyithitlhhkwhhskhini inakhe thekhehsathihsv ethohe'i nikhvnathvkwhnho nithothayunilohsvhi khvwaluhtshehe",
+    "asr_hypothesis": "ahsenho unukhotsv ulenvhe utsathhi thuyelihhsthhane'i ale thunhotshalne nahskhi nahskhino iyuhsthi tsihsa vtlhha nhakwh khvnikhehsv wikhvwayvhsthi yikhehse khathuhv'i thoyithitlhhkwhhskhini inakhe thekhehsathihsv ethohe'i nikhvnathvkwhnho nithothayunilohsvhi khvwaluhtshehe",
     "cost": -10000000000.0,
     "words": [
       {
@@ -4977,9 +4977,9 @@
         "word": "unukhotsv",
         "start_sec": 586.92,
         "end_sec": 587.74,
-        "confidence": 0.059818,
+        "confidence": 0.021391,
         "flagged": false,
-        "emitted_word": "unkhotsv"
+        "emitted_word": "unukhotsv"
       },
       {
         "word": "ulenvhe",
@@ -5017,25 +5017,25 @@
         "word": "thunotsalane",
         "start_sec": 593.12,
         "end_sec": 593.9,
-        "confidence": 0.010476,
-        "flagged": false,
-        "emitted_word": "thunhothslne"
+        "confidence": 0.008084,
+        "flagged": true,
+        "emitted_word": "thunhotshalne"
       },
       {
         "word": "nahskhi",
         "start_sec": 594.22,
-        "end_sec": 594.74,
-        "confidence": 0.022712,
+        "end_sec": 594.62,
+        "confidence": 0.029803,
         "flagged": false,
-        "emitted_word": "nahskh"
+        "emitted_word": "nahskhi"
       },
       {
         "word": "nahskhino",
         "start_sec": 595.84,
         "end_sec": 596.32,
-        "confidence": 0.294367,
+        "confidence": 0.262201,
         "flagged": false,
-        "emitted_word": "nahskhinho"
+        "emitted_word": "nahskhino"
       },
       {
         "word": "iyuhsthi",
@@ -5073,9 +5073,9 @@
         "word": "khvnikhehsv",
         "start_sec": 598.84,
         "end_sec": 599.58,
-        "confidence": 0.929827,
+        "confidence": 0.303567,
         "flagged": false,
-        "emitted_word": "khvnikhhsv"
+        "emitted_word": "khvnikhehsv"
       },
       {
         "word": "wikhvwayvhsthi",
@@ -5089,9 +5089,9 @@
         "word": "yikhehse",
         "start_sec": 600.86,
         "end_sec": 601.42,
-        "confidence": 0.640846,
+        "confidence": 0.119005,
         "flagged": false,
-        "emitted_word": "yikhhse"
+        "emitted_word": "yikhehse"
       },
       {
         "word": "khathuhvi",
@@ -5112,26 +5112,26 @@
       {
         "word": "inakhe",
         "start_sec": 605.56,
-        "end_sec": 606.12,
-        "confidence": 0.062115,
+        "end_sec": 605.96,
+        "confidence": 0.066453,
         "flagged": false,
-        "emitted_word": "inakh"
+        "emitted_word": "inakhe"
       },
       {
         "word": "thekhehsathihsv",
         "start_sec": 606.94,
         "end_sec": 607.82,
-        "confidence": 0.194217,
+        "confidence": 0.070904,
         "flagged": false,
-        "emitted_word": "thkhhsathihsv"
+        "emitted_word": "thekhehsathihsv"
       },
       {
         "word": "ethohei",
         "start_sec": 607.96,
         "end_sec": 608.62,
-        "confidence": 0.831308,
+        "confidence": 0.229662,
         "flagged": false,
-        "emitted_word": "ethhe'i"
+        "emitted_word": "ethohe'i"
       },
       {
         "word": "nikhvnathvkwhono",
@@ -5161,7 +5161,7 @@
     "cherokee_syllabary": "ᎠᏎᏃ ᎤᏄᎪᏨ, ᎤᎴᏅᎮ ᎤᏣᏘ ᏚᏰᎵᎯᏍᏔᏁᎢ, ᎠᎴ ᏚᏃᏣᎳᏁ ᎾᏍᎩ, ᎾᏍᎩᏃ ᎢᏳᏍᏗ ᏥᏌ ᎥᏝ ᎿᎭᏉ ᎬᏂᎨᏒ ᏫᎬᏩᏴᏍᏗ ᏱᎨᏎ ᎦᏚᎲᎢ, ᏙᏱᏗᏢᏉᏍᎩᏂ ᎢᎾᎨ ᏕᎨᏌᏗᏒ ᎡᏙᎮᎢ; ᏂᎬᎾᏛᏉᏃ ᏂᏙᏓᏳᏂᎶᏒᎯ ᎬᏩᎷᏤᎮᎢ.",
     "phonetic": "A-se-no u-nu-go-tsv, u-le-nv-he u-tsa-ti du-ye-li-hi-s-ta-ne-i, a-le du-no-tsa-la-ne na-s-gi, na-s-gi-no i-yu-s-di Tsi-sa v-tla hna-quo gv-ni-ge-sv wi-gv-wa-yv-s-di yi-ge-se ga-du-hv-i, do-yi-di-tlv-quo-s-gi-ni i-na-ge de-ge-sa-di-sv e-do-he-i; ni-gv-na-dv-quo-no ni-do-da-yu-ni-lo-sv-hi gv-wa-lu-tse-he-i.",
     "english": "But he went out, and began to publish it much, and to blaze abroad the matter, insomuch that Jesus could no more openly enter into the city, but was without in desert places: and they came to him from every quarter.",
-    "has_anomalies": false
+    "has_anomalies": true
   },
   {
     "verse_id": "020201",

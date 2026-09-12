@@ -32,7 +32,7 @@ from transcription.alignment.extractors import (
     CherokeeASRExtractor,
 )
 from transcription.alignment.ingestion import load_bible_chunks
-from transcription.alignment.models import AlignmentOutput
+from transcription.alignment.models import AlignmentOutput, WordInterval
 from transcription.alignment.normalizers import normalize_phonetics_for_alignment
 from transcription.alignment.reconciliation import reconcile_alignment_words
 from transcription.models.asr_model import CherokeeASRModel
@@ -144,11 +144,18 @@ def align_chapter(
 
         additional_word_tiers = None
         if reconcile:
-            syllabary_lookup = {
-                cid: meta.get("cherokee", meta.get("cherokee_syllabary", ""))
-                for cid, meta in source_lookup.items()
-            }
-            reconciled_words = reconcile_alignment_words(alignment, syllabary_lookup)
+            reconciled_words = [
+                WordInterval(
+                    word=w.emitted_word or w.word,
+                    start_sec=w.start_sec,
+                    end_sec=w.end_sec,
+                    confidence=w.confidence,
+                    flagged=w.flagged,
+                    emitted_word=w.emitted_word,
+                )
+                for c in alignment.aligned_chunks
+                for w in c.words
+            ]
             additional_word_tiers = {"Reconciled Transcriptions": reconciled_words}
 
         os.makedirs(str(output_dir), exist_ok=True)

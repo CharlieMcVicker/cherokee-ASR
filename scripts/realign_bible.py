@@ -46,7 +46,6 @@ from transcription.models.asr_model import CherokeeASRModel
 from transcription.new_testament.pipeline import (
     align_chapter,
     load_chapter_transcript,
-    reconcile_syllabary_asr,
 )
 
 NT_DIR = BASE_DIR / "cherokee_new_testament"
@@ -59,6 +58,8 @@ PRAAT_OUT_DIR = BASE_DIR / "output_praat" / "new_testament"
 DEFAULT_CACHE_DIR = BASE_DIR / "runs" / "cache" / "ctc_emissions"
 DEFAULT_MODEL_REPO = "charliemcvicker/length-only-20260704-155307-asr-cherokee-colon"
 DEFAULT_REVISION = "76e62140955f4738abdab345ea34068b02d8d2a2"
+DEFAULT_SYNCOPE_PENALTY = 6.0
+DEFAULT_INTRUSIVE_PENALTY = 2.5
 
 BOOK_CONFIGS = {
     "mark": {"chapters": 16, "name": "Mark"},
@@ -71,6 +72,8 @@ def get_default_ctc_aligner(
     model_revision: str = DEFAULT_REVISION,
     cache_dir: Path = DEFAULT_CACHE_DIR,
     cache: bool = True,
+    syncope_penalty: float = DEFAULT_SYNCOPE_PENALTY,
+    intrusive_penalty: float = DEFAULT_INTRUSIVE_PENALTY,
 ) -> CTCSegmentationAligner:
     """Instantiates default CTCSegmentationAligner with cached emissions."""
     token = os.environ.get("HF_TOKEN", None)
@@ -85,6 +88,8 @@ def get_default_ctc_aligner(
         model=asr_model,
         cache=cache,
         cache_dir=cache_dir,
+        syncope_penalty=syncope_penalty,
+        intrusive_penalty=intrusive_penalty,
     )
     return aligner
 
@@ -139,6 +144,8 @@ def realign_book(
     export_praat: bool = True,
     cache_dir: Path = DEFAULT_CACHE_DIR,
     cache: bool = True,
+    syncope_penalty: float = DEFAULT_SYNCOPE_PENALTY,
+    intrusive_penalty: float = DEFAULT_INTRUSIVE_PENALTY,
 ) -> Tuple[List[Dict[str, Any]], List[Dict[str, str]]]:
     book_key = book.lower().strip()
     if book_key not in BOOK_CONFIGS:
@@ -169,6 +176,8 @@ def realign_book(
             model_revision=model_revision,
             cache_dir=cache_dir,
             cache=cache,
+            syncope_penalty=syncope_penalty,
+            intrusive_penalty=intrusive_penalty,
         )
 
     records: List[Dict[str, Any]] = []
@@ -264,12 +273,8 @@ def realign_book(
             phonetic_text = verse_info.get("phonetic", "")
             english_text = verse_info.get("english", "")
 
-            # Reconcile syllabary & ASR tokens
-            asr_hyp = chunk.emitted_text or ""
-            reconciled_syllabary, _ = reconcile_syllabary_asr(
-                syllabary_text=cherokee_text,
-                asr_hypothesis=asr_hyp,
-            )
+            # Use direct CTC trellis emissions (syncope- and intrusion-aware)
+            emitted_sentence = (chunk.emitted_text or "").strip()
 
             words_list = [
                 {
@@ -297,8 +302,8 @@ def realign_book(
                 "end_sec": end_sec,
                 "duration_sec": dur,
                 "reference_sentence": cherokee_text,
-                "reconciled_phonetics": reconciled_syllabary,
-                "asr_hypothesis": asr_hyp,
+                "reconciled_phonetics": emitted_sentence,
+                "asr_hypothesis": emitted_sentence,
                 "cost": round(chunk.distance_score, 4),
                 "words": words_list,
                 "cherokee_syllabary": cherokee_text,
@@ -308,13 +313,18 @@ def realign_book(
             }
             records.append(record)
 
-            # Only export non-anomalous verses to the training dataset
-            if not chunk.has_anomalies:
+            # Only export non-anomalous verses with valid emitted text to the training dataset.
+            # Strict quality control: no fallback to phonetic text. If emitted_text is missing or anomalous, do not export.
+            if not chunk.has_anomalies and emitted_sentence:
                 csv_rows.append(
                     {
                         "path": f"cherokee_new_testament/split_audio/{split_filename}",
-                        "sentence": reconciled_syllabary or phonetic_text,
+                        "sentence": emitted_sentence,
                     }
+                )
+            elif not emitted_sentence:
+                print(
+                    f"    [Missing Emission Filtered] Excluded verse {verse_id} from training CSV due to missing emitted text."
                 )
             else:
                 print(
@@ -401,12 +411,16 @@ def realign_all(
     export_praat: bool = True,
     cache_dir: Path = DEFAULT_CACHE_DIR,
     cache: bool = True,
+    syncope_penalty: float = DEFAULT_SYNCOPE_PENALTY,
+    intrusive_penalty: float = DEFAULT_INTRUSIVE_PENALTY,
 ) -> Dict[str, List[Dict[str, Any]]]:
     ctc_aligner = get_default_ctc_aligner(
         model_repo=model_repo,
         model_revision=model_revision,
         cache_dir=cache_dir,
         cache=cache,
+        syncope_penalty=syncope_penalty,
+        intrusive_penalty=intrusive_penalty,
     )
 
     all_records: List[Dict[str, Any]] = []
@@ -422,6 +436,8 @@ def realign_all(
             export_praat=export_praat,
             cache_dir=cache_dir,
             cache=cache,
+            syncope_penalty=syncope_penalty,
+            intrusive_penalty=intrusive_penalty,
         )
         book_results[book] = records
         all_records.extend(records)
@@ -484,6 +500,18 @@ def main():
         help=f"HF model revision (default: {DEFAULT_REVISION})",
     )
     parser.add_argument(
+        "--syncope-penalty",
+        type=float,
+        default=DEFAULT_SYNCOPE_PENALTY,
+        help=f"CTC segmentation syncope penalty for vowel deletion (default: {DEFAULT_SYNCOPE_PENALTY})",
+    )
+    parser.add_argument(
+        "--intrusive-penalty",
+        type=float,
+        default=DEFAULT_INTRUSIVE_PENALTY,
+        help=f"CTC segmentation intrusive penalty for h/' insertion (default: {DEFAULT_INTRUSIVE_PENALTY})",
+    )
+    parser.add_argument(
         "--no-praat",
         action="store_true",
         default=False,
@@ -512,6 +540,8 @@ def main():
             export_praat=not args.no_praat,
             cache_dir=args.cache_dir,
             cache=not args.no_cache,
+            syncope_penalty=args.syncope_penalty,
+            intrusive_penalty=args.intrusive_penalty,
         )
     else:
         records, _ = realign_book(
@@ -522,6 +552,8 @@ def main():
             export_praat=not args.no_praat,
             cache_dir=args.cache_dir,
             cache=not args.no_cache,
+            syncope_penalty=args.syncope_penalty,
+            intrusive_penalty=args.intrusive_penalty,
         )
         # Also update combined if single book is run
         ALIGNMENTS_DIR.mkdir(parents=True, exist_ok=True)
