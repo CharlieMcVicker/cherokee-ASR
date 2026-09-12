@@ -62,6 +62,8 @@ class CTCSegmentationAligner:
         max_window_size: int = 100000,
         buffer_trail_ms: int = 300,
         buffer_lead_ms: int = 100,
+        chunk_seconds: float = 30.0,
+        margin_seconds: float = 1.0,
         intrusive_tokens: Sequence[str] = ("h", "'"),
         intrusive_penalty: float = 0.1,
         flag_min_confidence: float = 0.01,
@@ -82,6 +84,8 @@ class CTCSegmentationAligner:
         self.max_window_size = max_window_size
         self.buffer_trail_ms = buffer_trail_ms
         self.buffer_lead_ms = buffer_lead_ms
+        self.chunk_seconds = float(chunk_seconds)
+        self.margin_seconds = float(margin_seconds)
         self.cache = cache
         self.cache_dir = Path(cache_dir) if cache_dir is not None else DEFAULT_CACHE_DIR
 
@@ -91,25 +95,31 @@ class CTCSegmentationAligner:
         vocab = asr_model.processor.tokenizer.get_vocab()
         char_list = [token for token, idx in sorted(vocab.items(), key=lambda x: x[1])]
         pad_id = getattr(asr_model.processor.tokenizer, "pad_token_id", None)
-        if pad_id is None:
-            pad_id = vocab.get("[PAD]", 18)
-        return char_list, pad_id
+        if pad_id is None or not isinstance(pad_id, (int, np.integer)):
+            pad_id = vocab.get("[PAD]", 0)
+        if not isinstance(pad_id, (int, np.integer)):
+            pad_id = 0
+        return char_list, int(pad_id)
 
     def extract_logits(
         self,
         audio_input: Union[str, Path, AudioSegment, np.ndarray],
         asr_model: Optional[CherokeeASRModel] = None,
-        chunk_seconds: float = 30.0,
+        chunk_seconds: Optional[float] = None,
+        margin_seconds: Optional[float] = None,
         apply_buffers: bool = True,
     ) -> Tuple[np.ndarray, float, float]:
         """
         Extract log-probability matrix (T, V) from audio input using ASR model.
-        Uses batched chunk processing for memory efficiency and speed on long files.
+        Uses overlapping sliding-window inference with margin trimming for long files.
         Returns: (lpz, raw_audio_duration_sec, lead_offset_sec)
         """
         model = asr_model or self.model
         if model is None:
             raise ValueError("ASR model must be provided to extract logits.")
+
+        c_sec = self.chunk_seconds if chunk_seconds is None else float(chunk_seconds)
+        m_sec = self.margin_seconds if margin_seconds is None else float(margin_seconds)
 
         if isinstance(audio_input, (str, Path)):
             audio = (
@@ -147,19 +157,53 @@ class CTCSegmentationAligner:
             samples = np.concatenate([lead_pad, samples, trail_pad])
             lead_offset_sec = self.buffer_lead_ms / 1000.0
 
-        chunk_len = int(16000 * chunk_seconds)
-        if len(samples) <= chunk_len:
+        chunk_len = int(16000 * c_sec)
+        if len(samples) <= chunk_len or m_sec <= 0:
             logits = model.get_logits(samples, sample_rate=16000)
             if logits.ndim == 3:
                 logits = logits.squeeze(0)
             lpz = torch.nn.functional.log_softmax(logits, dim=-1).cpu().numpy()
         else:
-            audio_chunks = [
-                samples[i : i + chunk_len] for i in range(0, len(samples), chunk_len)
-            ]
-            chunk_logits = [model.get_logits(c) for c in audio_chunks]
-            all_logits = torch.cat(chunk_logits, dim=0)
-            lpz = torch.nn.functional.log_softmax(all_logits, dim=-1).cpu().numpy()
+            if hasattr(model, "get_logits_sliding_window") and callable(
+                getattr(model, "get_logits_sliding_window")
+            ):
+                logits = model.get_logits_sliding_window(
+                    samples,
+                    sample_rate=16000,
+                    chunk_seconds=c_sec,
+                    margin_seconds=m_sec,
+                )
+            else:
+                margin_samples = int(16000 * m_sec)
+                step_samples = chunk_len - 2 * margin_samples
+                if step_samples <= 0:
+                    step_samples = chunk_len
+                margin_frames = int(round(m_sec / self.index_duration))
+                cur_start = 0
+                total_samples = len(samples)
+                logits_list: List[torch.Tensor] = []
+                while cur_start < total_samples:
+                    cur_end = min(cur_start + chunk_len, total_samples)
+                    chunk = samples[cur_start:cur_end]
+                    chunk_logits = model.get_logits(chunk, sample_rate=16000)
+                    if chunk_logits.ndim == 3:
+                        chunk_logits = chunk_logits.squeeze(0)
+                    T_chunk = chunk_logits.shape[0]
+                    is_first = cur_start == 0
+                    is_last = cur_end >= total_samples
+                    left_trim = 0 if is_first else margin_frames
+                    right_trim = 0 if is_last else margin_frames
+                    left_idx = min(left_trim, T_chunk)
+                    right_idx = max(left_idx, T_chunk - right_trim)
+                    logits_list.append(chunk_logits[left_idx:right_idx])
+                    if is_last:
+                        break
+                    cur_start += step_samples
+                logits = torch.cat(logits_list, dim=0)
+
+            if logits.ndim == 3:
+                logits = logits.squeeze(0)
+            lpz = torch.nn.functional.log_softmax(logits, dim=-1).cpu().numpy()
 
         return lpz, total_audio_sec, lead_offset_sec
 
@@ -167,11 +211,14 @@ class CTCSegmentationAligner:
         self,
         audio_input: Union[str, Path, AudioSegment, np.ndarray],
         asr_model: Optional[CherokeeASRModel] = None,
-        chunk_seconds: float = 30.0,
+        chunk_seconds: Optional[float] = None,
+        margin_seconds: Optional[float] = None,
         apply_buffers: bool = True,
     ) -> str:
         model = asr_model or self.model
         model_name = getattr(model, "model_name", None) or "cherokee_asr"
+        c_sec = self.chunk_seconds if chunk_seconds is None else float(chunk_seconds)
+        m_sec = self.margin_seconds if margin_seconds is None else float(margin_seconds)
 
         stem = "audio"
         if isinstance(audio_input, (str, Path)):
@@ -195,7 +242,7 @@ class CTCSegmentationAligner:
 
         lead = self.buffer_lead_ms if apply_buffers else 0
         trail = self.buffer_trail_ms if apply_buffers else 0
-        buf_str = f"lead={lead}:trail={trail}:chunk={chunk_seconds}"
+        buf_str = f"lead={lead}:trail={trail}:chunk={c_sec}:margin={m_sec}"
         full_key = f"{model_name}|{input_id}|{buf_str}"
         cache_hash = hashlib.sha256(full_key.encode("utf-8")).hexdigest()
         return f"{stem}_{cache_hash[:16]}"
@@ -204,7 +251,8 @@ class CTCSegmentationAligner:
         self,
         audio_input: Union[str, Path, AudioSegment, np.ndarray],
         asr_model: Optional[CherokeeASRModel] = None,
-        chunk_seconds: float = 30.0,
+        chunk_seconds: Optional[float] = None,
+        margin_seconds: Optional[float] = None,
         apply_buffers: bool = True,
         cache: Optional[bool] = None,
         cache_dir: Optional[Union[str, Path]] = None,
@@ -219,8 +267,10 @@ class CTCSegmentationAligner:
             Audio input to extract logits for.
         asr_model : Optional[CherokeeASRModel]
             ASR model to use. If None, uses self.model.
-        chunk_seconds : float
-            Chunk length for batched audio processing.
+        chunk_seconds : Optional[float]
+            Chunk length for batched audio processing. Defaults to self.chunk_seconds.
+        margin_seconds : Optional[float]
+            Margin length for sliding-window trimming. Defaults to self.margin_seconds.
         apply_buffers : bool
             Whether to pad audio with lead/trail context buffers.
         cache : Optional[bool]
@@ -235,12 +285,15 @@ class CTCSegmentationAligner:
         """
         use_cache = self.cache if cache is None else bool(cache)
         target_cache_dir = Path(cache_dir) if cache_dir is not None else self.cache_dir
+        c_sec = self.chunk_seconds if chunk_seconds is None else float(chunk_seconds)
+        m_sec = self.margin_seconds if margin_seconds is None else float(margin_seconds)
 
         if not use_cache:
             return self.extract_logits(
                 audio_input=audio_input,
                 asr_model=asr_model,
-                chunk_seconds=chunk_seconds,
+                chunk_seconds=c_sec,
+                margin_seconds=m_sec,
                 apply_buffers=apply_buffers,
             )
 
@@ -248,7 +301,8 @@ class CTCSegmentationAligner:
         cache_key = self._compute_cache_key(
             audio_input=audio_input,
             asr_model=asr_model,
-            chunk_seconds=chunk_seconds,
+            chunk_seconds=c_sec,
+            margin_seconds=m_sec,
             apply_buffers=apply_buffers,
         )
         cache_path = target_cache_dir / f"{cache_key}.npz"
@@ -271,7 +325,8 @@ class CTCSegmentationAligner:
         lpz, dur_sec, lead_offset_sec = self.extract_logits(
             audio_input=audio_input,
             asr_model=asr_model,
-            chunk_seconds=chunk_seconds,
+            chunk_seconds=c_sec,
+            margin_seconds=m_sec,
             apply_buffers=apply_buffers,
         )
 
@@ -325,12 +380,15 @@ class CTCSegmentationAligner:
                 emitted_text="",
             )
 
+        valid_syncope = [t for t in self.syncope_tokens if t in char_list]
+        valid_intrusive = [t for t in self.intrusive_tokens if t in char_list]
+
         config = CtcSegmentationParameters(
             char_list=char_list,
             blank=pad_id,
-            syncope_tokens=self.syncope_tokens,
+            syncope_tokens=valid_syncope,
             syncope_penalty=self.syncope_penalty,
-            intrusive_tokens=self.intrusive_tokens,
+            intrusive_tokens=valid_intrusive,
             intrusive_penalty=self.intrusive_penalty,
             index_duration=self.index_duration,
             score_min_mean_over_L=2,
@@ -352,7 +410,9 @@ class CTCSegmentationAligner:
                 raw_w_start = min(w_timings)
                 raw_w_end = max(w_timings) + self.index_duration
                 w_start = max(0.0, round(raw_w_start - lead_offset_sec, 3))
-                w_end = min(dur_sec, round(raw_w_end - lead_offset_sec, 3))
+                w_end = max(
+                    w_start, min(dur_sec, round(raw_w_end - lead_offset_sec, 3))
+                )
             else:
                 w_start = prev_end
                 w_end = prev_end
@@ -403,7 +463,9 @@ class CTCSegmentationAligner:
             prev_end = w_end
 
         chunk_start = word_intervals[0].start_sec if word_intervals else 0.0
-        chunk_end = word_intervals[-1].end_sec if word_intervals else dur_sec
+        chunk_end = (
+            max(chunk_start, word_intervals[-1].end_sec) if word_intervals else dur_sec
+        )
 
         # Construct emitted hypothesis directly from backtracked CTC trellis path
         emitted_text = " ".join(
@@ -439,17 +501,36 @@ class CTCSegmentationAligner:
         if model is None:
             raise ValueError("ASR model must be provided.")
 
+        if not chunks:
+            return AlignmentOutput(
+                aligned_chunks=[],
+                source_id=source_id,
+                raw_tokens=[],
+                metrics=AlignmentMetrics(
+                    total_chunks=0,
+                    matched_chunks=0,
+                    match_ratio=0.0,
+                    mean_distance_score=0.0,
+                    total_ground_truth_chars=0,
+                    total_emitted_chars=0,
+                    flagged_words_count=0,
+                ),
+            )
+
         lpz, dur_sec, _ = self.get_logits_cached(
             audio_input, asr_model=model, apply_buffers=False, cache=cache
         )
         char_list, pad_id = self._get_char_list_and_blank(model)
 
+        valid_syncope = [t for t in self.syncope_tokens if t in char_list]
+        valid_intrusive = [t for t in self.intrusive_tokens if t in char_list]
+
         config = CtcSegmentationParameters(
             char_list=char_list,
             blank=pad_id,
-            syncope_tokens=self.syncope_tokens,
+            syncope_tokens=valid_syncope,
             syncope_penalty=self.syncope_penalty,
-            intrusive_tokens=self.intrusive_tokens,
+            intrusive_tokens=valid_intrusive,
             intrusive_penalty=self.intrusive_penalty,
             index_duration=self.index_duration,
             min_window_size=max(self.min_window_size, lpz.shape[0]),
@@ -458,70 +539,146 @@ class CTCSegmentationAligner:
             replace_spaces_with_blanks=False,
         )
 
-        texts = [self.chunk_norm(c.text).replace(" ", "|") for c in chunks]
-        gt_mat, utt_indices = prepare_text(config, texts, char_list)
+        all_words: List[str] = []
+        chunk_word_slices: List[Tuple[int, int]] = []
+        for c in chunks:
+            norm_words = self.chunk_norm(c.text).split()
+            w_start = len(all_words)
+            all_words.extend(norm_words)
+            chunk_word_slices.append((w_start, len(all_words)))
 
+        if not all_words or lpz.shape[0] == 0:
+            aligned_chunks = [
+                AlignedChunk(
+                    chunk_id=c.chunk_id,
+                    start_sec=0.0,
+                    end_sec=dur_sec,
+                    words=[],
+                    distance_score=1.0,
+                    emitted_text="",
+                )
+                for c in chunks
+            ]
+            return AlignmentOutput(
+                aligned_chunks=aligned_chunks,
+                source_id=source_id,
+                raw_tokens=[],
+                metrics=AlignmentMetrics(
+                    total_chunks=len(chunks),
+                    matched_chunks=0,
+                    match_ratio=0.0,
+                    mean_distance_score=1.0,
+                    total_ground_truth_chars=sum(len(c.text) for c in chunks),
+                    total_emitted_chars=0,
+                    flagged_words_count=0,
+                ),
+            )
+
+        gt_mat, utt_indices = prepare_text(config, all_words, char_list)
         timings, char_probs, state_list = ctc_segmentation(config, lpz, gt_mat)
+
+        chunk_utt_indices = [utt_indices[s] for s, _ in chunk_word_slices] + [
+            utt_indices[-1]
+        ]
         raw_segments = determine_utterance_segments(
-            config, utt_indices, char_probs, timings, texts
+            config, chunk_utt_indices, char_probs, timings, [c.text for c in chunks]
         )
 
         aligned_chunks: List[AlignedChunk] = []
+        prev_end = 0.0
 
         for c_idx, chunk in enumerate(chunks):
-            start_utt_idx = utt_indices[c_idx]
-            end_utt_idx = utt_indices[c_idx + 1]
-            chunk_timings = [t for t in timings[start_utt_idx:end_utt_idx] if t > 0.0]
+            w_start_idx, w_end_idx = chunk_word_slices[c_idx]
+            chunk_words = all_words[w_start_idx:w_end_idx]
 
-            if chunk_timings:
-                c_start = round(min(chunk_timings), 3)
-                c_end = round(max(chunk_timings) + self.index_duration, 3)
+            raw_s, raw_e, score = raw_segments[c_idx]
+            prev_boundary = aligned_chunks[-1].end_sec if aligned_chunks else 0.0
+            if float(raw_s) >= 0.0:
+                c_start = max(prev_boundary, round(float(raw_s), 3))
             else:
-                raw_s, raw_e, _ = raw_segments[c_idx]
-                c_start = (
-                    round(float(raw_s), 3)
-                    if float(raw_s) > 0.0
-                    else (aligned_chunks[-1].end_sec if aligned_chunks else 0.0)
-                )
-                c_end = round(float(raw_e), 3) if float(raw_e) > c_start else c_start
+                c_start = prev_boundary
+
+            if float(raw_e) >= c_start:
+                c_end = round(float(raw_e), 3)
+            else:
+                c_end = c_start
 
             # Extract word intervals within chunk
-            words = self.chunk_norm(chunk.text).split()
             word_intervals: List[WordInterval] = []
-            if words:
-                w_start_f = int(round(c_start / self.index_duration))
-                w_end_f = int(round(c_end / self.index_duration))
-                frames_per_word = max(1, (w_end_f - w_start_f) // len(words))
+            for local_w_i, raw_w in enumerate(chunk_words):
+                global_w_i = w_start_idx + local_w_i
+                start_idx = utt_indices[global_w_i]
+                end_idx = utt_indices[global_w_i + 1]
+                w_timings = [t for t in timings[start_idx:end_idx] if t > 0.0]
 
-                for w_i, raw_w in enumerate(words):
-                    ws = round(c_start + w_i * frames_per_word * self.index_duration, 3)
-                    we = round(
-                        min(
-                            c_end,
-                            c_start + (w_i + 1) * frames_per_word * self.index_duration,
-                        ),
-                        3,
-                    )
-                    word_intervals.append(
-                        WordInterval(
-                            word=raw_w,
-                            start_sec=ws,
-                            end_sec=we,
-                            confidence=1.0,
-                            flagged=False,
-                            emitted_word=raw_w,
+                if w_timings:
+                    w_start = max(0.0, min(dur_sec, round(min(w_timings), 3)))
+                    w_end = min(dur_sec, round(max(w_timings) + self.index_duration, 3))
+                else:
+                    w_start = prev_end
+                    w_end = prev_end
+
+                start_f = (
+                    int(round(min(w_timings) / self.index_duration)) if w_timings else 0
+                )
+                end_f = (
+                    int(
+                        round(
+                            (max(w_timings) + self.index_duration) / self.index_duration
                         )
                     )
+                    if w_timings
+                    else 0
+                )
+                emitted_chars = [
+                    s
+                    for s in state_list[start_f : max(start_f + 1, end_f)]
+                    if s and s != "ε" and s != "[PAD]"
+                ]
+                emitted_w = "".join(emitted_chars) or raw_w
 
-            # Emitted text in frame range from backtracked state_list
-            start_frame = int(round(c_start / self.index_duration))
-            end_frame = int(round(c_end / self.index_duration))
-            emitted_chars = [
-                s
-                for s in state_list[start_frame:end_frame]
-                if s and s != "ε" and s != "[PAD]"
-            ]
-            emitted_text = " ".join("".join(emitted_chars).replace("|", " ").split())
+                char_state_lps = [
+                    char_probs[f]
+                    for f in range(start_f, max(start_f + 1, end_f))
+                    if state_list[f] and state_list[f] not in ("ε", "[PAD]")
+                ]
+                if w_timings and char_state_lps:
+                    mean_logprob = float(np.mean(char_state_lps))
+                    word_conf = float(np.exp(mean_logprob))
+                else:
+                    word_conf = 0.0
+
+                is_low_conf = bool(word_conf < self.flag_min_confidence)
+                is_unaligned = bool(len(w_timings) == 0 or len(emitted_chars) == 0)
+                is_flagged = bool(is_low_conf or is_unaligned)
+
+                word_intervals.append(
+                    WordInterval(
+                        word=raw_w,
+                        start_sec=w_start,
+                        end_sec=w_end,
+                        confidence=round(word_conf, 6),
+                        flagged=is_flagged,
+                        emitted_word=emitted_w,
+                    )
+                )
+                prev_end = w_end
+
+            if word_intervals:
+                emitted_text = " ".join(
+                    [w.emitted_word for w in word_intervals if w.emitted_word]
+                )
+            else:
+                start_frame = int(round(c_start / self.index_duration))
+                end_frame = int(round(c_end / self.index_duration))
+                emitted_chars = [
+                    s
+                    for s in state_list[start_frame:end_frame]
+                    if s and s != "ε" and s != "[PAD]"
+                ]
+                emitted_text = " ".join(
+                    "".join(emitted_chars).replace("|", " ").split()
+                )
 
             aligned_chunks.append(
                 AlignedChunk(
@@ -529,7 +686,7 @@ class CTCSegmentationAligner:
                     start_sec=c_start,
                     end_sec=c_end,
                     words=word_intervals,
-                    distance_score=round(float(raw_segments[c_idx][2]), 4),
+                    distance_score=round(float(score), 4),
                     emitted_text=emitted_text,
                 )
             )
@@ -568,6 +725,7 @@ def get_logits_cached(
     audio_input: Union[str, Path, AudioSegment, np.ndarray],
     asr_model: Optional[CherokeeASRModel] = None,
     chunk_seconds: float = 30.0,
+    margin_seconds: float = 1.0,
     apply_buffers: bool = True,
     cache: bool = True,
     cache_dir: Optional[Union[str, Path]] = None,
@@ -585,6 +743,8 @@ def get_logits_cached(
         ASR model instance. Required if cache is False or on cache miss.
     chunk_seconds : float
         Audio chunk size in seconds for batched model forward passes.
+    margin_seconds : float
+        Margin length in seconds for sliding-window trimming.
     apply_buffers : bool
         Whether to pad lead/trail acoustic context buffers.
     cache : bool
@@ -605,6 +765,8 @@ def get_logits_cached(
         model=asr_model,
         buffer_lead_ms=buffer_lead_ms,
         buffer_trail_ms=buffer_trail_ms,
+        chunk_seconds=chunk_seconds,
+        margin_seconds=margin_seconds,
         cache=cache,
         cache_dir=cache_dir,
     )
@@ -612,6 +774,7 @@ def get_logits_cached(
         audio_input=audio_input,
         asr_model=asr_model,
         chunk_seconds=chunk_seconds,
+        margin_seconds=margin_seconds,
         apply_buffers=apply_buffers,
         cache=cache,
         cache_dir=cache_dir,

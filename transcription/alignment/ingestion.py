@@ -4,6 +4,7 @@ Ingestion utilities for loading text chunks from Bible metadata and generic JSON
 
 import json
 import os
+from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 from transcription.alignment.models import TextChunk
@@ -15,7 +16,7 @@ from transcription.alignment.normalizers import (
 
 
 def load_bible_chunks(
-    source: Union[str, Dict[str, Any], List[Dict[str, Any]]],
+    source: Union[str, Path, Dict[str, Any], List[Dict[str, Any]]],
     normalizer: Callable[[str], str] = normalize_syllabary_for_alignment,
 ) -> Tuple[List[TextChunk], Dict[str, Dict[str, Any]]]:
     """
@@ -30,10 +31,10 @@ def load_bible_chunks(
             chunks: List[TextChunk] with chunk_id and normalized text.
             source_lookup: Dict[str, Dict[str, Any]] mapping chunk_id to source metadata.
     """
-    if isinstance(source, str):
-        if not os.path.exists(source):
+    if isinstance(source, (str, Path)):
+        if not os.path.exists(str(source)):
             raise FileNotFoundError(f"Bible metadata file not found: {source}")
-        with open(source, "r", encoding="utf-8") as f:
+        with open(str(source), "r", encoding="utf-8") as f:
             data = json.load(f)
     else:
         data = source
@@ -76,7 +77,7 @@ def load_bible_chunks(
 
 
 def load_generic_chunks(
-    source: Union[str, List[Dict[str, Any]], Dict[str, Any]],
+    source: Union[str, Path, List[Dict[str, Any]], Dict[str, Any]],
     normalizer: Optional[Callable[[str], str]] = None,
 ) -> Tuple[List[TextChunk], Dict[str, Dict[str, Any]]]:
     """
@@ -91,10 +92,10 @@ def load_generic_chunks(
             chunks: List[TextChunk] with chunk_id and text.
             source_lookup: Dict[str, Dict[str, Any]] mapping chunk_id to source item.
     """
-    if isinstance(source, str):
-        if not os.path.exists(source):
+    if isinstance(source, (str, Path)):
+        if not os.path.exists(str(source)):
             raise FileNotFoundError(f"Chunk list file not found: {source}")
-        with open(source, "r", encoding="utf-8") as f:
+        with open(str(source), "r", encoding="utf-8") as f:
             data = json.load(f)
     else:
         data = source

@@ -4,13 +4,13 @@
 realign_bible.py
 
 Realigns New Testament books (Mark, Matthew) using:
-1. Baseline pre-Bible ASR model (charliemcvicker/asr-cherokee:5464d15).
-2. CachedASREmissionsExtractor to cache and reuse chapter emissions.
-3. ConfusionMatrixCostMetric loaded from confusion_cost_matrix_prebible.json.
-4. Phonological syllabary/ASR reconciliation.
-5. Slices audio into 16kHz mono WAV files in cherokee_new_testament/split_audio/.
-6. Exports full alignment records to cherokee_new_testament/alignments/.
-7. Exports training CSVs to cherokee_new_testament/train_csvs/.
+1. CTCSegmentationAligner with syncope-aware DP trellis segmentation on continuous chapter audio.
+2. Slices unclipped verse audio into 16kHz mono WAV files in cherokee_new_testament/split_audio/
+   using natural inter-verse boundary partition points.
+3. Performs phonological syllabary/ASR reconciliation.
+4. Exports 4-tier Praat TextGrids to output_praat/new_testament/{book}_{ch}/.
+5. Exports full alignment records to cherokee_new_testament/alignments/{book}_alignment_records.json and bible_alignment_records.json.
+6. Exports training CSVs to cherokee_new_testament/train_csvs/.
 """
 
 import argparse
@@ -18,16 +18,24 @@ import csv
 import json
 import os
 from pathlib import Path
+import sys
 from typing import Any, Dict, List, Optional, Tuple
+
 import numpy as np
 from pydub import AudioSegment
+import torch
 
-from transcription.alignment.calibrated_distance_metrics import (
-    PhonologicalConfusionCostMetric,
-)
+BASE_DIR = Path(__file__).resolve().parent.parent
+if str(BASE_DIR) not in sys.path:
+    sys.path.insert(0, str(BASE_DIR))
+
+from transcription.alignment.ctc_aligner import CTCSegmentationAligner
 from transcription.alignment.distance_metrics import (
     ConfusionMatrixCostMetric,
     DistanceMetric,
+)
+from transcription.alignment.calibrated_distance_metrics import (
+    PhonologicalConfusionCostMetric,
 )
 from transcription.alignment.extractors import (
     ASREmissionsExtractor,
@@ -41,7 +49,6 @@ from transcription.new_testament.pipeline import (
     reconcile_syllabary_asr,
 )
 
-BASE_DIR = Path(__file__).resolve().parent.parent
 NT_DIR = BASE_DIR / "cherokee_new_testament"
 AUDIO_SRC_DIR = NT_DIR / "audio_source"
 TRANSCRIPTS_DIR = NT_DIR / "book_transcripts"
@@ -49,10 +56,7 @@ SPLIT_AUDIO_DIR = NT_DIR / "split_audio"
 ALIGNMENTS_DIR = NT_DIR / "alignments"
 TRAIN_CSVS_DIR = NT_DIR / "train_csvs"
 PRAAT_OUT_DIR = BASE_DIR / "output_praat" / "new_testament"
-DEFAULT_COST_MATRIX_PATH = (
-    BASE_DIR / "runs" / "evaluation" / "confusion_cost_matrix_prebible.json"
-)
-DEFAULT_CACHE_DIR = BASE_DIR / "runs" / "cache" / "emissions"
+DEFAULT_CACHE_DIR = BASE_DIR / "runs" / "cache" / "ctc_emissions"
 DEFAULT_MODEL_REPO = "charliemcvicker/length-only-20260704-155307-asr-cherokee-colon"
 DEFAULT_REVISION = "76e62140955f4738abdab345ea34068b02d8d2a2"
 
@@ -62,12 +66,39 @@ BOOK_CONFIGS = {
 }
 
 
-def get_default_extractor_and_metric(
+def get_default_ctc_aligner(
     model_repo: str = DEFAULT_MODEL_REPO,
     model_revision: str = DEFAULT_REVISION,
     cache_dir: Path = DEFAULT_CACHE_DIR,
-    cost_matrix_path: Path = DEFAULT_COST_MATRIX_PATH,
+    cache: bool = True,
+) -> CTCSegmentationAligner:
+    """Instantiates default CTCSegmentationAligner with cached emissions."""
+    token = os.environ.get("HF_TOKEN", None)
+    device = "mps" if torch.backends.mps.is_available() else "cpu"
+    asr_model = CherokeeASRModel.from_pretrained_or_best(
+        path_or_repo=model_repo,
+        revision=model_revision,
+        device=device,
+        token=token,
+    )
+    aligner = CTCSegmentationAligner(
+        model=asr_model,
+        cache=cache,
+        cache_dir=cache_dir,
+    )
+    return aligner
+
+
+def get_default_extractor_and_metric(
+    model_repo: str = DEFAULT_MODEL_REPO,
+    model_revision: str = DEFAULT_REVISION,
+    cache_dir: Path = BASE_DIR / "runs" / "cache" / "emissions",
+    cost_matrix_path: Path = BASE_DIR
+    / "runs"
+    / "evaluation"
+    / "confusion_cost_matrix_prebible.json",
 ) -> Tuple[CachedASREmissionsExtractor, DistanceMetric]:
+    """Legacy helper for DTW distance metric and emissions extractor."""
     token = os.environ.get("HF_TOKEN", None)
     asr_model = CherokeeASRModel.from_pretrained_or_best(
         path_or_repo=model_repo,
@@ -99,11 +130,14 @@ def get_default_extractor_and_metric(
 
 def realign_book(
     book: str,
+    ctc_aligner: Optional[CTCSegmentationAligner] = None,
     distance_metric: Optional[DistanceMetric] = None,
     emissions_extractor: Optional[ASREmissionsExtractor] = None,
     model_repo: str = DEFAULT_MODEL_REPO,
     model_revision: str = DEFAULT_REVISION,
     export_praat: bool = True,
+    cache_dir: Path = DEFAULT_CACHE_DIR,
+    cache: bool = True,
 ) -> Tuple[List[Dict[str, Any]], List[Dict[str, str]]]:
     book_key = book.lower().strip()
     if book_key not in BOOK_CONFIGS:
@@ -119,20 +153,22 @@ def realign_book(
     ALIGNMENTS_DIR.mkdir(parents=True, exist_ok=True)
     TRAIN_CSVS_DIR.mkdir(parents=True, exist_ok=True)
 
-    if emissions_extractor is None or distance_metric is None:
-        def_extractor, def_metric = get_default_extractor_and_metric(
+    if ctc_aligner is None and emissions_extractor is None:
+        ctc_aligner = get_default_ctc_aligner(
             model_repo=model_repo,
             model_revision=model_revision,
+            cache_dir=cache_dir,
+            cache=cache,
         )
-        emissions_extractor = emissions_extractor or def_extractor
-        distance_metric = distance_metric or def_metric
 
     records: List[Dict[str, Any]] = []
     csv_rows: List[Dict[str, str]] = []
     durations_sec: List[float] = []
 
     print(f"\n==================================================")
-    print(f"Starting Realignment of Book of {book_display} ({num_chapters} chapters)")
+    print(
+        f"Starting Continuous CTC Realignment of Book of {book_display} ({num_chapters} chapters)"
+    )
     print(f"==================================================")
 
     for ch in range(1, num_chapters + 1):
@@ -147,20 +183,31 @@ def realign_book(
             print(f"[Warning] Transcript not found: {transcript_path}, skipping.")
             continue
 
-        print(f"\n>>> Realigning {book_display} Chapter {ch} ...")
+        ch_out_dir = PRAAT_OUT_DIR / f"{book_key}_{ch_str}"
+        print(
+            f"\n>>> Realigning {book_display} Chapter {ch} with CTCSegmentationAligner ..."
+        )
         res = align_chapter(
             audio_path=audio_path,
             transcript_path=transcript_path,
-            output_dir=PRAAT_OUT_DIR,
+            output_dir=ch_out_dir,
             export_praat=export_praat,
+            export_manifest=True,
+            engine="ctc" if ctc_aligner is not None else "dtw",
+            ctc_aligner=ctc_aligner,
             distance_metric=distance_metric,
             emissions_extractor=emissions_extractor,
+            model_path=model_repo,
             model_revision=model_revision,
+            cache_dir=cache_dir,
+            cache=cache,
         )
 
         audio_seg = AudioSegment.from_file(str(audio_path))
         num_verses_aligned = len(res.aligned_chunks)
         print(f"    Aligned {num_verses_aligned} verses.")
+
+        ch_data = load_chapter_transcript(transcript_path)
 
         for chunk in res.aligned_chunks:
             verse_id = chunk.chunk_id
@@ -180,7 +227,7 @@ def realign_book(
 
             split_out_path = SPLIT_AUDIO_DIR / split_filename
 
-            # Slicing audio
+            # Slicing unclipped verse audio using natural inter-verse boundary partition points
             start_ms = int(start_sec * 1000)
             end_ms = int(end_sec * 1000)
             verse_audio = audio_seg[start_ms:end_ms]
@@ -188,7 +235,6 @@ def realign_book(
             verse_audio.export(str(split_out_path), format="wav")
 
             # Load verse transcript text
-            ch_data = load_chapter_transcript(transcript_path)
             verse_info = ch_data.get(verse_id, {})
             cherokee_text = (
                 verse_info.get("cherokee")
@@ -268,7 +314,7 @@ def realign_book(
         writer.writeheader()
         writer.writerows(csv_rows)
     print(
-        f"[Artifact] Saved training CSV with {len(csv_rows)} rows to '{train_csv_path}'"
+        f"[Artifact] Saved training CSV with {len(csv_rows)} rows to '{train_csv_alt}'"
     )
 
     if durations_sec:
@@ -290,10 +336,14 @@ def realign_all(
     model_repo: str = DEFAULT_MODEL_REPO,
     model_revision: str = DEFAULT_REVISION,
     export_praat: bool = True,
+    cache_dir: Path = DEFAULT_CACHE_DIR,
+    cache: bool = True,
 ) -> Dict[str, List[Dict[str, Any]]]:
-    cached_extractor, distance_metric = get_default_extractor_and_metric(
+    ctc_aligner = get_default_ctc_aligner(
         model_repo=model_repo,
         model_revision=model_revision,
+        cache_dir=cache_dir,
+        cache=cache,
     )
 
     all_records: List[Dict[str, Any]] = []
@@ -302,11 +352,12 @@ def realign_all(
     for book in ["mark", "matthew"]:
         records, _ = realign_book(
             book=book,
-            distance_metric=distance_metric,
-            emissions_extractor=cached_extractor,
+            ctc_aligner=ctc_aligner,
             model_repo=model_repo,
             model_revision=model_revision,
             export_praat=export_praat,
+            cache_dir=cache_dir,
+            cache=cache,
         )
         book_results[book] = records
         all_records.extend(records)
@@ -325,7 +376,7 @@ def realign_all(
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Realign Cherokee New Testament books with pre-Bible model and confusion cost metric."
+        description="Realign Cherokee New Testament books with continuous CTC segmentation aligner."
     )
     parser.add_argument(
         "--book",
@@ -349,6 +400,18 @@ def main():
         default=False,
         help="Skip Praat TextGrid export",
     )
+    parser.add_argument(
+        "--cache-dir",
+        type=Path,
+        default=DEFAULT_CACHE_DIR,
+        help=f"Directory for caching CTC logits (default: {DEFAULT_CACHE_DIR})",
+    )
+    parser.add_argument(
+        "--no-cache",
+        action="store_true",
+        default=False,
+        help="Disable disk caching for CTC logits",
+    )
 
     args = parser.parse_args()
 
@@ -357,6 +420,8 @@ def main():
             model_repo=args.model_repo,
             model_revision=args.model_revision,
             export_praat=not args.no_praat,
+            cache_dir=args.cache_dir,
+            cache=not args.no_cache,
         )
     else:
         records, _ = realign_book(
@@ -364,6 +429,8 @@ def main():
             model_repo=args.model_repo,
             model_revision=args.model_revision,
             export_praat=not args.no_praat,
+            cache_dir=args.cache_dir,
+            cache=not args.no_cache,
         )
         # Also update combined if single book is run
         ALIGNMENTS_DIR.mkdir(parents=True, exist_ok=True)

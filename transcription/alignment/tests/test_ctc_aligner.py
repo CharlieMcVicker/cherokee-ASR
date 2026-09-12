@@ -50,7 +50,7 @@ class DummyASRModel:
 
     def get_logits(self, samples: np.ndarray, sample_rate: int = 16000) -> torch.Tensor:
         self.call_count += 1
-        num_frames = max(10, len(samples) // 320)
+        num_frames = max(50, len(samples) // 320)
         vocab_size = 9
         # Deterministic logits
         logits = torch.zeros((num_frames, vocab_size), dtype=torch.float32)
@@ -67,8 +67,8 @@ class DummyASRModel:
 @pytest.fixture
 def dummy_audio_file(tmp_path: Path) -> Path:
     audio_path = tmp_path / "test_verse.wav"
-    # Create a 0.5-second 16kHz silent audio file
-    silence = AudioSegment.silent(duration=500, frame_rate=16000)
+    # Create a 2.0-second 16kHz silent audio file
+    silence = AudioSegment.silent(duration=2000, frame_rate=16000)
     silence.export(str(audio_path), format="wav")
     return audio_path
 
@@ -167,3 +167,226 @@ def test_get_logits_cached_ndarray_and_audiosegment(tmp_path: Path):
     lpz_arr_hit, _, _ = aligner.get_logits_cached(arr)
     assert model.call_count == 2
     np.testing.assert_allclose(lpz_arr, lpz_arr_hit, rtol=1e-5, atol=1e-5)
+
+
+def test_cherokee_asr_model_get_logits_sliding_window():
+    from transcription.models.asr_model import CherokeeASRModel
+
+    # Mock inner Wav2Vec2 model and processor
+    mock_model = MagicMock()
+    mock_processor = MagicMock()
+    mock_processor.tokenizer.get_vocab.return_value = {"[PAD]": 0, "a": 1}
+
+    def fake_processor(speech, sampling_rate=16000):
+        res = MagicMock()
+        res.input_values = [np.array(speech, dtype=np.float32)]
+        return res
+
+    mock_processor.side_effect = fake_processor
+
+    def fake_call(x):
+        # x is [1, num_samples]
+        n_samples = x.shape[1]
+        n_frames = n_samples // 320
+        res = MagicMock()
+        res.logits = torch.ones((1, n_frames, 10), dtype=torch.float32)
+        return res
+
+    mock_model.side_effect = fake_call
+    asr = CherokeeASRModel(model=mock_model, processor=mock_processor, device="cpu")
+
+    # Short audio (audio <= chunk_seconds): single pass without chunking
+    short_audio = np.zeros(16000 * 5, dtype=np.float32)
+    logits_short = asr.get_logits_sliding_window(
+        short_audio, chunk_seconds=10.0, margin_seconds=1.0
+    )
+    assert logits_short.shape[0] == 250
+    assert logits_short.shape[1] == 10
+
+    # Long audio (70 seconds with 30s chunk and 1s margin)
+    long_audio = np.zeros(16000 * 70, dtype=np.float32)
+    logits_long = asr.get_logits_sliding_window(
+        long_audio, chunk_seconds=30.0, margin_seconds=1.0
+    )
+    assert logits_long.shape[1] == 10
+    assert logits_long.shape[0] > 0
+
+    # Invalid margin error
+    with pytest.raises(ValueError):
+        asr.get_logits_sliding_window(long_audio, chunk_seconds=2.0, margin_seconds=1.5)
+
+
+def test_ctc_aligner_sliding_window_cache_key():
+    model = DummyASRModel()
+    aligner = CTCSegmentationAligner(
+        model=cast(Any, model), chunk_seconds=30.0, margin_seconds=1.0
+    )
+    arr = np.zeros(16000, dtype=np.float32)
+
+    key1 = aligner._compute_cache_key(arr, chunk_seconds=30.0, margin_seconds=1.0)
+    key2 = aligner._compute_cache_key(arr, chunk_seconds=20.0, margin_seconds=1.0)
+    key3 = aligner._compute_cache_key(arr, chunk_seconds=30.0, margin_seconds=2.0)
+
+    assert key1 != key2
+    assert key1 != key3
+
+
+def test_ctc_aligner_full_chapter_verse_and_word_harvesting():
+    from transcription.alignment.models import TextChunk
+
+    model = DummyASRModel()
+
+    # Create aligner with mock model
+    aligner = CTCSegmentationAligner(
+        model=cast(Any, model),
+        syncope_tokens=["a"],
+        syncope_penalty=2.0,
+        flag_min_confidence=0.1,
+    )
+
+    # Audio of 2 seconds
+    audio = np.zeros(16000 * 2, dtype=np.float32)
+
+    chunks = [
+        TextChunk(chunk_id="verse_1", text="a a"),
+        TextChunk(chunk_id="verse_2", text="a"),
+    ]
+
+    res = aligner.align(audio, chunks=chunks)
+    assert len(res.aligned_chunks) == 2
+
+    # Check verse 1
+    v1 = res.aligned_chunks[0]
+    assert v1.chunk_id == "verse_1"
+    assert v1.start_sec >= 0.0
+    assert v1.end_sec >= v1.start_sec
+    assert len(v1.words) == 2
+    assert v1.words[0].word == "a"
+    assert v1.words[1].word == "a"
+    assert v1.words[0].start_sec <= v1.words[0].end_sec
+    assert isinstance(v1.words[0].confidence, float)
+    assert isinstance(v1.words[0].flagged, bool)
+    assert v1.emitted_text != ""
+
+    # Check verse 2
+    v2 = res.aligned_chunks[1]
+    assert v2.chunk_id == "verse_2"
+    assert v2.start_sec >= v1.start_sec
+    assert len(v2.words) == 1
+    assert v2.words[0].word == "a"
+
+    # Check alignment metrics
+    assert res.metrics is not None
+    assert res.metrics.total_chunks == 2
+    assert res.metrics.matched_chunks >= 1
+    assert res.metrics.match_ratio > 0.0
+
+
+def test_ctc_aligner_align_empty_chunks():
+    from transcription.alignment.models import TextChunk
+
+    model = DummyASRModel()
+    aligner = CTCSegmentationAligner(model=cast(Any, model))
+    audio = np.zeros(16000, dtype=np.float32)
+
+    # Empty chunk list
+    res = aligner.align(audio, chunks=[])
+    assert len(res.aligned_chunks) == 0
+    assert res.metrics is not None
+    assert res.metrics.total_chunks == 0
+
+    # Chunks with empty text
+    chunks = [TextChunk(chunk_id="empty_1", text="")]
+    res2 = aligner.align(audio, chunks=chunks)
+    assert len(res2.aligned_chunks) == 1
+    assert res2.aligned_chunks[0].words == []
+
+
+def test_ctc_aligner_extract_logits_sliding_window_fallback():
+    # Model without get_logits_sliding_window method
+    model = DummyASRModel()
+    aligner = CTCSegmentationAligner(
+        model=cast(Any, model),
+        chunk_seconds=1.0,
+        margin_seconds=0.2,
+        buffer_lead_ms=0,
+        buffer_trail_ms=0,
+    )
+    long_audio = np.zeros(16000 * 3, dtype=np.float32)
+
+    lpz, dur_sec, lead_offset = aligner.extract_logits(
+        long_audio, chunk_seconds=1.0, margin_seconds=0.2, apply_buffers=False
+    )
+    assert dur_sec == 3.0
+    assert lead_offset == 0.0
+    assert lpz.ndim == 2
+    assert lpz.shape[1] == 9
+    assert lpz.shape[0] > 0
+
+
+def test_ctc_aligner_verse_slice_alignment_and_anomaly_detection(
+    dummy_audio_file: Path,
+):
+    model = DummyASRModel()
+    aligner = CTCSegmentationAligner(
+        model=cast(Any, model),
+        flag_min_confidence=0.1,
+    )
+
+    aligned = aligner.align_verse_slice(
+        audio_input=dummy_audio_file,
+        chunk_id="020101",
+        phonetic_text="a a a",
+        syllabary_text="Ꭰ Ꭰ Ꭰ",
+    )
+
+    assert aligned.chunk_id == "020101"
+    assert aligned.start_sec >= 0.0
+    assert aligned.end_sec >= aligned.start_sec
+    assert len(aligned.words) == 3
+    for w in aligned.words:
+        assert w.word == "a"
+        assert w.start_sec <= w.end_sec
+        assert isinstance(w.confidence, float)
+        assert isinstance(w.flagged, bool)
+        assert w.emitted_word != ""
+
+
+def test_ctc_aligner_continuous_chapter_multi_verse_monotonicity():
+    from transcription.alignment.models import TextChunk
+
+    model = DummyASRModel()
+    aligner = CTCSegmentationAligner(
+        model=cast(Any, model),
+        syncope_tokens=["a", "e", "i", "o", "u", "v"],
+        syncope_penalty=2.0,
+        intrusive_tokens=["h", "'"],
+        intrusive_penalty=0.1,
+    )
+
+    audio = np.zeros(16000 * 6, dtype=np.float32)
+    chunks = [
+        TextChunk(chunk_id="v1", text="a a"),
+        TextChunk(chunk_id="v2", text="a a a"),
+        TextChunk(chunk_id="v3", text="a"),
+    ]
+
+    out = aligner.align(audio, chunks=chunks)
+    assert len(out.aligned_chunks) == 3
+
+    prev_end = 0.0
+    for idx, c in enumerate(out.aligned_chunks):
+        assert c.chunk_id == chunks[idx].chunk_id
+        assert c.start_sec >= 0.0
+        assert c.end_sec >= c.start_sec
+        assert c.start_sec >= prev_end - 0.001
+        prev_end = c.end_sec
+        assert len(c.words) > 0
+        for w in c.words:
+            assert w.start_sec <= w.end_sec
+            assert w.word == "a"
+
+    assert out.metrics is not None
+    assert out.metrics.total_chunks == 3
+    assert out.metrics.matched_chunks >= 1
+    assert out.metrics.match_ratio > 0.0

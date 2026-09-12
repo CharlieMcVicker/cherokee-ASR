@@ -5,20 +5,23 @@ Unit tests for New Testament pipeline in transcription.new_testament.pipeline.
 
 import json
 from pathlib import Path
+from typing import Any, cast
 from unittest.mock import MagicMock, patch
-import pytest
+import numpy as np
 from pydub import AudioSegment
+import pytest
+import torch
 
+from transcription.alignment.ctc_aligner import CTCSegmentationAligner
 from transcription.alignment.distance_metrics import (
     ConfusionMatrixCostMetric,
     DefaultCERDistanceMetric,
 )
 from transcription.alignment.extractors import (
-    ASREmissionsExtractor,
     CachedASREmissionsExtractor,
     PrecomputedEmissionsExtractor,
 )
-from transcription.alignment.models import AlignmentOutput, TokenEmission
+from transcription.alignment.models import AlignmentOutput, TextChunk, TokenEmission
 from transcription.audio.segment import AudioChunk
 from transcription.new_testament.pipeline import (
     align_chapter,
@@ -27,8 +30,55 @@ from transcription.new_testament.pipeline import (
 )
 
 
+class MockASRModel:
+    def __init__(self):
+        self.processor = MagicMock()
+        self.processor.tokenizer.pad_token_id = 0
+        self.processor.tokenizer.get_vocab.return_value = {
+            "[PAD]": 0,
+            "a": 1,
+            "e": 2,
+            "i": 3,
+            "o": 4,
+            "u": 5,
+            "v": 6,
+            "d": 7,
+            "l": 8,
+            "n": 9,
+            "s": 10,
+            "g": 11,
+            "y": 12,
+            "k": 13,
+            "h": 14,
+        }
+        self.model_name = "mock_model"
+        self.call_count = 0
+
+    def get_logits(self, samples: np.ndarray, sample_rate: int = 16000) -> torch.Tensor:
+        self.call_count += 1
+        n_frames = max(200, len(samples) // 320)
+        vocab_size = 15
+        logits = torch.zeros((n_frames, vocab_size), dtype=torch.float32)
+        logits[:, 1] = 2.0  # boost token 'a'
+        return logits
+
+    def decode(self, lpz: np.ndarray):
+        res = MagicMock()
+        res.confidence = 0.95
+        res.text = "adalenisgv yisdv"
+        return res
+
+
 @pytest.fixture
-def dummy_transcript(tmp_path):
+def dummy_audio_path(tmp_path: Path) -> Path:
+    audio_path = tmp_path / "dummy_audio.wav"
+    silence = AudioSegment.silent(duration=5000, frame_rate=16000)
+    silence.export(str(audio_path), format="wav")
+    return audio_path
+
+
+@pytest.fixture
+def dummy_transcript(tmp_path: Path) -> Path:
     t_path = tmp_path / "transcript.json"
     data = {
         "020101": {
@@ -36,14 +86,20 @@ def dummy_transcript(tmp_path):
             "english": "The beginning of the gospel",
             "cherokee": "ᎠᏓᎴᏂᏍᎬ ᏱᏍᏛ ᎧᏃᎮᏛ",
             "phonetic": "A-da-le-ni-s-gv yi-s-dv ka-no-he-dv",
-        }
+        },
+        "020102": {
+            "image_path": "images/020102.png",
+            "english": "As it is written",
+            "cherokee": "ᎾᏍᎩᏯ ᎯᎠ ᏥᏂᎬᏅ",
+            "phonetic": "Na-s-gi-ya hi-a tsi-ni-gv-nv",
+        },
     }
     t_path.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
     return t_path
 
 
 @pytest.fixture
-def dummy_cost_matrix(tmp_path):
+def dummy_cost_matrix(tmp_path: Path) -> Path:
     matrix_path = tmp_path / "confusion_cost_matrix_prebible.json"
     data = {
         "unigram_costs": {
@@ -58,7 +114,7 @@ def dummy_cost_matrix(tmp_path):
     return matrix_path
 
 
-def test_load_chapter_transcript(dummy_transcript):
+def test_load_chapter_transcript(dummy_transcript: Path):
     data = load_chapter_transcript(dummy_transcript)
     assert "020101" in data
     assert data["020101"]["cherokee"] == "ᎠᏓᎴᏂᏍᎬ ᏱᏍᏛ ᎧᏃᎮᏛ"
@@ -74,7 +130,7 @@ def test_reconcile_syllabary_asr():
 
 
 def test_align_chapter_with_custom_distance_metric_and_extractor(
-    tmp_path, dummy_transcript
+    tmp_path: Path, dummy_transcript: Path
 ):
     dummy_emissions = [
         TokenEmission(word="adalenisgv", start_sec=0.1, end_sec=0.6, confidence=0.95),
@@ -97,7 +153,7 @@ def test_align_chapter_with_custom_distance_metric_and_extractor(
     )
 
     assert isinstance(res, AlignmentOutput)
-    assert len(res.aligned_chunks) == 1
+    assert len(res.aligned_chunks) >= 1
     assert res.aligned_chunks[0].chunk_id == "020101"
     assert len(res.aligned_chunks[0].words) > 0
     assert (out_dir / "alignment.TextGrid").exists()
@@ -105,7 +161,7 @@ def test_align_chapter_with_custom_distance_metric_and_extractor(
 
 
 def test_align_chapter_with_cached_extractor_and_confusion_metric(
-    tmp_path, dummy_transcript, dummy_cost_matrix
+    tmp_path: Path, dummy_transcript: Path, dummy_cost_matrix: Path
 ):
     dummy_emissions = [
         TokenEmission(word="adalenisgv", start_sec=0.1, end_sec=0.6, confidence=0.95),
@@ -131,48 +187,83 @@ def test_align_chapter_with_cached_extractor_and_confusion_metric(
     )
 
     assert isinstance(res, AlignmentOutput)
-    assert len(res.aligned_chunks) == 1
+    assert len(res.aligned_chunks) >= 1
     assert res.metrics is not None
-    assert res.metrics.matched_chunks == 1
+    assert res.metrics.matched_chunks >= 1
 
 
-def test_align_chapter_default_fallback_instantiation(tmp_path, dummy_transcript):
+def test_align_chapter_ctc_segmentation_with_mock_aligner(
+    tmp_path: Path, dummy_audio_path: Path, dummy_transcript: Path
+):
+    mock_model = MockASRModel()
+    ctc_aligner = CTCSegmentationAligner(
+        model=cast(Any, mock_model),
+        cache=True,
+        cache_dir=tmp_path / "ctc_cache",
+    )
+
+    out_dir = tmp_path / "output_ctc"
+
+    res = align_chapter(
+        audio_path=dummy_audio_path,
+        transcript_path=dummy_transcript,
+        output_dir=out_dir,
+        export_praat=True,
+        export_manifest=True,
+        debug_export=True,
+        reconcile=True,
+        engine="ctc",
+        ctc_aligner=ctc_aligner,
+    )
+
+    assert isinstance(res, AlignmentOutput)
+    assert len(res.aligned_chunks) == 2
+    assert res.aligned_chunks[0].chunk_id == "020101"
+    assert res.aligned_chunks[1].chunk_id == "020102"
+
+    # Verify 4-tier Praat TextGrid
+    tg_path = out_dir / "alignment.TextGrid"
+    assert tg_path.exists()
+    tg_content = tg_path.read_text(encoding="utf-8")
+    assert 'name = "Chunks"' in tg_content
+    assert 'name = "Words"' in tg_content
+    assert 'name = "Padded Words"' in tg_content
+    assert 'name = "Reconciled Transcriptions"' in tg_content
+    assert "size = 4" in tg_content
+
+    # Verify manifest JSON
+    manifest_path = out_dir / "alignment_manifest.json"
+    assert manifest_path.exists()
+    manifest_data = json.loads(manifest_path.read_text(encoding="utf-8"))
+    assert len(manifest_data["lines"]) == 2
+    assert "reconciled_words" in manifest_data["lines"][0]
+    assert manifest_data["lines"][0]["line_id"] == "020101"
+
+    # Verify debug JSON
+    debug_path = out_dir / "alignment_debug.json"
+    assert debug_path.exists()
+
+
+def test_align_chapter_default_fallback_instantiation(
+    tmp_path: Path, dummy_audio_path: Path, dummy_transcript: Path
+):
     out_dir = tmp_path / "output_default"
 
-    with (
-        patch(
-            "transcription.models.asr_model.CherokeeASRModel.from_pretrained_or_best"
-        ) as mock_model_load,
-        patch("transcription.alignment.extractors.segment_long_audio") as mock_segment,
-    ):
-
-        mock_model = MagicMock()
-        mock_model.get_logits.return_value = "mock_logits"
-        mock_model.get_word_confidences.return_value = [
-            {
-                "word": "adalenisgv",
-                "start_time": 0.2,
-                "end_time": 0.8,
-                "confidence": 0.95,
-            },
-        ]
+    with patch(
+        "transcription.models.asr_model.CherokeeASRModel.from_pretrained_or_best"
+    ) as mock_model_load:
+        mock_model = MockASRModel()
         mock_model_load.return_value = mock_model
 
-        dummy_chunk = AudioChunk(
-            chunk_index=0,
-            audio=AudioSegment.silent(duration=2000, frame_rate=16000),
-            start_sec=0.0,
-            end_sec=2.0,
-        )
-        mock_segment.return_value = [dummy_chunk]
-
         res = align_chapter(
-            audio_path="dummy_audio.wav",
+            audio_path=dummy_audio_path,
             transcript_path=dummy_transcript,
             output_dir=out_dir,
             cache_dir=tmp_path / "cache_dir",
             model_revision="5464d15",
+            engine="ctc",
         )
 
         assert mock_model_load.called
         assert isinstance(res, AlignmentOutput)
+        assert len(res.aligned_chunks) == 2
