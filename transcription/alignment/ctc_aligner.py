@@ -64,7 +64,7 @@ class CTCSegmentationAligner:
         buffer_lead_ms: int = 100,
         intrusive_tokens: Sequence[str] = ("h", "'"),
         intrusive_penalty: float = 0.1,
-        flag_min_confidence: float = 0.0002,
+        flag_min_confidence: float = 0.01,
         flag_min_char_duration_sec: float = 0.03,
         cache: bool = False,
         cache_dir: Optional[Union[str, Path]] = None,
@@ -374,9 +374,14 @@ class CTCSegmentationAligner:
             emitted_w = "".join(emitted_chars) or raw_w
 
             w_dur = max(0.0, w_end - w_start)
-            # Word confidence from acoustic frame log-probabilities
-            if w_timings and end_f > start_f:
-                mean_logprob = float(np.mean(char_probs[start_f:end_f]))
+            # Word confidence from acoustic character state log-probabilities
+            char_state_lps = [
+                char_probs[f]
+                for f in range(start_f, max(start_f + 1, end_f))
+                if state_list[f] and state_list[f] not in ("ε", "[PAD]")
+            ]
+            if w_timings and char_state_lps:
+                mean_logprob = float(np.mean(char_state_lps))
                 word_conf = float(np.exp(mean_logprob))
             else:
                 word_conf = 0.0
