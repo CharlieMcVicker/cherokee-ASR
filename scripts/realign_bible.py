@@ -130,6 +130,7 @@ def get_default_extractor_and_metric(
 
 def realign_book(
     book: str,
+    chapter: Optional[int] = None,
     ctc_aligner: Optional[CTCSegmentationAligner] = None,
     distance_metric: Optional[DistanceMetric] = None,
     emissions_extractor: Optional[ASREmissionsExtractor] = None,
@@ -149,6 +150,15 @@ def realign_book(
     num_chapters = config["chapters"]
     book_display = config["name"]
 
+    if chapter is not None:
+        if chapter < 1 or chapter > num_chapters:
+            raise ValueError(
+                f"Invalid chapter {chapter} for {book_display}. Valid: 1 to {num_chapters}"
+            )
+        chapters_to_run = [chapter]
+    else:
+        chapters_to_run = list(range(1, num_chapters + 1))
+
     SPLIT_AUDIO_DIR.mkdir(parents=True, exist_ok=True)
     ALIGNMENTS_DIR.mkdir(parents=True, exist_ok=True)
     TRAIN_CSVS_DIR.mkdir(parents=True, exist_ok=True)
@@ -164,14 +174,16 @@ def realign_book(
     records: List[Dict[str, Any]] = []
     csv_rows: List[Dict[str, str]] = []
     durations_sec: List[float] = []
+    total_flagged_words = 0
 
-    print(f"\n==================================================")
-    print(
-        f"Starting Continuous CTC Realignment of Book of {book_display} ({num_chapters} chapters)"
+    scope_str = (
+        f"Chapter {chapter}" if chapter is not None else f"All {num_chapters} chapters"
     )
+    print(f"\n==================================================")
+    print(f"Starting Continuous CTC Realignment of {book_display} ({scope_str})")
     print(f"==================================================")
 
-    for ch in range(1, num_chapters + 1):
+    for ch in chapters_to_run:
         ch_str = f"{ch:02d}"
         audio_path = AUDIO_SRC_DIR / f"{book_key}_{ch_str}.mp3"
         transcript_path = TRANSCRIPTS_DIR / f"{book_key}_{ch_str}.json"
@@ -271,6 +283,10 @@ def realign_book(
                 for w in chunk.words
             ]
 
+            for w in chunk.words:
+                if w.flagged:
+                    total_flagged_words += 1
+
             record = {
                 "verse_id": verse_id,
                 "book": book_key,
@@ -298,39 +314,70 @@ def realign_book(
                 }
             )
 
-    # Export per-book alignment JSON
+    # Merge or save per-book alignment JSON
     book_alignments_path = ALIGNMENTS_DIR / f"{book_key}_alignment_records.json"
+    if chapter is not None and book_alignments_path.exists():
+        try:
+            with open(book_alignments_path, "r", encoding="utf-8") as f:
+                existing_book_records = json.load(f)
+            other_ch_records = [
+                r for r in existing_book_records if r.get("chapter") != chapter
+            ]
+            saved_records = sorted(
+                other_ch_records + records,
+                key=lambda x: (x.get("chapter", 0), x.get("verse_idx", 0)),
+            )
+        except Exception:
+            saved_records = records
+    else:
+        saved_records = records
+
     with open(book_alignments_path, "w", encoding="utf-8") as f:
-        json.dump(records, f, indent=2, ensure_ascii=False)
+        json.dump(saved_records, f, indent=2, ensure_ascii=False)
     print(
-        f"\n[Artifact] Saved {len(records)} alignment records to '{book_alignments_path}'"
+        f"\n[Artifact] Saved {len(saved_records)} alignment records to '{book_alignments_path}'"
     )
 
     # Export training CSV
     train_csv_path = TRAIN_CSVS_DIR / f"{book_key}.csv"
+    if chapter is not None and train_csv_path.exists():
+        try:
+            with open(train_csv_path, "r", encoding="utf-8") as f:
+                existing_csv = list(csv.DictReader(f))
+            # Remove rows matching current chapter prefix
+            ch_prefix = f"cherokee_new_testament/split_audio/{book_key}_{chapter:02d}_"
+            other_csv_rows = [
+                r for r in existing_csv if not r.get("path", "").startswith(ch_prefix)
+            ]
+            saved_csv_rows = sorted(
+                other_csv_rows + csv_rows, key=lambda x: x.get("path", "")
+            )
+        except Exception:
+            saved_csv_rows = csv_rows
+    else:
+        saved_csv_rows = csv_rows
+
     with open(train_csv_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=["path", "sentence"])
         writer.writeheader()
-        writer.writerows(csv_rows)
+        writer.writerows(saved_csv_rows)
     print(
-        f"[Artifact] Saved training CSV with {len(csv_rows)} rows to '{train_csv_path}'"
+        f"[Artifact] Saved training CSV with {len(saved_csv_rows)} rows to '{train_csv_path}'"
     )
 
     train_csv_alt = TRAIN_CSVS_DIR / f"{book_key}_train.csv"
     with open(train_csv_alt, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=["path", "sentence"])
         writer.writeheader()
-        writer.writerows(csv_rows)
-    print(
-        f"[Artifact] Saved training CSV with {len(csv_rows)} rows to '{train_csv_alt}'"
-    )
+        writer.writerows(saved_csv_rows)
 
     if durations_sec:
         total_sec = sum(durations_sec)
         mean_len = float(np.mean(durations_sec))
         median_len = float(np.median(durations_sec))
-        print(f"\n--- {book_display} Audio Slicing Summary ---")
+        print(f"\n--- {book_display} ({scope_str}) Alignment Summary ---")
         print(f"Total sliced segments: {len(durations_sec)}")
+        print(f"Flagged anomaly words: {total_flagged_words}")
         print(f"Mean verse length    : {mean_len:.2f} seconds")
         print(f"Median verse length  : {median_len:.2f} seconds")
         print(
@@ -341,6 +388,7 @@ def realign_book(
 
 
 def realign_all(
+    chapter: Optional[int] = None,
     model_repo: str = DEFAULT_MODEL_REPO,
     model_revision: str = DEFAULT_REVISION,
     export_praat: bool = True,
@@ -360,6 +408,7 @@ def realign_all(
     for book in ["mark", "matthew"]:
         records, _ = realign_book(
             book=book,
+            chapter=chapter,
             ctc_aligner=ctc_aligner,
             model_repo=model_repo,
             model_revision=model_revision,
@@ -373,10 +422,28 @@ def realign_all(
     # Save combined alignment records
     ALIGNMENTS_DIR.mkdir(parents=True, exist_ok=True)
     combined_out_path = ALIGNMENTS_DIR / "bible_alignment_records.json"
+    if chapter is not None and combined_out_path.exists():
+        try:
+            with open(combined_out_path, "r", encoding="utf-8") as f:
+                existing_comb = json.load(f)
+            other_comb = [r for r in existing_comb if r.get("chapter") != chapter]
+            final_comb = sorted(
+                other_comb + all_records,
+                key=lambda x: (
+                    x.get("book", ""),
+                    x.get("chapter", 0),
+                    x.get("verse_idx", 0),
+                ),
+            )
+        except Exception:
+            final_comb = all_records
+    else:
+        final_comb = all_records
+
     with open(combined_out_path, "w", encoding="utf-8") as f:
-        json.dump(all_records, f, indent=2, ensure_ascii=False)
+        json.dump(final_comb, f, indent=2, ensure_ascii=False)
     print(
-        f"\n[Artifact] Saved {len(all_records)} combined alignment records to '{combined_out_path}'"
+        f"\n[Artifact] Saved {len(final_comb)} combined alignment records to '{combined_out_path}'"
     )
 
     return book_results
@@ -391,6 +458,13 @@ def main():
         choices=["mark", "matthew", "all"],
         default="all",
         help="Book to realign (default: all)",
+    )
+    parser.add_argument(
+        "--chapter",
+        "-c",
+        type=int,
+        default=None,
+        help="Specific chapter number to realign (default: all chapters)",
     )
     parser.add_argument(
         "--model-repo",
@@ -425,6 +499,7 @@ def main():
 
     if args.book == "all":
         realign_all(
+            chapter=args.chapter,
             model_repo=args.model_repo,
             model_revision=args.model_revision,
             export_praat=not args.no_praat,
@@ -434,6 +509,7 @@ def main():
     else:
         records, _ = realign_book(
             book=args.book,
+            chapter=args.chapter,
             model_repo=args.model_repo,
             model_revision=args.model_revision,
             export_praat=not args.no_praat,
@@ -448,12 +524,29 @@ def main():
             try:
                 with open(combined_path, "r", encoding="utf-8") as f:
                     existing = json.load(f)
+                if args.chapter is not None:
+                    existing_records = [
+                        r
+                        for r in existing
+                        if not (
+                            r.get("book") == args.book
+                            and r.get("chapter") == args.chapter
+                        )
+                    ]
+                else:
                     existing_records = [
                         r for r in existing if r.get("book") != args.book
                     ]
             except Exception:
                 existing_records = []
         existing_records.extend(records)
+        existing_records.sort(
+            key=lambda x: (
+                x.get("book", ""),
+                x.get("chapter", 0),
+                x.get("verse_idx", 0),
+            )
+        )
         with open(combined_path, "w", encoding="utf-8") as f:
             json.dump(existing_records, f, indent=2, ensure_ascii=False)
 

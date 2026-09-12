@@ -267,3 +267,64 @@ def test_align_chapter_default_fallback_instantiation(
         assert mock_model_load.called
         assert isinstance(res, AlignmentOutput)
         assert len(res.aligned_chunks) == 2
+
+
+def test_realign_book_single_chapter(tmp_path: Path, monkeypatch):
+    import scripts.realign_bible as rb
+
+    mock_model = MockASRModel()
+    ctc_aligner = CTCSegmentationAligner(
+        model=cast(Any, mock_model),
+        cache=False,
+    )
+
+    # Mock paths
+    split_dir = tmp_path / "split_audio"
+    alignments_dir = tmp_path / "alignments"
+    train_csvs_dir = tmp_path / "train_csvs"
+    audio_src_dir = tmp_path / "audio_source"
+    transcripts_dir = tmp_path / "book_transcripts"
+
+    for d in [
+        split_dir,
+        alignments_dir,
+        train_csvs_dir,
+        audio_src_dir,
+        transcripts_dir,
+    ]:
+        d.mkdir(parents=True, exist_ok=True)
+
+    monkeypatch.setattr(rb, "SPLIT_AUDIO_DIR", split_dir)
+    monkeypatch.setattr(rb, "ALIGNMENTS_DIR", alignments_dir)
+    monkeypatch.setattr(rb, "TRAIN_CSVS_DIR", train_csvs_dir)
+    monkeypatch.setattr(rb, "AUDIO_SRC_DIR", audio_src_dir)
+    monkeypatch.setattr(rb, "TRANSCRIPTS_DIR", transcripts_dir)
+    monkeypatch.setattr(rb, "PRAAT_OUT_DIR", tmp_path / "praat_out")
+
+    # Create dummy chapter 1 audio and transcript
+    silence = AudioSegment.silent(duration=3000, frame_rate=16000)
+    silence.export(str(audio_src_dir / "mark_01.mp3"), format="mp3")
+
+    transcript_data = {
+        "020101": {
+            "cherokee": "ᎠᏓᎴᏂᏍᎬ ᏱᏍᏛ ᎧᏃᎮᏛ",
+            "phonetic": "A-da-le-ni-s-gv yi-s-dv ka-no-he-dv",
+            "english": "The beginning of the gospel",
+        },
+    }
+    with open(transcripts_dir / "mark_01.json", "w", encoding="utf-8") as f:
+        json.dump(transcript_data, f)
+
+    records, csv_rows = rb.realign_book(
+        book="mark",
+        chapter=1,
+        ctc_aligner=ctc_aligner,
+        cache=False,
+    )
+
+    assert len(records) == 1
+    assert records[0]["verse_id"] == "020101"
+    assert records[0]["chapter"] == 1
+    assert (alignments_dir / "mark_alignment_records.json").exists()
+    assert (train_csvs_dir / "mark.csv").exists()
+    assert (split_dir / "mark_01_01.wav").exists()
