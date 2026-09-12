@@ -304,15 +304,22 @@ def realign_book(
                 "cherokee_syllabary": cherokee_text,
                 "phonetic": phonetic_text,
                 "english": english_text,
+                "has_anomalies": bool(chunk.has_anomalies),
             }
             records.append(record)
 
-            csv_rows.append(
-                {
-                    "path": f"cherokee_new_testament/split_audio/{split_filename}",
-                    "sentence": reconciled_syllabary or phonetic_text,
-                }
-            )
+            # Only export non-anomalous verses to the training dataset
+            if not chunk.has_anomalies:
+                csv_rows.append(
+                    {
+                        "path": f"cherokee_new_testament/split_audio/{split_filename}",
+                        "sentence": reconciled_syllabary or phonetic_text,
+                    }
+                )
+            else:
+                print(
+                    f"    [Anomaly Filtered] Excluded verse {verse_id} from training CSV due to flagged word(s)."
+                )
 
     # Merge or save per-book alignment JSON
     book_alignments_path = ALIGNMENTS_DIR / f"{book_key}_alignment_records.json"

@@ -342,6 +342,125 @@ class CTCSegmentationAligner:
 
         return lpz, dur_sec, lead_offset_sec
 
+    def _extract_word_intervals(
+        self,
+        words: Sequence[str],
+        timings: np.ndarray,
+        char_probs: np.ndarray,
+        state_list: Sequence[str],
+        utt_indices: Sequence[int],
+        start_word_idx: int = 0,
+        dur_sec: float = float("inf"),
+        lead_offset_sec: float = 0.0,
+        initial_prev_end: float = 0.0,
+    ) -> List[WordInterval]:
+        """
+        Extract WordInterval objects from CTC segmentation timings and character states.
+
+        Parameters
+        ----------
+        words : Sequence[str]
+            List of word tokens to extract intervals for.
+        timings : np.ndarray
+            Array of frame timing alignments from ctc_segmentation.
+        char_probs : np.ndarray
+            Acoustic posterior probability array per frame.
+        state_list : Sequence[str]
+            Backtracked character/token state emissions per frame.
+        utt_indices : Sequence[int]
+            Indices in ground-truth matrix denoting utterance/word boundaries.
+        start_word_idx : int
+            Starting index in utt_indices corresponding to the first word in words.
+        dur_sec : float
+            Maximum duration of the audio slice / chunk in seconds.
+        lead_offset_sec : float
+            Lead buffer duration in seconds to subtract from raw timings.
+        initial_prev_end : float
+            Initial end timestamp of preceding word for unaligned token fallbacks.
+
+        Returns
+        -------
+        List[WordInterval]
+            List of extracted word interval metadata objects.
+        """
+        word_intervals: List[WordInterval] = []
+        prev_end = initial_prev_end
+
+        for local_w_i, raw_w in enumerate(words):
+            global_w_i = start_word_idx + local_w_i
+            start_idx = utt_indices[global_w_i]
+            end_idx = utt_indices[global_w_i + 1]
+            char_start_idx = min(start_idx + 1, end_idx)
+
+            # ctc_segmentation initializes unvisited trellis character slots to 0.0.
+            # Valid character alignments have t > 0.0, except possibly the very first
+            # character of the first word at frame 0 if aligned to non-blank acoustic state.
+            w_timings = [
+                t
+                for idx, t in enumerate(timings[char_start_idx:end_idx])
+                if t > 0.0
+                or (
+                    global_w_i == 0
+                    and idx == 0
+                    and t == 0.0
+                    and len(state_list) > 0
+                    and state_list[0] not in ("", "ε", "[PAD]")
+                )
+            ]
+
+            if w_timings:
+                raw_w_start = min(w_timings)
+                raw_w_end = max(w_timings) + self.index_duration
+                w_start = max(
+                    0.0, min(dur_sec, round(raw_w_start - lead_offset_sec, 3))
+                )
+                w_end = max(
+                    w_start, min(dur_sec, round(raw_w_end - lead_offset_sec, 3))
+                )
+                start_f = int(round(raw_w_start / self.index_duration))
+                end_f = int(round(raw_w_end / self.index_duration))
+                emitted_chars = [
+                    s
+                    for s in state_list[start_f : max(start_f + 1, end_f)]
+                    if s and s != "ε" and s != "[PAD]"
+                ]
+                emitted_w = "".join(emitted_chars) or raw_w
+
+                char_state_lps = [
+                    char_probs[f]
+                    for f in range(start_f, max(start_f + 1, end_f))
+                    if state_list[f] and state_list[f] not in ("ε", "[PAD]")
+                ]
+                if char_state_lps:
+                    mean_logprob = float(np.mean(char_state_lps))
+                    word_conf = float(np.exp(mean_logprob))
+                else:
+                    word_conf = 0.0
+            else:
+                w_start = prev_end
+                w_end = prev_end
+                emitted_chars = []
+                emitted_w = ""
+                word_conf = 0.0
+
+            is_low_conf = bool(word_conf < self.flag_min_confidence)
+            is_unaligned = bool(len(w_timings) == 0 or len(emitted_chars) == 0)
+            is_flagged = bool(is_low_conf or is_unaligned)
+
+            word_intervals.append(
+                WordInterval(
+                    word=raw_w,
+                    start_sec=w_start,
+                    end_sec=w_end,
+                    confidence=round(word_conf, 6),
+                    flagged=is_flagged,
+                    emitted_word=emitted_w,
+                )
+            )
+            prev_end = w_end
+
+        return word_intervals
+
     def align_verse_slice(
         self,
         audio_input: Union[str, Path, AudioSegment, np.ndarray],
@@ -398,67 +517,17 @@ class CTCSegmentationAligner:
         gt_mat, utt_indices = prepare_text(config, words, char_list)
         timings, char_probs, state_list = ctc_segmentation(config, lpz, gt_mat)
 
-        word_intervals: List[WordInterval] = []
-        prev_end = 0.0
-
-        for w_idx, raw_w in enumerate(words):
-            start_idx = utt_indices[w_idx]
-            end_idx = utt_indices[w_idx + 1]
-            w_timings = [t for t in timings[start_idx:end_idx] if t >= 0.0]
-
-            if w_timings:
-                raw_w_start = min(w_timings)
-                raw_w_end = max(w_timings) + self.index_duration
-                w_start = max(0.0, round(raw_w_start - lead_offset_sec, 3))
-                w_end = max(
-                    w_start, min(dur_sec, round(raw_w_end - lead_offset_sec, 3))
-                )
-                # Extract emitted word tokens from state_list across raw slice
-                start_f = int(round(min(w_timings) / self.index_duration))
-                end_f = int(
-                    round((max(w_timings) + self.index_duration) / self.index_duration)
-                )
-                emitted_chars = [
-                    s
-                    for s in state_list[start_f : max(start_f + 1, end_f)]
-                    if s and s != "ε" and s != "[PAD]"
-                ]
-                emitted_w = "".join(emitted_chars) or raw_w
-
-                # Word confidence from acoustic character state log-probabilities
-                char_state_lps = [
-                    char_probs[f]
-                    for f in range(start_f, max(start_f + 1, end_f))
-                    if state_list[f] and state_list[f] not in ("ε", "[PAD]")
-                ]
-                if char_state_lps:
-                    mean_logprob = float(np.mean(char_state_lps))
-                    word_conf = float(np.exp(mean_logprob))
-                else:
-                    word_conf = 0.0
-            else:
-                w_start = prev_end
-                w_end = prev_end
-                emitted_chars = []
-                emitted_w = ""
-                word_conf = 0.0
-
-            w_dur = max(0.0, w_end - w_start)
-            is_low_conf = bool(word_conf < self.flag_min_confidence)
-            is_unaligned = bool(len(w_timings) == 0 or len(emitted_chars) == 0)
-            is_flagged = bool(is_low_conf or is_unaligned)
-
-            word_intervals.append(
-                WordInterval(
-                    word=raw_w,
-                    start_sec=w_start,
-                    end_sec=w_end,
-                    confidence=round(word_conf, 6),
-                    flagged=is_flagged,
-                    emitted_word=emitted_w,
-                )
-            )
-            prev_end = w_end
+        word_intervals = self._extract_word_intervals(
+            words=words,
+            timings=timings,
+            char_probs=char_probs,
+            state_list=state_list,
+            utt_indices=utt_indices,
+            start_word_idx=0,
+            dur_sec=dur_sec,
+            lead_offset_sec=lead_offset_sec,
+            initial_prev_end=0.0,
+        )
 
         chunk_start = word_intervals[0].start_sec if word_intervals else 0.0
         chunk_end = (
@@ -603,61 +672,19 @@ class CTCSegmentationAligner:
                 c_end = c_start
 
             # Extract word intervals within chunk
-            word_intervals: List[WordInterval] = []
-            for local_w_i, raw_w in enumerate(chunk_words):
-                global_w_i = w_start_idx + local_w_i
-                start_idx = utt_indices[global_w_i]
-                end_idx = utt_indices[global_w_i + 1]
-                w_timings = [t for t in timings[start_idx:end_idx] if t >= 0.0]
-
-                if w_timings:
-                    w_start = max(0.0, min(dur_sec, round(min(w_timings), 3)))
-                    w_end = min(dur_sec, round(max(w_timings) + self.index_duration, 3))
-                    start_f = int(round(min(w_timings) / self.index_duration))
-                    end_f = int(
-                        round(
-                            (max(w_timings) + self.index_duration) / self.index_duration
-                        )
-                    )
-                    emitted_chars = [
-                        s
-                        for s in state_list[start_f : max(start_f + 1, end_f)]
-                        if s and s != "ε" and s != "[PAD]"
-                    ]
-                    emitted_w = "".join(emitted_chars) or raw_w
-
-                    char_state_lps = [
-                        char_probs[f]
-                        for f in range(start_f, max(start_f + 1, end_f))
-                        if state_list[f] and state_list[f] not in ("ε", "[PAD]")
-                    ]
-                    if char_state_lps:
-                        mean_logprob = float(np.mean(char_state_lps))
-                        word_conf = float(np.exp(mean_logprob))
-                    else:
-                        word_conf = 0.0
-                else:
-                    w_start = prev_end
-                    w_end = prev_end
-                    emitted_chars = []
-                    emitted_w = ""
-                    word_conf = 0.0
-
-                is_low_conf = bool(word_conf < self.flag_min_confidence)
-                is_unaligned = bool(len(w_timings) == 0 or len(emitted_chars) == 0)
-                is_flagged = bool(is_low_conf or is_unaligned)
-
-                word_intervals.append(
-                    WordInterval(
-                        word=raw_w,
-                        start_sec=w_start,
-                        end_sec=w_end,
-                        confidence=round(word_conf, 6),
-                        flagged=is_flagged,
-                        emitted_word=emitted_w,
-                    )
-                )
-                prev_end = w_end
+            word_intervals = self._extract_word_intervals(
+                words=chunk_words,
+                timings=timings,
+                char_probs=char_probs,
+                state_list=state_list,
+                utt_indices=utt_indices,
+                start_word_idx=w_start_idx,
+                dur_sec=dur_sec,
+                lead_offset_sec=0.0,
+                initial_prev_end=prev_end,
+            )
+            if word_intervals:
+                prev_end = word_intervals[-1].end_sec
 
             valid_w = [w for w in word_intervals if w.end_sec > w.start_sec]
             if c_end <= c_start and valid_w:

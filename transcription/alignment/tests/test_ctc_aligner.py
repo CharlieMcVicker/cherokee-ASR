@@ -50,11 +50,13 @@ class DummyASRModel:
 
     def get_logits(self, samples: np.ndarray, sample_rate: int = 16000) -> torch.Tensor:
         self.call_count += 1
-        num_frames = max(50, len(samples) // 320)
+        num_frames = max(60, len(samples) // 320)
         vocab_size = 9
-        # Deterministic logits
-        logits = torch.zeros((num_frames, vocab_size), dtype=torch.float32)
-        logits[:, 1] = 2.0  # token 'a' has higher logit
+        # Deterministic logits: blank baseline with periodic 'a' activations
+        logits = torch.full((num_frames, vocab_size), -5.0, dtype=torch.float32)
+        logits[:, 0] = 0.0  # [PAD] / blank baseline
+        for frame in range(10, num_frames, 15):
+            logits[frame, 1] = 5.0  # 'a' token
         return logits
 
     def decode(self, lpz: np.ndarray):
@@ -404,8 +406,8 @@ def test_ctc_aligner_zero_start_timing_preserved(dummy_audio_file: Path):
         buffer_trail_ms=0,
     )
 
-    # Ground truth trellis for 1 word has length 4; word index slice is [1:3]
-    fake_timings = np.array([-1.0, 0.0, -1.0, -1.0], dtype=np.float32)
+    # Ground truth trellis for 1 word has length 4; word character index is 2
+    fake_timings = np.array([-1.0, -1.0, 0.0, -1.0], dtype=np.float32)
     fake_char_probs = np.full(100, -0.1, dtype=np.float32)
     fake_state_list = ["a"] * 100
 
@@ -440,8 +442,8 @@ def test_ctc_aligner_unaligned_word_emissions_and_confidence(dummy_audio_file: P
         buffer_trail_ms=0,
     )
 
-    # Word 1 aligns at 0.1s (trellis slice [1:3]), Word 2 unaligned (slice [3:5])
-    fake_timings = np.array([-1.0, 0.1, -1.0, -1.0, -1.0, -1.0], dtype=np.float32)
+    # Word 1 character aligns at 0.1s (trellis index 2), Word 2 unaligned (trellis index 4)
+    fake_timings = np.array([-1.0, -1.0, 0.1, -1.0, -1.0, -1.0], dtype=np.float32)
     fake_char_probs = np.full(100, -0.05, dtype=np.float32)
     fake_state_list = ["a"] * 100
 
@@ -486,8 +488,8 @@ def test_ctc_aligner_align_unaligned_word_and_window_size():
     audio = np.zeros(16000 * 2, dtype=np.float32)
     chunks = [TextChunk(chunk_id="v1", text="a a")]
 
-    # Word 1 aligns at 0.0s (slice [1:3]), Word 2 unaligned (slice [3:5])
-    fake_timings = np.array([-1.0, 0.0, -1.0, -1.0, -1.0, -1.0], dtype=np.float32)
+    # Word 1 character aligns at 0.0s (trellis index 2), Word 2 unaligned (trellis index 4)
+    fake_timings = np.array([-1.0, -1.0, 0.0, -1.0, -1.0, -1.0], dtype=np.float32)
     fake_char_probs = np.full(100, -0.1, dtype=np.float32)
     fake_state_list = ["a"] * 100
     fake_segments = [(0.0, 0.5, 0.1)]
@@ -520,3 +522,60 @@ def test_ctc_aligner_align_unaligned_word_and_window_size():
         assert c.words[1].emitted_word == ""
         assert c.words[1].confidence == 0.0
         assert c.words[1].flagged is True
+
+
+def test_ctc_aligner_intra_verse_unaligned_word_isolation(dummy_audio_file: Path):
+    """
+    Assert that unaligned words do not cause subsequent words to accumulate
+    preceding word character states or evaluate to 0.0s start timestamps.
+    """
+    model = DummyASRModel()
+    aligner = CTCSegmentationAligner(
+        model=cast(Any, model),
+        buffer_lead_ms=0,
+        buffer_trail_ms=0,
+    )
+
+    # Word 1 (a) aligns at 0.10s (frame 5)
+    # Word 2 (a) is unaligned (no timing)
+    # Word 3 (a) aligns at 0.30s (frame 15)
+    # utt_indices: [1, 3, 5, 7]
+    fake_timings = np.array(
+        [-1.0, -1.0, 0.10, -1.0, -1.0, -1.0, 0.30, -1.0], dtype=np.float32
+    )
+    fake_char_probs = np.full(100, -0.05, dtype=np.float32)
+    fake_state_list = [""] * 100
+    fake_state_list[5] = "a"
+    fake_state_list[15] = "a"
+
+    with patch(
+        "transcription.alignment.ctc_aligner.ctc_segmentation",
+        return_value=(fake_timings, fake_char_probs, fake_state_list),
+    ):
+        aligned_slice = aligner.align_verse_slice(
+            audio_input=dummy_audio_file,
+            chunk_id="001",
+            phonetic_text="a a a",
+            cache=False,
+        )
+
+        assert len(aligned_slice.words) == 3
+        w1, w2, w3 = aligned_slice.words
+
+        # Word 1
+        assert w1.start_sec == 0.10
+        assert w1.end_sec == 0.12
+        assert w1.emitted_word == "a"
+        assert w1.flagged is False
+
+        # Word 2 (unaligned)
+        assert w2.start_sec == w1.end_sec
+        assert w2.end_sec == w1.end_sec
+        assert w2.emitted_word == ""
+        assert w2.flagged is True
+
+        # Word 3 (isolated from Word 1 & 2)
+        assert w3.start_sec == 0.30
+        assert w3.end_sec == 0.32
+        assert w3.emitted_word == "a"
+        assert w3.flagged is False

@@ -325,6 +325,165 @@ def test_realign_book_single_chapter(tmp_path: Path, monkeypatch):
     assert len(records) == 1
     assert records[0]["verse_id"] == "020101"
     assert records[0]["chapter"] == 1
+    assert "has_anomalies" in records[0]
     assert (alignments_dir / "mark_alignment_records.json").exists()
     assert (train_csvs_dir / "mark.csv").exists()
     assert (split_dir / "mark_01_01.wav").exists()
+
+
+def test_realign_book_flags_and_excludes_anomaly_verse_from_train_csv(
+    tmp_path: Path, monkeypatch
+):
+    """
+    Test that when an aligned chunk has flagged words (e.g. transcript typo/low confidence),
+    the verse is marked with has_anomalies: True in alignment records and is NOT added
+    to the generated training CSV (mark.csv).
+    """
+    import csv
+    import scripts.realign_bible as rb
+    from transcription.alignment.models import (
+        AlignedChunk,
+        AlignmentMetrics,
+        AlignmentOutput,
+        WordInterval,
+    )
+
+    split_dir = tmp_path / "split_audio"
+    alignments_dir = tmp_path / "alignments"
+    train_csvs_dir = tmp_path / "train_csvs"
+    audio_src_dir = tmp_path / "audio_source"
+    transcripts_dir = tmp_path / "book_transcripts"
+
+    for d in [
+        split_dir,
+        alignments_dir,
+        train_csvs_dir,
+        audio_src_dir,
+        transcripts_dir,
+    ]:
+        d.mkdir(parents=True, exist_ok=True)
+
+    monkeypatch.setattr(rb, "SPLIT_AUDIO_DIR", split_dir)
+    monkeypatch.setattr(rb, "ALIGNMENTS_DIR", alignments_dir)
+    monkeypatch.setattr(rb, "TRAIN_CSVS_DIR", train_csvs_dir)
+    monkeypatch.setattr(rb, "AUDIO_SRC_DIR", audio_src_dir)
+    monkeypatch.setattr(rb, "TRANSCRIPTS_DIR", transcripts_dir)
+    monkeypatch.setattr(rb, "PRAAT_OUT_DIR", tmp_path / "praat_out")
+
+    silence = AudioSegment.silent(duration=4000, frame_rate=16000)
+    silence.export(str(audio_src_dir / "mark_01.mp3"), format="mp3")
+
+    transcript_data = {
+        "020101": {
+            "cherokee": "ᎠᏓᎴᏂᏍᎬ ᏱᏍᏛ ᎧᏃᎮᏛ",
+            "phonetic": "A-da-le-ni-s-gv yi-s-dv ka-no-he-dv",
+            "english": "The beginning of the gospel",
+        },
+        "020102": {
+            "cherokee": "ᎾᏍᎩᏯ ᎯᎠ ᏥᏂᎬᏅ",
+            "phonetic": "Na-s-gi-ya hi-a tsi-ni-gv-nv",
+            "english": "As it is written",
+        },
+    }
+    with open(transcripts_dir / "mark_01.json", "w", encoding="utf-8") as f:
+        json.dump(transcript_data, f)
+
+    # Mock align_chapter return: Verse 020101 has flagged typo word, Verse 020102 is clean
+    chunk1 = AlignedChunk(
+        chunk_id="020101",
+        start_sec=0.1,
+        end_sec=1.5,
+        words=[
+            WordInterval(
+                word="adalenisgv",
+                start_sec=0.1,
+                end_sec=0.5,
+                confidence=0.9,
+                flagged=False,
+                emitted_word="adalenisgv",
+            ),
+            WordInterval(
+                word="yisdv",
+                start_sec=0.5,
+                end_sec=0.9,
+                confidence=0.005,
+                flagged=True,
+                emitted_word="ysdv",
+            ),  # Typo/anomaly!
+            WordInterval(
+                word="kanohedv",
+                start_sec=0.9,
+                end_sec=1.5,
+                confidence=0.88,
+                flagged=False,
+                emitted_word="kanohedv",
+            ),
+        ],
+        distance_score=0.1,
+        emitted_text="adalenisgv ysdv kanohedv",
+    )
+    chunk2 = AlignedChunk(
+        chunk_id="020102",
+        start_sec=1.6,
+        end_sec=3.0,
+        words=[
+            WordInterval(
+                word="nasgiya",
+                start_sec=1.6,
+                end_sec=2.0,
+                confidence=0.95,
+                flagged=False,
+                emitted_word="nasgiya",
+            ),
+            WordInterval(
+                word="hia",
+                start_sec=2.0,
+                end_sec=2.4,
+                confidence=0.92,
+                flagged=False,
+                emitted_word="hia",
+            ),
+            WordInterval(
+                word="tsinigvnv",
+                start_sec=2.4,
+                end_sec=3.0,
+                confidence=0.91,
+                flagged=False,
+                emitted_word="tsinigvnv",
+            ),
+        ],
+        distance_score=0.05,
+        emitted_text="nasgiya hia tsinigvnv",
+    )
+
+    mock_res = AlignmentOutput(
+        aligned_chunks=[chunk1, chunk2],
+        source_id="mark_01",
+    )
+
+    with patch("scripts.realign_bible.align_chapter", return_value=mock_res):
+        records, csv_rows = rb.realign_book(
+            book="mark",
+            chapter=1,
+            cache=False,
+        )
+
+    # Check alignment records: both verses recorded, but 020101 marked as anomaly
+    assert len(records) == 2
+    rec1 = next(r for r in records if r["verse_id"] == "020101")
+    rec2 = next(r for r in records if r["verse_id"] == "020102")
+    assert rec1["has_anomalies"] is True
+    assert rec2["has_anomalies"] is False
+
+    # Check training CSV rows: ONLY clean verse 020102 is present
+    assert len(csv_rows) == 1
+    assert "mark_01_01.wav" not in csv_rows[0]["path"]
+    assert "mark_01_02.wav" in csv_rows[0]["path"]
+
+    # Verify written CSV file
+    train_csv_file = train_csvs_dir / "mark.csv"
+    with open(train_csv_file, "r", encoding="utf-8") as f:
+        rows_on_disk = list(csv.DictReader(f))
+    assert len(rows_on_disk) == 1
+    assert any("mark_01_02.wav" in r["path"] for r in rows_on_disk)
+    assert not any("mark_01_01.wav" in r["path"] for r in rows_on_disk)
