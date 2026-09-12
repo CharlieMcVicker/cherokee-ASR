@@ -578,8 +578,9 @@ class CTCSegmentationAligner:
         chunk_utt_indices = [utt_indices[s] for s, _ in chunk_word_slices] + [
             utt_indices[-1]
         ]
+        chunk_texts = [" ".join(all_words[s:e]) for s, e in chunk_word_slices]
         raw_segments = determine_utterance_segments(
-            config, chunk_utt_indices, char_probs, timings, [c.text for c in chunks]
+            config, chunk_utt_indices, char_probs, timings, chunk_texts
         )
 
         aligned_chunks: List[AlignedChunk] = []
@@ -657,6 +658,11 @@ class CTCSegmentationAligner:
                     )
                 )
                 prev_end = w_end
+
+            valid_w = [w for w in word_intervals if w.end_sec > w.start_sec]
+            if c_end <= c_start and valid_w:
+                c_start = max(prev_boundary, valid_w[0].start_sec)
+                c_end = max(c_start, valid_w[-1].end_sec)
 
             if word_intervals:
                 emitted_text = " ".join(
