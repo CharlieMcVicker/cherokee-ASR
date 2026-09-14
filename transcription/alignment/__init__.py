@@ -61,6 +61,17 @@ from transcription.alignment.reconciliation import (
     reconcile_alignment_words,
     reconcile_word_intervals,
 )
+from transcription.alignment.phonotactics import (
+    PhonemeCategory,
+    PhonotacticAnalysis,
+    PhonotacticToken,
+    analyze_phonotactics,
+    get_intrusion_site_mask,
+    get_syncope_mask,
+    is_valid_phonotactic_sequence,
+    prepare_cherokee_text,
+    tokenize_phonemes,
+)
 from transcription.alignment.threshold_finder import (
     AlignmentRecord,
     AlignmentThresholdFinder,
@@ -125,4 +136,14 @@ __all__ = [
     "find_threshold_bounds",
     "load_alignment_records",
     "parse_verse_reference",
+    # Phonotactics & Custom Text Preparation
+    "PhonemeCategory",
+    "PhonotacticToken",
+    "PhonotacticAnalysis",
+    "tokenize_phonemes",
+    "get_syncope_mask",
+    "get_intrusion_site_mask",
+    "is_valid_phonotactic_sequence",
+    "analyze_phonotactics",
+    "prepare_cherokee_text",
 ]

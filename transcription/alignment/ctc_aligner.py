@@ -34,6 +34,7 @@ from transcription.alignment.normalizers import (
     normalize_phonetics_for_alignment,
     normalize_syllabary_for_alignment,
 )
+from transcription.alignment.phonotactics import prepare_cherokee_text
 from transcription.models.asr_model import CherokeeASRModel
 
 logger = logging.getLogger(__name__)
@@ -514,7 +515,7 @@ class CTCSegmentationAligner:
             replace_spaces_with_blanks=False,
         )
 
-        gt_mat, utt_indices = prepare_text(config, words, char_list)
+        gt_mat, utt_indices = prepare_cherokee_text(config, words, char_list)
         timings, char_probs, state_list = ctc_segmentation(config, lpz, gt_mat)
 
         word_intervals = self._extract_word_intervals(
@@ -641,7 +642,7 @@ class CTCSegmentationAligner:
                 ),
             )
 
-        gt_mat, utt_indices = prepare_text(config, all_words, char_list)
+        gt_mat, utt_indices = prepare_cherokee_text(config, all_words, char_list)
         timings, char_probs, state_list = ctc_segmentation(config, lpz, gt_mat)
 
         chunk_utt_indices = [utt_indices[s] for s, _ in chunk_word_slices] + [
