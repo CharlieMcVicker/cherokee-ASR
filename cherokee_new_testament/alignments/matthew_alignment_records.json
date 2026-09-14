@@ -5,98 +5,99 @@
     "chapter": 1,
     "verse_idx": 1,
     "audio_path": "cherokee_new_testament/split_audio/matthew_01_01.wav",
-    "start_sec": 10.27,
-    "end_sec": 19.995,
-    "duration_sec": 9.725,
+    "start_sec": 9.78,
+    "end_sec": 19.99,
+    "duration_sec": 10.21,
     "reference_sentence": "ᎯᎠ ᎪᏪᎵ ᎧᏃᎮᎭ ᏧᏁᏢᏔᏅᏒ ᏥᏌ ᎦᎶᏁᏛ, ᏕᏫ ᎤᏪᏥ, ᎡᏆᎭᎻ ᎤᏪᏥ.",
-    "reconciled_phonetics": "hi'a kowheli khanoheha tsunelhthanvhsv tsihsa kalonetvhi tewi uwetsiav ekwahami uwetsi.",
-    "asr_hypothesis": "hi'a kowheli kanoheha tsunelhthanvhsv tsihsa kaloneta ahi tewi uwetsi av ekwohami uwetsi",
-    "cost": 0.1041,
+    "reconciled_phonetics": "hi'a khowheli khanoheha tsunelhthanvhsv tsihsa khaloneth, thewi uwetsi, ekwhami uwetsi.",
+    "asr_hypothesis": "hi'a khowheli khhanoheha tsunetlhhthhanvhsv tsihsa khaloneth thewi uwetsi ekwhhami uwetsi",
+    "cost": -10.3272,
     "words": [
       {
-        "word": "ia",
-        "start_sec": 10.27,
-        "end_sec": 10.57,
-        "confidence": 0.9495421350002289,
+        "word": "hia",
+        "start_sec": 10.28,
+        "end_sec": 10.56,
+        "confidence": 0.34747,
         "flagged": false,
         "emitted_word": "hi'a"
       },
       {
-        "word": "koweli",
-        "start_sec": 10.95,
-        "end_sec": 11.53,
-        "confidence": 0.9993376306125096,
+        "word": "khoweli",
+        "start_sec": 10.96,
+        "end_sec": 11.54,
+        "confidence": 0.171553,
         "flagged": false,
-        "emitted_word": "kowheli"
+        "emitted_word": "khowheli"
       },
       {
-        "word": "kanoea",
-        "start_sec": 11.61,
-        "end_sec": 12.47,
-        "confidence": 0.8964651674032211,
+        "word": "khhanoheha",
+        "start_sec": 11.62,
+        "end_sec": 12.48,
+        "confidence": 0.304334,
         "flagged": false,
-        "emitted_word": "kanoheha"
+        "emitted_word": "khhanoheha"
       },
       {
-        "word": "tsunetlvtanvsv",
-        "start_sec": 12.85,
-        "end_sec": 13.87,
-        "confidence": 0.9574291547139485,
+        "word": "tsunetlhhvthhanvhsv",
+        "start_sec": 12.86,
+        "end_sec": 13.86,
+        "confidence": 0.540269,
         "flagged": false,
-        "emitted_word": "tsunelhthanvhsv"
+        "emitted_word": "tsunetlhhthhanvhsv"
       },
       {
-        "word": "tsisa",
-        "start_sec": 14.41,
-        "end_sec": 14.83,
-        "confidence": 0.9820468227068583,
+        "word": "tsihsa",
+        "start_sec": 14.42,
+        "end_sec": 14.84,
+        "confidence": 0.999444,
         "flagged": false,
         "emitted_word": "tsihsa"
       },
       {
-        "word": "kalonetv",
-        "start_sec": 14.95,
-        "end_sec": 16.23,
-        "confidence": 0.8493385774393876,
+        "word": "khalonethv",
+        "start_sec": 14.94,
+        "end_sec": 15.62,
+        "confidence": 0.049687,
         "flagged": false,
-        "emitted_word": "kaloneta ahi"
+        "emitted_word": "khaloneth"
       },
       {
-        "word": "tewi",
-        "start_sec": 16.57,
-        "end_sec": 16.91,
-        "confidence": 0.9996103942394257,
+        "word": "thewi",
+        "start_sec": 15.7,
+        "end_sec": 16.9,
+        "confidence": 0.015616,
         "flagged": false,
-        "emitted_word": "tewi"
+        "emitted_word": "thewi"
       },
       {
         "word": "uwetsi",
-        "start_sec": 16.99,
-        "end_sec": 17.47,
-        "confidence": 0.999886820713679,
+        "start_sec": 17.0,
+        "end_sec": 17.46,
+        "confidence": 0.997781,
         "flagged": false,
         "emitted_word": "uwetsi"
       },
       {
-        "word": "ekwaami",
-        "start_sec": 17.88,
-        "end_sec": 19.175,
-        "confidence": 0.9396952800452709,
+        "word": "ekwhahami",
+        "start_sec": 18.34,
+        "end_sec": 19.18,
+        "confidence": 0.155093,
         "flagged": false,
-        "emitted_word": "av ekwohami"
+        "emitted_word": "ekwhhami"
       },
       {
         "word": "uwetsi",
-        "start_sec": 19.455,
-        "end_sec": 19.995,
-        "confidence": 0.9811976651350657,
+        "start_sec": 19.46,
+        "end_sec": 20.0,
+        "confidence": 0.965072,
         "flagged": false,
         "emitted_word": "uwetsi"
       }
     ],
     "cherokee_syllabary": "ᎯᎠ ᎪᏪᎵ ᎧᏃᎮᎭ ᏧᏁᏢᏔᏅᏒ ᏥᏌ ᎦᎶᏁᏛ, ᏕᏫ ᎤᏪᏥ, ᎡᏆᎭᎻ ᎤᏪᏥ.",
     "phonetic": "Hi-a go-we-li ka-no-he-ha tsu-ne-tlv-ta-nv-sv Tsi-sa Ga-lo-ne-dv, De-wi u-we-tsi, E-qua-ha-mi u-we-tsi.",
-    "english": "The book of the generation of Jesus Christ, the son of David, the son of Abraham."
+    "english": "The book of the generation of Jesus Christ, the son of David, the son of Abraham.",
+    "has_anomalies": false
   },
   {
     "verse_id": "010102",
@@ -104,106 +105,115 @@
     "chapter": 1,
     "verse_idx": 2,
     "audio_path": "cherokee_new_testament/split_audio/matthew_01_02.wav",
-    "start_sec": 21.48,
-    "end_sec": 35.35,
-    "duration_sec": 13.87,
+    "start_sec": 20.98,
+    "end_sec": 35.31,
+    "duration_sec": 14.33,
     "reference_sentence": "ᎡᏆᎭᎻ ᎡᏏᎩ ᎤᏕᏁᎴᎢ; ᎡᏏᎩᏃ ᏤᎦᏈ ᎤᏕᏁᎴᎢ, ᏤᎦᏈᏃ ᏧᏓ ᎠᎴ ᎾᏍᎩ ᎠᎾᏓᏅᏟ ᎬᏩᏕᏁᎴᎢ;",
-    "reconciled_phonetics": "ekwahami ehsiki utenhele'i; ehsikinho tsekakwi utenhele'ihi tsekakwinho tsuta ale nahski anatanvtli kvwatenhele'i;",
-    "asr_hypothesis": "ekwohami ehsiki utenhelv'i ehsikinho tsekakwi utenhelv'i hi tsekakwinho tsuta alenvhski anatlhvnvtli kvwatvnhelv'i",
-    "cost": 0.0594,
+    "reconciled_phonetics": "ekwhami ehsikhi uthenhele'i; ehsikhino tsekhakwi uthenhele'i, tsekhakwin tsutha ale nhskhi anathanvlhi khvwathnhele'i;",
+    "asr_hypothesis": "ekwhhami ehsikhi uthenhele'i ehsikhino tsekhakwhi uthenhele'i tsekhakwhin tsutha ale nhskhi anathanvtlhhi khvwathnhele'i",
+    "cost": -10.5067,
     "words": [
       {
-        "word": "ekwaami",
+        "word": "ekwhahami",
         "start_sec": 21.48,
-        "end_sec": 22.24,
-        "confidence": 0.9987354278564453,
+        "end_sec": 22.22,
+        "confidence": 0.641269,
         "flagged": false,
-        "emitted_word": "ekwohami"
+        "emitted_word": "ekwhhami"
       },
       {
-        "word": "esiki",
+        "word": "ehsikhi",
         "start_sec": 22.4,
         "end_sec": 22.84,
-        "confidence": 0.999769926071167,
+        "confidence": 0.09555,
         "flagged": false,
-        "emitted_word": "ehsiki"
+        "emitted_word": "ehsikhi"
       },
       {
-        "word": "utenelei",
+        "word": "uthenelei",
         "start_sec": 23.0,
         "end_sec": 23.86,
-        "confidence": 0.9987621486186982,
+        "confidence": 0.212151,
         "flagged": false,
-        "emitted_word": "utenhelv'i"
+        "emitted_word": "uthenhele'i"
       },
       {
-        "word": "esikino",
+        "word": "ehsikhino",
         "start_sec": 24.98,
         "end_sec": 25.64,
-        "confidence": 0.9830610023604499,
+        "confidence": 0.630764,
         "flagged": false,
-        "emitted_word": "ehsikinho"
+        "emitted_word": "ehsikhino"
       },
       {
-        "word": "tsekakwi",
-        "start_sec": 26.61,
-        "end_sec": 27.13,
-        "confidence": 0.9872815161943436,
+        "word": "tsekhakwhi",
+        "start_sec": 26.62,
+        "end_sec": 27.12,
+        "confidence": 0.072125,
         "flagged": false,
-        "emitted_word": "tsekakwi"
+        "emitted_word": "tsekhakwhi"
       },
       {
-        "word": "utenelei",
-        "start_sec": 27.67,
-        "end_sec": 28.43,
-        "confidence": 0.9666615724563599,
+        "word": "uthenelei",
+        "start_sec": 27.68,
+        "end_sec": 28.44,
+        "confidence": 0.235657,
         "flagged": false,
-        "emitted_word": "utenhelv'i"
+        "emitted_word": "uthenhele'i"
       },
       {
-        "word": "tsekakwino",
-        "start_sec": 29.05,
-        "end_sec": 30.13,
-        "confidence": 0.7526064040985974,
+        "word": "tsekhakwhino",
+        "start_sec": 29.4,
+        "end_sec": 29.94,
+        "confidence": 0.148174,
         "flagged": false,
-        "emitted_word": "hi tsekakwinho"
+        "emitted_word": "tsekhakwhin"
       },
       {
-        "word": "tsuta",
-        "start_sec": 30.51,
-        "end_sec": 30.89,
-        "confidence": 0.999101710319519,
+        "word": "tsutha",
+        "start_sec": 30.5,
+        "end_sec": 30.88,
+        "confidence": 0.236379,
         "flagged": false,
-        "emitted_word": "tsuta"
+        "emitted_word": "tsutha"
       },
       {
-        "word": "ale naski",
-        "start_sec": 31.29,
-        "end_sec": 32.05,
-        "confidence": 0.9802482922871908,
+        "word": "ale",
+        "start_sec": 31.26,
+        "end_sec": 31.46,
+        "confidence": 0.99885,
         "flagged": false,
-        "emitted_word": "alenvhski"
+        "emitted_word": "ale"
       },
       {
-        "word": "anatanvtli",
-        "start_sec": 33.21,
-        "end_sec": 34.05,
-        "confidence": 0.9511336187521616,
+        "word": "nahskhi",
+        "start_sec": 31.62,
+        "end_sec": 32.04,
+        "confidence": 0.068073,
         "flagged": false,
-        "emitted_word": "anatlhvnvtli"
+        "emitted_word": "nhskhi"
       },
       {
-        "word": "kvwatenelei",
-        "start_sec": 34.45,
-        "end_sec": 35.35,
-        "confidence": 0.976681493795835,
+        "word": "anathanvtlhhi",
+        "start_sec": 33.2,
+        "end_sec": 34.04,
+        "confidence": 0.270342,
         "flagged": false,
-        "emitted_word": "kvwatvnhelv'i"
+        "emitted_word": "anathanvtlhhi"
+      },
+      {
+        "word": "khvwathenelei",
+        "start_sec": 34.44,
+        "end_sec": 35.32,
+        "confidence": 0.171435,
+        "flagged": false,
+        "emitted_word": "khvwathnhele'i"
       }
     ],
     "cherokee_syllabary": "ᎡᏆᎭᎻ ᎡᏏᎩ ᎤᏕᏁᎴᎢ; ᎡᏏᎩᏃ ᏤᎦᏈ ᎤᏕᏁᎴᎢ, ᏤᎦᏈᏃ ᏧᏓ ᎠᎴ ᎾᏍᎩ ᎠᎾᏓᏅᏟ ᎬᏩᏕᏁᎴᎢ;",
     "phonetic": "E-qua-ha-mi E-si-gi u-de-ne-le-i; E-si-gi-no Tse-ga-qui u-de-ne-le-i, Tse-ga-qui-no Tsu-da a-le na-s-gi a-na-da-nv-tli gv-wa-de-ne-le-i;",
-    "english": "Abraham begat Isaac; and Isaac begat Jacob; and Jacob begat Judas and his brethren;"
+    "english": "Abraham begat Isaac; and Isaac begat Jacob; and Jacob begat Judas and his brethren;",
+    "has_anomalies": false
   },
   {
     "verse_id": "010103",
@@ -211,114 +221,123 @@
     "chapter": 1,
     "verse_idx": 3,
     "audio_path": "cherokee_new_testament/split_audio/matthew_01_03.wav",
-    "start_sec": 36.64,
-    "end_sec": 55.03,
-    "duration_sec": 18.39,
+    "start_sec": 36.12,
+    "end_sec": 54.99,
+    "duration_sec": 18.87,
     "reference_sentence": "ᏧᏓᏃ ᏇᎵᏏ ᎠᎴ ᏎᎳ ᎬᏩᏕᏁᎴᎢ ᏖᎹ ᏚᎾᏄᎪᏫᏎᎢ; ᏇᎵᏏᏃ ᎢᏏᎳᎻ ᎤᏕᏁᎴᎢ; ᎢᏏᎳᎻᏃ ᎡᎵᎻ ᎤᏕᏁᎴᎢ;",
-    "reconciled_phonetics": "tsutanho kwelihsi' ale hsela kvwatenhele'i thema tunanukowihse'i; kwelisino ihsilami utenhele'i'i ihsilaminho elimi utenhele'i;",
-    "asr_hypothesis": "tsutanho kwilihsi'ule hsela kvwatvnhelv'i thema tunanukowihse'i kwelilhino ihsilami utenhelv'i 'i ihsilaminho elima utenhelv'i",
-    "cost": 0.0488,
+    "reconciled_phonetics": "tsuthano kwlihsi ale hsela khvwathenhele'i thema thunanukhowhihse'i; kwelihsino ihsilami uthenhele'i; ihsilamino elimi uthenhele'i;",
+    "asr_hypothesis": "tsuthano kwhlihsi le hsela khvwathenhele'i thhema thunanukhowhihse'i kwhelihsino ihsilami uthenhele'i ihsilamino elimi uthenhele'i",
+    "cost": -11.5172,
     "words": [
       {
-        "word": "tsutano",
-        "start_sec": 36.64,
+        "word": "tsuthano",
+        "start_sec": 36.62,
         "end_sec": 37.34,
-        "confidence": 0.9372997954487801,
+        "confidence": 0.138784,
         "flagged": false,
-        "emitted_word": "tsutanho"
+        "emitted_word": "tsuthano"
       },
       {
-        "word": "kwelisi ale",
-        "start_sec": 37.88,
-        "end_sec": 38.96,
-        "confidence": 0.9507279594739279,
+        "word": "kwhelihsi",
+        "start_sec": 37.86,
+        "end_sec": 38.52,
+        "confidence": 0.275207,
         "flagged": false,
-        "emitted_word": "kwilihsi'ule"
+        "emitted_word": "kwhlihsi"
       },
       {
-        "word": "sela",
-        "start_sec": 39.56,
-        "end_sec": 40.02,
-        "confidence": 0.9999215483665467,
+        "word": "ale",
+        "start_sec": 38.82,
+        "end_sec": 38.94,
+        "confidence": 0.812859,
+        "flagged": false,
+        "emitted_word": "le"
+      },
+      {
+        "word": "hsela",
+        "start_sec": 39.54,
+        "end_sec": 40.0,
+        "confidence": 0.999606,
         "flagged": false,
         "emitted_word": "hsela"
       },
       {
-        "word": "kvwatenelei",
-        "start_sec": 40.67,
-        "end_sec": 41.57,
-        "confidence": 0.9740993747344384,
+        "word": "khvwathenelei",
+        "start_sec": 40.1,
+        "end_sec": 41.54,
+        "confidence": 0.074488,
         "flagged": false,
-        "emitted_word": "kvwatvnhelv'i"
+        "emitted_word": "khvwathenhele'i"
       },
       {
-        "word": "tema",
-        "start_sec": 42.82,
-        "end_sec": 43.32,
-        "confidence": 0.9999518632888794,
+        "word": "thhema",
+        "start_sec": 42.8,
+        "end_sec": 43.3,
+        "confidence": 0.999577,
         "flagged": false,
-        "emitted_word": "thema"
+        "emitted_word": "thhema"
       },
       {
-        "word": "tunanukowisei",
-        "start_sec": 44.41,
-        "end_sec": 45.57,
-        "confidence": 0.9839692552884419,
+        "word": "thunanukhowihsei",
+        "start_sec": 44.4,
+        "end_sec": 45.54,
+        "confidence": 0.23961,
         "flagged": false,
-        "emitted_word": "tunanukowihse'i"
+        "emitted_word": "thunanukhowhihse'i"
       },
       {
-        "word": "kwelisino",
-        "start_sec": 46.56,
-        "end_sec": 47.54,
-        "confidence": 0.9803000807762146,
+        "word": "kwhelihsino",
+        "start_sec": 46.54,
+        "end_sec": 47.52,
+        "confidence": 0.322493,
         "flagged": false,
-        "emitted_word": "kwelilhino"
+        "emitted_word": "kwhelihsino"
       },
       {
-        "word": "isilami",
-        "start_sec": 48.53,
-        "end_sec": 49.17,
-        "confidence": 0.9957968965172768,
+        "word": "ihsilami",
+        "start_sec": 48.52,
+        "end_sec": 49.14,
+        "confidence": 0.851118,
         "flagged": false,
         "emitted_word": "ihsilami"
       },
       {
-        "word": "utenelei",
-        "start_sec": 49.69,
-        "end_sec": 50.37,
-        "confidence": 0.9997876107692718,
+        "word": "uthenelei",
+        "start_sec": 49.66,
+        "end_sec": 50.34,
+        "confidence": 0.158182,
         "flagged": false,
-        "emitted_word": "utenhelv'i"
+        "emitted_word": "uthenhele'i"
       },
       {
-        "word": "isilamino",
-        "start_sec": 50.92,
-        "end_sec": 52.32,
-        "confidence": 0.8864924013614655,
+        "word": "ihsilamino",
+        "start_sec": 51.32,
+        "end_sec": 52.3,
+        "confidence": 0.945464,
         "flagged": false,
-        "emitted_word": "'i ihsilaminho"
+        "emitted_word": "ihsilamino"
       },
       {
         "word": "elimi",
-        "start_sec": 52.82,
-        "end_sec": 53.34,
-        "confidence": 0.9874014258384705,
+        "start_sec": 52.8,
+        "end_sec": 53.32,
+        "confidence": 0.110087,
         "flagged": false,
-        "emitted_word": "elima"
+        "emitted_word": "elimi"
       },
       {
-        "word": "utenelei",
-        "start_sec": 54.27,
-        "end_sec": 55.03,
-        "confidence": 0.9689663350582123,
+        "word": "uthenelei",
+        "start_sec": 54.26,
+        "end_sec": 55.0,
+        "confidence": 0.220462,
         "flagged": false,
-        "emitted_word": "utenhelv'i"
+        "emitted_word": "uthenhele'i"
       }
     ],
     "cherokee_syllabary": "ᏧᏓᏃ ᏇᎵᏏ ᎠᎴ ᏎᎳ ᎬᏩᏕᏁᎴᎢ ᏖᎹ ᏚᎾᏄᎪᏫᏎᎢ; ᏇᎵᏏᏃ ᎢᏏᎳᎻ ᎤᏕᏁᎴᎢ; ᎢᏏᎳᎻᏃ ᎡᎵᎻ ᎤᏕᏁᎴᎢ;",
     "phonetic": "Tsu-da-no Que-li-si a-le Se-la gv-wa-de-ne-le-i Te-ma du-na-nu-go-wi-se-i; Que-li-si-no I-si-la-mi u-de-ne-le-i; I-si-la-mi-no E-li-mi u-de-ne-le-i;",
-    "english": "And Judas begat Phares and Zara of Thamar; and Phares begat Esrom; and Esrom begat Aram;"
+    "english": "And Judas begat Phares and Zara of Thamar; and Phares begat Esrom; and Esrom begat Aram;",
+    "has_anomalies": false
   },
   {
     "verse_id": "010104",
@@ -326,90 +345,91 @@
     "chapter": 1,
     "verse_idx": 4,
     "audio_path": "cherokee_new_testament/split_audio/matthew_01_04.wav",
-    "start_sec": 56.09,
-    "end_sec": 68.995,
-    "duration_sec": 12.905,
+    "start_sec": 55.56,
+    "end_sec": 68.94,
+    "duration_sec": 13.38,
     "reference_sentence": "ᎡᎵᎻᏃ ᎡᎻᏂᏓᏈ ᎤᏕᏁᎴᎢ; ᎡᎻᏂᏓᏈᏃ ᎾᏐᏂ ᎤᏕᏁᎴᎢ; ᎾᏐᏂᏃ ᏌᎵᎹ ᎤᏕᏁᎴᎢ;",
-    "reconciled_phonetics": "eliminho eminitakwi utenhele'i v eminitakwinho nahsoni utenhele'i; nahsonino hsalima utenhele'i;",
-    "asr_hypothesis": "elimanho eminitakwi ahi utenhelv'i v v eminitakwinho nahsoni utenhelv'i nahsonino hsalima ayv utenhelv'i",
-    "cost": 0.1508,
+    "reconciled_phonetics": "eliminho eminithakwi uthenhele'i; eminithakwino nahsoni uthenhele'i; nahsonin hsalima uthenhele'i;",
+    "asr_hypothesis": "eliminho eminithakwhi uthenhele'i eminithakwhino nahsoni uthenhele'i nahsonin hsalima uthenhele'i",
+    "cost": -10.3648,
     "words": [
       {
         "word": "elimino",
-        "start_sec": 56.09,
-        "end_sec": 56.81,
-        "confidence": 0.9726900160312653,
+        "start_sec": 56.06,
+        "end_sec": 56.7,
+        "confidence": 0.215007,
         "flagged": false,
-        "emitted_word": "elimanho"
+        "emitted_word": "eliminho"
       },
       {
-        "word": "eminitakwi",
-        "start_sec": 57.34,
-        "end_sec": 59.16,
-        "confidence": 0.9031656493743261,
+        "word": "eminithakwhi",
+        "start_sec": 57.28,
+        "end_sec": 58.6,
+        "confidence": 0.170194,
         "flagged": false,
-        "emitted_word": "eminitakwi ahi"
+        "emitted_word": "eminithakwhi"
       },
       {
-        "word": "utenelei",
-        "start_sec": 59.26,
-        "end_sec": 60.0,
-        "confidence": 0.9990712583065033,
+        "word": "uthenelei",
+        "start_sec": 59.22,
+        "end_sec": 59.96,
+        "confidence": 0.325705,
         "flagged": false,
-        "emitted_word": "utenhelv'i"
+        "emitted_word": "uthenhele'i"
       },
       {
-        "word": "eminitakwino",
-        "start_sec": 60.29,
-        "end_sec": 61.975,
-        "confidence": 0.7989384272159675,
+        "word": "eminithakwhino",
+        "start_sec": 60.8,
+        "end_sec": 61.94,
+        "confidence": 0.242766,
         "flagged": false,
-        "emitted_word": "v v eminitakwinho"
+        "emitted_word": "eminithakwhino"
       },
       {
-        "word": "nasoni",
-        "start_sec": 62.75,
-        "end_sec": 63.47,
-        "confidence": 0.9998617768287659,
+        "word": "nahsoni",
+        "start_sec": 62.7,
+        "end_sec": 63.44,
+        "confidence": 0.999064,
         "flagged": false,
         "emitted_word": "nahsoni"
       },
       {
-        "word": "utenelei",
-        "start_sec": 63.77,
-        "end_sec": 64.49,
-        "confidence": 0.9991114020347596,
+        "word": "uthenelei",
+        "start_sec": 63.74,
+        "end_sec": 64.44,
+        "confidence": 0.248047,
         "flagged": false,
-        "emitted_word": "utenhelv'i"
+        "emitted_word": "uthenhele'i"
       },
       {
-        "word": "nasonino",
-        "start_sec": 65.91,
-        "end_sec": 66.61,
-        "confidence": 0.9983083142174615,
+        "word": "nahsonino",
+        "start_sec": 65.86,
+        "end_sec": 66.44,
+        "confidence": 0.988546,
         "flagged": false,
-        "emitted_word": "nahsonino"
+        "emitted_word": "nahsonin"
       },
       {
-        "word": "salima",
-        "start_sec": 67.07,
-        "end_sec": 67.67,
-        "confidence": 0.9471180609294346,
+        "word": "hsalima",
+        "start_sec": 66.44,
+        "end_sec": 67.62,
+        "confidence": 0.995864,
         "flagged": false,
         "emitted_word": "hsalima"
       },
       {
-        "word": "utenelei",
-        "start_sec": 67.93,
-        "end_sec": 68.995,
-        "confidence": 0.8886290609836578,
+        "word": "uthenelei",
+        "start_sec": 68.2,
+        "end_sec": 68.94,
+        "confidence": 0.381547,
         "flagged": false,
-        "emitted_word": "ayv utenhelv'i"
+        "emitted_word": "uthenhele'i"
       }
     ],
     "cherokee_syllabary": "ᎡᎵᎻᏃ ᎡᎻᏂᏓᏈ ᎤᏕᏁᎴᎢ; ᎡᎻᏂᏓᏈᏃ ᎾᏐᏂ ᎤᏕᏁᎴᎢ; ᎾᏐᏂᏃ ᏌᎵᎹ ᎤᏕᏁᎴᎢ;",
     "phonetic": "E-li-mi-no E-mi-ni-da-qui u-de-ne-le-i; E-mi-ni-da-qui-no Na-so-ni u-de-ne-le-i; Na-so-ni-no Sa-li-ma u-de-ne-le-i;",
-    "english": "And Aram begat Aminadab; and Aminadab begat Naasson; and Naasson begat Salmon;"
+    "english": "And Aram begat Aminadab; and Aminadab begat Naasson; and Naasson begat Salmon;",
+    "has_anomalies": false
   },
   {
     "verse_id": "010105",
@@ -417,114 +437,123 @@
     "chapter": 1,
     "verse_idx": 5,
     "audio_path": "cherokee_new_testament/split_audio/matthew_01_05.wav",
-    "start_sec": 70.45,
-    "end_sec": 88.5,
-    "duration_sec": 18.05,
+    "start_sec": 69.92,
+    "end_sec": 88.43,
+    "duration_sec": 18.51,
     "reference_sentence": "ᏌᎵᎹᏃ ᏉᏏ ᎤᏕᏁᎴᎢ ᎴᎭᏫ ᎤᎾᎸᎪᏫᏎᎢ; ᏉᏏᏃ ᎣᏇᏗ ᎤᏕᏁᎴᎢ ᎷᏏ ᎤᎾᏄᎪᏫᏎᎢ; ᎣᏇᏗᏃ ᏤᏏ ᎤᏕᏁᎴᎢ;",
-    "reconciled_phonetics": "salimanho kwohsi utenhele'i lehawi unalvkowhihse'i; kwohsinho okweti utenhele'i' luhsi unanukowhihse'i a okwetinho tsehsi utenhele'i;",
-    "asr_hypothesis": "salimanho kwohsi utenhele'i lehawi unanvkowhihse'i kwohsinho okweti utenhelv'i v 'v luwuhsi unanukowhihse'i a okwetinho tsehsi utenhelv'i",
-    "cost": 0.0833,
+    "reconciled_phonetics": "salimanho kwohsi uthenhele'i lehawi unalvkhowhihse'i; kwsino okwethi uthenhele'i luhsi unanukhowhihse'i; okwethinho tsehsi uthenhele'i;",
+    "asr_hypothesis": "salimanho kwhohsi uthenhele'i lehawi unalvkhowhihse'i kwhhsino okwhethi uthenhele'i luhsi unanukhowhihse'i okwhethinho tsehsi uthenhele'i",
+    "cost": -10.5535,
     "words": [
       {
         "word": "salimano",
-        "start_sec": 70.45,
-        "end_sec": 71.27,
-        "confidence": 0.98077921072642,
+        "start_sec": 70.42,
+        "end_sec": 71.12,
+        "confidence": 0.344708,
         "flagged": false,
         "emitted_word": "salimanho"
       },
       {
-        "word": "kwosi",
-        "start_sec": 71.69,
-        "end_sec": 72.15,
-        "confidence": 0.9819861650466919,
+        "word": "kwhohsi",
+        "start_sec": 71.66,
+        "end_sec": 72.1,
+        "confidence": 0.193514,
         "flagged": false,
-        "emitted_word": "kwohsi"
+        "emitted_word": "kwhohsi"
       },
       {
-        "word": "utenelei",
-        "start_sec": 72.43,
-        "end_sec": 73.21,
-        "confidence": 0.966377991437912,
+        "word": "uthenelei",
+        "start_sec": 72.38,
+        "end_sec": 73.16,
+        "confidence": 0.337131,
         "flagged": false,
-        "emitted_word": "utenhele'i"
+        "emitted_word": "uthenhele'i"
       },
       {
-        "word": "leawi",
-        "start_sec": 74.39,
-        "end_sec": 75.15,
-        "confidence": 0.9507265090942383,
+        "word": "lehawi",
+        "start_sec": 74.34,
+        "end_sec": 75.1,
+        "confidence": 0.977184,
         "flagged": false,
         "emitted_word": "lehawi"
       },
       {
-        "word": "unalvkowisei",
-        "start_sec": 75.98,
-        "end_sec": 77.12,
-        "confidence": 0.9789840102195739,
+        "word": "unalvkhowihsei",
+        "start_sec": 75.94,
+        "end_sec": 77.06,
+        "confidence": 0.205129,
         "flagged": false,
-        "emitted_word": "unanvkowhihse'i"
+        "emitted_word": "unalvkhowhihse'i"
       },
       {
-        "word": "kwosino",
-        "start_sec": 78.07,
-        "end_sec": 78.67,
-        "confidence": 0.9983317852020264,
+        "word": "kwhohsino",
+        "start_sec": 78.04,
+        "end_sec": 78.64,
+        "confidence": 0.927708,
         "flagged": false,
-        "emitted_word": "kwohsinho"
+        "emitted_word": "kwhhsino"
       },
       {
-        "word": "okweti",
-        "start_sec": 79.74,
-        "end_sec": 80.38,
-        "confidence": 0.9731910626093546,
+        "word": "okwhethi",
+        "start_sec": 79.68,
+        "end_sec": 80.32,
+        "confidence": 0.039056,
         "flagged": false,
-        "emitted_word": "okweti"
+        "emitted_word": "okwhethi"
       },
       {
-        "word": "utenelei",
-        "start_sec": 80.735,
-        "end_sec": 81.83,
-        "confidence": 0.8627991497516632,
+        "word": "uthenelei",
+        "start_sec": 80.68,
+        "end_sec": 81.44,
+        "confidence": 0.317417,
         "flagged": false,
-        "emitted_word": "utenhelv'i v"
+        "emitted_word": "uthenhele'i"
       },
       {
-        "word": "lusi unanukowisei",
-        "start_sec": 82.125,
-        "end_sec": 84.505,
-        "confidence": 0.9044404698742761,
+        "word": "luhsi",
+        "start_sec": 82.42,
+        "end_sec": 82.98,
+        "confidence": 0.917975,
         "flagged": false,
-        "emitted_word": "'v luwuhsi unanukowhihse'i"
+        "emitted_word": "luhsi"
       },
       {
-        "word": "okwetino",
-        "start_sec": 84.87,
-        "end_sec": 86.345,
-        "confidence": 0.9094849791791704,
+        "word": "unanukhowihsei",
+        "start_sec": 83.2,
+        "end_sec": 84.44,
+        "confidence": 0.429669,
         "flagged": false,
-        "emitted_word": "a okwetinho"
+        "emitted_word": "unanukhowhihse'i"
       },
       {
-        "word": "tsesi",
-        "start_sec": 86.86,
-        "end_sec": 87.36,
-        "confidence": 0.9988407293955485,
+        "word": "okwhethino",
+        "start_sec": 85.38,
+        "end_sec": 86.22,
+        "confidence": 0.187406,
+        "flagged": false,
+        "emitted_word": "okwhethinho"
+      },
+      {
+        "word": "tsehsi",
+        "start_sec": 86.8,
+        "end_sec": 87.3,
+        "confidence": 0.826139,
         "flagged": false,
         "emitted_word": "tsehsi"
       },
       {
-        "word": "utenelei",
-        "start_sec": 87.68,
-        "end_sec": 88.5,
-        "confidence": 0.9638827025890351,
+        "word": "uthenelei",
+        "start_sec": 87.62,
+        "end_sec": 88.44,
+        "confidence": 0.311534,
         "flagged": false,
-        "emitted_word": "utenhelv'i"
+        "emitted_word": "uthenhele'i"
       }
     ],
     "cherokee_syllabary": "ᏌᎵᎹᏃ ᏉᏏ ᎤᏕᏁᎴᎢ ᎴᎭᏫ ᎤᎾᎸᎪᏫᏎᎢ; ᏉᏏᏃ ᎣᏇᏗ ᎤᏕᏁᎴᎢ ᎷᏏ ᎤᎾᏄᎪᏫᏎᎢ; ᎣᏇᏗᏃ ᏤᏏ ᎤᏕᏁᎴᎢ;",
     "phonetic": "Sa-li-ma-no Quo-si u-de-ne-le-i Le-ha-wi u-na-lv-go-wi-se-i; Quo-si-no O-que-di u-de-ne-le-i Lu-si u-na-nu-go-wi-se-i; O-que-di-no Tse-si u-de-ne-le-i;",
-    "english": "And Salmon begat Booz of Rachab; and Booz begat Obed of Ruth; and Obed begat Jesse;"
+    "english": "And Salmon begat Booz of Rachab; and Booz begat Obed of Ruth; and Obed begat Jesse;",
+    "has_anomalies": false
   },
   {
     "verse_id": "010106",
@@ -532,98 +561,107 @@
     "chapter": 1,
     "verse_idx": 6,
     "audio_path": "cherokee_new_testament/split_audio/matthew_01_06.wav",
-    "start_sec": 89.59,
-    "end_sec": 103.74,
-    "duration_sec": 14.15,
+    "start_sec": 89.04,
+    "end_sec": 103.67,
+    "duration_sec": 14.63,
     "reference_sentence": "ᏤᏏᏃ ᏕᏫ ᎤᎬᏫᏳᎯ ᎤᏕᏁᎴᎢ; ᏕᏫᏃ ᎤᎬᏫᏳᎯ ᏐᎵᎹᏅ ᎤᏕᏁᎴᎢ ᏳᎳᏯ ᎤᏓᏴᏛ ᎤᎾᏄᎪᏫᏎᎢ;",
-    "reconciled_phonetics": "tsehsinho tewi ukvwiyuhi utenhele'iyv tewinh ukvwiyuhi hsolimanv utenheli yulaya utayhvtv unanukowhihse'i;",
-    "asr_hypothesis": "tsehsinho tewi unukvwiyuhi utenhelv'i ayv tewinh ukvwiyuhi hsolimoni utenhele yulayv utayhihvta unanvkowhihse'i",
-    "cost": 0.1002,
+    "reconciled_phonetics": "tsehsinho thewi ukhvwiyuhi uthenhele'i; thewino ukhvwiyuhi hsolimanv uthenheli yulaya uthayhvthv unanukhowhihse'i;",
+    "asr_hypothesis": "tsehsinho thewi ukhvwiyuhi uthenhele'i thewino ukhvwiyuhi hsolimanv uthenhele yulaya uthayhvthv unanukhowhihse'i",
+    "cost": -9.9204,
     "words": [
       {
-        "word": "tsesino",
-        "start_sec": 89.59,
-        "end_sec": 90.13,
-        "confidence": 0.9982940422164069,
+        "word": "tsehsino",
+        "start_sec": 89.54,
+        "end_sec": 90.08,
+        "confidence": 0.994088,
         "flagged": false,
         "emitted_word": "tsehsinho"
       },
       {
-        "word": "tewi",
-        "start_sec": 90.84,
-        "end_sec": 91.22,
-        "confidence": 0.8185544013977051,
+        "word": "thewi",
+        "start_sec": 90.78,
+        "end_sec": 91.16,
+        "confidence": 0.07417,
         "flagged": false,
-        "emitted_word": "tewi"
+        "emitted_word": "thewi"
       },
       {
-        "word": "ukvwiyui utenelei",
-        "start_sec": 91.46,
-        "end_sec": 94.64,
-        "confidence": 0.9897953103287053,
+        "word": "ukhvwiyuhi",
+        "start_sec": 91.42,
+        "end_sec": 92.44,
+        "confidence": 0.32429,
         "flagged": false,
-        "emitted_word": "unukvwiyuhi utenhelv'i ayv"
+        "emitted_word": "ukhvwiyuhi"
       },
       {
-        "word": "tewino",
-        "start_sec": 95.025,
-        "end_sec": 95.405,
-        "confidence": 0.9267780383427938,
+        "word": "uthenelei",
+        "start_sec": 92.8,
+        "end_sec": 93.58,
+        "confidence": 0.289992,
         "flagged": false,
-        "emitted_word": "tewinh"
+        "emitted_word": "uthenhele'i"
       },
       {
-        "word": "ukvwiyui",
-        "start_sec": 95.805,
-        "end_sec": 96.565,
-        "confidence": 0.9765902227825589,
+        "word": "thewino",
+        "start_sec": 94.96,
+        "end_sec": 95.48,
+        "confidence": 0.137247,
         "flagged": false,
-        "emitted_word": "ukvwiyuhi"
+        "emitted_word": "thewino"
       },
       {
-        "word": "solimanv",
-        "start_sec": 96.845,
-        "end_sec": 97.605,
-        "confidence": 0.9603883690304227,
+        "word": "ukhvwiyuhi",
+        "start_sec": 95.74,
+        "end_sec": 96.5,
+        "confidence": 0.277887,
         "flagged": false,
-        "emitted_word": "hsolimoni"
+        "emitted_word": "ukhvwiyuhi"
       },
       {
-        "word": "utenelei",
-        "start_sec": 98.13,
-        "end_sec": 98.89,
-        "confidence": 0.9882756173610687,
+        "word": "hsolimanv",
+        "start_sec": 96.78,
+        "end_sec": 97.54,
+        "confidence": 0.188961,
         "flagged": false,
-        "emitted_word": "utenhele"
+        "emitted_word": "hsolimanv"
+      },
+      {
+        "word": "uthenelei",
+        "start_sec": 98.08,
+        "end_sec": 98.82,
+        "confidence": 0.239299,
+        "flagged": false,
+        "emitted_word": "uthenhele"
       },
       {
         "word": "yulaya",
-        "start_sec": 99.83,
-        "end_sec": 100.49,
-        "confidence": 0.9993929465611776,
+        "start_sec": 99.76,
+        "end_sec": 100.44,
+        "confidence": 0.992949,
         "flagged": false,
-        "emitted_word": "yulayv"
+        "emitted_word": "yulaya"
       },
       {
-        "word": "utayvtv",
-        "start_sec": 100.92,
-        "end_sec": 101.66,
-        "confidence": 0.9914956986904144,
+        "word": "uthayvthv",
+        "start_sec": 100.88,
+        "end_sec": 101.6,
+        "confidence": 0.117138,
         "flagged": false,
-        "emitted_word": "utayhihvta"
+        "emitted_word": "uthayhvthv"
       },
       {
-        "word": "unanukowisei",
-        "start_sec": 102.46,
-        "end_sec": 103.74,
-        "confidence": 0.9933172980944316,
+        "word": "unanukhowihsei",
+        "start_sec": 102.4,
+        "end_sec": 103.68,
+        "confidence": 0.329246,
         "flagged": false,
-        "emitted_word": "unanvkowhihse'i"
+        "emitted_word": "unanukhowhihse'i"
       }
     ],
     "cherokee_syllabary": "ᏤᏏᏃ ᏕᏫ ᎤᎬᏫᏳᎯ ᎤᏕᏁᎴᎢ; ᏕᏫᏃ ᎤᎬᏫᏳᎯ ᏐᎵᎹᏅ ᎤᏕᏁᎴᎢ ᏳᎳᏯ ᎤᏓᏴᏛ ᎤᎾᏄᎪᏫᏎᎢ;",
     "phonetic": "Tse-si-no De-wi u-gv-wi-yu-hi u-de-ne-le-i; De-wi-no u-gv-wi-yu-hi So-li-ma-nv u-de-ne-le-i Yu-la-ya u-da-yv-dv u-na-nu-go-wi-se-i;",
-    "english": "And Jesse begat David the king; and David the king begat Solomon of her that had been the wife of Urias;"
+    "english": "And Jesse begat David the king; and David the king begat Solomon of her that had been the wife of Urias;",
+    "has_anomalies": false
   },
   {
     "verse_id": "010107",
@@ -631,90 +669,91 @@
     "chapter": 1,
     "verse_idx": 7,
     "audio_path": "cherokee_new_testament/split_audio/matthew_01_07.wav",
-    "start_sec": 105.14,
-    "end_sec": 119.64,
-    "duration_sec": 14.5,
+    "start_sec": 104.6,
+    "end_sec": 119.55,
+    "duration_sec": 14.95,
     "reference_sentence": "ᏐᎵᎹᏅᏃ ᎶᏉᎹ ᎤᏕᏁᎴᎢ; ᎶᏉᎹᏃ ᎡᏆᏯ ᎤᏕᏁᎴᎢ; ᎡᏆᏯᏃ ᎡᏏ ᎤᏕᏁᎴᎢ;",
-    "reconciled_phonetics": "hsolimanvnho lokwoma utenhele'i i lokwomanho ekwaya utenhele'i v ekwayanho ehsi utenhele'i;",
-    "asr_hypothesis": "hsolimvtinho lokwotha utenhelv'i i lokwo manho ekwaya ahi utenhelv'i v ekwayvnho ehsi utenhelv'i",
-    "cost": 0.1376,
+    "reconciled_phonetics": "solimannho lokwoma uthenhele'i; lokwomanho ekwaya uthenhele'i; ekwayano ehsi uthenhele'i;",
+    "asr_hypothesis": "solimannho lokwhoma uthenhele'i lokwhomanho ekwhaya uthenhele'i ekwhayano ehsi uthenhele'i",
+    "cost": -11.4666,
     "words": [
       {
         "word": "solimanvno",
-        "start_sec": 105.14,
-        "end_sec": 106.04,
-        "confidence": 0.9833716054757436,
+        "start_sec": 105.1,
+        "end_sec": 105.96,
+        "confidence": 0.547934,
         "flagged": false,
-        "emitted_word": "hsolimvtinho"
+        "emitted_word": "solimannho"
       },
       {
-        "word": "lokwoma",
-        "start_sec": 107.05,
-        "end_sec": 107.83,
-        "confidence": 0.9564341455698013,
+        "word": "lokwhoma",
+        "start_sec": 106.98,
+        "end_sec": 107.78,
+        "confidence": 0.130889,
         "flagged": false,
-        "emitted_word": "lokwotha"
+        "emitted_word": "lokwhoma"
       },
       {
-        "word": "utenelei",
-        "start_sec": 108.64,
-        "end_sec": 109.4,
-        "confidence": 0.9997637391090393,
+        "word": "uthenelei",
+        "start_sec": 108.58,
+        "end_sec": 109.34,
+        "confidence": 0.198947,
         "flagged": false,
-        "emitted_word": "utenhelv'i"
+        "emitted_word": "uthenhele'i"
       },
       {
-        "word": "lokwomano",
-        "start_sec": 110.13,
-        "end_sec": 111.78,
-        "confidence": 0.9601995905240376,
+        "word": "lokwhomano",
+        "start_sec": 110.3,
+        "end_sec": 111.72,
+        "confidence": 0.263498,
         "flagged": false,
-        "emitted_word": "i lokwo manho"
+        "emitted_word": "lokwhomanho"
       },
       {
-        "word": "ekwaya",
-        "start_sec": 112.67,
-        "end_sec": 113.37,
-        "confidence": 0.9983604848384857,
+        "word": "ekwhaya",
+        "start_sec": 112.62,
+        "end_sec": 113.3,
+        "confidence": 0.158407,
         "flagged": false,
-        "emitted_word": "ekwaya"
+        "emitted_word": "ekwhaya"
       },
       {
-        "word": "utenelei",
-        "start_sec": 113.785,
-        "end_sec": 115.29,
-        "confidence": 0.7953133702278137,
+        "word": "uthenelei",
+        "start_sec": 114.38,
+        "end_sec": 115.22,
+        "confidence": 0.209363,
         "flagged": false,
-        "emitted_word": "ahi utenhelv'i"
+        "emitted_word": "uthenhele'i"
       },
       {
-        "word": "ekwayano",
-        "start_sec": 115.58,
-        "end_sec": 117.2,
-        "confidence": 0.7937344544463687,
+        "word": "ekwhayano",
+        "start_sec": 116.14,
+        "end_sec": 117.12,
+        "confidence": 0.122138,
         "flagged": false,
-        "emitted_word": "v ekwayvnho"
+        "emitted_word": "ekwhayano"
       },
       {
-        "word": "esi",
-        "start_sec": 117.54,
-        "end_sec": 118.0,
-        "confidence": 0.9999764859676361,
+        "word": "ehsi",
+        "start_sec": 117.46,
+        "end_sec": 117.9,
+        "confidence": 0.999816,
         "flagged": false,
         "emitted_word": "ehsi"
       },
       {
-        "word": "utenelei",
-        "start_sec": 118.84,
-        "end_sec": 119.64,
-        "confidence": 0.9521217167377471,
+        "word": "uthenelei",
+        "start_sec": 118.76,
+        "end_sec": 119.56,
+        "confidence": 0.193892,
         "flagged": false,
-        "emitted_word": "utenhelv'i"
+        "emitted_word": "uthenhele'i"
       }
     ],
     "cherokee_syllabary": "ᏐᎵᎹᏅᏃ ᎶᏉᎹ ᎤᏕᏁᎴᎢ; ᎶᏉᎹᏃ ᎡᏆᏯ ᎤᏕᏁᎴᎢ; ᎡᏆᏯᏃ ᎡᏏ ᎤᏕᏁᎴᎢ;",
     "phonetic": "So-li-ma-nv-no Lo-quo-ma u-de-ne-le-i; Lo-quo-ma-no E-qua-ya u-de-ne-le-i; E-qua-ya-no E-si u-de-ne-le-i;",
-    "english": "And Solomon begat Roboam; and Roboam begat Abia; and Abia begat Asa;"
+    "english": "And Solomon begat Roboam; and Roboam begat Abia; and Abia begat Asa;",
+    "has_anomalies": false
   },
   {
     "verse_id": "010108",
@@ -722,90 +761,91 @@
     "chapter": 1,
     "verse_idx": 8,
     "audio_path": "cherokee_new_testament/split_audio/matthew_01_08.wav",
-    "start_sec": 120.88,
-    "end_sec": 133.64,
-    "duration_sec": 12.76,
+    "start_sec": 120.3,
+    "end_sec": 133.55,
+    "duration_sec": 13.25,
     "reference_sentence": "ᎡᏏᏃ ᏦᏏᏆ ᎤᏕᏁᎴᎢ.  ᏦᏏᏆᏃ ᏦᎳᎻ ᎤᏕᏁᎴᎢ; ᏦᎳᎻᏃ ᎣᏌᏯ ᎤᏕᏁᎴᎢ;",
-    "reconciled_phonetics": "ehsinho tsohsikwa utenhele'i.  tsohsikwanho tsolami utenhele'i; tso'laminho ohsaya utenhele'i;",
-    "asr_hypothesis": "ehsinho v tsohsikwa utenhelv'i tsohsikwanho oi tsolani utenhelv'i tso'i tsolaminho ohsvyv utenhelv'i",
-    "cost": 0.1522,
+    "reconciled_phonetics": "ehsinho tsohsikwa uthenhele'i.  tsohsikwano tsolami uthenhele'i; tsolamino ohsaya uthenhele'i;",
+    "asr_hypothesis": "ehsinho tsohsikwha uthenhele'i tsohsikwhano tsolami uthenhele'i tsolamino ohsaya uthenhele'i",
+    "cost": -11.9078,
     "words": [
       {
-        "word": "esino",
-        "start_sec": 120.88,
-        "end_sec": 121.36,
-        "confidence": 0.939866806779589,
+        "word": "ehsino",
+        "start_sec": 120.8,
+        "end_sec": 121.28,
+        "confidence": 0.906747,
         "flagged": false,
         "emitted_word": "ehsinho"
       },
       {
-        "word": "tsosikwa",
-        "start_sec": 121.64,
-        "end_sec": 122.6,
-        "confidence": 0.9457013309001923,
+        "word": "tsohsikwha",
+        "start_sec": 121.82,
+        "end_sec": 122.52,
+        "confidence": 0.227947,
         "flagged": false,
-        "emitted_word": "v tsohsikwa"
+        "emitted_word": "tsohsikwha"
       },
       {
-        "word": "utenelei",
-        "start_sec": 122.99,
-        "end_sec": 123.79,
-        "confidence": 0.9998792886734009,
+        "word": "uthenelei",
+        "start_sec": 122.9,
+        "end_sec": 123.72,
+        "confidence": 0.200943,
         "flagged": false,
-        "emitted_word": "utenhelv'i"
+        "emitted_word": "uthenhele'i"
       },
       {
-        "word": "tsosikwano",
-        "start_sec": 124.58,
-        "end_sec": 126.155,
-        "confidence": 0.8549953053394954,
+        "word": "tsohsikwhano",
+        "start_sec": 124.5,
+        "end_sec": 125.48,
+        "confidence": 0.277601,
         "flagged": false,
-        "emitted_word": "tsohsikwanho oi"
+        "emitted_word": "tsohsikwhano"
       },
       {
         "word": "tsolami",
-        "start_sec": 126.55,
-        "end_sec": 127.19,
-        "confidence": 0.9999514307294574,
+        "start_sec": 126.48,
+        "end_sec": 127.12,
+        "confidence": 0.25351,
         "flagged": false,
-        "emitted_word": "tsolani"
+        "emitted_word": "tsolami"
       },
       {
-        "word": "utenelei",
-        "start_sec": 127.37,
-        "end_sec": 128.21,
-        "confidence": 0.9956221759319306,
+        "word": "uthenelei",
+        "start_sec": 127.28,
+        "end_sec": 128.12,
+        "confidence": 0.245127,
         "flagged": false,
-        "emitted_word": "utenhelv'i"
+        "emitted_word": "uthenhele'i"
       },
       {
         "word": "tsolamino",
-        "start_sec": 128.78,
-        "end_sec": 130.265,
-        "confidence": 0.7988594621419907,
+        "start_sec": 129.2,
+        "end_sec": 130.18,
+        "confidence": 0.94735,
         "flagged": false,
-        "emitted_word": "tso'i tsolaminho"
+        "emitted_word": "tsolamino"
       },
       {
-        "word": "osaya",
-        "start_sec": 131.55,
-        "end_sec": 132.25,
-        "confidence": 0.9852199653784434,
+        "word": "ohsaya",
+        "start_sec": 131.46,
+        "end_sec": 132.16,
+        "confidence": 0.897141,
         "flagged": false,
-        "emitted_word": "ohsvyv"
+        "emitted_word": "ohsaya"
       },
       {
-        "word": "utenelei",
-        "start_sec": 132.88,
-        "end_sec": 133.64,
-        "confidence": 0.9991168081760406,
+        "word": "uthenelei",
+        "start_sec": 132.8,
+        "end_sec": 133.56,
+        "confidence": 0.202078,
         "flagged": false,
-        "emitted_word": "utenhelv'i"
+        "emitted_word": "uthenhele'i"
       }
     ],
     "cherokee_syllabary": "ᎡᏏᏃ ᏦᏏᏆ ᎤᏕᏁᎴᎢ.  ᏦᏏᏆᏃ ᏦᎳᎻ ᎤᏕᏁᎴᎢ; ᏦᎳᎻᏃ ᎣᏌᏯ ᎤᏕᏁᎴᎢ;",
     "phonetic": "E-si-no Tso-si-qua u-de-ne-le-i.  Tso-si-qua-no Tso-la-mi u-de-ne-le-i; Tso-la-mi-no O-sa-ya u-de-ne-le-i;",
-    "english": "And Asa begat Josaphat; and Josaphat begat Joram; and Joram begat Ozias;"
+    "english": "And Asa begat Josaphat; and Josaphat begat Joram; and Joram begat Ozias;",
+    "has_anomalies": false
   },
   {
     "verse_id": "010109",
@@ -813,90 +853,91 @@
     "chapter": 1,
     "verse_idx": 9,
     "audio_path": "cherokee_new_testament/split_audio/matthew_01_09.wav",
-    "start_sec": 134.78,
-    "end_sec": 148.47,
-    "duration_sec": 13.69,
+    "start_sec": 134.2,
+    "end_sec": 148.35,
+    "duration_sec": 14.15,
     "reference_sentence": "ᎣᏌᏯᏃ ᏦᏓᎻ ᎤᏕᏁᎴᎢ; ᏦᏓᎻᏃ ᎡᎭᏏ ᎤᏕᏁᎴᎢ; ᎡᎭᏏᏃ ᎮᏏᎦᏯ ᎤᏕᏁᎴᎢ;",
-    "reconciled_phonetics": "ohsayanho tsotami utenhele'i; tsotaminho ehahsi utenhele'i; ehahsinho hehsikaya utenhele'i;",
-    "asr_hypothesis": "ohstayanho tsotami utenhelv'i tsotaminho ehahsi utenhelv'i ehahsinho hehsikaya utenhelv'i",
-    "cost": 0.0263,
+    "reconciled_phonetics": "ohsayano tsothami uthenhele'i; tsothmino ehahsi uthenhele'i; ehahsino hehsikhaya uthenhele'i;",
+    "asr_hypothesis": "ohsayano tsothami uthenhele'i tsothmino ehahsi uthenhele'i ehahsino hehsikhaya uthenhele'i",
+    "cost": -11.6362,
     "words": [
       {
-        "word": "osayano",
-        "start_sec": 134.78,
-        "end_sec": 135.64,
-        "confidence": 0.9015255987644195,
+        "word": "ohsayano",
+        "start_sec": 134.7,
+        "end_sec": 135.56,
+        "confidence": 0.871288,
         "flagged": false,
-        "emitted_word": "ohstayanho"
+        "emitted_word": "ohsayano"
       },
       {
-        "word": "tsotami",
-        "start_sec": 135.94,
-        "end_sec": 136.68,
-        "confidence": 0.9688040614128113,
+        "word": "tsothami",
+        "start_sec": 135.86,
+        "end_sec": 136.6,
+        "confidence": 0.153407,
         "flagged": false,
-        "emitted_word": "tsotami"
+        "emitted_word": "tsothami"
       },
       {
-        "word": "utenelei",
-        "start_sec": 136.96,
-        "end_sec": 137.72,
-        "confidence": 0.9726488411426544,
+        "word": "uthenelei",
+        "start_sec": 136.88,
+        "end_sec": 137.64,
+        "confidence": 0.197291,
         "flagged": false,
-        "emitted_word": "utenhelv'i"
+        "emitted_word": "uthenhele'i"
       },
       {
-        "word": "tsotamino",
-        "start_sec": 138.65,
-        "end_sec": 139.55,
-        "confidence": 0.9913114309310913,
+        "word": "tsothamino",
+        "start_sec": 138.58,
+        "end_sec": 139.48,
+        "confidence": 0.196924,
         "flagged": false,
-        "emitted_word": "tsotaminho"
+        "emitted_word": "tsothmino"
       },
       {
-        "word": "easi",
-        "start_sec": 140.34,
-        "end_sec": 141.06,
-        "confidence": 0.9965862234433492,
+        "word": "ehahsi",
+        "start_sec": 140.26,
+        "end_sec": 140.94,
+        "confidence": 0.985746,
         "flagged": false,
         "emitted_word": "ehahsi"
       },
       {
-        "word": "utenelei",
-        "start_sec": 142.07,
-        "end_sec": 142.83,
-        "confidence": 0.9986149132251739,
+        "word": "uthenelei",
+        "start_sec": 141.96,
+        "end_sec": 142.72,
+        "confidence": 0.239419,
         "flagged": false,
-        "emitted_word": "utenhelv'i"
+        "emitted_word": "uthenhele'i"
       },
       {
-        "word": "easino",
-        "start_sec": 144.15,
-        "end_sec": 145.15,
-        "confidence": 0.9918231434292264,
+        "word": "ehahsino",
+        "start_sec": 144.04,
+        "end_sec": 145.06,
+        "confidence": 0.889792,
         "flagged": false,
-        "emitted_word": "ehahsinho"
+        "emitted_word": "ehahsino"
       },
       {
-        "word": "esikaya",
-        "start_sec": 146.41,
-        "end_sec": 147.51,
-        "confidence": 0.9998282657729255,
+        "word": "hehsikhaya",
+        "start_sec": 145.2,
+        "end_sec": 147.42,
+        "confidence": 0.059466,
         "flagged": false,
-        "emitted_word": "hehsikaya"
+        "emitted_word": "hehsikhaya"
       },
       {
-        "word": "utenelei",
-        "start_sec": 147.65,
-        "end_sec": 148.47,
-        "confidence": 0.9967572867870331,
+        "word": "uthenelei",
+        "start_sec": 147.56,
+        "end_sec": 148.36,
+        "confidence": 0.295331,
         "flagged": false,
-        "emitted_word": "utenhelv'i"
+        "emitted_word": "uthenhele'i"
       }
     ],
     "cherokee_syllabary": "ᎣᏌᏯᏃ ᏦᏓᎻ ᎤᏕᏁᎴᎢ; ᏦᏓᎻᏃ ᎡᎭᏏ ᎤᏕᏁᎴᎢ; ᎡᎭᏏᏃ ᎮᏏᎦᏯ ᎤᏕᏁᎴᎢ;",
     "phonetic": "O-sa-ya-no Tso-da-mi u-de-ne-le-i; Tso-da-mi-no E-ha-si u-de-ne-le-i; E-ha-si-no He-si-ga-ya u-de-ne-le-i;",
-    "english": "And Ozias begat Joatham; and Joatham begat Achaz; and Achaz begat Ezekias;"
+    "english": "And Ozias begat Joatham; and Joatham begat Achaz; and Achaz begat Ezekias;",
+    "has_anomalies": false
   },
   {
     "verse_id": "010110",
@@ -904,90 +945,91 @@
     "chapter": 1,
     "verse_idx": 10,
     "audio_path": "cherokee_new_testament/split_audio/matthew_01_10.wav",
-    "start_sec": 149.98,
-    "end_sec": 161.98,
-    "duration_sec": 12.0,
+    "start_sec": 149.38,
+    "end_sec": 161.87,
+    "duration_sec": 12.49,
     "reference_sentence": "ᎮᏏᎦᏯᏃ ᎹᎾᏏ ᎤᏕᏁᎴᎢ; ᎹᎾᏏᏃ ᎠᎼᏂ ᎤᏕᏁᎴᎢ; ᎠᎼᏂᏃ ᏦᏌᏯ ᎤᏕᏁᎴᎢ;",
-    "reconciled_phonetics": "hehsikayanho manasi utenhele'i; manahsinho amoni utenhele'i; amoni'nho tsohsaya utenhele'i;",
-    "asr_hypothesis": "hehsikayanho v manalhi utenhelv'i manahsinho vmani utenhelv'i amoni'nho tsohsaya utenhelv'i",
-    "cost": 0.0542,
+    "reconciled_phonetics": "hehsikhayanho manahsi uthenhele'i; manahsino amoni uthenhele'i; amonhinho tsohsaya uthenhele'i;",
+    "asr_hypothesis": "hehsikhayanho manahsi uthenhele'i manahsino amoni uthenhele'i amonhinho tsohsaya uthenhele'i",
+    "cost": -10.2282,
     "words": [
       {
-        "word": "esikayano",
-        "start_sec": 149.98,
-        "end_sec": 151.76,
-        "confidence": 0.9735692615310352,
+        "word": "hehsikhayano",
+        "start_sec": 149.88,
+        "end_sec": 150.76,
+        "confidence": 0.158494,
         "flagged": false,
-        "emitted_word": "hehsikayanho v"
+        "emitted_word": "hehsikhayanho"
       },
       {
-        "word": "manasi",
-        "start_sec": 152.075,
-        "end_sec": 152.775,
-        "confidence": 0.9006504842213222,
+        "word": "manahsi",
+        "start_sec": 151.98,
+        "end_sec": 152.66,
+        "confidence": 0.858187,
         "flagged": false,
-        "emitted_word": "manalhi"
+        "emitted_word": "manahsi"
       },
       {
-        "word": "utenelei",
-        "start_sec": 152.895,
-        "end_sec": 153.655,
-        "confidence": 0.9236154854297638,
+        "word": "uthenelei",
+        "start_sec": 152.8,
+        "end_sec": 153.54,
+        "confidence": 0.265097,
         "flagged": false,
-        "emitted_word": "utenhelv'i"
+        "emitted_word": "uthenhele'i"
       },
       {
-        "word": "manasino",
-        "start_sec": 154.74,
-        "end_sec": 155.54,
-        "confidence": 0.9511367082595825,
+        "word": "manahsino",
+        "start_sec": 154.64,
+        "end_sec": 155.46,
+        "confidence": 0.984284,
         "flagged": false,
-        "emitted_word": "manahsinho"
+        "emitted_word": "manahsino"
       },
       {
         "word": "amoni",
-        "start_sec": 155.96,
-        "end_sec": 156.56,
-        "confidence": 0.8339100480079651,
+        "start_sec": 155.86,
+        "end_sec": 156.46,
+        "confidence": 0.981547,
         "flagged": false,
-        "emitted_word": "vmani"
+        "emitted_word": "amoni"
       },
       {
-        "word": "utenelei",
-        "start_sec": 157.41,
-        "end_sec": 158.19,
-        "confidence": 0.9582502007484436,
+        "word": "uthenelei",
+        "start_sec": 157.32,
+        "end_sec": 158.1,
+        "confidence": 0.275831,
         "flagged": false,
-        "emitted_word": "utenhelv'i"
+        "emitted_word": "uthenhele'i"
       },
       {
         "word": "amonino",
-        "start_sec": 159.03,
-        "end_sec": 159.79,
-        "confidence": 0.9826607505480448,
+        "start_sec": 158.94,
+        "end_sec": 159.68,
+        "confidence": 0.917616,
         "flagged": false,
-        "emitted_word": "amoni'nho"
+        "emitted_word": "amonhinho"
       },
       {
-        "word": "tsosaya",
-        "start_sec": 160.38,
-        "end_sec": 161.06,
-        "confidence": 0.954079158604145,
+        "word": "tsohsaya",
+        "start_sec": 160.28,
+        "end_sec": 160.94,
+        "confidence": 0.999888,
         "flagged": false,
         "emitted_word": "tsohsaya"
       },
       {
-        "word": "utenelei",
-        "start_sec": 161.18,
-        "end_sec": 161.98,
-        "confidence": 0.9993723154067993,
+        "word": "uthenelei",
+        "start_sec": 161.08,
+        "end_sec": 161.88,
+        "confidence": 0.272733,
         "flagged": false,
-        "emitted_word": "utenhelv'i"
+        "emitted_word": "uthenhele'i"
       }
     ],
     "cherokee_syllabary": "ᎮᏏᎦᏯᏃ ᎹᎾᏏ ᎤᏕᏁᎴᎢ; ᎹᎾᏏᏃ ᎠᎼᏂ ᎤᏕᏁᎴᎢ; ᎠᎼᏂᏃ ᏦᏌᏯ ᎤᏕᏁᎴᎢ;",
     "phonetic": "He-si-ga-ya-no Ma-na-si u-de-ne-le-i; Ma-na-si-no A-mo-ni u-de-ne-le-i; A-mo-ni-no Tso-sa-ya u-de-ne-le-i;",
-    "english": "And Ezekias begat Manasses; and Manasses begat Amon; and Amon begat Josias;"
+    "english": "And Ezekias begat Manasses; and Manasses begat Amon; and Amon begat Josias;",
+    "has_anomalies": false
   },
   {
     "verse_id": "010111",
@@ -995,82 +1037,83 @@
     "chapter": 1,
     "verse_idx": 11,
     "audio_path": "cherokee_new_testament/split_audio/matthew_01_11.wav",
-    "start_sec": 162.85,
-    "end_sec": 173.65,
-    "duration_sec": 10.8,
+    "start_sec": 162.26,
+    "end_sec": 173.51,
+    "duration_sec": 11.25,
     "reference_sentence": "ᏦᏌᏯᏃ ᏤᎪᎾᏯ ᎠᎴ ᎠᎾᏓᏅᏟ ᎬᏩᏕᏁᎴᎢ; ᎾᎯᏳ ᏓᏗᎶᏂ ᏥᏫᏗᎨᎦᏘᏅᏍᏔᏁᎢ;",
-    "reconciled_phonetics": "tsohsayanho tseknaya ale anatanvtli kvwatenhele'i; nahiyu tatiloni tsiwitikekathinhvhsthane'i;",
-    "asr_hypothesis": "tsohsayanho tsekwnayv ale analhanvtli av v kvwatvnhele'i nahiyu takiloni yuwitikekathinhvhsthane'i",
-    "cost": 0.1005,
+    "reconciled_phonetics": "tsohsayno tsekhnaya ale anathanvlh khvwathnhele'i; nahiyu ththiloni tsiwithikhekhathinhvhsthane'i;",
+    "asr_hypothesis": "tsohsayno tsekhnaya ale anathanvtlhh khvwathnhele'i nahiyu ththiloni tsiwithikhekhathhinhvhsthhane'i",
+    "cost": -14.8362,
     "words": [
       {
-        "word": "tsosayano",
-        "start_sec": 162.85,
-        "end_sec": 163.73,
-        "confidence": 0.9928834329951893,
+        "word": "tsohsayano",
+        "start_sec": 162.76,
+        "end_sec": 163.62,
+        "confidence": 0.999496,
         "flagged": false,
-        "emitted_word": "tsohsayanho"
+        "emitted_word": "tsohsayno"
       },
       {
-        "word": "tsekonaya",
-        "start_sec": 164.44,
-        "end_sec": 165.28,
-        "confidence": 0.9511258668369718,
+        "word": "tsekhonaya",
+        "start_sec": 164.34,
+        "end_sec": 165.18,
+        "confidence": 0.270245,
         "flagged": false,
-        "emitted_word": "tsekwnayv"
+        "emitted_word": "tsekhnaya"
       },
       {
         "word": "ale",
-        "start_sec": 165.4,
-        "end_sec": 165.58,
-        "confidence": 0.9786884586016337,
+        "start_sec": 165.28,
+        "end_sec": 165.48,
+        "confidence": 0.843385,
         "flagged": false,
         "emitted_word": "ale"
       },
       {
-        "word": "anatanvtli",
-        "start_sec": 165.86,
+        "word": "anathanvtlhhi",
+        "start_sec": 165.76,
         "end_sec": 166.8,
-        "confidence": 0.9978367740457709,
+        "confidence": 0.067955,
         "flagged": false,
-        "emitted_word": "analhanvtli"
+        "emitted_word": "anathanvtlhh"
       },
       {
-        "word": "kvwatenelei",
-        "start_sec": 167.08,
-        "end_sec": 168.95,
-        "confidence": 0.8596636102749752,
+        "word": "khvwathenelei",
+        "start_sec": 167.92,
+        "end_sec": 168.84,
+        "confidence": 0.239382,
         "flagged": false,
-        "emitted_word": "av v kvwatvnhele'i"
+        "emitted_word": "khvwathnhele'i"
       },
       {
-        "word": "naiyu",
-        "start_sec": 169.79,
-        "end_sec": 170.21,
-        "confidence": 0.9996667305628458,
+        "word": "nahiyu",
+        "start_sec": 169.68,
+        "end_sec": 170.1,
+        "confidence": 0.995689,
         "flagged": false,
         "emitted_word": "nahiyu"
       },
       {
-        "word": "tatiloni",
-        "start_sec": 170.53,
-        "end_sec": 171.27,
-        "confidence": 0.9858179986476898,
+        "word": "thathiloni",
+        "start_sec": 170.22,
+        "end_sec": 171.16,
+        "confidence": 0.025442,
         "flagged": false,
-        "emitted_word": "takiloni"
+        "emitted_word": "ththiloni"
       },
       {
-        "word": "tsiwitikekatinvstanei",
-        "start_sec": 171.69,
-        "end_sec": 173.65,
-        "confidence": 0.9741257166862488,
+        "word": "tsiwithikhekhathhinvhsthhanei",
+        "start_sec": 171.58,
+        "end_sec": 173.52,
+        "confidence": 0.1415,
         "flagged": false,
-        "emitted_word": "yuwitikekathinhvhsthane'i"
+        "emitted_word": "tsiwithikhekhathhinhvhsthhane'i"
       }
     ],
     "cherokee_syllabary": "ᏦᏌᏯᏃ ᏤᎪᎾᏯ ᎠᎴ ᎠᎾᏓᏅᏟ ᎬᏩᏕᏁᎴᎢ; ᎾᎯᏳ ᏓᏗᎶᏂ ᏥᏫᏗᎨᎦᏘᏅᏍᏔᏁᎢ;",
     "phonetic": "Tso-sa-ya-no Tse-go-na-ya a-le a-na-da-nv-tli gv-wa-de-ne-le-i; na-hi-yu Da-di-lo-ni tsi-wi-di-ge-ga-ti-nv-s-ta-ne-i;",
-    "english": "And Josias begat Jechonias and his brethren, about the time they were carried away to Babylon:"
+    "english": "And Josias begat Jechonias and his brethren, about the time they were carried away to Babylon:",
+    "has_anomalies": false
   },
   {
     "verse_id": "010112",
@@ -1078,82 +1121,83 @@
     "chapter": 1,
     "verse_idx": 12,
     "audio_path": "cherokee_new_testament/split_audio/matthew_01_12.wav",
-    "start_sec": 174.79,
-    "end_sec": 186.76,
-    "duration_sec": 11.97,
+    "start_sec": 173.51,
+    "end_sec": 186.63,
+    "duration_sec": 13.12,
     "reference_sentence": "ᏓᏗᎶᏂᏃ ᏫᏗᎨᎦᏘᏃᎸ ᏤᎪᎾᏯ ᏌᎳᏓᏱᎵ ᎤᏕᏁᎴᎢ; ᏌᎳᏓᏱᎵᏃ ᏥᎳᏇᎵ ᎤᏕᏁᎴᎢ;",
-    "reconciled_phonetics": "tatiloninho witikekathinolhv tsekonaya salatayili utenhele'i v saltayilinho tsilakweli utenhele'i;",
-    "asr_hypothesis": "takiloninho witikekathinolha tsekonaya salatayili utenhelv'i v v saltayilinho tsilakweli utenhelv'i",
-    "cost": 0.0608,
+    "reconciled_phonetics": "thathilonino withikhekhathinolhv tsekhnaya hsalthyili uthenhele'i; hsalathyilino tsilakweli uthenhele'i;",
+    "asr_hypothesis": "thathilonino withikhekhathhinolhv tsekhnaya hsalthyili uthenhele'i hsalathyilino tsilakwheli uthenhele'i",
+    "cost": -10.6824,
     "words": [
       {
-        "word": "tatilonino",
-        "start_sec": 174.79,
-        "end_sec": 175.63,
-        "confidence": 0.9788974848660555,
+        "word": "thathilonino",
+        "start_sec": 173.6,
+        "end_sec": 175.52,
+        "confidence": 0.080373,
         "flagged": false,
-        "emitted_word": "takiloninho"
+        "emitted_word": "thathilonino"
       },
       {
-        "word": "witikekatinolv",
-        "start_sec": 175.97,
-        "end_sec": 177.37,
-        "confidence": 0.9985000044107437,
+        "word": "withikhekhathhinolv",
+        "start_sec": 175.86,
+        "end_sec": 177.24,
+        "confidence": 0.083498,
         "flagged": false,
-        "emitted_word": "witikekathinolha"
+        "emitted_word": "withikhekhathhinolhv"
       },
       {
-        "word": "tsekonaya",
-        "start_sec": 178.38,
-        "end_sec": 179.3,
-        "confidence": 0.9663070638974508,
+        "word": "tsekhonaya",
+        "start_sec": 178.28,
+        "end_sec": 179.18,
+        "confidence": 0.428579,
         "flagged": false,
-        "emitted_word": "tsekonaya"
+        "emitted_word": "tsekhnaya"
       },
       {
-        "word": "salatayili",
-        "start_sec": 180.08,
-        "end_sec": 181.18,
-        "confidence": 0.9490761876106262,
+        "word": "hsalathayili",
+        "start_sec": 179.94,
+        "end_sec": 181.06,
+        "confidence": 0.359336,
         "flagged": false,
-        "emitted_word": "salatayili"
+        "emitted_word": "hsalthyili"
       },
       {
-        "word": "utenelei",
-        "start_sec": 181.3,
-        "end_sec": 182.06,
-        "confidence": 0.9979586601257324,
+        "word": "uthenelei",
+        "start_sec": 181.18,
+        "end_sec": 181.94,
+        "confidence": 0.297431,
         "flagged": false,
-        "emitted_word": "utenhelv'i"
+        "emitted_word": "uthenhele'i"
       },
       {
-        "word": "salatayilino",
-        "start_sec": 182.485,
-        "end_sec": 184.135,
-        "confidence": 0.8739530245463053,
+        "word": "hsalathayilino",
+        "start_sec": 182.8,
+        "end_sec": 184.0,
+        "confidence": 0.494424,
         "flagged": false,
-        "emitted_word": "v v saltayilinho"
+        "emitted_word": "hsalathyilino"
       },
       {
-        "word": "tsilakweli",
-        "start_sec": 184.765,
-        "end_sec": 185.425,
-        "confidence": 0.990606939792633,
+        "word": "tsilakwheli",
+        "start_sec": 184.64,
+        "end_sec": 185.3,
+        "confidence": 0.247857,
         "flagged": false,
-        "emitted_word": "tsilakweli"
+        "emitted_word": "tsilakwheli"
       },
       {
-        "word": "utenelei",
-        "start_sec": 186.04,
-        "end_sec": 186.76,
-        "confidence": 0.9938665390014648,
+        "word": "uthenelei",
+        "start_sec": 185.92,
+        "end_sec": 186.64,
+        "confidence": 0.081187,
         "flagged": false,
-        "emitted_word": "utenhelv'i"
+        "emitted_word": "uthenhele'i"
       }
     ],
     "cherokee_syllabary": "ᏓᏗᎶᏂᏃ ᏫᏗᎨᎦᏘᏃᎸ ᏤᎪᎾᏯ ᏌᎳᏓᏱᎵ ᎤᏕᏁᎴᎢ; ᏌᎳᏓᏱᎵᏃ ᏥᎳᏇᎵ ᎤᏕᏁᎴᎢ;",
     "phonetic": "Da-di-lo-ni-no wi-di-ge-ga-ti-no-lv Tse-go-na-ya Sa-la-da-yi-li u-de-ne-le-i; Sa-la-da-yi-li-no Tsi-la-que-li u-de-ne-le-i;",
-    "english": "And after they were brought to Babylon, Jechonias begat Salathiel; and Salathiel begat Zorobabel;"
+    "english": "And after they were brought to Babylon, Jechonias begat Salathiel; and Salathiel begat Zorobabel;",
+    "has_anomalies": false
   },
   {
     "verse_id": "010113",
@@ -1161,90 +1205,91 @@
     "chapter": 1,
     "verse_idx": 13,
     "audio_path": "cherokee_new_testament/split_audio/matthew_01_13.wav",
-    "start_sec": 187.47,
-    "end_sec": 201.4,
-    "duration_sec": 13.93,
+    "start_sec": 186.84,
+    "end_sec": 201.26,
+    "duration_sec": 14.42,
     "reference_sentence": "ᏥᎳᏇᎵᏃ ᎠᏆᏯᏗ ᎤᏕᏁᎴᎢ, ᎠᏆᏯᏗᏃ ᎢᎳᏯᎩᎻ ᎤᏕᏁᎴᎢ; ᎢᎳᏯᎩᎻᏃ ᎡᏐ ᎤᏕᏁᎴᎢ;",
-    "reconciled_phonetics": "tsilakwelinho akwayati utenhele'i v akwayahtinho ilaykimi utenhele'i; ilayakiminho ehso utenhele'i;",
-    "asr_hypothesis": "tilakwelinho akwayati utenhelv'i v akwayahinho ilaykimi utenhelv'i ilayakiminho ehso utenhele'i",
-    "cost": 0.0468,
+    "reconciled_phonetics": "tsilakwelino akwayathi uthenhele'i, akwayathino ilayakhimi uthenhele'i; ilaykhimino ehso uthenhelei;",
+    "asr_hypothesis": "tsilakwhelino akwhayathi uthenhele'i akwhayathino ilayakhimi uthenhele'i ilaykhimino ehso uthenhelei",
+    "cost": -8.9528,
     "words": [
       {
-        "word": "tsilakwelino",
-        "start_sec": 187.47,
-        "end_sec": 188.43,
-        "confidence": 0.9382438659667969,
+        "word": "tsilakwhelino",
+        "start_sec": 187.34,
+        "end_sec": 188.32,
+        "confidence": 0.242213,
         "flagged": false,
-        "emitted_word": "tilakwelinho"
+        "emitted_word": "tsilakwhelino"
       },
       {
-        "word": "akwayati",
-        "start_sec": 188.975,
-        "end_sec": 189.795,
-        "confidence": 0.9900777339935303,
+        "word": "akwhayathi",
+        "start_sec": 188.86,
+        "end_sec": 189.66,
+        "confidence": 0.075981,
         "flagged": false,
-        "emitted_word": "akwayati"
+        "emitted_word": "akwhayathi"
       },
       {
-        "word": "utenelei",
-        "start_sec": 190.48,
-        "end_sec": 191.24,
-        "confidence": 0.9164524137973785,
+        "word": "uthenelei",
+        "start_sec": 190.38,
+        "end_sec": 191.12,
+        "confidence": 0.293914,
         "flagged": false,
-        "emitted_word": "utenhelv'i"
+        "emitted_word": "uthenhele'i"
       },
       {
-        "word": "akwayatino",
-        "start_sec": 191.565,
-        "end_sec": 193.56,
-        "confidence": 0.9375173016027971,
+        "word": "akwhayathino",
+        "start_sec": 192.38,
+        "end_sec": 193.46,
+        "confidence": 0.291008,
         "flagged": false,
-        "emitted_word": "v akwayahinho"
+        "emitted_word": "akwhayathino"
       },
       {
-        "word": "ilayakimi",
-        "start_sec": 194.23,
-        "end_sec": 195.25,
-        "confidence": 0.9556294903159142,
+        "word": "ilayakhimi",
+        "start_sec": 194.1,
+        "end_sec": 195.12,
+        "confidence": 0.213734,
         "flagged": false,
-        "emitted_word": "ilaykimi"
+        "emitted_word": "ilayakhimi"
       },
       {
-        "word": "utenelei",
-        "start_sec": 196.11,
-        "end_sec": 196.85,
-        "confidence": 0.9979591250419617,
+        "word": "uthenelei",
+        "start_sec": 195.98,
+        "end_sec": 196.74,
+        "confidence": 0.303491,
         "flagged": false,
-        "emitted_word": "utenhelv'i"
+        "emitted_word": "uthenhele'i"
       },
       {
-        "word": "ilayakimino",
-        "start_sec": 197.5,
-        "end_sec": 198.68,
-        "confidence": 0.989722857872645,
+        "word": "ilayakhimino",
+        "start_sec": 197.36,
+        "end_sec": 198.54,
+        "confidence": 0.148971,
         "flagged": false,
-        "emitted_word": "ilayakiminho"
+        "emitted_word": "ilaykhimino"
       },
       {
-        "word": "eso",
-        "start_sec": 199.86,
-        "end_sec": 200.36,
-        "confidence": 0.9731776416301727,
+        "word": "ehso",
+        "start_sec": 199.7,
+        "end_sec": 200.22,
+        "confidence": 0.909196,
         "flagged": false,
         "emitted_word": "ehso"
       },
       {
-        "word": "utenelei",
-        "start_sec": 200.68,
-        "end_sec": 201.4,
-        "confidence": 0.9358675956726075,
+        "word": "uthenelei",
+        "start_sec": 200.54,
+        "end_sec": 201.26,
+        "confidence": 0.227529,
         "flagged": false,
-        "emitted_word": "utenhele'i"
+        "emitted_word": "uthenhelei"
       }
     ],
     "cherokee_syllabary": "ᏥᎳᏇᎵᏃ ᎠᏆᏯᏗ ᎤᏕᏁᎴᎢ, ᎠᏆᏯᏗᏃ ᎢᎳᏯᎩᎻ ᎤᏕᏁᎴᎢ; ᎢᎳᏯᎩᎻᏃ ᎡᏐ ᎤᏕᏁᎴᎢ;",
     "phonetic": "Tsi-la-que-li-no A-qua-ya-di u-de-ne-le-i, A-qua-ya-di-no I-la-ya-gi-mi u-de-ne-le-i; I-la-ya-gi-mi-no E-so u-de-ne-le-i;",
-    "english": "And Zorobabel begat Abiud; and Abiud begat Eliakim; and Eliakim begat Azor;"
+    "english": "And Zorobabel begat Abiud; and Abiud begat Eliakim; and Eliakim begat Azor;",
+    "has_anomalies": false
   },
   {
     "verse_id": "010114",
@@ -1252,90 +1297,91 @@
     "chapter": 1,
     "verse_idx": 14,
     "audio_path": "cherokee_new_testament/split_audio/matthew_01_14.wav",
-    "start_sec": 205.16,
-    "end_sec": 216.435,
-    "duration_sec": 11.275,
+    "start_sec": 202.04,
+    "end_sec": 216.28,
+    "duration_sec": 14.24,
     "reference_sentence": "ᎡᏐᏃ ᏎᏙᎩ ᎤᏕᏁᎴᎢ; ᏎᏙᎩᏃ ᎡᎩᎻ ᎤᏕᏁᎴᎢ; ᎡᎩᎻᏃ ᎢᎳᏯᏗ ᎤᏕᏁᎴᎢ;",
-    "reconciled_phonetics": "ehsonho hsetoki utenhele'i; setokinho ekimi utenhele'i; ekiminho ilayti utenhele'i;",
-    "asr_hypothesis": "ehsonho hsetoki utenhelv'i setokinho ekima utenhelv'i ekimanho ilayti e utenhelv'i",
-    "cost": 0.052,
+    "reconciled_phonetics": "ehsono hsethokhi uthenhele'i; hsethokhino ekhmi uthenhele'i; hkimno ilayathi uthenhele'i;",
+    "asr_hypothesis": "ehsono hsethokhi uthenhele'i hsethokhino ekhmi uthenhele'i khimno ilayathi uthenhele'i",
+    "cost": -10.597,
     "words": [
       {
-        "word": "esono",
-        "start_sec": 205.16,
-        "end_sec": 205.9,
-        "confidence": 0.9956228392464774,
+        "word": "ehsono",
+        "start_sec": 202.54,
+        "end_sec": 203.2,
+        "confidence": 0.999894,
         "flagged": false,
-        "emitted_word": "ehsonho"
+        "emitted_word": "ehsono"
       },
       {
-        "word": "setoki",
-        "start_sec": 206.2,
-        "end_sec": 206.86,
-        "confidence": 0.999288831438337,
+        "word": "hsethokhi",
+        "start_sec": 206.04,
+        "end_sec": 206.72,
+        "confidence": 0.028431,
         "flagged": false,
-        "emitted_word": "hsetoki"
+        "emitted_word": "hsethokhi"
       },
       {
-        "word": "utenelei",
-        "start_sec": 207.0,
-        "end_sec": 207.74,
-        "confidence": 0.9767700493335724,
+        "word": "uthenelei",
+        "start_sec": 206.86,
+        "end_sec": 207.58,
+        "confidence": 0.235807,
         "flagged": false,
-        "emitted_word": "utenhelv'i"
+        "emitted_word": "uthenhele'i"
       },
       {
-        "word": "setokino",
-        "start_sec": 208.56,
-        "end_sec": 209.46,
-        "confidence": 0.999468015299903,
+        "word": "hsethokhino",
+        "start_sec": 208.4,
+        "end_sec": 209.32,
+        "confidence": 0.135656,
         "flagged": false,
-        "emitted_word": "setokinho"
+        "emitted_word": "hsethokhino"
       },
       {
-        "word": "ekimi",
-        "start_sec": 210.065,
-        "end_sec": 210.625,
-        "confidence": 0.9997691869735718,
-        "flagged": false,
-        "emitted_word": "ekima"
+        "word": "ekhimi",
+        "start_sec": 209.92,
+        "end_sec": 210.48,
+        "confidence": 0.005422,
+        "flagged": true,
+        "emitted_word": "ekhmi"
       },
       {
-        "word": "utenelei",
-        "start_sec": 211.01,
-        "end_sec": 211.77,
-        "confidence": 0.9998264014720917,
+        "word": "uthenelei",
+        "start_sec": 210.86,
+        "end_sec": 211.64,
+        "confidence": 0.239577,
         "flagged": false,
-        "emitted_word": "utenhelv'i"
+        "emitted_word": "uthenhele'i"
       },
       {
-        "word": "ekimino",
-        "start_sec": 212.77,
-        "end_sec": 213.63,
-        "confidence": 0.9998064935207367,
+        "word": "ekhimino",
+        "start_sec": 211.72,
+        "end_sec": 213.48,
+        "confidence": 0.027279,
         "flagged": false,
-        "emitted_word": "ekimanho"
+        "emitted_word": "khimno"
       },
       {
-        "word": "ilayati",
-        "start_sec": 214.05,
-        "end_sec": 214.81,
-        "confidence": 0.9552666544914246,
+        "word": "ilayathi",
+        "start_sec": 213.92,
+        "end_sec": 214.66,
+        "confidence": 0.176237,
         "flagged": false,
-        "emitted_word": "ilayti"
+        "emitted_word": "ilayathi"
       },
       {
-        "word": "utenelei",
-        "start_sec": 215.0,
-        "end_sec": 216.435,
-        "confidence": 0.8387388676404953,
+        "word": "uthenelei",
+        "start_sec": 215.36,
+        "end_sec": 216.28,
+        "confidence": 0.276002,
         "flagged": false,
-        "emitted_word": "e utenhelv'i"
+        "emitted_word": "uthenhele'i"
       }
     ],
     "cherokee_syllabary": "ᎡᏐᏃ ᏎᏙᎩ ᎤᏕᏁᎴᎢ; ᏎᏙᎩᏃ ᎡᎩᎻ ᎤᏕᏁᎴᎢ; ᎡᎩᎻᏃ ᎢᎳᏯᏗ ᎤᏕᏁᎴᎢ;",
     "phonetic": "E-so-no Se-do-gi u-de-ne-le-i; Se-do-gi-no E-gi-mi u-de-ne-le-i; E-gi-mi-no I-la-ya-di u-de-ne-le-i;",
-    "english": "And Azor begat Sadoc; and Sadoc begat Achim; and Achim begat Eliud;"
+    "english": "And Azor begat Sadoc; and Sadoc begat Achim; and Achim begat Eliud;",
+    "has_anomalies": true
   },
   {
     "verse_id": "010115",
@@ -1343,90 +1389,91 @@
     "chapter": 1,
     "verse_idx": 15,
     "audio_path": "cherokee_new_testament/split_audio/matthew_01_15.wav",
-    "start_sec": 217.56,
-    "end_sec": 231.145,
-    "duration_sec": 13.585,
+    "start_sec": 216.92,
+    "end_sec": 230.98,
+    "duration_sec": 14.06,
     "reference_sentence": "ᎢᎳᏯᏗᏃ ᎢᎵᎡᏌ ᎤᏕᏁᎴᎢ; ᎢᎵᎡᏌᏃ ᎹᏓᏂ ᎤᏕᏁᎴᎢ; ᎹᏓᏂᏃ ᏤᎦᏈ ᎤᏕᏁᎴᎢ;",
-    "reconciled_phonetics": "ilayatino iliesa utenhele'iha ili'ehsanho matani utenhele'i v matani'nho tsekakwi utenhele'i;",
-    "asr_hypothesis": "ilayatino ili elha utenhelv'i ha ili'ehsanho v matani utenhelv'i v matani'nho tsekakwi utenhelv'i",
-    "cost": 0.1101,
+    "reconciled_phonetics": "ilayathino ili'ehsa uthenhele'i; ili'ehsanho mathani uthenhele'i; mathanino tsekhakwi uthenhele'i;",
+    "asr_hypothesis": "ilayathino ili'ehsa uthenhele'i ili'ehsanho mathani uthenhele'i mathanino tsekhakwhi uthenhele'i",
+    "cost": -10.4087,
     "words": [
       {
-        "word": "ilayatino",
-        "start_sec": 217.56,
-        "end_sec": 218.78,
-        "confidence": 0.9750635822614034,
+        "word": "ilayathino",
+        "start_sec": 217.42,
+        "end_sec": 218.66,
+        "confidence": 0.25749,
         "flagged": false,
-        "emitted_word": "ilayatino"
+        "emitted_word": "ilayathino"
       },
       {
-        "word": "iliesa",
-        "start_sec": 219.67,
-        "end_sec": 220.55,
-        "confidence": 0.9659148380160332,
+        "word": "iliehsa",
+        "start_sec": 219.54,
+        "end_sec": 220.42,
+        "confidence": 0.209361,
         "flagged": false,
-        "emitted_word": "ili elha"
+        "emitted_word": "ili'ehsa"
       },
       {
-        "word": "utenelei",
-        "start_sec": 220.75,
-        "end_sec": 222.18,
-        "confidence": 0.8532559871673584,
+        "word": "uthenelei",
+        "start_sec": 220.64,
+        "end_sec": 221.38,
+        "confidence": 0.225185,
         "flagged": false,
-        "emitted_word": "utenhelv'i ha"
+        "emitted_word": "uthenhele'i"
       },
       {
-        "word": "iliesano",
-        "start_sec": 222.365,
-        "end_sec": 224.03,
-        "confidence": 0.9651760513132268,
+        "word": "iliehsano",
+        "start_sec": 222.22,
+        "end_sec": 223.22,
+        "confidence": 0.938884,
         "flagged": false,
-        "emitted_word": "ili'ehsanho v"
+        "emitted_word": "ili'ehsanho"
       },
       {
-        "word": "matani",
-        "start_sec": 224.43,
-        "end_sec": 225.09,
-        "confidence": 0.9999276995658875,
+        "word": "mathani",
+        "start_sec": 224.28,
+        "end_sec": 224.92,
+        "confidence": 0.105941,
         "flagged": false,
-        "emitted_word": "matani"
+        "emitted_word": "mathani"
       },
       {
-        "word": "utenelei",
-        "start_sec": 225.54,
-        "end_sec": 226.26,
-        "confidence": 0.9993301928043365,
+        "word": "uthenelei",
+        "start_sec": 225.38,
+        "end_sec": 226.08,
+        "confidence": 0.283202,
         "flagged": false,
-        "emitted_word": "utenhelv'i"
+        "emitted_word": "uthenhele'i"
       },
       {
-        "word": "matanino",
-        "start_sec": 226.765,
-        "end_sec": 227.975,
-        "confidence": 0.7578815639019012,
+        "word": "mathanino",
+        "start_sec": 226.96,
+        "end_sec": 227.82,
+        "confidence": 0.174291,
         "flagged": false,
-        "emitted_word": "v matani'nho"
+        "emitted_word": "mathanino"
       },
       {
-        "word": "tsekakwi",
-        "start_sec": 229.31,
-        "end_sec": 229.83,
-        "confidence": 0.9911899417638779,
+        "word": "tsekhakwhi",
+        "start_sec": 229.16,
+        "end_sec": 229.66,
+        "confidence": 0.070581,
         "flagged": false,
-        "emitted_word": "tsekakwi"
+        "emitted_word": "tsekhakwhi"
       },
       {
-        "word": "utenelei",
-        "start_sec": 230.305,
-        "end_sec": 231.145,
-        "confidence": 0.9965782880783081,
+        "word": "uthenelei",
+        "start_sec": 230.14,
+        "end_sec": 230.98,
+        "confidence": 0.307357,
         "flagged": false,
-        "emitted_word": "utenhelv'i"
+        "emitted_word": "uthenhele'i"
       }
     ],
     "cherokee_syllabary": "ᎢᎳᏯᏗᏃ ᎢᎵᎡᏌ ᎤᏕᏁᎴᎢ; ᎢᎵᎡᏌᏃ ᎹᏓᏂ ᎤᏕᏁᎴᎢ; ᎹᏓᏂᏃ ᏤᎦᏈ ᎤᏕᏁᎴᎢ;",
     "phonetic": "I-la-ya-di-no I-li-e-sa u-de-ne-le-i; I-li-e-sa-no Ma-da-ni u-de-ne-le-i; Ma-da-ni-no Tse-ga-qui u-de-ne-le-i;",
-    "english": "And Eliud begat Eleazar; and Eleazar begat Matthan; and Matthan begat Jacob;"
+    "english": "And Eliud begat Eleazar; and Eleazar begat Matthan; and Matthan begat Jacob;",
+    "has_anomalies": false
   },
   {
     "verse_id": "010116",
@@ -1434,98 +1481,107 @@
     "chapter": 1,
     "verse_idx": 16,
     "audio_path": "cherokee_new_testament/split_audio/matthew_01_16.wav",
-    "start_sec": 231.78,
-    "end_sec": 242.48,
-    "duration_sec": 10.7,
+    "start_sec": 231.12,
+    "end_sec": 242.31,
+    "duration_sec": 11.19,
     "reference_sentence": "ᏤᎦᏈᏃ ᏦᏩ ᎤᏕᏁᎴᎢ, ᎾᏍᎩ ᎺᎵ ᎤᏰᎯ ᎾᏍᎩ ᏧᎾᏄᎪᏫᏎ ᏥᏌ ᎦᎶᏁᏛ ᏣᏃᎭᎰᎢ.",
-    "reconciled_phonetics": "tsekakwinho tsowa utenhele'i, nahski meli uyhehi nahski tsunanukowhihse tsihsa kalonetv tsanohaho'i.",
-    "asr_hypothesis": "tsekakwinho tsowa utanhelv'i nvhskimeli uyhehi nvhski tsunanukowhihse tsihsa kaloneta tsanohseho'i",
-    "cost": 0.0404,
+    "reconciled_phonetics": "tsekhakwino tsowa uthenhele'i, nahskhi meli uyhehi nahskhi tsunanukhowhihse tsihsa khaloneth tsanohaho'i.",
+    "asr_hypothesis": "tsekhakwhino tsowa uthenhele'i nahskhi meli uyhehi nahskhi tsunanukhowhihse tsihsa khaloneth tsanohaho'i",
+    "cost": -6.8321,
     "words": [
       {
-        "word": "tsekakwino",
-        "start_sec": 231.78,
-        "end_sec": 232.54,
-        "confidence": 0.9988044825467196,
+        "word": "tsekhakwhino",
+        "start_sec": 231.62,
+        "end_sec": 232.38,
+        "confidence": 0.127893,
         "flagged": false,
-        "emitted_word": "tsekakwinho"
+        "emitted_word": "tsekhakwhino"
       },
       {
         "word": "tsowa",
-        "start_sec": 232.86,
-        "end_sec": 233.34,
-        "confidence": 0.9997456431388855,
+        "start_sec": 232.7,
+        "end_sec": 233.18,
+        "confidence": 0.994063,
         "flagged": false,
         "emitted_word": "tsowa"
       },
       {
-        "word": "utenelei",
-        "start_sec": 233.6,
-        "end_sec": 234.36,
-        "confidence": 0.9447646677494049,
+        "word": "uthenelei",
+        "start_sec": 233.44,
+        "end_sec": 234.18,
+        "confidence": 0.388629,
         "flagged": false,
-        "emitted_word": "utanhelv'i"
+        "emitted_word": "uthenhele'i"
       },
       {
-        "word": "naski meli",
-        "start_sec": 235.47,
-        "end_sec": 236.23,
-        "confidence": 0.9995726346969604,
+        "word": "nahskhi",
+        "start_sec": 235.3,
+        "end_sec": 235.66,
+        "confidence": 0.172821,
         "flagged": false,
-        "emitted_word": "nvhskimeli"
+        "emitted_word": "nahskhi"
       },
       {
-        "word": "uyei",
-        "start_sec": 236.685,
-        "end_sec": 237.305,
-        "confidence": 0.9995879729588827,
+        "word": "meli",
+        "start_sec": 235.7,
+        "end_sec": 236.06,
+        "confidence": 0.951939,
+        "flagged": false,
+        "emitted_word": "meli"
+      },
+      {
+        "word": "uyehi",
+        "start_sec": 236.52,
+        "end_sec": 237.14,
+        "confidence": 0.998671,
         "flagged": false,
         "emitted_word": "uyhehi"
       },
       {
-        "word": "naski",
-        "start_sec": 238.05,
-        "end_sec": 238.41,
-        "confidence": 0.9360908269882202,
+        "word": "nahskhi",
+        "start_sec": 237.88,
+        "end_sec": 238.24,
+        "confidence": 0.068849,
         "flagged": false,
-        "emitted_word": "nvhski"
+        "emitted_word": "nahskhi"
       },
       {
-        "word": "tsunanukowise",
-        "start_sec": 238.63,
-        "end_sec": 239.73,
-        "confidence": 0.9721832474072775,
+        "word": "tsunanukhowihse",
+        "start_sec": 238.48,
+        "end_sec": 239.56,
+        "confidence": 0.515629,
         "flagged": false,
-        "emitted_word": "tsunanukowhihse"
+        "emitted_word": "tsunanukhowhihse"
       },
       {
-        "word": "tsisa",
-        "start_sec": 239.89,
-        "end_sec": 240.39,
-        "confidence": 0.9341153601805369,
+        "word": "tsihsa",
+        "start_sec": 239.72,
+        "end_sec": 240.22,
+        "confidence": 0.919156,
         "flagged": false,
         "emitted_word": "tsihsa"
       },
       {
-        "word": "kalonetv",
-        "start_sec": 240.82,
-        "end_sec": 241.5,
-        "confidence": 0.9522127881646156,
+        "word": "khalonethv",
+        "start_sec": 240.66,
+        "end_sec": 241.34,
+        "confidence": 0.056651,
         "flagged": false,
-        "emitted_word": "kaloneta"
+        "emitted_word": "khaloneth"
       },
       {
-        "word": "tsanoaoi",
-        "start_sec": 241.6,
-        "end_sec": 242.48,
-        "confidence": 0.9579030424356461,
+        "word": "tsanohahoi",
+        "start_sec": 241.44,
+        "end_sec": 242.32,
+        "confidence": 0.311595,
         "flagged": false,
-        "emitted_word": "tsanohseho'i"
+        "emitted_word": "tsanohaho'i"
       }
     ],
     "cherokee_syllabary": "ᏤᎦᏈᏃ ᏦᏩ ᎤᏕᏁᎴᎢ, ᎾᏍᎩ ᎺᎵ ᎤᏰᎯ ᎾᏍᎩ ᏧᎾᏄᎪᏫᏎ ᏥᏌ ᎦᎶᏁᏛ ᏣᏃᎭᎰᎢ.",
     "phonetic": "Tse-ga-qui-no Tso-wa u-de-ne-le-i, na-s-gi Me-li u-ye-hi na-s-gi tsu-na-nu-go-wi-se Tsi-sa Ga-lo-ne-dv tsa-no-ha-ho-i.",
-    "english": "And Jacob begat Joseph the husband of Mary, of whom was born Jesus, who is called Christ."
+    "english": "And Jacob begat Joseph the husband of Mary, of whom was born Jesus, who is called Christ.",
+    "has_anomalies": false
   },
   {
     "verse_id": "010117",
@@ -1533,258 +1589,275 @@
     "chapter": 1,
     "verse_idx": 17,
     "audio_path": "cherokee_new_testament/split_audio/matthew_01_17.wav",
-    "start_sec": 243.66,
-    "end_sec": 288.02,
-    "duration_sec": 44.36,
+    "start_sec": 243.02,
+    "end_sec": 287.81,
+    "duration_sec": 44.79,
     "reference_sentence": "ᎾᏍᎩᏃ ᏂᎦᏛ ᏄᎾᏓᏁᏟᏴᏒ ᎡᏆᎭᎻ ᏤᎮ ᎾᎯᏳ ᏅᏓᎬᏩᏓᎴᏅᏛ ᏕᏫᏃ ᏤᎮ ᏅᏛᏍᏘ ᏂᎦᏚ ᏄᎾᏓᏁᏟᏴᏎᎢ; ᏕᏫᏃ ᏤᎮ ᎾᎯᏳ ᏅᎵᎬᏩᏓᎴᏅᏛ ᏓᏗᎶᏂᏃ ᏥᏫᏗᎨᎦᏘᏅᏍᏔᏁ ᎾᎯᏳ ᏅᏛᏍᏘ ᏂᎦᏚ ᏄᎾᏓᏁᏟᏴᏎᎢ; ᏓᏗᎶᏂᏃ ᎾᎯᏳ ᏥᏫᏗᎨᎦᏘᏅᏍᏔᏁ ᎤᏓᏳᏓᎴᏅᏛ ᏥᏌᏃ ᏧᏕᏁ ᎾᎯᏳ ᏅᏛᏍᏘ ᏂᎦᏚ ᏄᎾᏓᏁᏟᏴᏎᎢ.",
-    "reconciled_phonetics": "nahskinho nikatv nunatanetliyvhsv ekwahami tsehe nahiyu nvtakvwatalenvtv tewinho tsehe nvtvhsthi nika'tu nuntanetliyvhse'i; tewinho tsehe nahiyu nlikvwatalenvtv tatiloninho tsiwitikekathinhvhsthane nahiyu nvtvhsthi nika'tu nuntanetliyvhse'i; tatiloninho nahiyu tsiwitikekathinhvhsthane utayutalenvtv tsihsanho tsutenhe nahiyu nvtvhsthi nika'tu nunatanetliyvhse'i.",
-    "asr_hypothesis": "nvhskinho nikatv nunatanetliyvhsv ekwo hamitsehe v nahiyu nitakvwatalenvta tewinhotsehe nitvhsti nika'tu nuntanetsiyvhse'i tewinho tsehe nahiyu tsakvwatalenvta tatiloninho tsuwitikekathinhvhsthane nahiyu nitvhsthi nika'tu nuntanetliyvhse'i tataloninho nahiyu tsuwitakekathinhvhsthane nvtvyutalenvta tsihsanho tsulenhe nahiyu nitvhsti nika'tu nunatsanetliyvhse'i",
-    "cost": 0.0425,
+    "reconciled_phonetics": "nahskhinho nikhath nunathanelhyvhsv ekwhami tsehe nahiyu nvthakhvwathalenvthv thwinho tsehe nvthvhsthi nikha'thu nunathanelhiyvhse'i; thewinho tsehe nahiyu nlkhvwathalenvth thathilonin tswithkhekhathinhvhsthane nahiyu nvthvhsthi nikha'thu nunathnelhyvhse'i; thathilonino nahiyu tswithkhkhathinhvhsthane htayuthalenvth tsihsanho tsuthenhe nahiyu nvthvhsthi nikha'thu nunathanelhiyvhse'i.",
+    "asr_hypothesis": "nahskhinho nikhath nunathanetlhhyvhsv ekwhhami tsehe nahiyu nvthakhvwathalenvthv thwinho tsehe nvthvhsthhi nikha'thu nunathanetlhhiyvhse'i thewinho tsehe nahiyu nlkhvwathalenvth thathilonin tswithkhekhathhinhvhsthhane nahiyu nvthvhsthhi nikha'thu nunathnetlhhyvhse'i thathilonino nahiyu tswithkhkhathhinhvhsthhane thayuthalenvth tsihsanho tsuthenhe nahiyu nvthvhsthhi nikha'thu nunathanetlhhiyvhse'i",
+    "cost": -14.5523,
     "words": [
       {
-        "word": "naskino",
-        "start_sec": 243.66,
-        "end_sec": 244.16,
-        "confidence": 0.9250159528520372,
+        "word": "nahskhino",
+        "start_sec": 243.52,
+        "end_sec": 244.0,
+        "confidence": 0.28339,
         "flagged": false,
-        "emitted_word": "nvhskinho"
+        "emitted_word": "nahskhinho"
       },
       {
-        "word": "nikatv",
-        "start_sec": 244.3,
-        "end_sec": 244.82,
-        "confidence": 0.9987990657488505,
+        "word": "nikhathv",
+        "start_sec": 244.14,
+        "end_sec": 244.78,
+        "confidence": 0.020448,
         "flagged": false,
-        "emitted_word": "nikatv"
+        "emitted_word": "nikhath"
       },
       {
-        "word": "nunatanetliyvsv",
-        "start_sec": 245.88,
-        "end_sec": 247.32,
-        "confidence": 0.9928212650120258,
+        "word": "nunathanetlhhiyvhsv",
+        "start_sec": 245.72,
+        "end_sec": 247.16,
+        "confidence": 0.078695,
         "flagged": false,
-        "emitted_word": "nunatanetliyvhsv"
+        "emitted_word": "nunathanetlhhyvhsv"
       },
       {
-        "word": "ekwaami tsee",
-        "start_sec": 247.78,
-        "end_sec": 249.45,
-        "confidence": 0.8860233685484639,
+        "word": "ekwhahami",
+        "start_sec": 247.62,
+        "end_sec": 248.44,
+        "confidence": 0.040138,
         "flagged": false,
-        "emitted_word": "ekwo hamitsehe v"
+        "emitted_word": "ekwhhami"
       },
       {
-        "word": "naiyu",
-        "start_sec": 249.775,
-        "end_sec": 250.255,
-        "confidence": 0.9865556160608927,
-        "flagged": false,
-        "emitted_word": "nahiyu"
-      },
-      {
-        "word": "nvtakvwatalenvtv",
-        "start_sec": 250.395,
-        "end_sec": 251.635,
-        "confidence": 0.9860458299517632,
-        "flagged": false,
-        "emitted_word": "nitakvwatalenvta"
-      },
-      {
-        "word": "tewino tsee",
-        "start_sec": 252.71,
-        "end_sec": 253.89,
-        "confidence": 0.960641140739123,
-        "flagged": false,
-        "emitted_word": "tewinhotsehe"
-      },
-      {
-        "word": "nvtvsti",
-        "start_sec": 254.43,
-        "end_sec": 255.03,
-        "confidence": 0.9941734448075294,
-        "flagged": false,
-        "emitted_word": "nitvhsti"
-      },
-      {
-        "word": "nikatu",
-        "start_sec": 256.15,
-        "end_sec": 256.59,
-        "confidence": 0.9938835842268807,
-        "flagged": false,
-        "emitted_word": "nika'tu"
-      },
-      {
-        "word": "nunatanetliyvsei",
-        "start_sec": 257.05,
-        "end_sec": 258.55,
-        "confidence": 0.9980567413217881,
-        "flagged": false,
-        "emitted_word": "nuntanetsiyvhse'i"
-      },
-      {
-        "word": "tewino",
-        "start_sec": 259.61,
-        "end_sec": 260.09,
-        "confidence": 0.9685308933258057,
-        "flagged": false,
-        "emitted_word": "tewinho"
-      },
-      {
-        "word": "tsee",
-        "start_sec": 260.27,
-        "end_sec": 260.63,
-        "confidence": 0.9813082456588745,
+        "word": "tsehe",
+        "start_sec": 248.52,
+        "end_sec": 248.96,
+        "confidence": 0.993265,
         "flagged": false,
         "emitted_word": "tsehe"
       },
       {
-        "word": "naiyu",
-        "start_sec": 260.71,
-        "end_sec": 261.21,
-        "confidence": 0.999891847372055,
+        "word": "nahiyu",
+        "start_sec": 249.62,
+        "end_sec": 250.1,
+        "confidence": 0.99893,
         "flagged": false,
         "emitted_word": "nahiyu"
       },
       {
-        "word": "nvlikvwatalenvtv",
-        "start_sec": 261.65,
-        "end_sec": 262.83,
-        "confidence": 0.94225598971049,
+        "word": "nvthakhvwathalenvthv",
+        "start_sec": 250.22,
+        "end_sec": 251.58,
+        "confidence": 0.030848,
         "flagged": false,
-        "emitted_word": "tsakvwatalenvta"
+        "emitted_word": "nvthakhvwathalenvthv"
       },
       {
-        "word": "tatilonino",
-        "start_sec": 263.98,
-        "end_sec": 264.9,
-        "confidence": 0.978067853234031,
+        "word": "thewino",
+        "start_sec": 252.56,
+        "end_sec": 253.08,
+        "confidence": 0.54589,
         "flagged": false,
-        "emitted_word": "tatiloninho"
+        "emitted_word": "thwinho"
       },
       {
-        "word": "tsiwitikekatinvstane",
-        "start_sec": 265.3,
-        "end_sec": 267.14,
-        "confidence": 0.9626291245222092,
+        "word": "tsehe",
+        "start_sec": 253.32,
+        "end_sec": 253.72,
+        "confidence": 0.993765,
         "flagged": false,
-        "emitted_word": "tsuwitikekathinhvhsthane"
+        "emitted_word": "tsehe"
       },
       {
-        "word": "naiyu",
-        "start_sec": 268.16,
-        "end_sec": 268.6,
-        "confidence": 0.9901649157206217,
+        "word": "nvthvhsthhi",
+        "start_sec": 254.24,
+        "end_sec": 254.86,
+        "confidence": 0.06681,
+        "flagged": false,
+        "emitted_word": "nvthvhsthhi"
+      },
+      {
+        "word": "nikhathu",
+        "start_sec": 255.98,
+        "end_sec": 256.4,
+        "confidence": 0.051481,
+        "flagged": false,
+        "emitted_word": "nikha'thu"
+      },
+      {
+        "word": "nunathanetlhhiyvhsei",
+        "start_sec": 256.88,
+        "end_sec": 258.36,
+        "confidence": 0.120699,
+        "flagged": false,
+        "emitted_word": "nunathanetlhhiyvhse'i"
+      },
+      {
+        "word": "thewino",
+        "start_sec": 259.42,
+        "end_sec": 259.9,
+        "confidence": 0.239047,
+        "flagged": false,
+        "emitted_word": "thewinho"
+      },
+      {
+        "word": "tsehe",
+        "start_sec": 260.08,
+        "end_sec": 260.44,
+        "confidence": 0.76137,
+        "flagged": false,
+        "emitted_word": "tsehe"
+      },
+      {
+        "word": "nahiyu",
+        "start_sec": 260.52,
+        "end_sec": 261.04,
+        "confidence": 0.987511,
         "flagged": false,
         "emitted_word": "nahiyu"
       },
       {
-        "word": "nvtvsti",
-        "start_sec": 268.8,
-        "end_sec": 269.38,
-        "confidence": 0.9997221893734403,
+        "word": "nvlikhvwathalenvthv",
+        "start_sec": 261.36,
+        "end_sec": 262.64,
+        "confidence": 0.044597,
         "flagged": false,
-        "emitted_word": "nitvhsthi"
+        "emitted_word": "nlkhvwathalenvth"
       },
       {
-        "word": "nikatu",
-        "start_sec": 270.02,
-        "end_sec": 270.5,
-        "confidence": 0.9331655842917306,
+        "word": "thathilonino",
+        "start_sec": 262.74,
+        "end_sec": 264.58,
+        "confidence": 0.055936,
         "flagged": false,
-        "emitted_word": "nika'tu"
+        "emitted_word": "thathilonin"
       },
       {
-        "word": "nunatanetliyvsei",
-        "start_sec": 271.135,
-        "end_sec": 272.535,
-        "confidence": 0.9757547974586487,
+        "word": "tsiwithikhekhathhinvhsthhane",
+        "start_sec": 265.12,
+        "end_sec": 266.96,
+        "confidence": 0.256783,
         "flagged": false,
-        "emitted_word": "nuntanetliyvhse'i"
+        "emitted_word": "tswithkhekhathhinhvhsthhane"
       },
       {
-        "word": "tatilonino",
-        "start_sec": 273.25,
-        "end_sec": 274.17,
-        "confidence": 0.9754132357510653,
-        "flagged": false,
-        "emitted_word": "tataloninho"
-      },
-      {
-        "word": "naiyu",
-        "start_sec": 274.61,
-        "end_sec": 275.11,
-        "confidence": 0.9997032781442007,
+        "word": "nahiyu",
+        "start_sec": 268.0,
+        "end_sec": 268.42,
+        "confidence": 0.997704,
         "flagged": false,
         "emitted_word": "nahiyu"
       },
       {
-        "word": "tsiwitikekatinvstane",
-        "start_sec": 276.13,
-        "end_sec": 277.91,
-        "confidence": 0.9529017408688863,
+        "word": "nvthvhsthhi",
+        "start_sec": 268.62,
+        "end_sec": 269.2,
+        "confidence": 0.135923,
         "flagged": false,
-        "emitted_word": "tsuwitakekathinhvhsthane"
+        "emitted_word": "nvthvhsthhi"
       },
       {
-        "word": "utayutalenvtv",
-        "start_sec": 279.18,
-        "end_sec": 280.3,
-        "confidence": 0.9412156194448471,
+        "word": "nikhathu",
+        "start_sec": 269.84,
+        "end_sec": 270.32,
+        "confidence": 0.047475,
         "flagged": false,
-        "emitted_word": "nvtvyutalenvta"
+        "emitted_word": "nikha'thu"
       },
       {
-        "word": "tsisano",
-        "start_sec": 280.645,
-        "end_sec": 281.225,
-        "confidence": 0.9994076490402222,
+        "word": "nunathanetlhhiyvhsei",
+        "start_sec": 270.94,
+        "end_sec": 272.34,
+        "confidence": 0.122309,
+        "flagged": false,
+        "emitted_word": "nunathnetlhhyvhse'i"
+      },
+      {
+        "word": "thathilonino",
+        "start_sec": 273.08,
+        "end_sec": 274.0,
+        "confidence": 0.151283,
+        "flagged": false,
+        "emitted_word": "thathilonino"
+      },
+      {
+        "word": "nahiyu",
+        "start_sec": 274.44,
+        "end_sec": 274.94,
+        "confidence": 0.999623,
+        "flagged": false,
+        "emitted_word": "nahiyu"
+      },
+      {
+        "word": "tsiwithikhekhathhinvhsthhane",
+        "start_sec": 275.96,
+        "end_sec": 277.72,
+        "confidence": 0.272771,
+        "flagged": false,
+        "emitted_word": "tswithkhkhathhinhvhsthhane"
+      },
+      {
+        "word": "uthayuthalenvthv",
+        "start_sec": 277.82,
+        "end_sec": 280.12,
+        "confidence": 0.026061,
+        "flagged": false,
+        "emitted_word": "thayuthalenvth"
+      },
+      {
+        "word": "tsihsano",
+        "start_sec": 280.48,
+        "end_sec": 281.02,
+        "confidence": 0.991278,
         "flagged": false,
         "emitted_word": "tsihsanho"
       },
       {
-        "word": "tsutene",
-        "start_sec": 281.91,
-        "end_sec": 282.65,
-        "confidence": 0.9612273648381233,
+        "word": "tsuthene",
+        "start_sec": 281.72,
+        "end_sec": 282.46,
+        "confidence": 0.292064,
         "flagged": false,
-        "emitted_word": "tsulenhe"
+        "emitted_word": "tsuthenhe"
       },
       {
-        "word": "naiyu",
-        "start_sec": 283.37,
-        "end_sec": 283.83,
-        "confidence": 0.9938107629617056,
+        "word": "nahiyu",
+        "start_sec": 283.18,
+        "end_sec": 283.64,
+        "confidence": 0.996276,
         "flagged": false,
         "emitted_word": "nahiyu"
       },
       {
-        "word": "nvtvsti",
-        "start_sec": 283.97,
-        "end_sec": 284.61,
-        "confidence": 0.9999068826436996,
+        "word": "nvthvhsthhi",
+        "start_sec": 283.78,
+        "end_sec": 284.42,
+        "confidence": 0.033781,
         "flagged": false,
-        "emitted_word": "nitvhsti"
+        "emitted_word": "nvthvhsthhi"
       },
       {
-        "word": "nikatu",
-        "start_sec": 285.38,
-        "end_sec": 285.82,
-        "confidence": 0.9298940215791974,
+        "word": "nikhathu",
+        "start_sec": 285.16,
+        "end_sec": 285.62,
+        "confidence": 0.046344,
         "flagged": false,
-        "emitted_word": "nika'tu"
+        "emitted_word": "nikha'thu"
       },
       {
-        "word": "nunatanetliyvsei",
-        "start_sec": 286.44,
-        "end_sec": 288.02,
-        "confidence": 0.9850147868457594,
+        "word": "nunathanetlhhiyvhsei",
+        "start_sec": 286.24,
+        "end_sec": 287.82,
+        "confidence": 0.147948,
         "flagged": false,
-        "emitted_word": "nunatsanetliyvhse'i"
+        "emitted_word": "nunathanetlhhiyvhse'i"
       }
     ],
     "cherokee_syllabary": "ᎾᏍᎩᏃ ᏂᎦᏛ ᏄᎾᏓᏁᏟᏴᏒ ᎡᏆᎭᎻ ᏤᎮ ᎾᎯᏳ ᏅᏓᎬᏩᏓᎴᏅᏛ ᏕᏫᏃ ᏤᎮ ᏅᏛᏍᏘ ᏂᎦᏚ ᏄᎾᏓᏁᏟᏴᏎᎢ; ᏕᏫᏃ ᏤᎮ ᎾᎯᏳ ᏅᎵᎬᏩᏓᎴᏅᏛ ᏓᏗᎶᏂᏃ ᏥᏫᏗᎨᎦᏘᏅᏍᏔᏁ ᎾᎯᏳ ᏅᏛᏍᏘ ᏂᎦᏚ ᏄᎾᏓᏁᏟᏴᏎᎢ; ᏓᏗᎶᏂᏃ ᎾᎯᏳ ᏥᏫᏗᎨᎦᏘᏅᏍᏔᏁ ᎤᏓᏳᏓᎴᏅᏛ ᏥᏌᏃ ᏧᏕᏁ ᎾᎯᏳ ᏅᏛᏍᏘ ᏂᎦᏚ ᏄᎾᏓᏁᏟᏴᏎᎢ.",
     "phonetic": "Na-s-gi-no ni-ga-dv nu-na-da-ne-tli-yv-sv E-qua-ha-mi tse-he na-hi-yu nv-da-gv-wa-da-le-nv-dv De-wi-no tse-he nv-dv-s-ti ni-ga-du nu-na-da-ne-tli-yv-se-i; De-wi-no tse-he na-hi-yu nv-li-gv-wa-da-le-nv-dv Da-di-lo-ni-no tsi-wi-di-ge-ga-ti-nv-s-ta-ne na-hi-yu nv-dv-s-ti ni-ga-du nu-na-da-ne-tli-yv-se-i; Da-di-lo-ni-no na-hi-yu tsi-wi-di-ge-ga-ti-nv-s-ta-ne u-da-yu-da-le-nv-dv Tsi-sa-no tsu-de-ne na-hi-yu nv-dv-s-ti ni-ga-du nu-na-da-ne-tli-yv-se-i.",
-    "english": "So all the generations from Abraham to David are fourteen generations; and from David until the carrying away into Babylon are fourteen generations; and from the carrying away into Babylon unto Christ are fourteen generations."
+    "english": "So all the generations from Abraham to David are fourteen generations; and from David until the carrying away into Babylon are fourteen generations; and from the carrying away into Babylon unto Christ are fourteen generations.",
+    "has_anomalies": false
   },
   {
     "verse_id": "010118",
@@ -1792,154 +1865,171 @@
     "chapter": 1,
     "verse_idx": 18,
     "audio_path": "cherokee_new_testament/split_audio/matthew_01_18.wav",
-    "start_sec": 289.13,
-    "end_sec": 309.08,
-    "duration_sec": 19.95,
+    "start_sec": 288.44,
+    "end_sec": 308.85,
+    "duration_sec": 20.41,
     "reference_sentence": "ᎾᏍᎩᏃ ᎯᎠ ᏄᎵᏍᏔᏂᏙᎴ ᎤᏕᏅ ᏥᏌ ᎦᎶᏁᏛ.  ᎾᏍᎩ ᎺᎵ ᏥᏌ ᎤᏥ ᏦᏩ ᎤᏓᏴᏍᏗ, ᎠᏏᏉ ᏂᏓᎾᏤᎬᎾ ᎨᏎᎢ, ᎤᏁᎵᏤ ᎦᎸᏉᏗᏳ ᎠᏓᏅᏙ ᎤᏓᏅᏖᎸᎯ.",
-    "reconciled_phonetics": "nahskinho hi'a nulhsthanitole utenhv tsihsa kalonetv.  nahski meli tsihsa' utsi tsowa utayhvhsti v ahsikwo nitanatshekvna kehse'i, unelitse kalvkwtiyu atanto utanhthelhvhi.",
-    "asr_hypothesis": "nvhskinho hi'a nulhstvitole utenhv tsihsa kaloneta nvhskimeli tsihsa'utsi tsokwa utayhvhsti v ahsikwu nitanvtshekvna ahi kehse'i unelitse kalvkwhtiyu ata to utanhthelhvhi",
-    "cost": 0.0733,
+    "reconciled_phonetics": "nahskhino hi'a nulihsthnithole uthenhv tsihsa khaloneth.  nahskhi meli tsihsa utsi tsowa uthyhvhsthi, ahsikwo nithanatshekhvna khehse'i, unelitse khalvkwthiyu athantho uthanvhthelhvhi.",
+    "asr_hypothesis": "nahskhino hi'a nulihsthhnithole uthenhv tsihsa khaloneth nahskhi meli tsihsa utsi tsowa uthyhvhsthi ahsikwho nithanatshekhvna khehse'i unelitse khalvkwhthiyu athantho uthanvhthhelhvhi",
+    "cost": -14.1044,
     "words": [
       {
-        "word": "naskino",
-        "start_sec": 289.13,
-        "end_sec": 289.65,
-        "confidence": 0.9384771585464478,
+        "word": "nahskhino",
+        "start_sec": 288.94,
+        "end_sec": 289.44,
+        "confidence": 0.269173,
         "flagged": false,
-        "emitted_word": "nvhskinho"
+        "emitted_word": "nahskhino"
       },
       {
-        "word": "ia",
-        "start_sec": 289.81,
-        "end_sec": 290.07,
-        "confidence": 0.9996932744979858,
+        "word": "hia",
+        "start_sec": 289.62,
+        "end_sec": 289.86,
+        "confidence": 0.998421,
         "flagged": false,
         "emitted_word": "hi'a"
       },
       {
-        "word": "nulistanitole",
-        "start_sec": 290.39,
-        "end_sec": 291.57,
-        "confidence": 0.9758138706286749,
+        "word": "nulihsthhanithole",
+        "start_sec": 290.2,
+        "end_sec": 291.36,
+        "confidence": 0.100628,
         "flagged": false,
-        "emitted_word": "nulhstvitole"
+        "emitted_word": "nulihsthhnithole"
       },
       {
-        "word": "utenv",
-        "start_sec": 292.46,
-        "end_sec": 293.0,
-        "confidence": 0.9469675024350485,
+        "word": "uthenv",
+        "start_sec": 292.26,
+        "end_sec": 292.8,
+        "confidence": 0.180923,
         "flagged": false,
-        "emitted_word": "utenhv"
+        "emitted_word": "uthenhv"
       },
       {
-        "word": "tsisa",
-        "start_sec": 293.29,
-        "end_sec": 293.69,
-        "confidence": 0.9601571957270304,
+        "word": "tsihsa",
+        "start_sec": 293.1,
+        "end_sec": 293.48,
+        "confidence": 0.999788,
         "flagged": false,
         "emitted_word": "tsihsa"
       },
       {
-        "word": "kalonetv",
-        "start_sec": 294.05,
-        "end_sec": 294.61,
-        "confidence": 0.9998117238283157,
+        "word": "khalonethv",
+        "start_sec": 293.84,
+        "end_sec": 294.42,
+        "confidence": 0.049061,
         "flagged": false,
-        "emitted_word": "kaloneta"
+        "emitted_word": "khaloneth"
       },
       {
-        "word": "naski meli",
-        "start_sec": 295.25,
-        "end_sec": 296.07,
-        "confidence": 0.9507862746715545,
+        "word": "nahskhi",
+        "start_sec": 295.06,
+        "end_sec": 295.4,
+        "confidence": 0.211484,
         "flagged": false,
-        "emitted_word": "nvhskimeli"
+        "emitted_word": "nahskhi"
       },
       {
-        "word": "tsisa utsi",
-        "start_sec": 296.37,
-        "end_sec": 297.37,
-        "confidence": 0.9650441950017755,
+        "word": "meli",
+        "start_sec": 295.46,
+        "end_sec": 295.88,
+        "confidence": 0.999426,
         "flagged": false,
-        "emitted_word": "tsihsa'utsi"
+        "emitted_word": "meli"
+      },
+      {
+        "word": "tsihsa",
+        "start_sec": 296.18,
+        "end_sec": 296.7,
+        "confidence": 0.978975,
+        "flagged": false,
+        "emitted_word": "tsihsa"
+      },
+      {
+        "word": "utsi",
+        "start_sec": 296.84,
+        "end_sec": 297.16,
+        "confidence": 0.474756,
+        "flagged": false,
+        "emitted_word": "utsi"
       },
       {
         "word": "tsowa",
-        "start_sec": 297.715,
-        "end_sec": 298.115,
-        "confidence": 0.9319436848163605,
+        "start_sec": 297.52,
+        "end_sec": 297.92,
+        "confidence": 0.487632,
         "flagged": false,
-        "emitted_word": "tsokwa"
+        "emitted_word": "tsowa"
       },
       {
-        "word": "utayvsti",
-        "start_sec": 298.235,
-        "end_sec": 299.68,
-        "confidence": 0.8328406006097794,
+        "word": "uthayvhsthi",
+        "start_sec": 298.04,
+        "end_sec": 298.9,
+        "confidence": 0.125924,
         "flagged": false,
-        "emitted_word": "utayhvhsti v"
+        "emitted_word": "uthyhvhsthi"
       },
       {
-        "word": "asikwo",
-        "start_sec": 300.045,
-        "end_sec": 300.605,
-        "confidence": 0.9279816917010716,
+        "word": "ahsikwho",
+        "start_sec": 299.84,
+        "end_sec": 300.66,
+        "confidence": 0.029411,
         "flagged": false,
-        "emitted_word": "ahsikwu"
+        "emitted_word": "ahsikwho"
       },
       {
-        "word": "nitanatsekvna",
-        "start_sec": 301.085,
-        "end_sec": 302.73,
-        "confidence": 0.8897204583599454,
+        "word": "nithanatsekhvna",
+        "start_sec": 300.88,
+        "end_sec": 301.92,
+        "confidence": 0.118039,
         "flagged": false,
-        "emitted_word": "nitanvtshekvna ahi"
+        "emitted_word": "nithanatshekhvna"
       },
       {
-        "word": "kesei",
-        "start_sec": 302.995,
-        "end_sec": 303.555,
-        "confidence": 0.9995280163628715,
+        "word": "khehsei",
+        "start_sec": 302.0,
+        "end_sec": 303.34,
+        "confidence": 0.065325,
         "flagged": false,
-        "emitted_word": "kehse'i"
+        "emitted_word": "khehse'i"
       },
       {
         "word": "unelitse",
-        "start_sec": 304.42,
-        "end_sec": 305.12,
-        "confidence": 0.9454110935330391,
+        "start_sec": 304.24,
+        "end_sec": 304.9,
+        "confidence": 0.99638,
         "flagged": false,
         "emitted_word": "unelitse"
       },
       {
-        "word": "kalvkwotiyu",
-        "start_sec": 305.4,
-        "end_sec": 306.1,
-        "confidence": 0.9877901510758833,
+        "word": "khalvkwhothiyu",
+        "start_sec": 305.2,
+        "end_sec": 305.9,
+        "confidence": 0.243829,
         "flagged": false,
-        "emitted_word": "kalvkwhtiyu"
+        "emitted_word": "khalvkwhthiyu"
       },
       {
-        "word": "atanvto",
-        "start_sec": 306.34,
-        "end_sec": 307.07,
-        "confidence": 0.9997404366731644,
+        "word": "athanvtho",
+        "start_sec": 306.14,
+        "end_sec": 306.86,
+        "confidence": 0.084591,
         "flagged": false,
-        "emitted_word": "ata to"
+        "emitted_word": "athantho"
       },
       {
-        "word": "utanvtelvi",
-        "start_sec": 307.88,
-        "end_sec": 309.08,
-        "confidence": 0.9552502907239474,
+        "word": "uthanvthhelvhi",
+        "start_sec": 306.98,
+        "end_sec": 308.86,
+        "confidence": 0.126429,
         "flagged": false,
-        "emitted_word": "utanhthelhvhi"
+        "emitted_word": "uthanvhthhelhvhi"
       }
     ],
     "cherokee_syllabary": "ᎾᏍᎩᏃ ᎯᎠ ᏄᎵᏍᏔᏂᏙᎴ ᎤᏕᏅ ᏥᏌ ᎦᎶᏁᏛ.  ᎾᏍᎩ ᎺᎵ ᏥᏌ ᎤᏥ ᏦᏩ ᎤᏓᏴᏍᏗ, ᎠᏏᏉ ᏂᏓᎾᏤᎬᎾ ᎨᏎᎢ, ᎤᏁᎵᏤ ᎦᎸᏉᏗᏳ ᎠᏓᏅᏙ ᎤᏓᏅᏖᎸᎯ.",
     "phonetic": "Na-s-gi-no hi-a nu-li-s-ta-ni-do-le u-de-nv Tsi-sa Ga-lo-ne-dv.  Na-s-gi Me-li Tsi-sa u-tsi Tso-wa u-da-yv-s-di, a-si-quo ni-da-na-tse-gv-na ge-se-i, u-ne-li-tse Ga-lv-quo-di-yu A-da-nv-do u-da-nv-te-lv-hi.",
-    "english": "Now the birth of Jesus Christ was on this wise: When as his mother Mary was espoused to Joseph, before they came together, she was found with child of the Holy Ghost."
+    "english": "Now the birth of Jesus Christ was on this wise: When as his mother Mary was espoused to Joseph, before they came together, she was found with child of the Holy Ghost.",
+    "has_anomalies": false
   },
   {
     "verse_id": "010119",
@@ -1947,146 +2037,155 @@
     "chapter": 1,
     "verse_idx": 19,
     "audio_path": "cherokee_new_testament/split_audio/matthew_01_19.wav",
-    "start_sec": 310.42,
-    "end_sec": 328.1,
-    "duration_sec": 17.68,
+    "start_sec": 309.7,
+    "end_sec": 327.87,
+    "duration_sec": 18.17,
     "reference_sentence": "ᏦᏩ ᎾᏍᎩ Ꮎ ᏧᎾᏨᏍᏗ ᎤᏓᏅᏘᏳ ᎨᏒ ᎢᏳᏍᏗ, ᎠᎴ ᏄᏚᎵᏍᎬᎾ ᎨᏒ ᎢᏳᏍᏗ ᎬᏂᎨᏒ ᎤᏕᎰᎯᏍᏙᏗᏱ, ᎤᏕᎵᏛᏉ ᎢᏴᏛ ᏮᏓᏥᏯᎧᏂ, ᎤᏪᎵᏎᎢ.",
-    "reconciled_phonetics": "tsowa nahski na tsunatshvhsti utanhthiyhu kehsv iyuhsti, ale nutulihskvna kehsv' iyuhsti' kvnikehshv utehohihstohtiyi, utelitvkwo iyvtv wvtatsiyahkhanhi, uwelihse'i.",
-    "asr_hypothesis": "tsowan nvhski na tsunatshvhsti utanhthiyhu ukehsv iyuhsti ilanitulihskvna kehsv'i iyuhsti s'i kvnikehshv utehohihstohtiye utelitakwu iyvta wutatsiyahkhanhi uwelihse'i",
-    "cost": 0.0701,
+    "reconciled_phonetics": "tsowa nahskhi na tsunatsvhsthi htanhvhthiyu khsv iyuhsthi, al nuthulihskhvna khsv iyuhsthi khvnikhsv uthhohihsthohthiyi, uthelithkw iyvth wthtsiyakhanhi, uwelihse'i.",
+    "asr_hypothesis": "tsowa nahskhi na tsunatsvhsthi thanhvhthhiyu khhsv iyuhsthi al nuthulihskhvna khhsv iyuhsthi khvnikhhsv uthhohihsthohthiyi uthelithkwh iyvth wthtsiyakhhanhi uwelihse'i",
+    "cost": -10.4318,
     "words": [
       {
         "word": "tsowa",
-        "start_sec": 310.42,
-        "end_sec": 310.82,
-        "confidence": 0.9718506236871084,
+        "start_sec": 310.2,
+        "end_sec": 310.52,
+        "confidence": 0.88818,
         "flagged": false,
-        "emitted_word": "tsowan"
+        "emitted_word": "tsowa"
       },
       {
-        "word": "naski",
-        "start_sec": 310.92,
-        "end_sec": 311.34,
-        "confidence": 0.9993168512980143,
+        "word": "nahskhi",
+        "start_sec": 310.7,
+        "end_sec": 311.14,
+        "confidence": 0.086343,
         "flagged": false,
-        "emitted_word": "nvhski"
+        "emitted_word": "nahskhi"
       },
       {
         "word": "na",
-        "start_sec": 311.62,
-        "end_sec": 311.74,
-        "confidence": 0.9991719424724579,
+        "start_sec": 311.4,
+        "end_sec": 311.52,
+        "confidence": 0.992527,
         "flagged": false,
         "emitted_word": "na"
       },
       {
-        "word": "tsunatsvsti",
-        "start_sec": 312.41,
-        "end_sec": 313.21,
-        "confidence": 0.946810979109544,
+        "word": "tsunatsvhsthi",
+        "start_sec": 312.2,
+        "end_sec": 313.0,
+        "confidence": 0.405807,
         "flagged": false,
-        "emitted_word": "tsunatshvhsti"
+        "emitted_word": "tsunatsvhsthi"
       },
       {
-        "word": "utanvtiyu",
-        "start_sec": 314.17,
-        "end_sec": 314.97,
-        "confidence": 0.9301259951158003,
+        "word": "uthanvthhiyu",
+        "start_sec": 313.08,
+        "end_sec": 314.76,
+        "confidence": 0.065986,
         "flagged": false,
-        "emitted_word": "utanhthiyhu"
+        "emitted_word": "thanhvhthhiyu"
       },
       {
-        "word": "kesv",
-        "start_sec": 315.19,
-        "end_sec": 315.59,
-        "confidence": 0.9789887269337972,
+        "word": "khehsv",
+        "start_sec": 315.04,
+        "end_sec": 315.38,
+        "confidence": 0.997137,
         "flagged": false,
-        "emitted_word": "ukehsv"
+        "emitted_word": "khhsv"
       },
       {
-        "word": "iyusti",
-        "start_sec": 315.73,
-        "end_sec": 316.25,
-        "confidence": 0.9995824268886021,
+        "word": "iyuhsthi",
+        "start_sec": 315.52,
+        "end_sec": 316.04,
+        "confidence": 0.174003,
         "flagged": false,
-        "emitted_word": "iyuhsti"
+        "emitted_word": "iyuhsthi"
       },
       {
-        "word": "ale nutuliskvna",
-        "start_sec": 317.37,
-        "end_sec": 318.49,
-        "confidence": 0.9814297278722127,
+        "word": "ale",
+        "start_sec": 317.16,
+        "end_sec": 317.22,
+        "confidence": 0.199626,
         "flagged": false,
-        "emitted_word": "ilanitulihskvna"
+        "emitted_word": "al"
       },
       {
-        "word": "kesv",
-        "start_sec": 318.67,
-        "end_sec": 319.15,
-        "confidence": 0.941624573298863,
+        "word": "nuthulihskhvna",
+        "start_sec": 317.34,
+        "end_sec": 318.28,
+        "confidence": 0.176216,
         "flagged": false,
-        "emitted_word": "kehsv'i"
+        "emitted_word": "nuthulihskhvna"
       },
       {
-        "word": "iyusti",
-        "start_sec": 319.25,
-        "end_sec": 319.73,
-        "confidence": 0.9999347840036664,
+        "word": "khehsv",
+        "start_sec": 318.44,
+        "end_sec": 318.76,
+        "confidence": 0.860969,
         "flagged": false,
-        "emitted_word": "iyuhsti"
+        "emitted_word": "khhsv"
       },
       {
-        "word": "kvnikesv",
-        "start_sec": 320.06,
-        "end_sec": 321.2,
-        "confidence": 0.878853976726532,
+        "word": "iyuhsthi",
+        "start_sec": 319.02,
+        "end_sec": 319.52,
+        "confidence": 0.244321,
         "flagged": false,
-        "emitted_word": "s'i kvnikehshv"
+        "emitted_word": "iyuhsthi"
       },
       {
-        "word": "uteoistotiyi",
-        "start_sec": 321.38,
-        "end_sec": 322.68,
-        "confidence": 0.9409777484834194,
+        "word": "khvnikhehsv",
+        "start_sec": 320.24,
+        "end_sec": 320.96,
+        "confidence": 0.516238,
         "flagged": false,
-        "emitted_word": "utehohihstohtiye"
+        "emitted_word": "khvnikhhsv"
       },
       {
-        "word": "utelitvkwo",
-        "start_sec": 323.495,
-        "end_sec": 324.295,
-        "confidence": 0.9976496994495392,
+        "word": "uthehohihsthothiyi",
+        "start_sec": 321.18,
+        "end_sec": 322.46,
+        "confidence": 0.233662,
         "flagged": false,
-        "emitted_word": "utelitakwu"
+        "emitted_word": "uthhohihsthohthiyi"
       },
       {
-        "word": "iyvtv",
-        "start_sec": 324.435,
-        "end_sec": 324.855,
-        "confidence": 0.9347100973129272,
+        "word": "uthelithvkwho",
+        "start_sec": 323.28,
+        "end_sec": 324.16,
+        "confidence": 0.025697,
         "flagged": false,
-        "emitted_word": "iyvta"
+        "emitted_word": "uthelithkwh"
       },
       {
-        "word": "wvtatsiyakani",
-        "start_sec": 325.33,
-        "end_sec": 326.39,
-        "confidence": 0.9756695292890072,
+        "word": "iyvthv",
+        "start_sec": 324.22,
+        "end_sec": 324.64,
+        "confidence": 0.075721,
         "flagged": false,
-        "emitted_word": "wutatsiyahkhanhi"
+        "emitted_word": "iyvth"
       },
       {
-        "word": "uwelisei",
-        "start_sec": 327.0,
-        "end_sec": 328.1,
-        "confidence": 0.9976427674293518,
+        "word": "wvthatsiyakhhani",
+        "start_sec": 325.1,
+        "end_sec": 326.14,
+        "confidence": 0.483888,
+        "flagged": false,
+        "emitted_word": "wthtsiyakhhanhi"
+      },
+      {
+        "word": "uwelihsei",
+        "start_sec": 326.78,
+        "end_sec": 327.88,
+        "confidence": 0.869043,
         "flagged": false,
         "emitted_word": "uwelihse'i"
       }
     ],
     "cherokee_syllabary": "ᏦᏩ ᎾᏍᎩ Ꮎ ᏧᎾᏨᏍᏗ ᎤᏓᏅᏘᏳ ᎨᏒ ᎢᏳᏍᏗ, ᎠᎴ ᏄᏚᎵᏍᎬᎾ ᎨᏒ ᎢᏳᏍᏗ ᎬᏂᎨᏒ ᎤᏕᎰᎯᏍᏙᏗᏱ, ᎤᏕᎵᏛᏉ ᎢᏴᏛ ᏮᏓᏥᏯᎧᏂ, ᎤᏪᎵᏎᎢ.",
     "phonetic": "Tso-wa na-s-gi na tsu-na-tsv-s-di u-da-nv-ti-yu ge-sv i-yu-s-di, a-le nu-du-li-s-gv-na ge-sv i-yu-s-di gv-ni-ge-sv u-de-ho-hi-s-do-di-yi, u-de-li-dv-quo i-yv-dv wv-da-tsi-ya-ka-ni, u-we-li-se-i.",
-    "english": "Then Joseph her husband, being a just man, and not willing to make her a publick example, was minded to put her away privily."
+    "english": "Then Joseph her husband, being a just man, and not willing to make her a publick example, was minded to put her away privily.",
+    "has_anomalies": false
   },
   {
     "verse_id": "010120",
@@ -2094,226 +2193,243 @@
     "chapter": 1,
     "verse_idx": 20,
     "audio_path": "cherokee_new_testament/split_audio/matthew_01_20.wav",
-    "start_sec": 329.08,
-    "end_sec": 360.61,
-    "duration_sec": 31.53,
+    "start_sec": 328.36,
+    "end_sec": 360.35,
+    "duration_sec": 31.99,
     "reference_sentence": "ᎠᏎᏃ ᎠᏏᏉ ᎯᎠ ᎾᏍᎩ ᏄᏍᏕ ᎠᏓᏅᏖᏍᎨᎢ, ᎬᏂᏳᏉ ᏗᎧᎿᎭᏩᏗᏙᎯ ᏱᎰᏩ ᎤᏅᏏᏛ ᎬᏂᎨᏒ ᏄᏛᏁᎴ ᎠᏍᎩᏓᏍᎬᎢ, ᎯᎠ ᏂᎦᏪᏍᎨᎢ; ᏦᏩ, ᏕᏫ ᎤᏪᏥ, ᏞᏍᏗ ᏣᏍᎦᎸ ᎯᏯᏅᏗᏱ ᎺᎵ ᏣᏓᏴᏍᏗ, ᎾᏍᎩᏰᏃ Ꮎ ᏥᎦᏁᎵ ᎦᎸᏉᏗᏳ ᎠᏓᏅᏙ ᎤᏓᏅᏖᎸᎯ;",
-    "reconciled_phonetics": "ahsenho ahsikwo hi'a nahski nuhste atanhthehske'i, kvnhiyukwo tikhanhahwatitohi yihowa unvhsitv khvnikehsv nutvnhele ahskitskv'i, hi'a nikawehske'i i tsowa, tewi uwetsi, lhehsti tsahskalv hiyanvtiyi meli tsatayhvhsti v nahskiyhenho na tsikaneli kalvkwtiyu atanhto utanthelhvhi;",
-    "asr_hypothesis": "ahsenho ahsikwu hi'a nvhskinulhstey atanhthehske'i tvnhiyukwu tikhanowatitohi yihowa unvhsita khvni kehsv nutvnhelv se v ahskilhskv'i hi'anikawehske'i i tsowa tewi uwetsi lhehsti tsvhskalv hiyanv tiye meli tsatayhvhsti v nvhskiyhvnho na tsikvneli kalvkwhtiyu atanhto utanlhelhvhi",
-    "cost": 0.0942,
+    "reconciled_phonetics": "ahsenho ahsikw hi'a nahskhi nuhsthe athanvthehskhe'i, khvniykw thikhanhhwathithhi yihowa unvhsith khvnikhsv nuthvnhele ahskhithskhv'i, hi'a nikhawehskhe'i; tsowa, thewi uwetsi, lhehsthi tsahskhalv hiyanvhthiyi meli tsathayvhsthi, nahskhiyhenho na tsikhneli khalvkwthiyu athanvhtho uthanthelhvhi;",
+    "asr_hypothesis": "ahsenho ahsikwh hi'a nahskhi nuhstheathanvthhehskhe'i khvniykwh thikhhanhwathithhi yihowa unvhsith khvnikhhsv nuthvnhele ahskhithhskhv'i hi'a nikhawehskhe'i tsowa thewi uwetsi tlhhehsthi tsahskhalv hiyanvhthiyi meli tsathayvhsthi nahskhiyhenho na tsikhneli khalvkwhthiyu athanvhtho uthanthhelhvhi",
+    "cost": -10.3915,
     "words": [
       {
-        "word": "aseno",
-        "start_sec": 329.08,
-        "end_sec": 329.58,
-        "confidence": 0.995845547744206,
+        "word": "ahseno",
+        "start_sec": 328.86,
+        "end_sec": 329.36,
+        "confidence": 0.999936,
         "flagged": false,
         "emitted_word": "ahsenho"
       },
       {
-        "word": "asikwo",
-        "start_sec": 330.33,
-        "end_sec": 330.89,
-        "confidence": 0.9492507662091937,
+        "word": "ahsikwho",
+        "start_sec": 330.1,
+        "end_sec": 330.82,
+        "confidence": 0.96806,
         "flagged": false,
-        "emitted_word": "ahsikwu"
+        "emitted_word": "ahsikwh"
       },
       {
-        "word": "ia",
-        "start_sec": 331.01,
-        "end_sec": 331.25,
-        "confidence": 0.9996905624866486,
+        "word": "hia",
+        "start_sec": 330.82,
+        "end_sec": 331.02,
+        "confidence": 0.967171,
         "flagged": false,
         "emitted_word": "hi'a"
       },
       {
-        "word": "naski nusteatanvteskei",
-        "start_sec": 331.51,
-        "end_sec": 334.365,
-        "confidence": 0.9790826588869095,
+        "word": "nahskhi",
+        "start_sec": 331.28,
+        "end_sec": 331.64,
+        "confidence": 0.168614,
         "flagged": false,
-        "emitted_word": "nvhskinulhstey atanhthehske'i"
+        "emitted_word": "nahskhi"
       },
       {
-        "word": "kvniyukwo",
-        "start_sec": 335.28,
-        "end_sec": 335.96,
-        "confidence": 0.9479517996311188,
+        "word": "nuhstheathanvthhehskhei",
+        "start_sec": 331.76,
+        "end_sec": 334.14,
+        "confidence": 0.210733,
         "flagged": false,
-        "emitted_word": "tvnhiyukwu"
+        "emitted_word": "nuhstheathanvthhehskhe'i"
       },
       {
-        "word": "tikanawatitoi",
-        "start_sec": 336.16,
-        "end_sec": 337.42,
-        "confidence": 0.9651746153831482,
+        "word": "khvniyukwho",
+        "start_sec": 334.22,
+        "end_sec": 335.88,
+        "confidence": 0.016135,
         "flagged": false,
-        "emitted_word": "tikhanowatitohi"
+        "emitted_word": "khvniykwh"
       },
       {
-        "word": "yiowa",
-        "start_sec": 338.22,
-        "end_sec": 338.84,
-        "confidence": 0.9358185430367788,
+        "word": "thikhhanhawathithohi",
+        "start_sec": 335.94,
+        "end_sec": 337.18,
+        "confidence": 0.137564,
+        "flagged": false,
+        "emitted_word": "thikhhanhwathithhi"
+      },
+      {
+        "word": "yihowa",
+        "start_sec": 338.0,
+        "end_sec": 338.6,
+        "confidence": 0.925942,
         "flagged": false,
         "emitted_word": "yihowa"
       },
       {
-        "word": "unvsitv",
-        "start_sec": 339.02,
-        "end_sec": 339.66,
-        "confidence": 0.9999459534883499,
+        "word": "unvhsithv",
+        "start_sec": 338.78,
+        "end_sec": 339.56,
+        "confidence": 0.158637,
         "flagged": false,
-        "emitted_word": "unvhsita"
+        "emitted_word": "unvhsith"
       },
       {
-        "word": "kvnikesv",
-        "start_sec": 339.96,
-        "end_sec": 340.62,
-        "confidence": 0.948029351234436,
+        "word": "khvnikhehsv",
+        "start_sec": 339.72,
+        "end_sec": 340.4,
+        "confidence": 0.972418,
         "flagged": false,
-        "emitted_word": "khvni kehsv"
+        "emitted_word": "khvnikhhsv"
       },
       {
-        "word": "nutvnele",
-        "start_sec": 340.74,
-        "end_sec": 341.52,
-        "confidence": 0.9995540844069587,
+        "word": "nuthvnele",
+        "start_sec": 340.5,
+        "end_sec": 341.28,
+        "confidence": 0.087949,
         "flagged": false,
-        "emitted_word": "nutvnhelv"
+        "emitted_word": "nuthvnhele"
       },
       {
-        "word": "askitaskvi",
-        "start_sec": 341.68,
-        "end_sec": 343.275,
-        "confidence": 0.7225331233607398,
+        "word": "ahskhithahskhvi",
+        "start_sec": 342.06,
+        "end_sec": 343.02,
+        "confidence": 0.160952,
         "flagged": false,
-        "emitted_word": "se v ahskilhskv'i"
+        "emitted_word": "ahskhithhskhv'i"
       },
       {
-        "word": "ia nikaweskei",
+        "word": "hia",
+        "start_sec": 343.96,
+        "end_sec": 344.14,
+        "confidence": 0.418706,
+        "flagged": false,
+        "emitted_word": "hi'a"
+      },
+      {
+        "word": "nikhawehskhei",
         "start_sec": 344.18,
-        "end_sec": 345.47,
-        "confidence": 0.7439116556197405,
+        "end_sec": 345.0,
+        "confidence": 0.178754,
         "flagged": false,
-        "emitted_word": "hi'anikawehske'i i"
+        "emitted_word": "nikhawehskhe'i"
       },
       {
         "word": "tsowa",
-        "start_sec": 345.645,
-        "end_sec": 346.085,
-        "confidence": 0.9925793528556823,
+        "start_sec": 345.4,
+        "end_sec": 345.84,
+        "confidence": 0.985436,
         "flagged": false,
         "emitted_word": "tsowa"
       },
       {
-        "word": "tewi",
-        "start_sec": 346.6,
-        "end_sec": 346.9,
-        "confidence": 0.9973711371421814,
+        "word": "thewi",
+        "start_sec": 346.36,
+        "end_sec": 346.66,
+        "confidence": 0.118161,
         "flagged": false,
-        "emitted_word": "tewi"
+        "emitted_word": "thewi"
       },
       {
         "word": "uwetsi",
-        "start_sec": 347.0,
-        "end_sec": 347.42,
-        "confidence": 0.9985589881738027,
+        "start_sec": 346.76,
+        "end_sec": 347.18,
+        "confidence": 0.979253,
         "flagged": false,
         "emitted_word": "uwetsi"
       },
       {
-        "word": "tlesti",
-        "start_sec": 348.29,
-        "end_sec": 348.73,
-        "confidence": 0.9995199271610805,
+        "word": "tlhhehsthi",
+        "start_sec": 347.26,
+        "end_sec": 348.48,
+        "confidence": 0.068617,
         "flagged": false,
-        "emitted_word": "lhehsti"
+        "emitted_word": "tlhhehsthi"
       },
       {
-        "word": "tsaskalv",
-        "start_sec": 348.91,
-        "end_sec": 349.63,
-        "confidence": 0.9888437390327454,
+        "word": "tsahskhalv",
+        "start_sec": 348.68,
+        "end_sec": 349.4,
+        "confidence": 0.39103,
         "flagged": false,
-        "emitted_word": "tsvhskalv"
+        "emitted_word": "tsahskhalv"
       },
       {
-        "word": "iyanvtiyi",
-        "start_sec": 350.37,
-        "end_sec": 351.435,
-        "confidence": 0.9391072193781536,
+        "word": "hiyanvthiyi",
+        "start_sec": 350.14,
+        "end_sec": 351.18,
+        "confidence": 0.395125,
         "flagged": false,
-        "emitted_word": "hiyanv tiye"
+        "emitted_word": "hiyanvhthiyi"
       },
       {
         "word": "meli",
-        "start_sec": 351.895,
-        "end_sec": 352.275,
-        "confidence": 0.9763797521591187,
+        "start_sec": 351.64,
+        "end_sec": 352.04,
+        "confidence": 0.999212,
         "flagged": false,
         "emitted_word": "meli"
       },
       {
-        "word": "tsatayvsti",
-        "start_sec": 352.7,
-        "end_sec": 353.85,
-        "confidence": 0.984683374563853,
+        "word": "tsathayvhsthi",
+        "start_sec": 352.48,
+        "end_sec": 353.32,
+        "confidence": 0.097883,
         "flagged": false,
-        "emitted_word": "tsatayhvhsti v"
+        "emitted_word": "tsathayvhsthi"
       },
       {
-        "word": "naskiyeno",
-        "start_sec": 354.66,
-        "end_sec": 355.44,
-        "confidence": 0.9575804074605306,
+        "word": "nahskhiyeno",
+        "start_sec": 354.42,
+        "end_sec": 355.1,
+        "confidence": 0.130827,
         "flagged": false,
-        "emitted_word": "nvhskiyhvnho"
+        "emitted_word": "nahskhiyhenho"
       },
       {
         "word": "na",
-        "start_sec": 355.66,
-        "end_sec": 355.78,
-        "confidence": 0.9996651113033295,
+        "start_sec": 355.42,
+        "end_sec": 355.54,
+        "confidence": 0.999328,
         "flagged": false,
         "emitted_word": "na"
       },
       {
-        "word": "tsikaneli",
-        "start_sec": 356.24,
-        "end_sec": 356.9,
-        "confidence": 0.999644849035475,
+        "word": "tsikhaneli",
+        "start_sec": 356.0,
+        "end_sec": 356.66,
+        "confidence": 0.238642,
         "flagged": false,
-        "emitted_word": "tsikvneli"
+        "emitted_word": "tsikhneli"
       },
       {
-        "word": "kalvkwotiyu",
-        "start_sec": 357.63,
-        "end_sec": 358.31,
-        "confidence": 0.9970415938984264,
+        "word": "khalvkwhothiyu",
+        "start_sec": 357.4,
+        "end_sec": 358.06,
+        "confidence": 0.206307,
         "flagged": false,
-        "emitted_word": "kalvkwhtiyu"
+        "emitted_word": "khalvkwhthiyu"
       },
       {
-        "word": "atanvto",
-        "start_sec": 358.41,
-        "end_sec": 358.95,
-        "confidence": 0.9995624593326023,
+        "word": "athanvtho",
+        "start_sec": 358.16,
+        "end_sec": 358.72,
+        "confidence": 0.031514,
         "flagged": false,
-        "emitted_word": "atanhto"
+        "emitted_word": "athanvhtho"
       },
       {
-        "word": "utanvtelvi",
-        "start_sec": 359.31,
-        "end_sec": 360.61,
-        "confidence": 0.9698067009449005,
+        "word": "uthanvthhelvhi",
+        "start_sec": 358.92,
+        "end_sec": 360.36,
+        "confidence": 0.079313,
         "flagged": false,
-        "emitted_word": "utanlhelhvhi"
+        "emitted_word": "uthanthhelhvhi"
       }
     ],
     "cherokee_syllabary": "ᎠᏎᏃ ᎠᏏᏉ ᎯᎠ ᎾᏍᎩ ᏄᏍᏕ ᎠᏓᏅᏖᏍᎨᎢ, ᎬᏂᏳᏉ ᏗᎧᎿᎭᏩᏗᏙᎯ ᏱᎰᏩ ᎤᏅᏏᏛ ᎬᏂᎨᏒ ᏄᏛᏁᎴ ᎠᏍᎩᏓᏍᎬᎢ, ᎯᎠ ᏂᎦᏪᏍᎨᎢ; ᏦᏩ, ᏕᏫ ᎤᏪᏥ, ᏞᏍᏗ ᏣᏍᎦᎸ ᎯᏯᏅᏗᏱ ᎺᎵ ᏣᏓᏴᏍᏗ, ᎾᏍᎩᏰᏃ Ꮎ ᏥᎦᏁᎵ ᎦᎸᏉᏗᏳ ᎠᏓᏅᏙ ᎤᏓᏅᏖᎸᎯ;",
     "phonetic": "A-se-no a-si-quo hi-a na-s-gi nu-s-de-a-da-nv-te-s-ge-i, gv-ni-yu-quo di-ka-hna-wa-di-do-hi Yi-ho-wa u-nv-si-dv gv-ni-ge-sv nu-dv-ne-le a-s-gi-da-s-gv-i, hi-a ni-ga-we-s-ge-i; Tso-wa, De-wi u-we-tsi, tle-s-di tsa-s-ga-lv hi-ya-nv-di-yi Me-li tsa-da-yv-s-di, na-s-gi-ye-no na tsi-ga-ne-li Ga-lv-quo-di-yu A-da-nv-do u-da-nv-te-lv-hi;",
-    "english": "But while he thought on these things, behold, the angel of the Lord appeared unto him in a dream, saying, Joseph, thou son of David, fear not to take unto thee Mary thy wife: for that which is conceived in her is of the Holy Ghost."
+    "english": "But while he thought on these things, behold, the angel of the Lord appeared unto him in a dream, saying, Joseph, thou son of David, fear not to take unto thee Mary thy wife: for that which is conceived in her is of the Holy Ghost.",
+    "has_anomalies": false
   },
   {
     "verse_id": "010121",
@@ -2321,106 +2437,107 @@
     "chapter": 1,
     "verse_idx": 21,
     "audio_path": "cherokee_new_testament/split_audio/matthew_01_21.wav",
-    "start_sec": 362.38,
-    "end_sec": 376.39,
-    "duration_sec": 14.01,
+    "start_sec": 361.64,
+    "end_sec": 376.13,
+    "duration_sec": 14.49,
     "reference_sentence": "ᎠᎴ ᏓᎦᎾᏄᎪᏫᏏ ᎠᏧᏣ, ᎾᏍᎩᏃ ᏥᏌ ᏕᎯᏲᎥᎭ, ᏧᏤᎵᏰᏃ ᏴᏫ ᏙᏛᏍᏕᎸᎯ ᏙᏓᎫᏓᎴᏏ ᎤᏂᏍᎦᏅᏨᎢ.",
-    "reconciled_phonetics": "ale takananukowhihsi atshutsa v nahskinho tsihsa tehiyo'vha, tsutseliyhenho yvwi totvhstelvhi' totakutalehsi unihskanvtsv'i.",
-    "asr_hypothesis": "ale takayanukowhihsi atshutsa v nvhskinho tsihsa tehiyo'vha tsutseliyhenho yvwi totvhstelvhi' totakutaliyhsi unihskanvtsv'i",
-    "cost": 0.0378,
+    "reconciled_phonetics": "ale thkhananukhowhihsi atshutsa, nahskhinho tsihsa thehiyo'vha, tsutseliyhenho yvwi thothvhsthelvhi thothakhuthalehsi unihskhanvtsv'i.",
+    "asr_hypothesis": "ale thkhananukhowhihsi atshutsa nahskhinho tsihsa thehiyo'vha tsutseliyhenho yvwi thothvhsthelvhi thothakhuthalehsi unihskhanvtsv'i",
+    "cost": -10.6295,
     "words": [
       {
         "word": "ale",
-        "start_sec": 362.38,
-        "end_sec": 362.56,
-        "confidence": 0.9997476935386658,
+        "start_sec": 362.14,
+        "end_sec": 362.32,
+        "confidence": 0.97105,
         "flagged": false,
         "emitted_word": "ale"
       },
       {
-        "word": "takananukowisi",
-        "start_sec": 362.82,
-        "end_sec": 364.08,
-        "confidence": 0.9778799265623093,
+        "word": "thakhananukhowihsi",
+        "start_sec": 362.58,
+        "end_sec": 363.84,
+        "confidence": 0.10044,
         "flagged": false,
-        "emitted_word": "takayanukowhihsi"
+        "emitted_word": "thkhananukhowhihsi"
       },
       {
         "word": "atsutsa",
-        "start_sec": 364.56,
-        "end_sec": 365.14,
-        "confidence": 0.9836351945996284,
+        "start_sec": 364.32,
+        "end_sec": 364.86,
+        "confidence": 0.998357,
         "flagged": false,
         "emitted_word": "atshutsa"
       },
       {
-        "word": "naskino",
-        "start_sec": 365.85,
-        "end_sec": 366.695,
-        "confidence": 0.9851893054114448,
+        "word": "nahskhino",
+        "start_sec": 365.92,
+        "end_sec": 366.44,
+        "confidence": 0.374679,
         "flagged": false,
-        "emitted_word": "v nvhskinho"
+        "emitted_word": "nahskhinho"
       },
       {
-        "word": "tsisa",
-        "start_sec": 366.815,
-        "end_sec": 367.275,
-        "confidence": 0.9999130666255951,
+        "word": "tsihsa",
+        "start_sec": 366.56,
+        "end_sec": 367.02,
+        "confidence": 0.999348,
         "flagged": false,
         "emitted_word": "tsihsa"
       },
       {
-        "word": "teiyova",
-        "start_sec": 367.375,
-        "end_sec": 368.355,
-        "confidence": 0.9993152499198914,
+        "word": "thehiyovha",
+        "start_sec": 367.12,
+        "end_sec": 368.1,
+        "confidence": 0.318329,
         "flagged": false,
-        "emitted_word": "tehiyo'vha"
+        "emitted_word": "thehiyo'vha"
       },
       {
         "word": "tsutseliyeno",
-        "start_sec": 369.21,
-        "end_sec": 370.25,
-        "confidence": 0.9716146545750755,
+        "start_sec": 368.94,
+        "end_sec": 370.0,
+        "confidence": 0.957199,
         "flagged": false,
         "emitted_word": "tsutseliyhenho"
       },
       {
         "word": "yvwi",
-        "start_sec": 370.45,
-        "end_sec": 370.87,
-        "confidence": 0.9990387856960297,
+        "start_sec": 370.18,
+        "end_sec": 370.6,
+        "confidence": 0.99977,
         "flagged": false,
         "emitted_word": "yvwi"
       },
       {
-        "word": "totvstelvi",
-        "start_sec": 371.82,
-        "end_sec": 373.28,
-        "confidence": 0.973162041260646,
+        "word": "thothvhsthelvhi",
+        "start_sec": 371.56,
+        "end_sec": 372.78,
+        "confidence": 0.118442,
         "flagged": false,
-        "emitted_word": "totvhstelvhi'"
+        "emitted_word": "thothvhsthelvhi"
       },
       {
-        "word": "totakutalesi",
-        "start_sec": 373.65,
-        "end_sec": 375.07,
-        "confidence": 0.9269171293292727,
+        "word": "thothakhuthalehsi",
+        "start_sec": 373.38,
+        "end_sec": 374.8,
+        "confidence": 0.041287,
         "flagged": false,
-        "emitted_word": "totakutaliyhsi"
+        "emitted_word": "thothakhuthalehsi"
       },
       {
-        "word": "uniskanvtsvi",
-        "start_sec": 375.25,
-        "end_sec": 376.39,
-        "confidence": 0.9943482492651258,
+        "word": "unihskhanvtsvi",
+        "start_sec": 374.98,
+        "end_sec": 376.14,
+        "confidence": 0.39231,
         "flagged": false,
-        "emitted_word": "unihskanvtsv'i"
+        "emitted_word": "unihskhanvtsv'i"
       }
     ],
     "cherokee_syllabary": "ᎠᎴ ᏓᎦᎾᏄᎪᏫᏏ ᎠᏧᏣ, ᎾᏍᎩᏃ ᏥᏌ ᏕᎯᏲᎥᎭ, ᏧᏤᎵᏰᏃ ᏴᏫ ᏙᏛᏍᏕᎸᎯ ᏙᏓᎫᏓᎴᏏ ᎤᏂᏍᎦᏅᏨᎢ.",
     "phonetic": "A-le da-ga-na-nu-go-wi-si a-tsu-tsa, na-s-gi-no Tsi-Sa de-hi-yo-v-ha, tsu-tse-li-ye-no yv-wi do-dv-s-de-lv-hi do-da-gu-da-le-si u-ni-s-ga-nv-tsv-i.",
-    "english": "And she shall bring forth a son, and thou shalt call his name JESUS: for he shall save his people from their sins."
+    "english": "And she shall bring forth a son, and thou shalt call his name JESUS: for he shall save his people from their sins.",
+    "has_anomalies": false
   },
   {
     "verse_id": "010122",
@@ -2428,98 +2545,107 @@
     "chapter": 1,
     "verse_idx": 22,
     "audio_path": "cherokee_new_testament/split_audio/matthew_01_22.wav",
-    "start_sec": 377.8,
-    "end_sec": 389.59,
-    "duration_sec": 11.79,
+    "start_sec": 377.04,
+    "end_sec": 389.31,
+    "duration_sec": 12.27,
     "reference_sentence": "ᎾᏍᎩᏃ ᎯᎠ ᏂᎦᏗᏳ ᏄᎵᏍᏔᏂᏙᎴ ᎤᏙᎯᏳᏗᏱ ᎠᏰᎸᏒᎢ ᎯᎠ ᏥᏄᏪᏎ ᏱᎰᏩ ᎠᏙᎴᎰᏍᎩ ᎠᎬᏗᏍᎬᎢ;",
-    "reconciled_phonetics": "nahskino hi'a nikatiyu nulhsthnitole utohiyuhtiyi ayelvhsv'i hi'a tsinuwehse yihowa atolehohski akvtihskv'i;",
-    "asr_hypothesis": "nahskinohi'a nikatiyu nulhsnitole utohiyuhtiyi ayelvhv'i isi hi'a tsinuwehse ihowa atalehohski akvtihskv'i",
-    "cost": 0.0703,
+    "reconciled_phonetics": "nahskhino hi'a nikhthiyu nulhsthnithole uthohiyuthiy ayelvhsv'i hi'a tsinuwehse yihowa athlehohskh akhthihskhv'i;",
+    "asr_hypothesis": "nahskhino hi'a nikhthiyu nulhsthhnithole uthohiyuthiy ayelvhsv'i hi'a tsinuwehse yihowa athlehohskh akhthihskhv'i",
+    "cost": -10.3279,
     "words": [
       {
-        "word": "naskino ia",
-        "start_sec": 377.8,
-        "end_sec": 378.84,
-        "confidence": 0.9863043328126272,
+        "word": "nahskhino",
+        "start_sec": 377.54,
+        "end_sec": 378.1,
+        "confidence": 0.411775,
         "flagged": false,
-        "emitted_word": "nahskinohi'a"
+        "emitted_word": "nahskhino"
       },
       {
-        "word": "nikatiyu",
-        "start_sec": 379.12,
-        "end_sec": 379.82,
-        "confidence": 0.9988070875406265,
-        "flagged": false,
-        "emitted_word": "nikatiyu"
-      },
-      {
-        "word": "nulistanitole",
-        "start_sec": 380.04,
-        "end_sec": 381.04,
-        "confidence": 0.9550721645355225,
-        "flagged": false,
-        "emitted_word": "nulhsnitole"
-      },
-      {
-        "word": "utoiyutiyi",
-        "start_sec": 381.89,
-        "end_sec": 382.93,
-        "confidence": 0.9897338449954987,
-        "flagged": false,
-        "emitted_word": "utohiyuhtiyi"
-      },
-      {
-        "word": "ayelvsvi",
-        "start_sec": 383.09,
-        "end_sec": 384.95,
-        "confidence": 0.8066481285625033,
-        "flagged": false,
-        "emitted_word": "ayelvhv'i isi"
-      },
-      {
-        "word": "ia",
-        "start_sec": 385.115,
-        "end_sec": 385.295,
-        "confidence": 0.999340757727623,
+        "word": "hia",
+        "start_sec": 378.32,
+        "end_sec": 378.58,
+        "confidence": 0.998417,
         "flagged": false,
         "emitted_word": "hi'a"
       },
       {
-        "word": "tsinuwese",
-        "start_sec": 385.395,
-        "end_sec": 386.115,
-        "confidence": 0.9714766442775726,
+        "word": "nikhathiyu",
+        "start_sec": 378.86,
+        "end_sec": 379.56,
+        "confidence": 0.104418,
+        "flagged": false,
+        "emitted_word": "nikhthiyu"
+      },
+      {
+        "word": "nulihsthhanithole",
+        "start_sec": 379.78,
+        "end_sec": 380.8,
+        "confidence": 0.080688,
+        "flagged": false,
+        "emitted_word": "nulhsthhnithole"
+      },
+      {
+        "word": "uthohiyuthiyi",
+        "start_sec": 381.64,
+        "end_sec": 382.6,
+        "confidence": 0.127369,
+        "flagged": false,
+        "emitted_word": "uthohiyuthiy"
+      },
+      {
+        "word": "ayelvhsvi",
+        "start_sec": 382.82,
+        "end_sec": 383.82,
+        "confidence": 0.896431,
+        "flagged": false,
+        "emitted_word": "ayelvhsv'i"
+      },
+      {
+        "word": "hia",
+        "start_sec": 384.88,
+        "end_sec": 385.02,
+        "confidence": 0.371555,
+        "flagged": false,
+        "emitted_word": "hi'a"
+      },
+      {
+        "word": "tsinuwehse",
+        "start_sec": 385.14,
+        "end_sec": 385.86,
+        "confidence": 0.941728,
         "flagged": false,
         "emitted_word": "tsinuwehse"
       },
       {
-        "word": "yiowa",
-        "start_sec": 386.355,
-        "end_sec": 386.895,
-        "confidence": 0.8447298884391785,
+        "word": "yihowa",
+        "start_sec": 385.96,
+        "end_sec": 386.62,
+        "confidence": 0.115354,
         "flagged": false,
-        "emitted_word": "ihowa"
+        "emitted_word": "yihowa"
       },
       {
-        "word": "atoleoski",
-        "start_sec": 387.015,
-        "end_sec": 388.115,
-        "confidence": 0.9983889189633456,
+        "word": "atholehohskhi",
+        "start_sec": 386.76,
+        "end_sec": 387.96,
+        "confidence": 0.106001,
         "flagged": false,
-        "emitted_word": "atalehohski"
+        "emitted_word": "athlehohskh"
       },
       {
-        "word": "akvtiskvi",
-        "start_sec": 388.71,
-        "end_sec": 389.59,
-        "confidence": 0.9926029552112926,
+        "word": "akhvthihskhvi",
+        "start_sec": 388.46,
+        "end_sec": 389.32,
+        "confidence": 0.091325,
         "flagged": false,
-        "emitted_word": "akvtihskv'i"
+        "emitted_word": "akhthihskhv'i"
       }
     ],
     "cherokee_syllabary": "ᎾᏍᎩᏃ ᎯᎠ ᏂᎦᏗᏳ ᏄᎵᏍᏔᏂᏙᎴ ᎤᏙᎯᏳᏗᏱ ᎠᏰᎸᏒᎢ ᎯᎠ ᏥᏄᏪᏎ ᏱᎰᏩ ᎠᏙᎴᎰᏍᎩ ᎠᎬᏗᏍᎬᎢ;",
     "phonetic": "Na-s-gi-no hi-a ni-ga-di-yu nu-li-s-ta-ni-do-le u-do-hi-yu-di-yi a-ye-lv-sv-i hi-a tsi-nu-we-se Yi-ho-wa a-do-le-ho-s-gi a-gv-di-s-gv-i;",
-    "english": "Now all this was done, that it might be fulfilled which was spoken of the Lord by the prophet, saying,"
+    "english": "Now all this was done, that it might be fulfilled which was spoken of the Lord by the prophet, saying,",
+    "has_anomalies": false
   },
   {
     "verse_id": "010123",
@@ -2527,170 +2653,171 @@
     "chapter": 1,
     "verse_idx": 23,
     "audio_path": "cherokee_new_testament/split_audio/matthew_01_23.wav",
-    "start_sec": 390.94,
-    "end_sec": 415.3,
-    "duration_sec": 24.36,
+    "start_sec": 390.68,
+    "end_sec": 403.22,
+    "duration_sec": 12.54,
     "reference_sentence": "ᎬᏂᏳᏉ ᎠᏛ ᎾᏥᏰᎲᎾ ᎦᏁᎵᏛ ᎨᏎᏍᏗ, ᎠᎴ ᏓᎦᎾᏄᎪᏫᏏ ᎠᏧᏣ, ᎾᏍᎩᏃ ᎢᎹᏄᎡᎵ ᎠᏃᏎᎮᏍᏗ, ᎾᏍᎩ ᎠᏁᏢᏔᏅᎯ ᎨᏒ ᎯᎠ ᏄᏍᏗ ᎦᏛᎦ, ᎤᏁᎳᏅᎯ ᎢᎨᎳᏗᏙᎭ.",
-    "reconciled_phonetics": "khvniyukwo athv natsiyehvna kanelitv kehsehsti, ale takananukowhihsi atshutsaav nahskino' imanu'eli anohsehehsti, nahski anhelhthanvhi kehsv' hi'a nuhsti kathka, unelhanvhi ikelatitoha.",
-    "asr_hypothesis": "khvniyukwu atha nvkiyehvna kanelita kehsehsti ale takana nukowhihsti atshutsa av nahskino' imanu'eli anohsehehsti nvhski anhelhthanvhi kehsv' hi'a luhsti kathka unelhanvhi ikalaltitoha",
-    "cost": 0.0671,
+    "reconciled_phonetics": "khvniyukw athv natsiyehvna khanelithv khsehsthi, ale thkhnnkhwhs atstsa, nhskhn imneli anhshsthi, nahskh anlhthnvh khs ha nhsth khthkh, unlnh ikhlathth.",
+    "asr_hypothesis": "khvniyukwh athv natsiyehvna khanelithv khhsehsthi ale thkhnnkhwhs tstsa nhskhn mneli nhshhsthi nahskh ntlhhthhnvh khhs hi nhsth khthkh nlnh khlaththh",
+    "cost": -10000000000.0,
     "words": [
       {
-        "word": "kvniyukwo",
-        "start_sec": 390.94,
-        "end_sec": 391.68,
-        "confidence": 0.9571793794631958,
+        "word": "khvniyukwho",
+        "start_sec": 390.68,
+        "end_sec": 391.64,
+        "confidence": 0.207011,
         "flagged": false,
-        "emitted_word": "khvniyukwu"
+        "emitted_word": "khvniyukwh"
       },
       {
-        "word": "atv",
-        "start_sec": 392.08,
-        "end_sec": 392.4,
-        "confidence": 0.9971653670072556,
+        "word": "athv",
+        "start_sec": 391.82,
+        "end_sec": 392.14,
+        "confidence": 0.05727,
         "flagged": false,
-        "emitted_word": "atha"
+        "emitted_word": "athv"
       },
       {
-        "word": "natsiyevna",
-        "start_sec": 393.2,
-        "end_sec": 394.1,
-        "confidence": 0.9689279913902282,
+        "word": "natsiyehvna",
+        "start_sec": 392.92,
+        "end_sec": 393.82,
+        "confidence": 0.988889,
         "flagged": false,
-        "emitted_word": "nvkiyehvna"
+        "emitted_word": "natsiyehvna"
       },
       {
-        "word": "kanelitv",
-        "start_sec": 394.66,
-        "end_sec": 395.24,
-        "confidence": 0.9968628957867622,
+        "word": "khanelithv",
+        "start_sec": 394.38,
+        "end_sec": 394.96,
+        "confidence": 0.094051,
         "flagged": false,
-        "emitted_word": "kanelita"
+        "emitted_word": "khanelithv"
       },
       {
-        "word": "kesesti",
-        "start_sec": 395.3,
-        "end_sec": 395.96,
-        "confidence": 0.9962369004885355,
+        "word": "khehsehsthi",
+        "start_sec": 395.02,
+        "end_sec": 395.68,
+        "confidence": 0.24451,
         "flagged": false,
-        "emitted_word": "kehsehsti"
+        "emitted_word": "khhsehsthi"
       },
       {
         "word": "ale",
-        "start_sec": 397.19,
-        "end_sec": 397.37,
-        "confidence": 0.9987903237342834,
+        "start_sec": 396.9,
+        "end_sec": 397.1,
+        "confidence": 0.852088,
         "flagged": false,
         "emitted_word": "ale"
       },
       {
-        "word": "takananukowisi",
-        "start_sec": 398.02,
-        "end_sec": 399.18,
-        "confidence": 0.9729416392969362,
-        "flagged": false,
-        "emitted_word": "takana nukowhihsti"
+        "word": "thakhananukhowihsi",
+        "start_sec": 397.3,
+        "end_sec": 397.96,
+        "confidence": 0.000101,
+        "flagged": true,
+        "emitted_word": "thkhnnkhwhs"
       },
       {
         "word": "atsutsa",
-        "start_sec": 399.48,
-        "end_sec": 400.0,
-        "confidence": 0.9992474913597107,
+        "start_sec": 398.0,
+        "end_sec": 398.1,
+        "confidence": 0.013043,
         "flagged": false,
-        "emitted_word": "atshutsa"
+        "emitted_word": "tstsa"
       },
       {
-        "word": "naskino",
-        "start_sec": 400.76,
-        "end_sec": 402.31,
-        "confidence": 0.863416862156656,
-        "flagged": false,
-        "emitted_word": "av nahskino'"
+        "word": "nahskhino",
+        "start_sec": 398.14,
+        "end_sec": 398.4,
+        "confidence": 0.00019,
+        "flagged": true,
+        "emitted_word": "nhskhn"
       },
       {
         "word": "imanueli",
-        "start_sec": 403.1,
-        "end_sec": 404.14,
-        "confidence": 0.9997589190800985,
-        "flagged": false,
-        "emitted_word": "imanu'eli"
+        "start_sec": 398.5,
+        "end_sec": 398.62,
+        "confidence": 1.3e-05,
+        "flagged": true,
+        "emitted_word": "mneli"
       },
       {
-        "word": "anoseesti",
-        "start_sec": 405.02,
-        "end_sec": 405.82,
-        "confidence": 0.9801264653603236,
-        "flagged": false,
-        "emitted_word": "anohsehehsti"
+        "word": "anohsehehsthi",
+        "start_sec": 398.66,
+        "end_sec": 398.9,
+        "confidence": 0.006374,
+        "flagged": true,
+        "emitted_word": "nhshhsthi"
       },
       {
-        "word": "naski",
-        "start_sec": 406.56,
-        "end_sec": 406.94,
-        "confidence": 0.9424551626046499,
-        "flagged": false,
-        "emitted_word": "nvhski"
+        "word": "nahskhi",
+        "start_sec": 399.1,
+        "end_sec": 399.42,
+        "confidence": 0.00124,
+        "flagged": true,
+        "emitted_word": "nahskh"
       },
       {
-        "word": "anetlvtanvi",
-        "start_sec": 407.26,
-        "end_sec": 408.18,
-        "confidence": 0.9786809270198529,
-        "flagged": false,
-        "emitted_word": "anhelhthanvhi"
+        "word": "anetlhhvthhanvhi",
+        "start_sec": 399.46,
+        "end_sec": 401.34,
+        "confidence": 0.000153,
+        "flagged": true,
+        "emitted_word": "ntlhhthhnvh"
       },
       {
-        "word": "kesv",
-        "start_sec": 408.48,
-        "end_sec": 408.94,
-        "confidence": 0.9166508515675863,
-        "flagged": false,
-        "emitted_word": "kehsv'"
+        "word": "khehsv",
+        "start_sec": 401.34,
+        "end_sec": 401.42,
+        "confidence": 0.006186,
+        "flagged": true,
+        "emitted_word": "khhs"
       },
       {
-        "word": "ia",
-        "start_sec": 409.82,
-        "end_sec": 410.08,
-        "confidence": 0.9999455809593201,
-        "flagged": false,
-        "emitted_word": "hi'a"
+        "word": "hia",
+        "start_sec": 401.44,
+        "end_sec": 401.5,
+        "confidence": 0.002705,
+        "flagged": true,
+        "emitted_word": "hi"
       },
       {
-        "word": "nusti",
-        "start_sec": 410.5,
-        "end_sec": 411.0,
-        "confidence": 0.9997950394948324,
-        "flagged": false,
-        "emitted_word": "luhsti"
+        "word": "nuhsthi",
+        "start_sec": 401.56,
+        "end_sec": 401.72,
+        "confidence": 0.000366,
+        "flagged": true,
+        "emitted_word": "nhsth"
       },
       {
-        "word": "katvka",
-        "start_sec": 411.515,
-        "end_sec": 412.135,
-        "confidence": 0.99983083208402,
-        "flagged": false,
-        "emitted_word": "kathka"
+        "word": "khathvkha",
+        "start_sec": 401.72,
+        "end_sec": 402.04,
+        "confidence": 4e-06,
+        "flagged": true,
+        "emitted_word": "khthkh"
       },
       {
-        "word": "unelanvi",
-        "start_sec": 412.98,
-        "end_sec": 413.84,
-        "confidence": 0.9764942407608033,
-        "flagged": false,
-        "emitted_word": "unelhanvhi"
+        "word": "unelanvhi",
+        "start_sec": 402.76,
+        "end_sec": 402.84,
+        "confidence": 1e-05,
+        "flagged": true,
+        "emitted_word": "nlnh"
       },
       {
-        "word": "ikelatitoa",
-        "start_sec": 414.16,
-        "end_sec": 415.3,
-        "confidence": 0.9291446655988693,
-        "flagged": false,
-        "emitted_word": "ikalaltitoha"
+        "word": "ikhelathithoha",
+        "start_sec": 402.86,
+        "end_sec": 403.22,
+        "confidence": 7.9e-05,
+        "flagged": true,
+        "emitted_word": "khlaththh"
       }
     ],
     "cherokee_syllabary": "ᎬᏂᏳᏉ ᎠᏛ ᎾᏥᏰᎲᎾ ᎦᏁᎵᏛ ᎨᏎᏍᏗ, ᎠᎴ ᏓᎦᎾᏄᎪᏫᏏ ᎠᏧᏣ, ᎾᏍᎩᏃ ᎢᎹᏄᎡᎵ ᎠᏃᏎᎮᏍᏗ, ᎾᏍᎩ ᎠᏁᏢᏔᏅᎯ ᎨᏒ ᎯᎠ ᏄᏍᏗ ᎦᏛᎦ, ᎤᏁᎳᏅᎯ ᎢᎨᎳᏗᏙᎭ.",
     "phonetic": "Gv-ni-yu-quo a-dv na-tsi-ye-hv-na ga-ne-li-dv ge-se-s-di, a-le da-ga-na-nu-go-wi-si a-tsu-tsa, na-s-gi-no I-ma-nu-e-li a-no-se-he-s-di, na-s-gi a-ne-tlv-ta-nv-hi ge-sv hi-a nu-s-di ga-dv-ga, U-ne-la-nv-hi i-ge-la-di-do-ha.",
-    "english": "Behold, a virgin shall be with child, and shall bring forth a son, and they shall call his name Emmanuel, which being interpreted is, God with us."
+    "english": "Behold, a virgin shall be with child, and shall bring forth a son, and they shall call his name Emmanuel, which being interpreted is, God with us.",
+    "has_anomalies": true
   },
   {
     "verse_id": "010124",
@@ -2698,98 +2825,99 @@
     "chapter": 1,
     "verse_idx": 24,
     "audio_path": "cherokee_new_testament/split_audio/matthew_01_24.wav",
-    "start_sec": 416.43,
-    "end_sec": 429.25,
-    "duration_sec": 12.82,
+    "start_sec": 403.22,
+    "end_sec": 407.24,
+    "duration_sec": 4.02,
     "reference_sentence": "ᏦᏩᏃ ᎤᏰᏨ ᎤᎸᏅᎢ ᏗᎧᎿᎭᏩᏗᏙᎯ ᏱᎰᏩ ᏅᏓᏳᏅᏏᏛ ᏄᏪᏎᎸ ᏄᏛᏁᎴᎢ, ᎤᏯᏅᎨᏉ ᎤᏓᏴᏍᏗ.",
-    "reconciled_phonetics": "tsowano uyetsv ulhvnhv'i tikhanhahwtitohi yihowa nvtayunvhsitv nuwehselv nutvnele'i, uyhanvhkekwo utayhvhsti.",
-    "asr_hypothesis": "tsowano uyetsv ulhvnhv'i tikanotitohi yihowv nitsayunvhsita nuwehselv nutvnele'i uyhanvhekwu utayhvhsti",
-    "cost": 0.0416,
+    "reconciled_phonetics": "tswn uye'ts ulni thkhanhhwthth yhw nthynhsth nwhsl nthnli, uynkhkw htayhsth.",
+    "asr_hypothesis": "tswn uy'ets lni thkhhanhwththh yhw nthynhsth nwhsl nthnli ynkhkwh thayhsth",
+    "cost": -10000000000.0,
     "words": [
       {
         "word": "tsowano",
-        "start_sec": 416.43,
-        "end_sec": 416.97,
-        "confidence": 0.9829050132206508,
-        "flagged": false,
-        "emitted_word": "tsowano"
+        "start_sec": 403.22,
+        "end_sec": 403.34,
+        "confidence": 0.000156,
+        "flagged": true,
+        "emitted_word": "tswn"
       },
       {
         "word": "uyetsv",
-        "start_sec": 417.4,
-        "end_sec": 418.02,
-        "confidence": 0.9998417397340139,
-        "flagged": false,
-        "emitted_word": "uyetsv"
+        "start_sec": 403.38,
+        "end_sec": 403.74,
+        "confidence": 0.001033,
+        "flagged": true,
+        "emitted_word": "uy'ets"
       },
       {
         "word": "ulvnvi",
-        "start_sec": 418.99,
-        "end_sec": 419.67,
-        "confidence": 0.9974464774131775,
-        "flagged": false,
-        "emitted_word": "ulhvnhv'i"
+        "start_sec": 403.78,
+        "end_sec": 403.88,
+        "confidence": 0.006942,
+        "flagged": true,
+        "emitted_word": "lni"
       },
       {
-        "word": "tikanawatitoi",
-        "start_sec": 420.45,
-        "end_sec": 421.53,
-        "confidence": 0.9727196047703425,
-        "flagged": false,
-        "emitted_word": "tikanotitohi"
+        "word": "thikhhanhawathithohi",
+        "start_sec": 403.92,
+        "end_sec": 405.06,
+        "confidence": 0.000276,
+        "flagged": true,
+        "emitted_word": "thkhhanhwththh"
       },
       {
-        "word": "yiowa",
-        "start_sec": 421.63,
-        "end_sec": 422.13,
-        "confidence": 0.9471079111099243,
-        "flagged": false,
-        "emitted_word": "yihowv"
+        "word": "yihowa",
+        "start_sec": 405.06,
+        "end_sec": 405.14,
+        "confidence": 1e-06,
+        "flagged": true,
+        "emitted_word": "yhw"
       },
       {
-        "word": "nvtayunvsitv",
-        "start_sec": 422.64,
-        "end_sec": 423.58,
-        "confidence": 0.9357758292130062,
-        "flagged": false,
-        "emitted_word": "nitsayunvhsita"
+        "word": "nvthayunvhsithv",
+        "start_sec": 405.18,
+        "end_sec": 405.52,
+        "confidence": 0.000739,
+        "flagged": true,
+        "emitted_word": "nthynhsth"
       },
       {
-        "word": "nuweselv",
-        "start_sec": 424.22,
-        "end_sec": 424.88,
-        "confidence": 0.9749261140823364,
-        "flagged": false,
-        "emitted_word": "nuwehselv"
+        "word": "nuwehselv",
+        "start_sec": 405.52,
+        "end_sec": 405.68,
+        "confidence": 1e-06,
+        "flagged": true,
+        "emitted_word": "nwhsl"
       },
       {
-        "word": "nutvnelei",
-        "start_sec": 424.96,
-        "end_sec": 425.9,
-        "confidence": 0.9878507554531097,
-        "flagged": false,
-        "emitted_word": "nutvnele'i"
+        "word": "nuthvnelei",
+        "start_sec": 406.28,
+        "end_sec": 406.52,
+        "confidence": 6.5e-05,
+        "flagged": true,
+        "emitted_word": "nthnli"
       },
       {
-        "word": "uyanvkekwo",
-        "start_sec": 426.675,
-        "end_sec": 427.835,
-        "confidence": 0.9620838219469244,
-        "flagged": false,
-        "emitted_word": "uyhanvhekwu"
+        "word": "uyanvkhekwho",
+        "start_sec": 406.52,
+        "end_sec": 406.88,
+        "confidence": 4e-06,
+        "flagged": true,
+        "emitted_word": "ynkhkwh"
       },
       {
-        "word": "utayvsti",
-        "start_sec": 428.33,
-        "end_sec": 429.25,
-        "confidence": 0.978554755449295,
-        "flagged": false,
-        "emitted_word": "utayhvhsti"
+        "word": "uthayvhsthi",
+        "start_sec": 406.94,
+        "end_sec": 407.24,
+        "confidence": 0.000132,
+        "flagged": true,
+        "emitted_word": "thayhsth"
       }
     ],
     "cherokee_syllabary": "ᏦᏩᏃ ᎤᏰᏨ ᎤᎸᏅᎢ ᏗᎧᎿᎭᏩᏗᏙᎯ ᏱᎰᏩ ᏅᏓᏳᏅᏏᏛ ᏄᏪᏎᎸ ᏄᏛᏁᎴᎢ, ᎤᏯᏅᎨᏉ ᎤᏓᏴᏍᏗ.",
     "phonetic": "Tso-wa-no u-ye-tsv u-lv-nv-i di-ka-hna-wa-di-do-hi Yi-ho-wa nv-da-yu-nv-si-dv nu-we-se-lv nu-dv-ne-le-i, u-ya-nv-ge-quo u-da-yv-s-di.",
-    "english": "Then Joseph being raised from sleep did as the angel of the Lord had bidden him, and took unto him his wife:"
+    "english": "Then Joseph being raised from sleep did as the angel of the Lord had bidden him, and took unto him his wife:",
+    "has_anomalies": true
   },
   {
     "verse_id": "010125",
@@ -2797,98 +2925,107 @@
     "chapter": 1,
     "verse_idx": 25,
     "audio_path": "cherokee_new_testament/split_audio/matthew_01_25.wav",
-    "start_sec": 429.86,
-    "end_sec": 441.12,
-    "duration_sec": 11.26,
+    "start_sec": 407.28,
+    "end_sec": 411.64,
+    "duration_sec": 4.36,
     "reference_sentence": "ᎠᎴ ᎥᏝ ᏳᎦᏙᎥᏎᎢ ᎬᏂ ᎤᎾᏄᎪᏫᏒ ᎢᎬᏱ ᎡᎯ ᎤᏪᏥ ᎠᏧᏣ, ᏥᏌᏃ ᏑᏬᎡᎢ.",
-    "reconciled_phonetics": "ale' vlha yukhthovhse'i khvnhi unanukowhihsv ikvyi ehi uwetsi atshutsa, tsihsanho suwo'e'i.",
-    "asr_hypothesis": "ale'vlha yukhthavhse'i ahi khvnhi unanukowhihsv ikvyi ehi uwetsi atshutsa tsihsanho tuwo'e'i",
-    "cost": 0.0707,
+    "reconciled_phonetics": "al vlh ykhathvhsi khn unnkhwhsv ikhy ehi uwts atsuths, tsihsn hswei.",
+    "asr_hypothesis": "l tlhh ykhathvhsi khn nnkhwhsv khy hi wts tsuths tsihsn hswe",
+    "cost": -10000000000.0,
     "words": [
       {
-        "word": "ale vtla",
-        "start_sec": 429.86,
-        "end_sec": 430.64,
-        "confidence": 0.9465117529034615,
-        "flagged": false,
-        "emitted_word": "ale'vlha"
+        "word": "ale",
+        "start_sec": 407.28,
+        "end_sec": 407.3,
+        "confidence": 2.8e-05,
+        "flagged": true,
+        "emitted_word": "l"
       },
       {
-        "word": "yukatovsei",
-        "start_sec": 431.045,
-        "end_sec": 433.04,
-        "confidence": 0.7103864581157,
+        "word": "vtlhha",
+        "start_sec": 407.32,
+        "end_sec": 407.4,
+        "confidence": 0.044156,
         "flagged": false,
-        "emitted_word": "yukhthavhse'i ahi"
+        "emitted_word": "tlhh"
       },
       {
-        "word": "kvni",
-        "start_sec": 433.33,
-        "end_sec": 433.71,
-        "confidence": 0.9983526666959127,
-        "flagged": false,
-        "emitted_word": "khvnhi"
+        "word": "yukhathovhsei",
+        "start_sec": 407.4,
+        "end_sec": 407.9,
+        "confidence": 0.002308,
+        "flagged": true,
+        "emitted_word": "ykhathvhsi"
       },
       {
-        "word": "unanukowisv",
-        "start_sec": 433.89,
-        "end_sec": 434.99,
-        "confidence": 0.9922801164480356,
-        "flagged": false,
-        "emitted_word": "unanukowhihsv"
+        "word": "khvni",
+        "start_sec": 408.04,
+        "end_sec": 408.1,
+        "confidence": 7e-06,
+        "flagged": true,
+        "emitted_word": "khn"
       },
       {
-        "word": "ikvyi",
-        "start_sec": 435.11,
-        "end_sec": 435.67,
-        "confidence": 0.9654768228530883,
-        "flagged": false,
-        "emitted_word": "ikvyi"
+        "word": "unanukhowihsv",
+        "start_sec": 408.12,
+        "end_sec": 408.56,
+        "confidence": 0.000717,
+        "flagged": true,
+        "emitted_word": "nnkhwhsv"
       },
       {
-        "word": "ei",
-        "start_sec": 435.95,
-        "end_sec": 436.21,
-        "confidence": 0.9984472195307413,
+        "word": "ikhvyi",
+        "start_sec": 408.56,
+        "end_sec": 408.78,
+        "confidence": 2e-06,
+        "flagged": true,
+        "emitted_word": "khy"
+      },
+      {
+        "word": "ehi",
+        "start_sec": 409.54,
+        "end_sec": 409.62,
+        "confidence": 0.821941,
         "flagged": false,
-        "emitted_word": "ehi"
+        "emitted_word": "hi"
       },
       {
         "word": "uwetsi",
-        "start_sec": 437.03,
-        "end_sec": 437.65,
-        "confidence": 0.9901719689369202,
-        "flagged": false,
-        "emitted_word": "uwetsi"
+        "start_sec": 409.78,
+        "end_sec": 410.02,
+        "confidence": 0.0,
+        "flagged": true,
+        "emitted_word": "wts"
       },
       {
         "word": "atsutsa",
-        "start_sec": 437.99,
-        "end_sec": 438.47,
-        "confidence": 0.9996179193258286,
-        "flagged": false,
-        "emitted_word": "atshutsa"
+        "start_sec": 410.22,
+        "end_sec": 410.58,
+        "confidence": 0.004812,
+        "flagged": true,
+        "emitted_word": "tsuths"
       },
       {
-        "word": "tsisano",
-        "start_sec": 439.16,
-        "end_sec": 439.8,
-        "confidence": 0.9947550561692979,
-        "flagged": false,
-        "emitted_word": "tsihsanho"
+        "word": "tsihsano",
+        "start_sec": 410.62,
+        "end_sec": 411.26,
+        "confidence": 0.000686,
+        "flagged": true,
+        "emitted_word": "tsihsn"
       },
       {
-        "word": "suwoei",
-        "start_sec": 440.26,
-        "end_sec": 441.12,
-        "confidence": 0.9996001422405243,
-        "flagged": false,
-        "emitted_word": "tuwo'e'i"
+        "word": "hsuwoei",
+        "start_sec": 411.3,
+        "end_sec": 411.64,
+        "confidence": 4e-06,
+        "flagged": true,
+        "emitted_word": "hswe"
       }
     ],
     "cherokee_syllabary": "ᎠᎴ ᎥᏝ ᏳᎦᏙᎥᏎᎢ ᎬᏂ ᎤᎾᏄᎪᏫᏒ ᎢᎬᏱ ᎡᎯ ᎤᏪᏥ ᎠᏧᏣ, ᏥᏌᏃ ᏑᏬᎡᎢ.",
     "phonetic": "A-le v-tla yu-ga-do-v-se-i gv-ni u-na-nu-go-wi-sv i-gv-yi e-hi u-we-tsi a-tsu-tsa, Tsi-sa-no su-wo-e-i.",
-    "english": "And knew her not till she had brought forth her firstborn son: and he called his name JESUS."
+    "english": "And knew her not till she had brought forth her firstborn son: and he called his name JESUS.",
+    "has_anomalies": true
   },
   {
     "verse_id": "010201",

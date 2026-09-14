@@ -30,7 +30,6 @@ from transcription.alignment.normalizers import normalize_syllabary_for_alignmen
 from transcription.models.asr_model import CherokeeASRModel
 from transcription.new_testament.pipeline import (
     load_chapter_transcript,
-    reconcile_syllabary_asr,
 )
 
 DEFAULT_MODEL_REPO = "charliemcvicker/length-only-20260704-155307-asr-cherokee-colon"
@@ -163,15 +162,11 @@ def run_benchmark(
         elapsed = time.time() - t0
         total_elapsed += elapsed
 
-        # Reconcile syllabary with new hypothesis from exact backtracked CTC trellis path
-        new_asr_hyp = aligned_chunk.emitted_text
-        new_reconciled, _ = reconcile_syllabary_asr(
-            syllabary_text=cherokee_text,
-            asr_hypothesis=new_asr_hyp,
-        )
+        # Use emitted hypothesis directly from backtracked CTC trellis path
+        new_asr_hyp = (aligned_chunk.emitted_text or "").strip()
+        new_reconciled_clean = new_asr_hyp
 
         old_reconciled = base_rec["reconciled_phonetics"].strip()
-        new_reconciled_clean = new_reconciled.strip()
 
         is_different = old_reconciled != new_reconciled_clean
         if is_different:

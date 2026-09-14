@@ -324,8 +324,11 @@ def export_manifest(
         word_objs = []
         for w_idx, w in enumerate(c.words):
             w_dict = _serialize_word_interval(w)
-            if "Reconciled Words" in tier_chunk_words:
-                rec_words_for_chunk = tier_chunk_words["Reconciled Words"][c_idx]
+            rec_tier = tier_chunk_words.get("Reconciled Words") or tier_chunk_words.get(
+                "Reconciled Transcriptions"
+            )
+            if rec_tier:
+                rec_words_for_chunk = rec_tier[c_idx]
                 if w_idx < len(rec_words_for_chunk):
                     w_dict["reconciled_word"] = rec_words_for_chunk[w_idx].word
             word_objs.append(w_dict)
@@ -354,10 +357,11 @@ def export_manifest(
                 ]
 
             line_dict["additional_word_tiers"] = chunk_additional_tiers
-            if "Reconciled Words" in chunk_additional_tiers:
-                line_dict["reconciled_words"] = chunk_additional_tiers[
-                    "Reconciled Words"
-                ]
+            rec_chunk = chunk_additional_tiers.get(
+                "Reconciled Words"
+            ) or chunk_additional_tiers.get("Reconciled Transcriptions")
+            if rec_chunk is not None:
+                line_dict["reconciled_words"] = rec_chunk
 
         manifest_lines.append(line_dict)
 
@@ -385,8 +389,11 @@ def export_manifest(
                 _serialize_word_interval(tw) for tw in tier_words
             ]
         data["additional_word_tiers"] = top_additional_tiers
-        if "Reconciled Words" in top_additional_tiers:
-            data["reconciled_words"] = top_additional_tiers["Reconciled Words"]
+        rec_top = top_additional_tiers.get(
+            "Reconciled Words"
+        ) or top_additional_tiers.get("Reconciled Transcriptions")
+        if rec_top is not None:
+            data["reconciled_words"] = rec_top
 
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2, ensure_ascii=False)

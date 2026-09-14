@@ -4,13 +4,13 @@
 realign_bible.py
 
 Realigns New Testament books (Mark, Matthew) using:
-1. Baseline pre-Bible ASR model (charliemcvicker/asr-cherokee:5464d15).
-2. CachedASREmissionsExtractor to cache and reuse chapter emissions.
-3. ConfusionMatrixCostMetric loaded from confusion_cost_matrix_prebible.json.
-4. Phonological syllabary/ASR reconciliation.
-5. Slices audio into 16kHz mono WAV files in cherokee_new_testament/split_audio/.
-6. Exports full alignment records to cherokee_new_testament/alignments/.
-7. Exports training CSVs to cherokee_new_testament/train_csvs/.
+1. CTCSegmentationAligner with syncope-aware DP trellis segmentation on continuous chapter audio.
+2. Slices unclipped verse audio into 16kHz mono WAV files in cherokee_new_testament/split_audio/
+   using natural inter-verse boundary partition points.
+3. Performs phonological syllabary/ASR reconciliation.
+4. Exports 4-tier Praat TextGrids to output_praat/new_testament/{book}_{ch}/.
+5. Exports full alignment records to cherokee_new_testament/alignments/{book}_alignment_records.json and bible_alignment_records.json.
+6. Exports training CSVs to cherokee_new_testament/train_csvs/.
 """
 
 import argparse
@@ -18,16 +18,24 @@ import csv
 import json
 import os
 from pathlib import Path
+import sys
 from typing import Any, Dict, List, Optional, Tuple
+
 import numpy as np
 from pydub import AudioSegment
+import torch
 
-from transcription.alignment.calibrated_distance_metrics import (
-    PhonologicalConfusionCostMetric,
-)
+BASE_DIR = Path(__file__).resolve().parent.parent
+if str(BASE_DIR) not in sys.path:
+    sys.path.insert(0, str(BASE_DIR))
+
+from transcription.alignment.ctc_aligner import CTCSegmentationAligner
 from transcription.alignment.distance_metrics import (
     ConfusionMatrixCostMetric,
     DistanceMetric,
+)
+from transcription.alignment.calibrated_distance_metrics import (
+    PhonologicalConfusionCostMetric,
 )
 from transcription.alignment.extractors import (
     ASREmissionsExtractor,
@@ -38,10 +46,8 @@ from transcription.models.asr_model import CherokeeASRModel
 from transcription.new_testament.pipeline import (
     align_chapter,
     load_chapter_transcript,
-    reconcile_syllabary_asr,
 )
 
-BASE_DIR = Path(__file__).resolve().parent.parent
 NT_DIR = BASE_DIR / "cherokee_new_testament"
 AUDIO_SRC_DIR = NT_DIR / "audio_source"
 TRANSCRIPTS_DIR = NT_DIR / "book_transcripts"
@@ -49,12 +55,11 @@ SPLIT_AUDIO_DIR = NT_DIR / "split_audio"
 ALIGNMENTS_DIR = NT_DIR / "alignments"
 TRAIN_CSVS_DIR = NT_DIR / "train_csvs"
 PRAAT_OUT_DIR = BASE_DIR / "output_praat" / "new_testament"
-DEFAULT_COST_MATRIX_PATH = (
-    BASE_DIR / "runs" / "evaluation" / "confusion_cost_matrix_prebible.json"
-)
-DEFAULT_CACHE_DIR = BASE_DIR / "runs" / "cache" / "emissions"
+DEFAULT_CACHE_DIR = BASE_DIR / "runs" / "cache" / "ctc_emissions"
 DEFAULT_MODEL_REPO = "charliemcvicker/length-only-20260704-155307-asr-cherokee-colon"
 DEFAULT_REVISION = "76e62140955f4738abdab345ea34068b02d8d2a2"
+DEFAULT_SYNCOPE_PENALTY = 6.0
+DEFAULT_INTRUSIVE_PENALTY = 2.5
 
 BOOK_CONFIGS = {
     "mark": {"chapters": 16, "name": "Mark"},
@@ -62,12 +67,43 @@ BOOK_CONFIGS = {
 }
 
 
-def get_default_extractor_and_metric(
+def get_default_ctc_aligner(
     model_repo: str = DEFAULT_MODEL_REPO,
     model_revision: str = DEFAULT_REVISION,
     cache_dir: Path = DEFAULT_CACHE_DIR,
-    cost_matrix_path: Path = DEFAULT_COST_MATRIX_PATH,
+    cache: bool = True,
+    syncope_penalty: float = DEFAULT_SYNCOPE_PENALTY,
+    intrusive_penalty: float = DEFAULT_INTRUSIVE_PENALTY,
+) -> CTCSegmentationAligner:
+    """Instantiates default CTCSegmentationAligner with cached emissions."""
+    token = os.environ.get("HF_TOKEN", None)
+    device = "mps" if torch.backends.mps.is_available() else "cpu"
+    asr_model = CherokeeASRModel.from_pretrained_or_best(
+        path_or_repo=model_repo,
+        revision=model_revision,
+        device=device,
+        token=token,
+    )
+    aligner = CTCSegmentationAligner(
+        model=asr_model,
+        cache=cache,
+        cache_dir=cache_dir,
+        syncope_penalty=syncope_penalty,
+        intrusive_penalty=intrusive_penalty,
+    )
+    return aligner
+
+
+def get_default_extractor_and_metric(
+    model_repo: str = DEFAULT_MODEL_REPO,
+    model_revision: str = DEFAULT_REVISION,
+    cache_dir: Path = BASE_DIR / "runs" / "cache" / "emissions",
+    cost_matrix_path: Path = BASE_DIR
+    / "runs"
+    / "evaluation"
+    / "confusion_cost_matrix_prebible.json",
 ) -> Tuple[CachedASREmissionsExtractor, DistanceMetric]:
+    """Legacy helper for DTW distance metric and emissions extractor."""
     token = os.environ.get("HF_TOKEN", None)
     asr_model = CherokeeASRModel.from_pretrained_or_best(
         path_or_repo=model_repo,
@@ -99,11 +135,17 @@ def get_default_extractor_and_metric(
 
 def realign_book(
     book: str,
+    chapter: Optional[int] = None,
+    ctc_aligner: Optional[CTCSegmentationAligner] = None,
     distance_metric: Optional[DistanceMetric] = None,
     emissions_extractor: Optional[ASREmissionsExtractor] = None,
     model_repo: str = DEFAULT_MODEL_REPO,
     model_revision: str = DEFAULT_REVISION,
     export_praat: bool = True,
+    cache_dir: Path = DEFAULT_CACHE_DIR,
+    cache: bool = True,
+    syncope_penalty: float = DEFAULT_SYNCOPE_PENALTY,
+    intrusive_penalty: float = DEFAULT_INTRUSIVE_PENALTY,
 ) -> Tuple[List[Dict[str, Any]], List[Dict[str, str]]]:
     book_key = book.lower().strip()
     if book_key not in BOOK_CONFIGS:
@@ -115,27 +157,42 @@ def realign_book(
     num_chapters = config["chapters"]
     book_display = config["name"]
 
+    if chapter is not None:
+        if chapter < 1 or chapter > num_chapters:
+            raise ValueError(
+                f"Invalid chapter {chapter} for {book_display}. Valid: 1 to {num_chapters}"
+            )
+        chapters_to_run = [chapter]
+    else:
+        chapters_to_run = list(range(1, num_chapters + 1))
+
     SPLIT_AUDIO_DIR.mkdir(parents=True, exist_ok=True)
     ALIGNMENTS_DIR.mkdir(parents=True, exist_ok=True)
     TRAIN_CSVS_DIR.mkdir(parents=True, exist_ok=True)
 
-    if emissions_extractor is None or distance_metric is None:
-        def_extractor, def_metric = get_default_extractor_and_metric(
+    if ctc_aligner is None and emissions_extractor is None:
+        ctc_aligner = get_default_ctc_aligner(
             model_repo=model_repo,
             model_revision=model_revision,
+            cache_dir=cache_dir,
+            cache=cache,
+            syncope_penalty=syncope_penalty,
+            intrusive_penalty=intrusive_penalty,
         )
-        emissions_extractor = emissions_extractor or def_extractor
-        distance_metric = distance_metric or def_metric
 
     records: List[Dict[str, Any]] = []
     csv_rows: List[Dict[str, str]] = []
     durations_sec: List[float] = []
+    total_flagged_words = 0
 
+    scope_str = (
+        f"Chapter {chapter}" if chapter is not None else f"All {num_chapters} chapters"
+    )
     print(f"\n==================================================")
-    print(f"Starting Realignment of Book of {book_display} ({num_chapters} chapters)")
+    print(f"Starting Continuous CTC Realignment of {book_display} ({scope_str})")
     print(f"==================================================")
 
-    for ch in range(1, num_chapters + 1):
+    for ch in chapters_to_run:
         ch_str = f"{ch:02d}"
         audio_path = AUDIO_SRC_DIR / f"{book_key}_{ch_str}.mp3"
         transcript_path = TRANSCRIPTS_DIR / f"{book_key}_{ch_str}.json"
@@ -147,20 +204,35 @@ def realign_book(
             print(f"[Warning] Transcript not found: {transcript_path}, skipping.")
             continue
 
-        print(f"\n>>> Realigning {book_display} Chapter {ch} ...")
+        ch_out_dir = PRAAT_OUT_DIR / f"{book_key}_{ch_str}"
+        print(
+            f"\n>>> Realigning {book_display} Chapter {ch} with CTCSegmentationAligner ..."
+        )
         res = align_chapter(
             audio_path=audio_path,
             transcript_path=transcript_path,
-            output_dir=PRAAT_OUT_DIR,
+            output_dir=ch_out_dir,
             export_praat=export_praat,
+            export_manifest=True,
+            engine="ctc" if ctc_aligner is not None else "dtw",
+            ctc_aligner=ctc_aligner,
             distance_metric=distance_metric,
             emissions_extractor=emissions_extractor,
+            model_path=model_repo,
             model_revision=model_revision,
+            cache_dir=cache_dir,
+            cache=cache,
         )
 
-        audio_seg = AudioSegment.from_file(str(audio_path))
+        audio_seg = (
+            AudioSegment.from_file(str(audio_path))
+            .set_frame_rate(16000)
+            .set_channels(1)
+        )
         num_verses_aligned = len(res.aligned_chunks)
         print(f"    Aligned {num_verses_aligned} verses.")
+
+        ch_data = load_chapter_transcript(transcript_path)
 
         for chunk in res.aligned_chunks:
             verse_id = chunk.chunk_id
@@ -180,15 +252,18 @@ def realign_book(
 
             split_out_path = SPLIT_AUDIO_DIR / split_filename
 
-            # Slicing audio
+            # Slicing unclipped verse audio using natural inter-verse boundary partition points
             start_ms = int(start_sec * 1000)
             end_ms = int(end_sec * 1000)
-            verse_audio = audio_seg[start_ms:end_ms]
-            verse_audio = verse_audio.set_frame_rate(16000).set_channels(1)
-            verse_audio.export(str(split_out_path), format="wav")
+            if end_ms <= start_ms:
+                print(
+                    f"    [Warning] Skipping zero or negative duration audio slice for {verse_id}: [{start_sec}s - {end_sec}s]"
+                )
+            else:
+                verse_audio = audio_seg[start_ms:end_ms]
+                verse_audio.export(str(split_out_path), format="wav")
 
             # Load verse transcript text
-            ch_data = load_chapter_transcript(transcript_path)
             verse_info = ch_data.get(verse_id, {})
             cherokee_text = (
                 verse_info.get("cherokee")
@@ -198,12 +273,8 @@ def realign_book(
             phonetic_text = verse_info.get("phonetic", "")
             english_text = verse_info.get("english", "")
 
-            # Reconcile syllabary & ASR tokens
-            asr_hyp = chunk.emitted_text or ""
-            reconciled_syllabary, _ = reconcile_syllabary_asr(
-                syllabary_text=cherokee_text,
-                asr_hypothesis=asr_hyp,
-            )
+            # Use direct CTC trellis emissions (syncope- and intrusion-aware)
+            emitted_sentence = (chunk.emitted_text or "").strip()
 
             words_list = [
                 {
@@ -217,6 +288,10 @@ def realign_book(
                 for w in chunk.words
             ]
 
+            for w in chunk.words:
+                if w.flagged:
+                    total_flagged_words += 1
+
             record = {
                 "verse_id": verse_id,
                 "book": book_key,
@@ -227,56 +302,99 @@ def realign_book(
                 "end_sec": end_sec,
                 "duration_sec": dur,
                 "reference_sentence": cherokee_text,
-                "reconciled_phonetics": reconciled_syllabary,
-                "asr_hypothesis": asr_hyp,
+                "reconciled_phonetics": emitted_sentence,
+                "asr_hypothesis": emitted_sentence,
                 "cost": round(chunk.distance_score, 4),
                 "words": words_list,
                 "cherokee_syllabary": cherokee_text,
                 "phonetic": phonetic_text,
                 "english": english_text,
+                "has_anomalies": bool(chunk.has_anomalies),
             }
             records.append(record)
 
-            csv_rows.append(
-                {
-                    "path": f"cherokee_new_testament/split_audio/{split_filename}",
-                    "sentence": reconciled_syllabary or phonetic_text,
-                }
-            )
+            # Only export non-anomalous verses with valid emitted text to the training dataset.
+            # Strict quality control: no fallback to phonetic text. If emitted_text is missing or anomalous, do not export.
+            if not chunk.has_anomalies and emitted_sentence:
+                csv_rows.append(
+                    {
+                        "path": f"cherokee_new_testament/split_audio/{split_filename}",
+                        "sentence": emitted_sentence,
+                    }
+                )
+            elif not emitted_sentence:
+                print(
+                    f"    [Missing Emission Filtered] Excluded verse {verse_id} from training CSV due to missing emitted text."
+                )
+            else:
+                print(
+                    f"    [Anomaly Filtered] Excluded verse {verse_id} from training CSV due to flagged word(s)."
+                )
 
-    # Export per-book alignment JSON
+    # Merge or save per-book alignment JSON
     book_alignments_path = ALIGNMENTS_DIR / f"{book_key}_alignment_records.json"
+    if chapter is not None and book_alignments_path.exists():
+        try:
+            with open(book_alignments_path, "r", encoding="utf-8") as f:
+                existing_book_records = json.load(f)
+            other_ch_records = [
+                r for r in existing_book_records if r.get("chapter") != chapter
+            ]
+            saved_records = sorted(
+                other_ch_records + records,
+                key=lambda x: (x.get("chapter", 0), x.get("verse_idx", 0)),
+            )
+        except Exception:
+            saved_records = records
+    else:
+        saved_records = records
+
     with open(book_alignments_path, "w", encoding="utf-8") as f:
-        json.dump(records, f, indent=2, ensure_ascii=False)
+        json.dump(saved_records, f, indent=2, ensure_ascii=False)
     print(
-        f"\n[Artifact] Saved {len(records)} alignment records to '{book_alignments_path}'"
+        f"\n[Artifact] Saved {len(saved_records)} alignment records to '{book_alignments_path}'"
     )
 
     # Export training CSV
     train_csv_path = TRAIN_CSVS_DIR / f"{book_key}.csv"
+    if chapter is not None and train_csv_path.exists():
+        try:
+            with open(train_csv_path, "r", encoding="utf-8") as f:
+                existing_csv = list(csv.DictReader(f))
+            # Remove rows matching current chapter prefix
+            ch_prefix = f"cherokee_new_testament/split_audio/{book_key}_{chapter:02d}_"
+            other_csv_rows = [
+                r for r in existing_csv if not r.get("path", "").startswith(ch_prefix)
+            ]
+            saved_csv_rows = sorted(
+                other_csv_rows + csv_rows, key=lambda x: x.get("path", "")
+            )
+        except Exception:
+            saved_csv_rows = csv_rows
+    else:
+        saved_csv_rows = csv_rows
+
     with open(train_csv_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=["path", "sentence"])
         writer.writeheader()
-        writer.writerows(csv_rows)
+        writer.writerows(saved_csv_rows)
     print(
-        f"[Artifact] Saved training CSV with {len(csv_rows)} rows to '{train_csv_path}'"
+        f"[Artifact] Saved training CSV with {len(saved_csv_rows)} rows to '{train_csv_path}'"
     )
 
     train_csv_alt = TRAIN_CSVS_DIR / f"{book_key}_train.csv"
     with open(train_csv_alt, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=["path", "sentence"])
         writer.writeheader()
-        writer.writerows(csv_rows)
-    print(
-        f"[Artifact] Saved training CSV with {len(csv_rows)} rows to '{train_csv_path}'"
-    )
+        writer.writerows(saved_csv_rows)
 
     if durations_sec:
         total_sec = sum(durations_sec)
         mean_len = float(np.mean(durations_sec))
         median_len = float(np.median(durations_sec))
-        print(f"\n--- {book_display} Audio Slicing Summary ---")
+        print(f"\n--- {book_display} ({scope_str}) Alignment Summary ---")
         print(f"Total sliced segments: {len(durations_sec)}")
+        print(f"Flagged anomaly words: {total_flagged_words}")
         print(f"Mean verse length    : {mean_len:.2f} seconds")
         print(f"Median verse length  : {median_len:.2f} seconds")
         print(
@@ -287,13 +405,22 @@ def realign_book(
 
 
 def realign_all(
+    chapter: Optional[int] = None,
     model_repo: str = DEFAULT_MODEL_REPO,
     model_revision: str = DEFAULT_REVISION,
     export_praat: bool = True,
+    cache_dir: Path = DEFAULT_CACHE_DIR,
+    cache: bool = True,
+    syncope_penalty: float = DEFAULT_SYNCOPE_PENALTY,
+    intrusive_penalty: float = DEFAULT_INTRUSIVE_PENALTY,
 ) -> Dict[str, List[Dict[str, Any]]]:
-    cached_extractor, distance_metric = get_default_extractor_and_metric(
+    ctc_aligner = get_default_ctc_aligner(
         model_repo=model_repo,
         model_revision=model_revision,
+        cache_dir=cache_dir,
+        cache=cache,
+        syncope_penalty=syncope_penalty,
+        intrusive_penalty=intrusive_penalty,
     )
 
     all_records: List[Dict[str, Any]] = []
@@ -302,11 +429,15 @@ def realign_all(
     for book in ["mark", "matthew"]:
         records, _ = realign_book(
             book=book,
-            distance_metric=distance_metric,
-            emissions_extractor=cached_extractor,
+            chapter=chapter,
+            ctc_aligner=ctc_aligner,
             model_repo=model_repo,
             model_revision=model_revision,
             export_praat=export_praat,
+            cache_dir=cache_dir,
+            cache=cache,
+            syncope_penalty=syncope_penalty,
+            intrusive_penalty=intrusive_penalty,
         )
         book_results[book] = records
         all_records.extend(records)
@@ -314,10 +445,28 @@ def realign_all(
     # Save combined alignment records
     ALIGNMENTS_DIR.mkdir(parents=True, exist_ok=True)
     combined_out_path = ALIGNMENTS_DIR / "bible_alignment_records.json"
+    if chapter is not None and combined_out_path.exists():
+        try:
+            with open(combined_out_path, "r", encoding="utf-8") as f:
+                existing_comb = json.load(f)
+            other_comb = [r for r in existing_comb if r.get("chapter") != chapter]
+            final_comb = sorted(
+                other_comb + all_records,
+                key=lambda x: (
+                    x.get("book", ""),
+                    x.get("chapter", 0),
+                    x.get("verse_idx", 0),
+                ),
+            )
+        except Exception:
+            final_comb = all_records
+    else:
+        final_comb = all_records
+
     with open(combined_out_path, "w", encoding="utf-8") as f:
-        json.dump(all_records, f, indent=2, ensure_ascii=False)
+        json.dump(final_comb, f, indent=2, ensure_ascii=False)
     print(
-        f"\n[Artifact] Saved {len(all_records)} combined alignment records to '{combined_out_path}'"
+        f"\n[Artifact] Saved {len(final_comb)} combined alignment records to '{combined_out_path}'"
     )
 
     return book_results
@@ -325,13 +474,20 @@ def realign_all(
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Realign Cherokee New Testament books with pre-Bible model and confusion cost metric."
+        description="Realign Cherokee New Testament books with continuous CTC segmentation aligner."
     )
     parser.add_argument(
         "--book",
         choices=["mark", "matthew", "all"],
         default="all",
         help="Book to realign (default: all)",
+    )
+    parser.add_argument(
+        "--chapter",
+        "-c",
+        type=int,
+        default=None,
+        help="Specific chapter number to realign (default: all chapters)",
     )
     parser.add_argument(
         "--model-repo",
@@ -344,26 +500,60 @@ def main():
         help=f"HF model revision (default: {DEFAULT_REVISION})",
     )
     parser.add_argument(
+        "--syncope-penalty",
+        type=float,
+        default=DEFAULT_SYNCOPE_PENALTY,
+        help=f"CTC segmentation syncope penalty for vowel deletion (default: {DEFAULT_SYNCOPE_PENALTY})",
+    )
+    parser.add_argument(
+        "--intrusive-penalty",
+        type=float,
+        default=DEFAULT_INTRUSIVE_PENALTY,
+        help=f"CTC segmentation intrusive penalty for h/' insertion (default: {DEFAULT_INTRUSIVE_PENALTY})",
+    )
+    parser.add_argument(
         "--no-praat",
         action="store_true",
         default=False,
         help="Skip Praat TextGrid export",
+    )
+    parser.add_argument(
+        "--cache-dir",
+        type=Path,
+        default=DEFAULT_CACHE_DIR,
+        help=f"Directory for caching CTC logits (default: {DEFAULT_CACHE_DIR})",
+    )
+    parser.add_argument(
+        "--no-cache",
+        action="store_true",
+        default=False,
+        help="Disable disk caching for CTC logits",
     )
 
     args = parser.parse_args()
 
     if args.book == "all":
         realign_all(
+            chapter=args.chapter,
             model_repo=args.model_repo,
             model_revision=args.model_revision,
             export_praat=not args.no_praat,
+            cache_dir=args.cache_dir,
+            cache=not args.no_cache,
+            syncope_penalty=args.syncope_penalty,
+            intrusive_penalty=args.intrusive_penalty,
         )
     else:
         records, _ = realign_book(
             book=args.book,
+            chapter=args.chapter,
             model_repo=args.model_repo,
             model_revision=args.model_revision,
             export_praat=not args.no_praat,
+            cache_dir=args.cache_dir,
+            cache=not args.no_cache,
+            syncope_penalty=args.syncope_penalty,
+            intrusive_penalty=args.intrusive_penalty,
         )
         # Also update combined if single book is run
         ALIGNMENTS_DIR.mkdir(parents=True, exist_ok=True)
@@ -373,12 +563,29 @@ def main():
             try:
                 with open(combined_path, "r", encoding="utf-8") as f:
                     existing = json.load(f)
+                if args.chapter is not None:
+                    existing_records = [
+                        r
+                        for r in existing
+                        if not (
+                            r.get("book") == args.book
+                            and r.get("chapter") == args.chapter
+                        )
+                    ]
+                else:
                     existing_records = [
                         r for r in existing if r.get("book") != args.book
                     ]
             except Exception:
                 existing_records = []
         existing_records.extend(records)
+        existing_records.sort(
+            key=lambda x: (
+                x.get("book", ""),
+                x.get("chapter", 0),
+                x.get("verse_idx", 0),
+            )
+        )
         with open(combined_path, "w", encoding="utf-8") as f:
             json.dump(existing_records, f, indent=2, ensure_ascii=False)
 

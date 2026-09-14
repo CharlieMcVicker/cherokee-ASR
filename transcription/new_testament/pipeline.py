@@ -13,16 +13,28 @@ from transcription.alignment.cli import run_alignment_pipeline
 from transcription.alignment.calibrated_distance_metrics import (
     PhonologicalConfusionCostMetric,
 )
+from transcription.alignment.ctc_aligner import (
+    CTCSegmentationAligner,
+    DEFAULT_CACHE_DIR,
+)
 from transcription.alignment.distance_metrics import (
     ConfusionMatrixCostMetric,
     DistanceMetric,
+)
+from transcription.alignment.exporters import (
+    export_debug_json,
+    export_manifest as export_manifest_file,
+    export_textgrid,
 )
 from transcription.alignment.extractors import (
     ASREmissionsExtractor,
     CachedASREmissionsExtractor,
     CherokeeASRExtractor,
 )
-from transcription.alignment.models import AlignmentOutput
+from transcription.alignment.ingestion import load_bible_chunks
+from transcription.alignment.models import AlignmentOutput, WordInterval
+from transcription.alignment.normalizers import normalize_phonetics_for_alignment
+from transcription.alignment.reconciliation import reconcile_alignment_words
 from transcription.models.asr_model import CherokeeASRModel
 from transcription.syllabary_enrichment import (
     align_character_syllable,
@@ -53,6 +65,8 @@ def align_chapter(
     transcript_path: Union[str, Path],
     output_dir: Union[str, Path] = "output_praat/new_testament",
     export_praat: bool = True,
+    export_manifest: bool = True,
+    debug_export: bool = False,
     model_path: Optional[str] = None,
     skip_vad: bool = False,
     reconcile: bool = True,
@@ -60,14 +74,117 @@ def align_chapter(
     emissions_extractor: Optional[ASREmissionsExtractor] = None,
     model_revision: Optional[str] = None,
     cache_dir: Optional[Union[str, Path]] = None,
+    engine: str = "ctc",
+    ctc_aligner: Optional[CTCSegmentationAligner] = None,
+    asr_model: Optional[CherokeeASRModel] = None,
+    cache: bool = True,
 ) -> AlignmentOutput:
     """
     Align a New Testament audio recording with its syllabary transcript end-to-end.
 
-    Delegates directly to the core timestamping alignment pipeline (run_alignment_pipeline),
-    performing VAD, ground-truth ingest, ASR CTC emissions extraction, DTW alignment,
-    reconciliation, and automatic Praat TextGrid / alignment manifest export.
+    Supports continuous chapter alignment using CTCSegmentationAligner (default, engine="ctc"),
+    or DTW emissions alignment via run_alignment_pipeline (engine="dtw" or when DTW extractors are provided).
+
+    Args:
+        audio_path: Path to continuous chapter audio file (.wav/.mp3).
+        transcript_path: Path to chapter transcript JSON file.
+        output_dir: Directory to save exported Praat TextGrid and alignment JSON.
+        export_praat: Whether to export Praat TextGrids.
+        export_manifest: Whether to export alignment_manifest.json.
+        debug_export: Whether to export alignment_debug.json.
+        model_path: HuggingFace model repo or local checkpoint path.
+        skip_vad: Bypass VAD segmentation (for legacy DTW engine).
+        reconcile: Whether to perform syllabary/ASR phonological reconciliation.
+        distance_metric: Custom distance metric (for legacy DTW engine).
+        emissions_extractor: Custom emissions extractor (for legacy DTW engine).
+        model_revision: HuggingFace model revision tag or commit hash.
+        cache_dir: Directory to store/load cached emissions or CTC logits.
+        engine: Alignment engine ("ctc" or "dtw"). Defaults to "ctc".
+        ctc_aligner: Optional pre-instantiated CTCSegmentationAligner.
+        asr_model: Optional pre-instantiated CherokeeASRModel.
+        cache: Whether to use disk caching for CTC logits.
+
+    Returns:
+        AlignmentOutput object containing aligned chunks, words, and metrics.
     """
+    use_ctc = engine.lower() == "ctc" and (
+        ctc_aligner is not None
+        or (distance_metric is None and emissions_extractor is None)
+    )
+
+    if use_ctc:
+        chunks, source_lookup = load_bible_chunks(
+            transcript_path, normalizer=normalize_phonetics_for_alignment
+        )
+
+        aligner = ctc_aligner
+        if aligner is None:
+            model = asr_model
+            if model is None:
+                rev = model_revision or "5464d15"
+                repo = model_path or "charliemcvicker/asr-cherokee"
+                token = os.environ.get("HF_TOKEN", None)
+                model = CherokeeASRModel.from_pretrained_or_best(
+                    path_or_repo=repo,
+                    revision=rev,
+                    token=token,
+                )
+            c_dir = Path(cache_dir) if cache_dir is not None else DEFAULT_CACHE_DIR
+            aligner = CTCSegmentationAligner(
+                model=model,
+                cache=cache,
+                cache_dir=c_dir,
+            )
+
+        alignment = aligner.align(
+            audio_input=audio_path,
+            chunks=chunks,
+            source_id=str(audio_path),
+        )
+
+        additional_word_tiers = None
+        if reconcile:
+            reconciled_words = [
+                WordInterval(
+                    word=w.emitted_word or w.word,
+                    start_sec=w.start_sec,
+                    end_sec=w.end_sec,
+                    confidence=w.confidence,
+                    flagged=w.flagged,
+                    emitted_word=w.emitted_word,
+                )
+                for c in alignment.aligned_chunks
+                for w in c.words
+            ]
+            additional_word_tiers = {"Reconciled Transcriptions": reconciled_words}
+
+        os.makedirs(str(output_dir), exist_ok=True)
+
+        if export_manifest:
+            export_manifest_file(
+                alignment=alignment,
+                output_dir=output_dir,
+                source_metadata=source_lookup,
+                additional_word_tiers=additional_word_tiers,
+            )
+
+        if export_praat:
+            export_textgrid(
+                alignment=alignment,
+                output_dir=output_dir,
+                source_metadata=source_lookup,
+                additional_word_tiers=additional_word_tiers,
+            )
+
+        if debug_export:
+            export_debug_json(
+                alignment=alignment,
+                output_dir=output_dir,
+            )
+
+        return alignment
+
+    # Legacy DTW alignment fallback
     if distance_metric is None:
         cost_matrix_path = Path("runs/evaluation/confusion_cost_matrix_prebible.json")
         if not cost_matrix_path.exists():
@@ -85,12 +202,12 @@ def align_chapter(
         rev = model_revision or "5464d15"
         repo = model_path or "charliemcvicker/asr-cherokee"
         token = os.environ.get("HF_TOKEN", None)
-        asr_model = CherokeeASRModel.from_pretrained_or_best(
+        model = asr_model or CherokeeASRModel.from_pretrained_or_best(
             path_or_repo=repo,
             revision=rev,
             token=token,
         )
-        base_extractor = CherokeeASRExtractor(model=asr_model, skip_vad=skip_vad)
+        base_extractor = CherokeeASRExtractor(model=model, skip_vad=skip_vad)
         c_dir = (
             Path(cache_dir) if cache_dir is not None else Path("runs/cache/emissions")
         )
@@ -106,8 +223,10 @@ def align_chapter(
         output_dir=str(output_dir),
         bible_metadata_path=str(transcript_path),
         export_praat=export_praat,
+        export_manifest=export_manifest,
         model_path=model_path,
         skip_vad=skip_vad,
+        debug_export=debug_export,
         reconcile=reconcile,
         distance_metric=distance_metric,
         emissions_extractor=emissions_extractor,

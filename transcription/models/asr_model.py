@@ -25,6 +25,7 @@ from transcription.utils.model_utils import get_best_model_config, get_model
 logger = logging.getLogger(__name__)
 
 TARGET_SAMPLE_RATE = 16000
+FRAME_DURATION_SEC = 0.02
 
 
 @dataclass
@@ -323,6 +324,65 @@ class CherokeeASRModel:
                 raise e
 
         return logits.squeeze(0)
+
+    def get_logits_sliding_window(
+        self,
+        pcm_audio: Union[str, bytes, List[float], np.ndarray, torch.Tensor],
+        sample_rate: int = TARGET_SAMPLE_RATE,
+        chunk_seconds: float = 30.0,
+        margin_seconds: float = 1.0,
+    ) -> torch.Tensor:
+        """
+        Extracts raw logits tensor [sequence_length, vocab_size] using overlapping
+        sliding-window inference with margin trimming to eliminate boundary artifacts.
+        """
+        speech = self.preprocess_audio(pcm_audio, sample_rate=sample_rate)
+        chunk_samples = int(TARGET_SAMPLE_RATE * chunk_seconds)
+        margin_samples = int(TARGET_SAMPLE_RATE * margin_seconds)
+
+        if len(speech) <= chunk_samples or margin_seconds <= 0:
+            return self.get_logits(speech, sample_rate=TARGET_SAMPLE_RATE)
+
+        step_samples = chunk_samples - 2 * margin_samples
+        if step_samples <= 0:
+            raise ValueError(
+                f"chunk_seconds ({chunk_seconds}) must be strictly greater than 2 * margin_seconds ({2 * margin_seconds})."
+            )
+
+        margin_frames = int(round(margin_seconds / FRAME_DURATION_SEC))
+
+        cur_start = 0
+        total_samples = len(speech)
+        logits_list: List[torch.Tensor] = []
+
+        while cur_start < total_samples:
+            cur_end = min(cur_start + chunk_samples, total_samples)
+            chunk = speech[cur_start:cur_end]
+            chunk_logits = self.get_logits(chunk, sample_rate=TARGET_SAMPLE_RATE)
+            if chunk_logits.ndim == 3:
+                chunk_logits = chunk_logits.squeeze(0)
+
+            T_chunk = chunk_logits.shape[0]
+            is_first = cur_start == 0
+            is_last = cur_end >= total_samples
+
+            left_trim = 0 if is_first else margin_frames
+            right_trim = 0 if is_last else margin_frames
+
+            left_idx = min(left_trim, T_chunk)
+            right_idx = max(left_idx, T_chunk - right_trim)
+
+            trimmed = chunk_logits[left_idx:right_idx]
+            logits_list.append(trimmed)
+
+            if is_last:
+                break
+            cur_start += step_samples
+
+        if not logits_list:
+            return self.get_logits(speech, sample_rate=TARGET_SAMPLE_RATE)
+
+        return torch.cat(logits_list, dim=0)
 
     def get_logits_batch(
         self,
@@ -655,116 +715,14 @@ class CherokeeASRModel:
     ) -> List[ASRResult]:
         """
         Batched procedural pipeline for multiple audio inputs.
+        Delegates to get_logits_batch and decodes the resulting logits.
         """
-        results: List[ASRResult] = []
-
-        for i in range(0, len(audio_inputs), batch_size):
-            batch = audio_inputs[i : i + batch_size]
-            batch_speech = []
-            for item in batch:
-                try:
-                    speech = self.preprocess_audio(item, sample_rate=sample_rate)
-                    batch_speech.append(speech)
-                except Exception as e:
-                    logger.warning("Error preprocessing batch item: %s", e)
-                    batch_speech.append(np.zeros(TARGET_SAMPLE_RATE, dtype=np.float32))
-
-            inputs = self.processor(
-                batch_speech,
-                sampling_rate=TARGET_SAMPLE_RATE,
-                padding=True,
-                return_tensors="pt",
-            )
-            input_values = inputs.input_values.to(self.device)
-            attention_mask = getattr(inputs, "attention_mask", None)
-            if attention_mask is not None:
-                attention_mask = attention_mask.to(self.device)
-
-            try:
-                with torch.no_grad():
-                    if attention_mask is not None:
-                        batch_logits = self.model(
-                            input_values, attention_mask=attention_mask
-                        ).logits
-                    else:
-                        batch_logits = self.model(input_values).logits
-            except Exception as e:
-                err_str = str(e).lower()
-                is_oom = "out of memory" in err_str or (
-                    hasattr(torch.cuda, "OutOfMemoryError")
-                    and isinstance(e, torch.cuda.OutOfMemoryError)
-                )
-                if is_oom or "cudnn" in err_str:
-                    logger.warning(
-                        "OOM or cuDNN error in batch. Falling back to sequential."
-                    )
-                    del input_values
-                    if attention_mask is not None:
-                        del attention_mask
-                    if torch.cuda.is_available():
-                        torch.cuda.empty_cache()
-                    elif torch.backends.mps.is_available():
-                        torch.mps.empty_cache()
-
-                    for sp in batch_speech:
-                        results.append(
-                            self.transcribe(
-                                sp,
-                                sample_rate=TARGET_SAMPLE_RATE,
-                                compute_word_confidences=compute_word_confidences,
-                            )
-                        )
-                    continue
-                elif isinstance(e, NotImplementedError) and self.device == "mps":
-                    logger.warning("MPS error in batch. Falling back to CPU.")
-                    self.device = "cpu"
-                    self.model.to(self.device)
-                    input_values = input_values.to(self.device)
-                    if attention_mask is not None:
-                        attention_mask = attention_mask.to(self.device)
-                    with torch.no_grad():
-                        if attention_mask is not None:
-                            batch_logits = self.model(
-                                input_values, attention_mask=attention_mask
-                            ).logits
-                        else:
-                            batch_logits = self.model(input_values).logits
-                else:
-                    raise e
-
-            if attention_mask is not None:
-                input_lengths = attention_mask.sum(dim=-1)
-                feat_extractor = getattr(
-                    self.model, "_get_feat_extract_output_lengths", None
-                )
-                if callable(feat_extractor):
-                    raw_lengths: Any = feat_extractor(input_lengths)
-                    if hasattr(raw_lengths, "detach"):
-                        output_lengths = raw_lengths.detach().cpu().numpy()
-                    elif isinstance(raw_lengths, np.ndarray):
-                        output_lengths = raw_lengths
-                    else:
-                        output_lengths = np.array(raw_lengths)
-                else:
-                    output_lengths = [batch_logits.shape[1]] * batch_logits.shape[0]
-            else:
-                output_lengths = [batch_logits.shape[1]] * batch_logits.shape[0]
-
-            for idx in range(batch_logits.shape[0]):
-                actual_len = int(output_lengths[idx])
-                sliced_logits = batch_logits[idx, :actual_len, :]
-                res = self.decode(
-                    sliced_logits, compute_word_confidences=compute_word_confidences
-                )
-                results.append(res)
-
-            # Cleanup batch GPU memory
-            del batch_logits, inputs, input_values
-            if attention_mask is not None:
-                del attention_mask
-            if torch.cuda.is_available():
-                torch.cuda.empty_cache()
-            elif torch.backends.mps.is_available():
-                torch.mps.empty_cache()
-
-        return results
+        logits_list = self.get_logits_batch(
+            audio_inputs=audio_inputs,
+            sample_rate=sample_rate,
+            batch_size=batch_size,
+        )
+        return [
+            self.decode(logits, compute_word_confidences=compute_word_confidences)
+            for logits in logits_list
+        ]
