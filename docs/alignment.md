@@ -994,3 +994,44 @@ metrics = finder.run(quantile=0.85)
 # 3. Export threshold summary configuration
 finder.export_results(metrics, "runs/evaluation/alignment_threshold.json")
 ```
+
+---
+
+## 11. Continuous CTC Segmentation & Phonotactic Calibration (`CTCSegmentationAligner`)
+
+The [`CTCSegmentationAligner`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/ctc_aligner.py) provides syncope- and intrusion-aware CTC trellis segmentation operating directly on continuous chapter audio.
+
+### Phonotactic Text Preparation & Site Masking
+
+Cherokee surface phonotactics govern valid sites for vocalic deletion (syncope) and laryngeal insertions (pre-aspiration, post-aspiration, glottal stops).
+
+[`prepare_cherokee_text`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/phonotactics.py) automatically generates:
+1. `config.is_syncope_token`: 1D boolean/int8 mask indicating positions eligible for vocalic syncope without violating forbidden cluster constraints (`*HH`, `*ChR`).
+2. `config.is_intrusive_site`: 1D boolean/int8 mask licensing candidate sites for intrusive `/h/` and `/'/` detours.
+
+### Calibrated Optimal Parameters (Mark Chapter 1 Benchmark)
+
+Empirical grid search across candidate penalties on Mark Chapter 1 identified the following optimal defaults:
+
+| Parameter | Recommended Default | Purpose |
+| :--- | :--- | :--- |
+| `syncope_penalty` | `6.0` | Penalty for omitting citation vowels during fast speech syncope. |
+| `intrusive_penalties` | `{"h": 4.5, "'": 0.8}` | Per-token intrusion penalties; suppresses trailing breath noise on `/h/` while recovering brief transient glottal stops `/'/`. |
+| `intrusive_min_logprobs` | `{"h": -1.0498, "'": -1.6094}` | Posterior floor thresholds ($\approx 0.35$ for `/h/`, $\approx 0.20$ for `/'/`). |
+| `intrusive_max_stride` | `1` | Max blank frame stride for intrusive token detours. |
+| `flag_min_char_confidence` | `0.005` | Character-level minimum acoustic confidence threshold to reliably flag single-letter transcript corruptions (e.g. Mark 1:1 `yihstv` typo). |
+| `flag_min_confidence` | `0.01` | Geometric mean word confidence threshold. |
+| `enforce_phonotactics` | `True` | Applies Cherokee phonotactic rules and site masks. |
+
+### CLI Example
+
+```bash
+python scripts/realign_bible.py \
+    --book mark \
+    --chapter 1 \
+    --syncope-penalty 6.0 \
+    --intrusive-penalties '{"h": 4.5, "\'": 0.8}' \
+    --intrusive-min-logprobs '{"h": -1.0498, "\'": -1.6094}' \
+    --flag-min-char-confidence 0.005
+```
+

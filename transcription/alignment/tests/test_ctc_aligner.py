@@ -18,6 +18,7 @@ from transcription.alignment.ctc_aligner import (
     CTCSegmentationAligner,
     get_logits_cached,
 )
+from transcription.alignment.phonotactics import prepare_cherokee_text
 
 
 class DummyTokenizer:
@@ -579,3 +580,128 @@ def test_ctc_aligner_intra_verse_unaligned_word_isolation(dummy_audio_file: Path
         assert w3.end_sec == 0.32
         assert w3.emitted_word == "a"
         assert w3.flagged is False
+
+
+def test_ctc_aligner_min_char_confidence_flags_mark_1_1_typo(dummy_audio_file: Path):
+    """
+    Assert that Mark 1:1 'yihstv' typo is flagged due to min_char_confidence < 0.005,
+    even when overall geometric/mean confidence is above flag_min_confidence (0.01).
+    """
+    model = DummyASRModel()
+    aligner = CTCSegmentationAligner(
+        model=cast(Any, model),
+        flag_min_confidence=0.01,
+        flag_min_char_confidence=0.005,
+        buffer_lead_ms=0,
+        buffer_trail_ms=0,
+    )
+
+    # Word timings: ground truth trellis length 10, character timings at 0.10, 0.12, 0.14, 0.16
+    fake_timings = np.array(
+        [-1.0, -1.0, 0.10, 0.12, 0.14, 0.16, -1.0, -1.0, -1.0, -1.0],
+        dtype=np.float32,
+    )
+    fake_state_list = [""] * 100
+    fake_char_probs = np.full(100, 0.0, dtype=np.float32)
+
+    # Character states for 'yihstv' across frames 5..8
+    # Suppose 3 characters have logprob -0.5 (prob 0.606), but one typo character has logprob -6.0 (prob 0.00247 < 0.005)
+    for f, ch in zip([5, 6, 7, 8], ["y", "i", "h", "s"]):
+        fake_state_list[f] = ch
+        fake_char_probs[f] = -0.5
+
+    fake_char_probs[7] = -6.0  # low char prob: exp(-6.0) ~= 0.00247875
+
+    with patch(
+        "transcription.alignment.ctc_aligner.ctc_segmentation",
+        return_value=(fake_timings, fake_char_probs, fake_state_list),
+    ):
+        aligned_slice = aligner.align_verse_slice(
+            audio_input=dummy_audio_file,
+            chunk_id="020101",
+            phonetic_text="yihstv",
+            cache=False,
+        )
+
+        assert len(aligned_slice.words) == 1
+        w = aligned_slice.words[0]
+        assert w.word in ("yihstv", "yihsthv")
+        assert w.emitted_word == "yihs"
+        # Mean logprob: (-0.5*3 + -6.0)/4 = -1.875 -> exp(-1.875) ~= 0.153 > 0.01
+        assert w.confidence > 0.01
+        # Minimum char confidence is < 0.005
+        assert w.min_char_confidence is not None
+        assert w.min_char_confidence < 0.005
+        assert round(w.min_char_confidence, 4) == round(float(np.exp(-6.0)), 4)
+        # Therefore flagged should be True!
+        assert w.flagged is True
+
+
+def test_ctc_aligner_parameters_forwarding(dummy_audio_file: Path):
+    """
+    Verify that intrusive_penalties, intrusive_min_logprobs, intrusive_max_stride,
+    and enforce_phonotactics are forwarded to CtcSegmentationParameters and prepare_cherokee_text.
+    """
+    from transcription.alignment.models import TextChunk
+
+    model = DummyASRModel()
+    custom_penalties = {"h": 0.3, "'": 0.8}
+    custom_min_logprobs = {"h": -2.5, "'": -3.0}
+
+    aligner = CTCSegmentationAligner(
+        model=cast(Any, model),
+        intrusive_penalties=custom_penalties,
+        intrusive_min_logprobs=custom_min_logprobs,
+        intrusive_max_stride=2,
+        enforce_phonotactics=True,
+        flag_min_char_confidence=0.008,
+    )
+
+    fake_timings = np.array([-1.0, -1.0, 0.10, -1.0], dtype=np.float32)
+    fake_char_probs = np.full(100, -0.1, dtype=np.float32)
+    fake_state_list = ["a"] * 100
+    fake_segments = [(0.0, 0.5, 0.1)]
+
+    with (
+        patch(
+            "transcription.alignment.ctc_aligner.ctc_segmentation",
+            return_value=(fake_timings, fake_char_probs, fake_state_list),
+        ) as mock_seg,
+        patch(
+            "transcription.alignment.ctc_aligner.determine_utterance_segments",
+            return_value=fake_segments,
+        ),
+        patch(
+            "transcription.alignment.ctc_aligner.prepare_cherokee_text",
+            wraps=prepare_cherokee_text,
+        ) as mock_prep,
+    ):
+        # 1. align_verse_slice
+        aligner.align_verse_slice(
+            audio_input=dummy_audio_file,
+            chunk_id="001",
+            phonetic_text="adalenisgv",
+            cache=False,
+        )
+
+        passed_config = mock_seg.call_args[0][0]
+        assert passed_config.intrusive_penalties == custom_penalties
+        assert passed_config.intrusive_min_logprobs == custom_min_logprobs
+        assert passed_config.intrusive_max_stride == 2
+        assert mock_prep.call_args[1]["enforce_phonotactics"] is True
+        assert hasattr(passed_config, "is_syncope_token")
+        assert hasattr(passed_config, "is_intrusive_site")
+
+        # 2. align
+        mock_seg.reset_mock()
+        mock_prep.reset_mock()
+        audio = np.zeros(16000 * 2, dtype=np.float32)
+        aligner.align(
+            audio, chunks=[TextChunk(chunk_id="v1", text="adalenisgv")], cache=False
+        )
+
+        passed_config2 = mock_seg.call_args[0][0]
+        assert passed_config2.intrusive_penalties == custom_penalties
+        assert passed_config2.intrusive_min_logprobs == custom_min_logprobs
+        assert passed_config2.intrusive_max_stride == 2
+        assert mock_prep.call_args[1]["enforce_phonotactics"] is True

@@ -19,7 +19,7 @@ import json
 import os
 from pathlib import Path
 import sys
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import numpy as np
 from pydub import AudioSegment
@@ -67,6 +67,28 @@ BOOK_CONFIGS = {
 }
 
 
+def parse_penalty_param(
+    val: Optional[Union[str, float, Dict[str, float]]],
+) -> Optional[Union[float, Dict[str, float]]]:
+    """Parse penalty / logprob parameter from string JSON dict, float string, or number."""
+    if val is None:
+        return None
+    if isinstance(val, (int, float, dict)):
+        return val
+    if isinstance(val, str):
+        val_str = val.strip()
+        if not val_str:
+            return None
+        try:
+            parsed = json.loads(val_str)
+            if isinstance(parsed, dict):
+                return {str(k): float(v) for k, v in parsed.items()}
+            return float(parsed)
+        except (json.JSONDecodeError, ValueError):
+            return float(val_str)
+    return None
+
+
 def get_default_ctc_aligner(
     model_repo: str = DEFAULT_MODEL_REPO,
     model_revision: str = DEFAULT_REVISION,
@@ -74,6 +96,12 @@ def get_default_ctc_aligner(
     cache: bool = True,
     syncope_penalty: float = DEFAULT_SYNCOPE_PENALTY,
     intrusive_penalty: float = DEFAULT_INTRUSIVE_PENALTY,
+    intrusive_penalties: Optional[Union[float, Dict[str, float]]] = None,
+    intrusive_min_logprobs: Optional[Union[float, Dict[str, float]]] = None,
+    intrusive_max_stride: int = 1,
+    enforce_phonotactics: bool = True,
+    flag_min_confidence: float = 0.01,
+    flag_min_char_confidence: float = 0.005,
 ) -> CTCSegmentationAligner:
     """Instantiates default CTCSegmentationAligner with cached emissions."""
     token = os.environ.get("HF_TOKEN", None)
@@ -90,6 +118,12 @@ def get_default_ctc_aligner(
         cache_dir=cache_dir,
         syncope_penalty=syncope_penalty,
         intrusive_penalty=intrusive_penalty,
+        intrusive_penalties=intrusive_penalties,
+        intrusive_min_logprobs=intrusive_min_logprobs,
+        intrusive_max_stride=intrusive_max_stride,
+        enforce_phonotactics=enforce_phonotactics,
+        flag_min_confidence=flag_min_confidence,
+        flag_min_char_confidence=flag_min_char_confidence,
     )
     return aligner
 
@@ -146,6 +180,12 @@ def realign_book(
     cache: bool = True,
     syncope_penalty: float = DEFAULT_SYNCOPE_PENALTY,
     intrusive_penalty: float = DEFAULT_INTRUSIVE_PENALTY,
+    intrusive_penalties: Optional[Union[float, Dict[str, float]]] = None,
+    intrusive_min_logprobs: Optional[Union[float, Dict[str, float]]] = None,
+    intrusive_max_stride: int = 1,
+    enforce_phonotactics: bool = True,
+    flag_min_confidence: float = 0.01,
+    flag_min_char_confidence: float = 0.005,
 ) -> Tuple[List[Dict[str, Any]], List[Dict[str, str]]]:
     book_key = book.lower().strip()
     if book_key not in BOOK_CONFIGS:
@@ -178,6 +218,12 @@ def realign_book(
             cache=cache,
             syncope_penalty=syncope_penalty,
             intrusive_penalty=intrusive_penalty,
+            intrusive_penalties=intrusive_penalties,
+            intrusive_min_logprobs=intrusive_min_logprobs,
+            intrusive_max_stride=intrusive_max_stride,
+            enforce_phonotactics=enforce_phonotactics,
+            flag_min_confidence=flag_min_confidence,
+            flag_min_char_confidence=flag_min_char_confidence,
         )
 
     records: List[Dict[str, Any]] = []
@@ -222,6 +268,14 @@ def realign_book(
             model_revision=model_revision,
             cache_dir=cache_dir,
             cache=cache,
+            syncope_penalty=syncope_penalty,
+            intrusive_penalty=intrusive_penalty,
+            intrusive_penalties=intrusive_penalties,
+            intrusive_min_logprobs=intrusive_min_logprobs,
+            intrusive_max_stride=intrusive_max_stride,
+            enforce_phonotactics=enforce_phonotactics,
+            flag_min_confidence=flag_min_confidence,
+            flag_min_char_confidence=flag_min_char_confidence,
         )
 
         audio_seg = (
@@ -282,6 +336,7 @@ def realign_book(
                     "start_sec": round(w.start_sec, 3),
                     "end_sec": round(w.end_sec, 3),
                     "confidence": w.confidence,
+                    "min_char_confidence": w.min_char_confidence,
                     "flagged": w.flagged,
                     "emitted_word": w.emitted_word or "",
                 }
@@ -413,6 +468,12 @@ def realign_all(
     cache: bool = True,
     syncope_penalty: float = DEFAULT_SYNCOPE_PENALTY,
     intrusive_penalty: float = DEFAULT_INTRUSIVE_PENALTY,
+    intrusive_penalties: Optional[Union[float, Dict[str, float]]] = None,
+    intrusive_min_logprobs: Optional[Union[float, Dict[str, float]]] = None,
+    intrusive_max_stride: int = 1,
+    enforce_phonotactics: bool = True,
+    flag_min_confidence: float = 0.01,
+    flag_min_char_confidence: float = 0.005,
 ) -> Dict[str, List[Dict[str, Any]]]:
     ctc_aligner = get_default_ctc_aligner(
         model_repo=model_repo,
@@ -421,6 +482,12 @@ def realign_all(
         cache=cache,
         syncope_penalty=syncope_penalty,
         intrusive_penalty=intrusive_penalty,
+        intrusive_penalties=intrusive_penalties,
+        intrusive_min_logprobs=intrusive_min_logprobs,
+        intrusive_max_stride=intrusive_max_stride,
+        enforce_phonotactics=enforce_phonotactics,
+        flag_min_confidence=flag_min_confidence,
+        flag_min_char_confidence=flag_min_char_confidence,
     )
 
     all_records: List[Dict[str, Any]] = []
@@ -438,6 +505,12 @@ def realign_all(
             cache=cache,
             syncope_penalty=syncope_penalty,
             intrusive_penalty=intrusive_penalty,
+            intrusive_penalties=intrusive_penalties,
+            intrusive_min_logprobs=intrusive_min_logprobs,
+            intrusive_max_stride=intrusive_max_stride,
+            enforce_phonotactics=enforce_phonotactics,
+            flag_min_confidence=flag_min_confidence,
+            flag_min_char_confidence=flag_min_char_confidence,
         )
         book_results[book] = records
         all_records.extend(records)
@@ -512,6 +585,42 @@ def main():
         help=f"CTC segmentation intrusive penalty for h/' insertion (default: {DEFAULT_INTRUSIVE_PENALTY})",
     )
     parser.add_argument(
+        "--intrusive-penalties",
+        type=str,
+        default=None,
+        help="Per-token intrusive penalty JSON dict or float (e.g. '{\"h\": 0.1, \"'\": 0.5}' or '0.1')",
+    )
+    parser.add_argument(
+        "--intrusive-min-logprobs",
+        type=str,
+        default=None,
+        help="Per-token minimum log-prob JSON dict or float (e.g. '{\"h\": -3.0}' or '-3.0')",
+    )
+    parser.add_argument(
+        "--intrusive-max-stride",
+        type=int,
+        default=1,
+        help="Max stride for intrusive token insertion (default: 1)",
+    )
+    parser.add_argument(
+        "--no-enforce-phonotactics",
+        action="store_true",
+        default=False,
+        help="Disable phonotactic masking for syncope and intrusion",
+    )
+    parser.add_argument(
+        "--flag-min-confidence",
+        type=float,
+        default=0.01,
+        help="Minimum word confidence threshold for anomaly flagging (default: 0.01)",
+    )
+    parser.add_argument(
+        "--flag-min-char-confidence",
+        type=float,
+        default=0.005,
+        help="Minimum acoustic character confidence threshold for anomaly flagging (default: 0.005)",
+    )
+    parser.add_argument(
         "--no-praat",
         action="store_true",
         default=False,
@@ -532,6 +641,14 @@ def main():
 
     args = parser.parse_args()
 
+    intrusive_penalties = (
+        parse_penalty_param(args.intrusive_penalties)
+        if args.intrusive_penalties is not None
+        else args.intrusive_penalty
+    )
+    intrusive_min_logprobs = parse_penalty_param(args.intrusive_min_logprobs)
+    enforce_phonotactics = not args.no_enforce_phonotactics
+
     if args.book == "all":
         realign_all(
             chapter=args.chapter,
@@ -542,6 +659,12 @@ def main():
             cache=not args.no_cache,
             syncope_penalty=args.syncope_penalty,
             intrusive_penalty=args.intrusive_penalty,
+            intrusive_penalties=intrusive_penalties,
+            intrusive_min_logprobs=intrusive_min_logprobs,
+            intrusive_max_stride=args.intrusive_max_stride,
+            enforce_phonotactics=enforce_phonotactics,
+            flag_min_confidence=args.flag_min_confidence,
+            flag_min_char_confidence=args.flag_min_char_confidence,
         )
     else:
         records, _ = realign_book(
@@ -554,6 +677,12 @@ def main():
             cache=not args.no_cache,
             syncope_penalty=args.syncope_penalty,
             intrusive_penalty=args.intrusive_penalty,
+            intrusive_penalties=intrusive_penalties,
+            intrusive_min_logprobs=intrusive_min_logprobs,
+            intrusive_max_stride=args.intrusive_max_stride,
+            enforce_phonotactics=enforce_phonotactics,
+            flag_min_confidence=args.flag_min_confidence,
+            flag_min_char_confidence=args.flag_min_char_confidence,
         )
         # Also update combined if single book is run
         ALIGNMENTS_DIR.mkdir(parents=True, exist_ok=True)

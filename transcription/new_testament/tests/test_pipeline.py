@@ -615,3 +615,54 @@ def test_realign_book_excludes_verse_with_missing_emitted_text_from_train_csv(
     assert len(rows_on_disk) == 1
     assert any("mark_01_02.wav" in r["path"] for r in rows_on_disk)
     assert not any("mark_01_01.wav" in r["path"] for r in rows_on_disk)
+
+
+def test_align_chapter_forwards_intrusive_and_phonotactic_parameters(
+    tmp_path: Path, dummy_audio_path: Path, dummy_transcript: Path
+):
+    out_dir = tmp_path / "output_forwarding"
+
+    with patch(
+        "transcription.new_testament.pipeline.CTCSegmentationAligner"
+    ) as mock_aligner_cls:
+        mock_instance = MagicMock()
+        mock_instance.align.return_value = AlignmentOutput(aligned_chunks=[])
+        mock_aligner_cls.return_value = mock_instance
+
+        align_chapter(
+            audio_path=dummy_audio_path,
+            transcript_path=dummy_transcript,
+            output_dir=out_dir,
+            engine="ctc",
+            asr_model=cast(Any, MockASRModel()),
+            syncope_penalty=3.5,
+            intrusive_penalty=0.25,
+            intrusive_penalties={"h": 0.4},
+            intrusive_min_logprobs={"h": -2.0},
+            intrusive_max_stride=2,
+            enforce_phonotactics=True,
+            flag_min_confidence=0.02,
+            flag_min_char_confidence=0.006,
+        )
+
+        assert mock_aligner_cls.called
+        kwargs = mock_aligner_cls.call_args[1]
+        assert kwargs["syncope_penalty"] == 3.5
+        assert kwargs["intrusive_penalty"] == 0.25
+        assert kwargs["intrusive_penalties"] == {"h": 0.4}
+        assert kwargs["intrusive_min_logprobs"] == {"h": -2.0}
+        assert kwargs["intrusive_max_stride"] == 2
+        assert kwargs["enforce_phonotactics"] is True
+        assert kwargs["flag_min_confidence"] == 0.02
+        assert kwargs["flag_min_char_confidence"] == 0.006
+
+
+def test_realign_bible_parse_penalty_param():
+    from scripts.realign_bible import parse_penalty_param
+
+    assert parse_penalty_param(None) is None
+    assert parse_penalty_param(0.5) == 0.5
+    assert parse_penalty_param({"h": 0.2}) == {"h": 0.2}
+    assert parse_penalty_param("0.35") == 0.35
+    assert parse_penalty_param('{"h": 0.1, "\'": 0.5}') == {"h": 0.1, "'": 0.5}
+    assert parse_penalty_param('{"h": -3.0}') == {"h": -3.0}

@@ -94,6 +94,11 @@ def run_benchmark(
     output_json_path: Optional[Path] = None,
     cache: bool = True,
     cache_dir: Optional[Path] = None,
+    syncope_penalty: float = 6.0,
+    intrusive_penalties: Optional[Any] = None,
+    intrusive_min_logprobs: Optional[Any] = None,
+    flag_min_char_confidence: float = 0.005,
+    enforce_phonotactics: bool = True,
 ) -> Dict[str, Any]:
     print(f"Loading ASR Model: {model_repo} (rev: {model_revision})...")
     token = os.environ.get("HF_TOKEN", None)
@@ -109,6 +114,11 @@ def run_benchmark(
         model=asr_model,
         cache=cache,
         cache_dir=cache_dir,
+        syncope_penalty=syncope_penalty,
+        intrusive_penalties=intrusive_penalties,
+        intrusive_min_logprobs=intrusive_min_logprobs,
+        flag_min_char_confidence=flag_min_char_confidence,
+        enforce_phonotactics=enforce_phonotactics,
     )
 
     # Load existing baseline alignment records

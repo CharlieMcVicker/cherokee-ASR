@@ -36,6 +36,7 @@ class WordInterval:
     confidence: float = 1.0
     flagged: bool = False
     emitted_word: Optional[str] = None
+    min_char_confidence: Optional[float] = None
 
 
 @dataclass
