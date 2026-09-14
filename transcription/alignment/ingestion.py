@@ -17,14 +17,14 @@ from transcription.alignment.normalizers import (
 
 def load_bible_chunks(
     source: Union[str, Path, Dict[str, Any], List[Dict[str, Any]]],
-    normalizer: Callable[[str], str] = normalize_syllabary_for_alignment,
+    normalizer: Callable[[str], str] = normalize_phonetics_for_alignment,
 ) -> Tuple[List[TextChunk], Dict[str, Dict[str, Any]]]:
     """
     Loads Bible verse metadata into TextChunks and a source lookup dictionary.
 
     Args:
         source: File path to JSON, or a pre-parsed dictionary / list of verse items.
-        normalizer: Function to normalize raw phonetic text. Defaults to normalize_syllabary_for_alignment.
+        normalizer: Function to normalize raw phonetic text. Defaults to normalize_phonetics_for_alignment.
 
     Returns:
         A tuple of (chunks, source_lookup) where:
@@ -48,14 +48,17 @@ def load_bible_chunks(
             if not isinstance(verse_info, dict):
                 verse_info = {"text": str(verse_info)}
             raw_text = verse_info.get(
-                "cherokee",
+                "phonetic",
                 verse_info.get(
-                    "syllabary",
+                    "raw_phonetic",
                     verse_info.get(
                         "reference_sentence",
                         verse_info.get(
-                            "phonetic",
-                            verse_info.get("raw_phonetic", verse_info.get("text", "")),
+                            "cherokee",
+                            verse_info.get(
+                                "syllabary",
+                                verse_info.get("text", ""),
+                            ),
                         ),
                     ),
                 ),
@@ -73,13 +76,17 @@ def load_bible_chunks(
                 )
             )
             raw_text = item.get(
-                "cherokee",
+                "phonetic",
                 item.get(
-                    "syllabary",
+                    "raw_phonetic",
                     item.get(
                         "reference_sentence",
                         item.get(
-                            "raw_phonetic", item.get("phonetic", item.get("text", ""))
+                            "cherokee",
+                            item.get(
+                                "syllabary",
+                                item.get("text", ""),
+                            ),
                         ),
                     ),
                 ),
@@ -196,13 +203,13 @@ def prepare_alignment_input(
 
     if bible_metadata is not None:
         chunks, source_lookup = load_bible_chunks(
-            bible_metadata, normalizer=normalize_syllabary_for_alignment
+            bible_metadata, normalizer=normalize_phonetics_for_alignment
         )
         return (
             chunks,
             source_lookup,
-            normalize_syllabary_for_alignment,
-            normalize_syllabary_for_alignment,
+            normalize_phonetics_for_alignment,
+            normalize_phonetics_for_alignment,
         )
 
     if chunk_list is not None:

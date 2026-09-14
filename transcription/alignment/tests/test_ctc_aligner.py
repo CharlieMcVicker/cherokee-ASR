@@ -728,3 +728,64 @@ def test_ctc_aligner_parameters_forwarding(dummy_audio_file: Path):
         assert passed_config2.intrusive_min_logprobs == custom_min_logprobs
         assert passed_config2.intrusive_max_stride == 2
         assert mock_prep.call_args[1]["enforce_phonotactics"] is True
+
+
+def test_ctc_aligner_padded_midpoint_boundaries():
+    """
+    Verify that CTCSegmentationAligner.align pads chunk boundaries and resolves
+    adjacent inter-chunk boundaries at the midpoint between chunks.
+    """
+    from transcription.alignment.models import TextChunk
+
+    model = DummyASRModel()
+    aligner = CTCSegmentationAligner(
+        model=cast(Any, model),
+        config=CTCAlignerConfig(boundary_pad_sec=0.1),
+    )
+
+    # 2 chunks: chunk 1 [0.5 - 1.0], chunk 2 [2.0 - 2.5]
+    fake_timings = np.full(150, -1.0, dtype=np.float32)
+    fake_timings[2] = 0.50
+    fake_timings[4] = 2.00
+
+    fake_char_probs = np.full(150, -0.1, dtype=np.float32)
+    fake_state_list = ["a"] * 150
+    fake_segments = [(0.5, 1.0, 0.05), (2.0, 2.5, 0.05)]
+
+    chunks = [
+        TextChunk(chunk_id="c1", text="a"),
+        TextChunk(chunk_id="c2", text="a"),
+    ]
+
+    with (
+        patch(
+            "transcription.alignment.ctc_aligner.ctc_segmentation",
+            return_value=(fake_timings, fake_char_probs, fake_state_list),
+        ),
+        patch(
+            "transcription.alignment.ctc_aligner.determine_utterance_segments",
+            return_value=fake_segments,
+        ),
+    ):
+        audio = np.zeros(16000 * 4, dtype=np.float32)  # 4.0s total audio
+        res = aligner.align(audio, chunks=chunks, cache=False)
+
+        assert len(res.aligned_chunks) == 2
+        c1 = res.aligned_chunks[0]
+        c2 = res.aligned_chunks[1]
+
+        # First chunk start should be padded: max(0.0, 0.5 - 0.1) = 0.4s
+        assert c1.start_sec == 0.4
+
+        # Midpoint between c1 word end (0.52) and c2 word start (2.0) is 1.26s
+        assert c1.end_sec == 1.26
+        assert c2.start_sec == 1.26
+
+        # Last chunk end should be padded: min(4.0, 2.02 + 0.1) = 2.12s
+        assert c2.end_sec == 2.12
+
+        # Both chunks strictly cover their words
+        assert c1.start_sec <= c1.words[0].start_sec
+        assert c1.end_sec >= c1.words[-1].end_sec
+        assert c2.start_sec <= c2.words[0].start_sec
+        assert c2.end_sec >= c2.words[-1].end_sec

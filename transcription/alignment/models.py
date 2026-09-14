@@ -32,6 +32,7 @@ class CTCAlignerConfig:
     max_window_size: int = 100000
     buffer_trail_ms: int = 300
     buffer_lead_ms: int = 100
+    boundary_pad_sec: float = 0.1
     chunk_seconds: float = 30.0
     margin_seconds: float = 1.0
     cache: bool = True

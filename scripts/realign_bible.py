@@ -437,6 +437,12 @@ def main():
         help="Minimum word confidence threshold for anomaly flagging (default: 0.01)",
     )
     parser.add_argument(
+        "--boundary-pad",
+        type=float,
+        default=0.1,
+        help="Safety padding (in seconds) applied to verse boundaries (default: 0.1s)",
+    )
+    parser.add_argument(
         "--no-praat",
         action="store_true",
         default=False,
@@ -461,6 +467,7 @@ def main():
         syncope_penalty=args.syncope_penalty,
         intrusive_penalty=args.intrusive_penalty,
         flag_min_confidence=args.flag_min_confidence,
+        boundary_pad_sec=args.boundary_pad,
         cache=not args.no_cache,
         cache_dir=args.cache_dir,
     )

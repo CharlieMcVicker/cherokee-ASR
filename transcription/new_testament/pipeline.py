@@ -123,7 +123,7 @@ def align_chapter(
 
     if use_ctc:
         chunks, source_lookup = load_bible_chunks(
-            transcript_path, normalizer=normalize_syllabary_for_alignment
+            transcript_path, normalizer=normalize_phonetics_for_alignment
         )
 
         aligner = ctc_aligner

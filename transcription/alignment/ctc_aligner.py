@@ -62,7 +62,7 @@ class CTCSegmentationAligner:
     ):
         self.model = model
         self.config = config or CTCAlignerConfig()
-        self.chunk_norm = chunk_normalizer or normalize_syllabary_for_alignment
+        self.chunk_norm = chunk_normalizer or normalize_phonetics_for_alignment
 
         self.syncope_tokens = list(self.config.syncope_tokens)
         self.syncope_penalty = float(self.config.syncope_penalty)
@@ -81,6 +81,7 @@ class CTCSegmentationAligner:
         self.max_window_size = int(self.config.max_window_size)
         self.buffer_trail_ms = int(self.config.buffer_trail_ms)
         self.buffer_lead_ms = int(self.config.buffer_lead_ms)
+        self.boundary_pad_sec = float(getattr(self.config, "boundary_pad_sec", 0.1))
         self.chunk_seconds = float(self.config.chunk_seconds)
         self.margin_seconds = float(self.config.margin_seconds)
         self.cache = bool(self.config.cache)
@@ -495,7 +496,7 @@ class CTCSegmentationAligner:
         )
         char_list, pad_id = self._get_char_list_and_blank(model)
 
-        target_text = syllabary_text if syllabary_text else phonetic_text
+        target_text = phonetic_text if phonetic_text else syllabary_text
         norm_text = self.chunk_norm(target_text)
         words = norm_text.split()
 
@@ -672,27 +673,12 @@ class CTCSegmentationAligner:
             config, chunk_utt_indices, char_probs, timings, chunk_texts
         )
 
-        aligned_chunks: List[AlignedChunk] = []
+        chunk_word_intervals: List[List[WordInterval]] = []
         prev_end = 0.0
-
-        for c_idx, chunk in enumerate(chunks):
+        for c_idx in range(len(chunks)):
             w_start_idx, w_end_idx = chunk_word_slices[c_idx]
             chunk_words = all_words[w_start_idx:w_end_idx]
-
-            raw_s, raw_e, score = raw_segments[c_idx]
-            prev_boundary = aligned_chunks[-1].end_sec if aligned_chunks else 0.0
-            if float(raw_s) >= 0.0:
-                c_start = max(prev_boundary, round(float(raw_s), 3))
-            else:
-                c_start = prev_boundary
-
-            if float(raw_e) >= c_start:
-                c_end = round(float(raw_e), 3)
-            else:
-                c_end = c_start
-
-            # Extract word intervals within chunk
-            word_intervals = self._extract_word_intervals(
+            w_ints = self._extract_word_intervals(
                 words=chunk_words,
                 timings=timings,
                 char_probs=char_probs,
@@ -703,13 +689,62 @@ class CTCSegmentationAligner:
                 lead_offset_sec=0.0,
                 initial_prev_end=prev_end,
             )
-            if word_intervals:
-                prev_end = word_intervals[-1].end_sec
+            if w_ints:
+                prev_end = w_ints[-1].end_sec
+            chunk_word_intervals.append(w_ints)
 
-            valid_w = [w for w in word_intervals if w.end_sec > w.start_sec]
-            if c_end <= c_start and valid_w:
-                c_start = max(prev_boundary, valid_w[0].start_sec)
-                c_end = max(c_start, valid_w[-1].end_sec)
+        # Compute acoustic core envelope for each chunk
+        core_starts: List[float] = []
+        core_ends: List[float] = []
+        for c_idx in range(len(chunks)):
+            raw_s, raw_e, _ = raw_segments[c_idx]
+            w_ints = chunk_word_intervals[c_idx]
+            valid_w = [w for w in w_ints if w.end_sec > w.start_sec]
+            if valid_w:
+                cs = valid_w[0].start_sec
+                ce = valid_w[-1].end_sec
+            else:
+                cs = max(0.0, float(raw_s) if float(raw_s) >= 0.0 else 0.0)
+                ce = max(cs, float(raw_e) if float(raw_e) >= 0.0 else cs)
+            core_starts.append(cs)
+            core_ends.append(ce)
+
+        # Apply boundary padding and resolve adjacent boundaries at midpoint
+        num_chunks = len(chunks)
+        c_starts = [0.0] * num_chunks
+        c_ends = [0.0] * num_chunks
+
+        if num_chunks > 0:
+            c_starts[0] = max(0.0, round(core_starts[0] - self.boundary_pad_sec, 3))
+            for i in range(num_chunks - 1):
+                mid = (core_ends[i] + core_starts[i + 1]) / 2.0
+                mid = max(c_starts[i], min(dur_sec, mid))
+                c_ends[i] = round(mid, 3)
+                c_starts[i + 1] = round(mid, 3)
+            c_ends[-1] = min(
+                dur_sec,
+                round(max(c_starts[-1], core_ends[-1] + self.boundary_pad_sec), 3),
+            )
+
+            # Strictly ensure boundaries cover all valid words and respect [0.0, dur_sec] monotonically
+            for i in range(num_chunks):
+                w_ints = chunk_word_intervals[i]
+                valid_w = [w for w in w_ints if w.end_sec > w.start_sec]
+                if valid_w:
+                    c_starts[i] = min(c_starts[i], valid_w[0].start_sec)
+                    c_ends[i] = max(c_ends[i], valid_w[-1].end_sec)
+                c_starts[i] = max(0.0, min(c_starts[i], dur_sec))
+                c_ends[i] = max(c_starts[i], min(c_ends[i], dur_sec))
+                if i > 0:
+                    c_starts[i] = max(c_starts[i], c_ends[i - 1])
+                    c_ends[i] = max(c_starts[i], c_ends[i])
+
+        aligned_chunks: List[AlignedChunk] = []
+        for c_idx, chunk in enumerate(chunks):
+            word_intervals = chunk_word_intervals[c_idx]
+            c_start = c_starts[c_idx]
+            c_end = c_ends[c_idx]
+            _, _, score = raw_segments[c_idx]
 
             if word_intervals:
                 emitted_text = " ".join(
