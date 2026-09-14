@@ -37,7 +37,10 @@ from transcription.alignment.models import (
     CTCAlignerConfig,
     WordInterval,
 )
-from transcription.alignment.normalizers import normalize_phonetics_for_alignment
+from transcription.alignment.normalizers import (
+    normalize_phonetics_for_alignment,
+    normalize_syllabary_for_alignment,
+)
 from transcription.alignment.reconciliation import reconcile_alignment_words
 from transcription.models.asr_model import CherokeeASRModel
 from transcription.syllabary_enrichment import (
@@ -120,7 +123,7 @@ def align_chapter(
 
     if use_ctc:
         chunks, source_lookup = load_bible_chunks(
-            transcript_path, normalizer=normalize_phonetics_for_alignment
+            transcript_path, normalizer=normalize_syllabary_for_alignment
         )
 
         aligner = ctc_aligner

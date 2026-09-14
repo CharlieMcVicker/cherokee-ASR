@@ -146,7 +146,9 @@ def cherokee_to_bad_phonetics(text: str) -> str:
     Translates Cherokee syllabary into phonetic transliteration character by character.
     Preserves spaces, punctuation, and unknown non-syllabary characters.
     """
-    return "".join(CHEROKEE_SYLLABARY_MAP.get(char, char) for char in text)
+    if not text:
+        return ""
+    return "".join(CHEROKEE_SYLLABARY_MAP.get(char, char) for char in text.upper())
 
 
 def phonetics_to_syllabary(text: str) -> str:

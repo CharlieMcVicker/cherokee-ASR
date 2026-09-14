@@ -62,7 +62,7 @@ class CTCSegmentationAligner:
     ):
         self.model = model
         self.config = config or CTCAlignerConfig()
-        self.chunk_norm = chunk_normalizer or normalize_phonetics_for_alignment
+        self.chunk_norm = chunk_normalizer or normalize_syllabary_for_alignment
 
         self.syncope_tokens = list(self.config.syncope_tokens)
         self.syncope_penalty = float(self.config.syncope_penalty)
@@ -495,7 +495,8 @@ class CTCSegmentationAligner:
         )
         char_list, pad_id = self._get_char_list_and_blank(model)
 
-        norm_text = self.chunk_norm(phonetic_text)
+        target_text = syllabary_text if syllabary_text else phonetic_text
+        norm_text = self.chunk_norm(target_text)
         words = norm_text.split()
 
         if not words or lpz.shape[0] == 0:
