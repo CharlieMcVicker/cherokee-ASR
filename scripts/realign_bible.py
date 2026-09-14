@@ -47,8 +47,6 @@ PRAAT_OUT_DIR = BASE_DIR / "output_praat" / "new_testament"
 DEFAULT_CACHE_DIR = BASE_DIR / "runs" / "cache" / "ctc_emissions"
 DEFAULT_MODEL_REPO = "charliemcvicker/length-only-20260704-155307-asr-cherokee-colon"
 DEFAULT_REVISION = "76e62140955f4738abdab345ea34068b02d8d2a2"
-DEFAULT_SYNCOPE_PENALTY = 6.0
-DEFAULT_INTRUSIVE_PENALTY = 0.1
 
 BOOK_CONFIGS = {
     "mark": {"chapters": 16, "name": "Mark"},
@@ -419,24 +417,6 @@ def main():
         help=f"HF model revision (default: {DEFAULT_REVISION})",
     )
     parser.add_argument(
-        "--syncope-penalty",
-        type=float,
-        default=DEFAULT_SYNCOPE_PENALTY,
-        help=f"CTC segmentation syncope penalty for vowel deletion (default: {DEFAULT_SYNCOPE_PENALTY})",
-    )
-    parser.add_argument(
-        "--intrusive-penalty",
-        type=float,
-        default=DEFAULT_INTRUSIVE_PENALTY,
-        help=f"CTC segmentation intrusive penalty for h/' insertion (default: {DEFAULT_INTRUSIVE_PENALTY})",
-    )
-    parser.add_argument(
-        "--flag-min-confidence",
-        type=float,
-        default=0.01,
-        help="Minimum word confidence threshold for anomaly flagging (default: 0.01)",
-    )
-    parser.add_argument(
         "--boundary-pad",
         type=float,
         default=0.1,
@@ -464,9 +444,6 @@ def main():
     args = parser.parse_args()
 
     aligner_config = CTCAlignerConfig(
-        syncope_penalty=args.syncope_penalty,
-        intrusive_penalty=args.intrusive_penalty,
-        flag_min_confidence=args.flag_min_confidence,
         boundary_pad_sec=args.boundary_pad,
         cache=not args.no_cache,
         cache_dir=args.cache_dir,
