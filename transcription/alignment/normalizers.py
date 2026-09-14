@@ -6,7 +6,8 @@ import re
 from transcription.utils.syllabary_map import cherokee_to_bad_phonetics
 from transcription.utils.tone_normalization import respell_consonants
 
-PUNCTUATION_REGEX = r"[\,\?\.\!\-\;\:\"\'\“\%\”\(\)\[\]\{\}«»…\’\‘\ʼ\ʻ\`\´\‛]"
+PUNCTUATION_REGEX = r"[\,\?\.\!\-\;\:\"\“\%\”\(\)\[\]\{\}«»…\´\‛]"
+GLOTTAL_VARIANTS_REGEX = r"[\’\‘\ʼ\ʻ\`]"
 
 
 def normalize_syllabary_for_alignment(text: str) -> str:
@@ -17,7 +18,8 @@ def normalize_syllabary_for_alignment(text: str) -> str:
     3. Lowercase text and strip hyphens.
     4. Convert 'qu' to 'gw'.
     5. Strip numeric tone digits (0-9).
-    6. Remove punctuation and collapse extra whitespace.
+    6. Normalize glottal variants to apostrophe (').
+    7. Remove punctuation and collapse extra whitespace.
     """
     if not text:
         return ""
@@ -34,6 +36,7 @@ def normalize_syllabary_for_alignment(text: str) -> str:
     text = text.replace("-", "")
     text = text.replace("qu", "gw")
     text = re.sub(r"\d+", "", text)
+    text = re.sub(GLOTTAL_VARIANTS_REGEX, "'", text)
     text = re.sub(PUNCTUATION_REGEX, "", text)
     text = re.sub(r"\s+", " ", text).strip()
     return text
@@ -47,7 +50,8 @@ def normalize_phonetics_for_alignment(text: str) -> str:
     3. Apply consonant & aspiration respelling (t->th, d->t, k->kh, g->k, etc.).
     4. Preserve /h/ aspiration markers.
     5. Strip numeric tone digits (0-9).
-    6. Remove punctuation and collapse extra whitespace.
+    6. Normalize glottal variants to apostrophe (').
+    7. Remove punctuation and collapse extra whitespace.
     """
     if not text:
         return ""
@@ -57,6 +61,7 @@ def normalize_phonetics_for_alignment(text: str) -> str:
     text = text.replace("qu", "gw")
     text = respell_consonants(text)
     text = re.sub(r"\d+", "", text)
+    text = re.sub(GLOTTAL_VARIANTS_REGEX, "'", text)
     text = re.sub(PUNCTUATION_REGEX, "", text)
     text = re.sub(r"\s+", " ", text).strip()
     return text

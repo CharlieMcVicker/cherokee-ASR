@@ -144,11 +144,14 @@ PHONETIC_TO_SYLLABARY_MAP.update(
 def cherokee_to_bad_phonetics(text: str) -> str:
     """
     Translates Cherokee syllabary into phonetic transliteration character by character.
+    Inserts a glottal stop /'/ between adjacent vowels to resolve vowel hiatus (e.g. ᎢᎾᎨᎢ -> inake'i).
     Preserves spaces, punctuation, and unknown non-syllabary characters.
     """
     if not text:
         return ""
-    return "".join(CHEROKEE_SYLLABARY_MAP.get(char, char) for char in text.upper())
+    phonetic = "".join(CHEROKEE_SYLLABARY_MAP.get(char, char) for char in text.upper())
+    # Cherokee does not permit vowel hiatus; insert required glottal stop between adjacent vowels
+    return re.sub(r"([aeiouvAEIOUV])(?=[aeiouvAEIOUV])", r"\1'", phonetic)
 
 
 def phonetics_to_syllabary(text: str) -> str:
