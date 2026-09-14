@@ -195,3 +195,19 @@ def test_prepare_cherokee_text_matrix_and_masks():
     assert hasattr(config, "is_intrusive_site")
     assert config.is_intrusive_site is not None
     assert len(config.is_intrusive_site) == gt_mat.shape[0]
+
+
+def test_intrusion_site_mask_post_aspiration_and_coda_laryngeals():
+    """Verify that get_intrusion_site_mask licenses coda laryngeals and post-consonantal aspiration on vowels."""
+    # ukvwali -> u, k, v, w, a, l, i
+    # Vowels following plain sonorants and stops have is_intrusive = True (allowing l -> h -> i -> ukvwalhi)
+    tokens = tokenize_phonemes("ukvwali")
+    mask = get_intrusion_site_mask("ukvwali", return_char_mask=False)
+
+    token_map = {t.symbol: m for t, m in zip(tokens, mask)}
+    assert token_map["k"] is True  # Coda / pre-consonantal before k
+    assert token_map["v"] is True  # Post-consonantal aspiration k -> h -> v
+    assert token_map["w"] is True  # Pre-consonantal before w
+    assert token_map["a"] is True  # Post-consonantal aspiration w -> h -> a
+    assert token_map["l"] is True  # Pre-consonantal before l
+    assert token_map["i"] is True  # Post-consonantal aspiration l -> h -> i (ukvwalhi)

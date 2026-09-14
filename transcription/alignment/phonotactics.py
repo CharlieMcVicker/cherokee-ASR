@@ -251,7 +251,7 @@ def get_intrusion_site_mask(
 ) -> List[bool]:
     """
     Generates a boolean mask indicating positions eligible for intrusive laryngeals
-    (/h/ pre-aspiration, post-aspiration, or /'/ glottalization).
+    (/h/ coda aspiration, post-consonantal aspiration, or /'/ glottalization).
 
     Enforces Cherokee surface phonotactic constraints:
     - *HH constraint: Laryngeals can NEVER occur adjacent to another laryngeal or 'hs'.
@@ -259,8 +259,8 @@ def get_intrusion_site_mask(
     - *ChR constraint: Stop + voiceless sonorant clusters are prohibited.
 
     Eligible environments:
-    1. Pre-consonantal: V + _ + C (where C is plain stop, sibilant, or sonorant).
-    2. Plain stop post-aspiration candidate: t->th, k->kh, kw->kwh in non-preaspirated environments.
+    1. Coda laryngeals / Pre-consonantal: V + _ + C (where C is plain stop, sibilant, or sonorant).
+    2. Post-consonantal aspiration: C + _ + V (where C is plain stop or plain sonorant).
 
     Args:
         text_or_tokens: Input Cherokee phonetic text or pre-tokenized sequence of PhonotacticToken.
@@ -287,9 +287,12 @@ def get_intrusion_site_mask(
     for idx, tok in enumerate(tokens):
         prev_tok = tokens[idx - 1] if idx > 0 else None
 
-        # 1. Stop & affricate positions: plain stops are candidate sites for pre-/post-laryngeals
-        if tok.category == PhonemeCategory.PLAIN_STOP:
-            # Check *HH constraint: Not preceded by laryngeal
+        # 1. Coda laryngeals / Pre-consonantal intrusions (before consonants):
+        if tok.category in (
+            PhonemeCategory.PLAIN_STOP,
+            PhonemeCategory.PLAIN_SONORANT,
+            PhonemeCategory.SIBILANT,
+        ):
             if prev_tok is None or prev_tok.category not in (
                 PhonemeCategory.LARYNGEAL_FRICATIVE,
                 PhonemeCategory.GLOTTAL_STOP,
@@ -297,14 +300,12 @@ def get_intrusion_site_mask(
             ):
                 token_mask[idx] = True
 
-        # 2. Sonorants: Plain sonorants can be candidate pre-glottalized ('l, 'n, 'w, 'y)
-        elif tok.category == PhonemeCategory.PLAIN_SONORANT:
-            if prev_tok is not None and prev_tok.category == PhonemeCategory.VOWEL:
-                token_mask[idx] = True
-
-        # 3. Sibilant positions (un-preaspirated 's' following vowel):
-        elif tok.category == PhonemeCategory.SIBILANT and tok.symbol.lower() == "s":
-            if prev_tok is not None and prev_tok.category == PhonemeCategory.VOWEL:
+        # 2. Post-consonantal aspiration (on vowels following plain consonants):
+        elif tok.category == PhonemeCategory.VOWEL:
+            if prev_tok is not None and prev_tok.category in (
+                PhonemeCategory.PLAIN_SONORANT,
+                PhonemeCategory.PLAIN_STOP,
+            ):
                 token_mask[idx] = True
 
     if not return_char_mask:
