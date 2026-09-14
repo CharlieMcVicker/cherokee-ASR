@@ -32,7 +32,11 @@ from transcription.alignment.extractors import (
     CherokeeASRExtractor,
 )
 from transcription.alignment.ingestion import load_bible_chunks
-from transcription.alignment.models import AlignmentOutput, WordInterval
+from transcription.alignment.models import (
+    AlignmentOutput,
+    CTCAlignerConfig,
+    WordInterval,
+)
 from transcription.alignment.normalizers import normalize_phonetics_for_alignment
 from transcription.alignment.reconciliation import reconcile_alignment_words
 from transcription.models.asr_model import CherokeeASRModel
@@ -78,14 +82,7 @@ def align_chapter(
     ctc_aligner: Optional[CTCSegmentationAligner] = None,
     asr_model: Optional[CherokeeASRModel] = None,
     cache: bool = True,
-    syncope_penalty: float = 2.0,
-    intrusive_penalty: float = 0.1,
-    intrusive_penalties: Optional[Union[float, Dict[str, float]]] = None,
-    intrusive_min_logprobs: Optional[Union[float, Dict[str, float]]] = None,
-    intrusive_max_stride: int = 1,
-    enforce_phonotactics: bool = True,
-    flag_min_confidence: float = 0.01,
-    flag_min_char_confidence: float = 0.005,
+    aligner_config: Optional[CTCAlignerConfig] = None,
 ) -> AlignmentOutput:
     """
     Align a New Testament audio recording with its syllabary transcript end-to-end.
@@ -111,14 +108,7 @@ def align_chapter(
         ctc_aligner: Optional pre-instantiated CTCSegmentationAligner.
         asr_model: Optional pre-instantiated CherokeeASRModel.
         cache: Whether to use disk caching for CTC logits.
-        syncope_penalty: CTC segmentation syncope penalty for vowel deletion.
-        intrusive_penalty: CTC segmentation intrusive penalty for h/' insertion.
-        intrusive_penalties: Per-token intrusive penalties (Dict[str, float] or float).
-        intrusive_min_logprobs: Per-token minimum acoustic logprobs for intrusion.
-        intrusive_max_stride: Max stride for intrusive token insertion.
-        enforce_phonotactics: Whether to enforce Cherokee phonotactic constraints.
-        flag_min_confidence: Minimum word confidence threshold.
-        flag_min_char_confidence: Minimum character confidence threshold.
+        aligner_config: Optional strongly-typed CTCAlignerConfig for CTC segmentation.
 
     Returns:
         AlignmentOutput object containing aligned chunks, words, and metrics.
@@ -145,19 +135,15 @@ def align_chapter(
                     revision=rev,
                     token=token,
                 )
-            c_dir = Path(cache_dir) if cache_dir is not None else DEFAULT_CACHE_DIR
+            if aligner_config is None:
+                c_dir = Path(cache_dir) if cache_dir is not None else DEFAULT_CACHE_DIR
+                aligner_config = CTCAlignerConfig(
+                    cache=cache,
+                    cache_dir=c_dir,
+                )
             aligner = CTCSegmentationAligner(
                 model=model,
-                cache=cache,
-                cache_dir=c_dir,
-                syncope_penalty=syncope_penalty,
-                intrusive_penalty=intrusive_penalty,
-                intrusive_penalties=intrusive_penalties,
-                intrusive_min_logprobs=intrusive_min_logprobs,
-                intrusive_max_stride=intrusive_max_stride,
-                enforce_phonotactics=enforce_phonotactics,
-                flag_min_confidence=flag_min_confidence,
-                flag_min_char_confidence=flag_min_char_confidence,
+                config=aligner_config,
             )
 
         alignment = aligner.align(

@@ -5,7 +5,37 @@ Pure dataclasses with generic chunk semantics.
 """
 
 from dataclasses import dataclass, field
-from typing import List, Optional
+from pathlib import Path
+from typing import Dict, List, Optional, Tuple
+
+
+@dataclass(frozen=True)
+class CTCAlignerConfig:
+    """Strongly-typed configuration for syncope- and intrusion-aware CTC alignment."""
+
+    syncope_tokens: Tuple[str, ...] = ("a", "e", "i", "o", "u", "v")
+    syncope_penalty: float = 6.0
+    intrusive_tokens: Tuple[str, ...] = ("h", "'")
+    intrusive_penalty: float = 0.1
+    intrusive_penalties: Optional[Dict[str, float]] = field(
+        default_factory=lambda: {"h": 4.5, "'": 0.8}
+    )
+    intrusive_min_logprobs: Optional[Dict[str, float]] = field(
+        default_factory=lambda: {"h": -1.0498, "'": -1.6094}
+    )
+    intrusive_max_stride: int = 1
+    enforce_phonotactics: bool = True
+    flag_min_confidence: float = 0.01
+    flag_min_char_confidence: float = 0.0
+    index_duration: float = 0.02
+    min_window_size: int = 8000
+    max_window_size: int = 100000
+    buffer_trail_ms: int = 300
+    buffer_lead_ms: int = 100
+    chunk_seconds: float = 30.0
+    margin_seconds: float = 1.0
+    cache: bool = True
+    cache_dir: Optional[Path] = None
 
 
 @dataclass(frozen=True)

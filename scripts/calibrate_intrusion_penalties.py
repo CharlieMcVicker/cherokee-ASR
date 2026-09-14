@@ -23,8 +23,8 @@ if str(BASE_DIR) not in sys.path:
     sys.path.insert(0, str(BASE_DIR))
 
 from transcription.alignment.ctc_aligner import CTCSegmentationAligner
+from transcription.alignment.models import CTCAlignerConfig, TextChunk
 from transcription.models.asr_model import CherokeeASRModel
-from transcription.alignment.models import TextChunk
 from transcription.new_testament.pipeline import load_chapter_transcript
 
 DEFAULT_MODEL_REPO = "charliemcvicker/length-only-20260704-155307-asr-cherokee-colon"
@@ -34,13 +34,16 @@ DEFAULT_REVISION = "76e62140955f4738abdab345ea34068b02d8d2a2"
 def run_grid_search(
     book: str = "mark",
     chapter: int = 1,
-    cache_dir: Path = BASE_DIR / "runs" / "cache" / "ctc_emissions",
+    model_repo: str = DEFAULT_MODEL_REPO,
+    model_revision: str = DEFAULT_REVISION,
+    cache_dir: Optional[Path] = None,
 ) -> List[Dict[str, Any]]:
-    token = os.environ.get("HF_TOKEN", None)
+    print(f"Loading model {model_repo} (revision: {model_revision}) ...")
     device = "mps" if torch.backends.mps.is_available() else "cpu"
-    asr_model = CherokeeASRModel.from_pretrained(
-        path_or_repo=DEFAULT_MODEL_REPO,
-        revision=DEFAULT_REVISION,
+    token = os.environ.get("HF_TOKEN", None)
+    asr_model = CherokeeASRModel.from_pretrained_or_best(
+        path_or_repo=model_repo,
+        revision=model_revision,
         device=device,
         token=token,
     )
@@ -66,7 +69,8 @@ def run_grid_search(
 
     # Pre-extract/ensure logits are cached
     base_aligner = CTCSegmentationAligner(
-        model=asr_model, cache=True, cache_dir=cache_dir
+        model=asr_model,
+        config=CTCAlignerConfig(cache=True, cache_dir=cache_dir),
     )
     lpz, dur_sec, _ = base_aligner.get_logits_cached(
         audio_path, asr_model=asr_model, cache=True
@@ -95,13 +99,15 @@ def run_grid_search(
 
                 aligner = CTCSegmentationAligner(
                     model=asr_model,
-                    cache=True,
-                    cache_dir=cache_dir,
-                    syncope_penalty=6.0,
-                    intrusive_penalties=penalties,
-                    intrusive_min_logprobs=mlp,
-                    flag_min_char_confidence=0.005,
-                    enforce_phonotactics=True,
+                    config=CTCAlignerConfig(
+                        cache=True,
+                        cache_dir=cache_dir,
+                        syncope_penalty=6.0,
+                        intrusive_penalties=penalties,
+                        intrusive_min_logprobs=mlp,
+                        flag_min_char_confidence=0.005,
+                        enforce_phonotactics=True,
+                    ),
                 )
 
                 t0 = time.time()

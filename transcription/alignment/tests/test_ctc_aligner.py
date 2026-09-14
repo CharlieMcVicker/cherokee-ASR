@@ -18,6 +18,7 @@ from transcription.alignment.ctc_aligner import (
     CTCSegmentationAligner,
     get_logits_cached,
 )
+from transcription.alignment.models import CTCAlignerConfig
 from transcription.alignment.phonotactics import prepare_cherokee_text
 
 
@@ -80,7 +81,8 @@ def test_get_logits_cached_hit_and_miss(dummy_audio_file: Path, tmp_path: Path):
     cache_dir = tmp_path / "cache"
     model = DummyASRModel()
     aligner = CTCSegmentationAligner(
-        model=cast(Any, model), cache=True, cache_dir=cache_dir
+        model=cast(Any, model),
+        config=CTCAlignerConfig(cache=True, cache_dir=cache_dir),
     )
 
     assert model.call_count == 0
@@ -107,7 +109,8 @@ def test_get_logits_cached_disabled(dummy_audio_file: Path, tmp_path: Path):
     cache_dir = tmp_path / "cache_disabled"
     model = DummyASRModel()
     aligner = CTCSegmentationAligner(
-        model=cast(Any, model), cache=False, cache_dir=cache_dir
+        model=cast(Any, model),
+        config=CTCAlignerConfig(cache=False, cache_dir=cache_dir),
     )
 
     # First call
@@ -148,7 +151,8 @@ def test_get_logits_cached_ndarray_and_audiosegment(tmp_path: Path):
     cache_dir = tmp_path / "cache_mem"
     model = DummyASRModel()
     aligner = CTCSegmentationAligner(
-        model=cast(Any, model), cache=True, cache_dir=cache_dir
+        model=cast(Any, model),
+        config=CTCAlignerConfig(cache=True, cache_dir=cache_dir),
     )
 
     # Test with AudioSegment
@@ -222,7 +226,8 @@ def test_cherokee_asr_model_get_logits_sliding_window():
 def test_ctc_aligner_sliding_window_cache_key():
     model = DummyASRModel()
     aligner = CTCSegmentationAligner(
-        model=cast(Any, model), chunk_seconds=30.0, margin_seconds=1.0
+        model=cast(Any, model),
+        config=CTCAlignerConfig(chunk_seconds=30.0, margin_seconds=1.0),
     )
     arr = np.zeros(16000, dtype=np.float32)
 
@@ -242,9 +247,11 @@ def test_ctc_aligner_full_chapter_verse_and_word_harvesting():
     # Create aligner with mock model
     aligner = CTCSegmentationAligner(
         model=cast(Any, model),
-        syncope_tokens=["a"],
-        syncope_penalty=2.0,
-        flag_min_confidence=0.1,
+        config=CTCAlignerConfig(
+            syncope_tokens=("a",),
+            syncope_penalty=2.0,
+            flag_min_confidence=0.1,
+        ),
     )
 
     # Audio of 2 seconds
@@ -310,10 +317,12 @@ def test_ctc_aligner_extract_logits_sliding_window_fallback():
     model = DummyASRModel()
     aligner = CTCSegmentationAligner(
         model=cast(Any, model),
-        chunk_seconds=1.0,
-        margin_seconds=0.2,
-        buffer_lead_ms=0,
-        buffer_trail_ms=0,
+        config=CTCAlignerConfig(
+            chunk_seconds=1.0,
+            margin_seconds=0.2,
+            buffer_lead_ms=0,
+            buffer_trail_ms=0,
+        ),
     )
     long_audio = np.zeros(16000 * 3, dtype=np.float32)
 
@@ -333,7 +342,7 @@ def test_ctc_aligner_verse_slice_alignment_and_anomaly_detection(
     model = DummyASRModel()
     aligner = CTCSegmentationAligner(
         model=cast(Any, model),
-        flag_min_confidence=0.1,
+        config=CTCAlignerConfig(flag_min_confidence=0.1),
     )
 
     aligned = aligner.align_verse_slice(
@@ -361,10 +370,12 @@ def test_ctc_aligner_continuous_chapter_multi_verse_monotonicity():
     model = DummyASRModel()
     aligner = CTCSegmentationAligner(
         model=cast(Any, model),
-        syncope_tokens=["a", "e", "i", "o", "u", "v"],
-        syncope_penalty=2.0,
-        intrusive_tokens=["h", "'"],
-        intrusive_penalty=0.1,
+        config=CTCAlignerConfig(
+            syncope_tokens=("a", "e", "i", "o", "u", "v"),
+            syncope_penalty=2.0,
+            intrusive_tokens=("h", "'"),
+            intrusive_penalty=0.1,
+        ),
     )
 
     audio = np.zeros(16000 * 6, dtype=np.float32)
@@ -403,8 +414,10 @@ def test_ctc_aligner_zero_start_timing_preserved(dummy_audio_file: Path):
     model = DummyASRModel()
     aligner = CTCSegmentationAligner(
         model=cast(Any, model),
-        buffer_lead_ms=0,
-        buffer_trail_ms=0,
+        config=CTCAlignerConfig(
+            buffer_lead_ms=0,
+            buffer_trail_ms=0,
+        ),
     )
 
     # Ground truth trellis for 1 word has length 4; word character index is 2
@@ -439,8 +452,10 @@ def test_ctc_aligner_unaligned_word_emissions_and_confidence(dummy_audio_file: P
     model = DummyASRModel()
     aligner = CTCSegmentationAligner(
         model=cast(Any, model),
-        buffer_lead_ms=0,
-        buffer_trail_ms=0,
+        config=CTCAlignerConfig(
+            buffer_lead_ms=0,
+            buffer_trail_ms=0,
+        ),
     )
 
     # Word 1 character aligns at 0.1s (trellis index 2), Word 2 unaligned (trellis index 4)
@@ -480,10 +495,12 @@ def test_ctc_aligner_align_unaligned_word_and_window_size():
     model = DummyASRModel()
     aligner = CTCSegmentationAligner(
         model=cast(Any, model),
-        min_window_size=5000,
-        max_window_size=20000,
-        buffer_lead_ms=0,
-        buffer_trail_ms=0,
+        config=CTCAlignerConfig(
+            min_window_size=5000,
+            max_window_size=20000,
+            buffer_lead_ms=0,
+            buffer_trail_ms=0,
+        ),
     )
 
     audio = np.zeros(16000 * 2, dtype=np.float32)
@@ -533,8 +550,10 @@ def test_ctc_aligner_intra_verse_unaligned_word_isolation(dummy_audio_file: Path
     model = DummyASRModel()
     aligner = CTCSegmentationAligner(
         model=cast(Any, model),
-        buffer_lead_ms=0,
-        buffer_trail_ms=0,
+        config=CTCAlignerConfig(
+            buffer_lead_ms=0,
+            buffer_trail_ms=0,
+        ),
     )
 
     # Word 1 (a) aligns at 0.10s (frame 5)
@@ -590,10 +609,12 @@ def test_ctc_aligner_min_char_confidence_flags_mark_1_1_typo(dummy_audio_file: P
     model = DummyASRModel()
     aligner = CTCSegmentationAligner(
         model=cast(Any, model),
-        flag_min_confidence=0.01,
-        flag_min_char_confidence=0.005,
-        buffer_lead_ms=0,
-        buffer_trail_ms=0,
+        config=CTCAlignerConfig(
+            flag_min_confidence=0.01,
+            flag_min_char_confidence=0.005,
+            buffer_lead_ms=0,
+            buffer_trail_ms=0,
+        ),
     )
 
     # Word timings: ground truth trellis length 10, character timings at 0.10, 0.12, 0.14, 0.16
@@ -650,11 +671,13 @@ def test_ctc_aligner_parameters_forwarding(dummy_audio_file: Path):
 
     aligner = CTCSegmentationAligner(
         model=cast(Any, model),
-        intrusive_penalties=custom_penalties,
-        intrusive_min_logprobs=custom_min_logprobs,
-        intrusive_max_stride=2,
-        enforce_phonotactics=True,
-        flag_min_char_confidence=0.008,
+        config=CTCAlignerConfig(
+            intrusive_penalties=custom_penalties,
+            intrusive_min_logprobs=custom_min_logprobs,
+            intrusive_max_stride=2,
+            enforce_phonotactics=True,
+            flag_min_char_confidence=0.008,
+        ),
     )
 
     fake_timings = np.array([-1.0, -1.0, 0.10, -1.0], dtype=np.float32)

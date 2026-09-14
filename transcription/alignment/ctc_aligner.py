@@ -26,6 +26,7 @@ from transcription.alignment.models import (
     AlignedChunk,
     AlignmentMetrics,
     AlignmentOutput,
+    CTCAlignerConfig,
     TextChunk,
     TokenEmission,
     WordInterval,
@@ -55,48 +56,39 @@ class CTCSegmentationAligner:
     def __init__(
         self,
         model: Optional[CherokeeASRModel] = None,
-        syncope_tokens: Sequence[str] = DEFAULT_SYNCOPE_TOKENS,
-        syncope_penalty: float = 2.0,
-        index_duration: float = 0.02,
+        config: Optional[CTCAlignerConfig] = None,
         chunk_normalizer: Optional[Callable[[str], str]] = None,
-        min_window_size: int = 8000,
-        max_window_size: int = 100000,
-        buffer_trail_ms: int = 300,
-        buffer_lead_ms: int = 100,
-        chunk_seconds: float = 30.0,
-        margin_seconds: float = 1.0,
-        intrusive_tokens: Sequence[str] = ("h", "'"),
-        intrusive_penalty: float = 0.1,
-        intrusive_penalties: Optional[Union[float, Dict[str, float]]] = None,
-        intrusive_min_logprobs: Optional[Union[float, Dict[str, float]]] = None,
-        intrusive_max_stride: int = 1,
-        enforce_phonotactics: bool = True,
-        flag_min_confidence: float = 0.01,
-        flag_min_char_confidence: float = 0.005,
-        cache: bool = False,
-        cache_dir: Optional[Union[str, Path]] = None,
+        **kwargs: Any,
     ):
         self.model = model
-        self.syncope_tokens = list(syncope_tokens)
-        self.syncope_penalty = float(syncope_penalty)
-        self.intrusive_tokens = list(intrusive_tokens) if intrusive_tokens else []
-        self.intrusive_penalty = float(intrusive_penalty)
-        self.intrusive_penalties = intrusive_penalties
-        self.intrusive_min_logprobs = intrusive_min_logprobs
-        self.intrusive_max_stride = int(intrusive_max_stride)
-        self.enforce_phonotactics = bool(enforce_phonotactics)
-        self.flag_min_confidence = float(flag_min_confidence)
-        self.flag_min_char_confidence = float(flag_min_char_confidence)
-        self.index_duration = float(index_duration)
+        self.config = config or CTCAlignerConfig()
         self.chunk_norm = chunk_normalizer or normalize_phonetics_for_alignment
-        self.min_window_size = min_window_size
-        self.max_window_size = max_window_size
-        self.buffer_trail_ms = buffer_trail_ms
-        self.buffer_lead_ms = buffer_lead_ms
-        self.chunk_seconds = float(chunk_seconds)
-        self.margin_seconds = float(margin_seconds)
-        self.cache = cache
-        self.cache_dir = Path(cache_dir) if cache_dir is not None else DEFAULT_CACHE_DIR
+
+        self.syncope_tokens = list(self.config.syncope_tokens)
+        self.syncope_penalty = float(self.config.syncope_penalty)
+        self.intrusive_tokens = (
+            list(self.config.intrusive_tokens) if self.config.intrusive_tokens else []
+        )
+        self.intrusive_penalty = float(self.config.intrusive_penalty)
+        self.intrusive_penalties = self.config.intrusive_penalties
+        self.intrusive_min_logprobs = self.config.intrusive_min_logprobs
+        self.intrusive_max_stride = int(self.config.intrusive_max_stride)
+        self.enforce_phonotactics = bool(self.config.enforce_phonotactics)
+        self.flag_min_confidence = float(self.config.flag_min_confidence)
+        self.flag_min_char_confidence = float(self.config.flag_min_char_confidence)
+        self.index_duration = float(self.config.index_duration)
+        self.min_window_size = int(self.config.min_window_size)
+        self.max_window_size = int(self.config.max_window_size)
+        self.buffer_trail_ms = int(self.config.buffer_trail_ms)
+        self.buffer_lead_ms = int(self.config.buffer_lead_ms)
+        self.chunk_seconds = float(self.config.chunk_seconds)
+        self.margin_seconds = float(self.config.margin_seconds)
+        self.cache = bool(self.config.cache)
+        self.cache_dir = (
+            Path(self.config.cache_dir)
+            if self.config.cache_dir is not None
+            else DEFAULT_CACHE_DIR
+        )
 
     def _get_char_list_and_blank(
         self, asr_model: CherokeeASRModel

@@ -30,6 +30,7 @@ if str(BASE_DIR) not in sys.path:
     sys.path.insert(0, str(BASE_DIR))
 
 from transcription.alignment.ctc_aligner import CTCSegmentationAligner
+from transcription.alignment.models import CTCAlignerConfig
 from transcription.models.asr_model import CherokeeASRModel
 from transcription.new_testament.pipeline import (
     align_chapter,
@@ -47,7 +48,7 @@ DEFAULT_CACHE_DIR = BASE_DIR / "runs" / "cache" / "ctc_emissions"
 DEFAULT_MODEL_REPO = "charliemcvicker/length-only-20260704-155307-asr-cherokee-colon"
 DEFAULT_REVISION = "76e62140955f4738abdab345ea34068b02d8d2a2"
 DEFAULT_SYNCOPE_PENALTY = 6.0
-DEFAULT_INTRUSIVE_PENALTY = 2.5
+DEFAULT_INTRUSIVE_PENALTY = 0.1
 
 BOOK_CONFIGS = {
     "mark": {"chapters": 16, "name": "Mark"},
@@ -55,41 +56,10 @@ BOOK_CONFIGS = {
 }
 
 
-def parse_penalty_param(
-    val: Optional[Union[str, float, Dict[str, float]]],
-) -> Optional[Union[float, Dict[str, float]]]:
-    """Parse penalty / logprob parameter from string JSON dict, float string, or number."""
-    if val is None:
-        return None
-    if isinstance(val, (int, float, dict)):
-        return val
-    if isinstance(val, str):
-        val_str = val.strip()
-        if not val_str:
-            return None
-        try:
-            parsed = json.loads(val_str)
-            if isinstance(parsed, dict):
-                return {str(k): float(v) for k, v in parsed.items()}
-            return float(parsed)
-        except (json.JSONDecodeError, ValueError):
-            return float(val_str)
-    return None
-
-
 def get_default_ctc_aligner(
     model_repo: str = DEFAULT_MODEL_REPO,
     model_revision: str = DEFAULT_REVISION,
-    cache_dir: Path = DEFAULT_CACHE_DIR,
-    cache: bool = True,
-    syncope_penalty: float = DEFAULT_SYNCOPE_PENALTY,
-    intrusive_penalty: float = DEFAULT_INTRUSIVE_PENALTY,
-    intrusive_penalties: Optional[Union[float, Dict[str, float]]] = None,
-    intrusive_min_logprobs: Optional[Union[float, Dict[str, float]]] = None,
-    intrusive_max_stride: int = 1,
-    enforce_phonotactics: bool = True,
-    flag_min_confidence: float = 0.01,
-    flag_min_char_confidence: float = 0.005,
+    config: Optional[CTCAlignerConfig] = None,
 ) -> CTCSegmentationAligner:
     """Instantiates default CTCSegmentationAligner with cached emissions."""
     token = os.environ.get("HF_TOKEN", None)
@@ -102,16 +72,7 @@ def get_default_ctc_aligner(
     )
     aligner = CTCSegmentationAligner(
         model=asr_model,
-        cache=cache,
-        cache_dir=cache_dir,
-        syncope_penalty=syncope_penalty,
-        intrusive_penalty=intrusive_penalty,
-        intrusive_penalties=intrusive_penalties,
-        intrusive_min_logprobs=intrusive_min_logprobs,
-        intrusive_max_stride=intrusive_max_stride,
-        enforce_phonotactics=enforce_phonotactics,
-        flag_min_confidence=flag_min_confidence,
-        flag_min_char_confidence=flag_min_char_confidence,
+        config=config or CTCAlignerConfig(cache_dir=DEFAULT_CACHE_DIR),
     )
     return aligner
 
@@ -123,16 +84,7 @@ def realign_book(
     model_repo: str = DEFAULT_MODEL_REPO,
     model_revision: str = DEFAULT_REVISION,
     export_praat: bool = True,
-    cache_dir: Path = DEFAULT_CACHE_DIR,
-    cache: bool = True,
-    syncope_penalty: float = DEFAULT_SYNCOPE_PENALTY,
-    intrusive_penalty: float = DEFAULT_INTRUSIVE_PENALTY,
-    intrusive_penalties: Optional[Union[float, Dict[str, float]]] = None,
-    intrusive_min_logprobs: Optional[Union[float, Dict[str, float]]] = None,
-    intrusive_max_stride: int = 1,
-    enforce_phonotactics: bool = True,
-    flag_min_confidence: float = 0.01,
-    flag_min_char_confidence: float = 0.005,
+    aligner_config: Optional[CTCAlignerConfig] = None,
 ) -> Tuple[List[Dict[str, Any]], List[Dict[str, str]]]:
     book_key = book.lower().strip()
     if book_key not in BOOK_CONFIGS:
@@ -161,16 +113,7 @@ def realign_book(
         ctc_aligner = get_default_ctc_aligner(
             model_repo=model_repo,
             model_revision=model_revision,
-            cache_dir=cache_dir,
-            cache=cache,
-            syncope_penalty=syncope_penalty,
-            intrusive_penalty=intrusive_penalty,
-            intrusive_penalties=intrusive_penalties,
-            intrusive_min_logprobs=intrusive_min_logprobs,
-            intrusive_max_stride=intrusive_max_stride,
-            enforce_phonotactics=enforce_phonotactics,
-            flag_min_confidence=flag_min_confidence,
-            flag_min_char_confidence=flag_min_char_confidence,
+            config=aligner_config,
         )
 
     records: List[Dict[str, Any]] = []
@@ -211,16 +154,7 @@ def realign_book(
             ctc_aligner=ctc_aligner,
             model_path=model_repo,
             model_revision=model_revision,
-            cache_dir=cache_dir,
-            cache=cache,
-            syncope_penalty=syncope_penalty,
-            intrusive_penalty=intrusive_penalty,
-            intrusive_penalties=intrusive_penalties,
-            intrusive_min_logprobs=intrusive_min_logprobs,
-            intrusive_max_stride=intrusive_max_stride,
-            enforce_phonotactics=enforce_phonotactics,
-            flag_min_confidence=flag_min_confidence,
-            flag_min_char_confidence=flag_min_char_confidence,
+            aligner_config=aligner_config,
         )
 
         audio_seg = (
@@ -403,30 +337,12 @@ def realign_all(
     model_repo: str = DEFAULT_MODEL_REPO,
     model_revision: str = DEFAULT_REVISION,
     export_praat: bool = True,
-    cache_dir: Path = DEFAULT_CACHE_DIR,
-    cache: bool = True,
-    syncope_penalty: float = DEFAULT_SYNCOPE_PENALTY,
-    intrusive_penalty: float = DEFAULT_INTRUSIVE_PENALTY,
-    intrusive_penalties: Optional[Union[float, Dict[str, float]]] = None,
-    intrusive_min_logprobs: Optional[Union[float, Dict[str, float]]] = None,
-    intrusive_max_stride: int = 1,
-    enforce_phonotactics: bool = True,
-    flag_min_confidence: float = 0.01,
-    flag_min_char_confidence: float = 0.005,
+    aligner_config: Optional[CTCAlignerConfig] = None,
 ) -> Dict[str, List[Dict[str, Any]]]:
     ctc_aligner = get_default_ctc_aligner(
         model_repo=model_repo,
         model_revision=model_revision,
-        cache_dir=cache_dir,
-        cache=cache,
-        syncope_penalty=syncope_penalty,
-        intrusive_penalty=intrusive_penalty,
-        intrusive_penalties=intrusive_penalties,
-        intrusive_min_logprobs=intrusive_min_logprobs,
-        intrusive_max_stride=intrusive_max_stride,
-        enforce_phonotactics=enforce_phonotactics,
-        flag_min_confidence=flag_min_confidence,
-        flag_min_char_confidence=flag_min_char_confidence,
+        config=aligner_config,
     )
 
     all_records: List[Dict[str, Any]] = []
@@ -440,16 +356,7 @@ def realign_all(
             model_repo=model_repo,
             model_revision=model_revision,
             export_praat=export_praat,
-            cache_dir=cache_dir,
-            cache=cache,
-            syncope_penalty=syncope_penalty,
-            intrusive_penalty=intrusive_penalty,
-            intrusive_penalties=intrusive_penalties,
-            intrusive_min_logprobs=intrusive_min_logprobs,
-            intrusive_max_stride=intrusive_max_stride,
-            enforce_phonotactics=enforce_phonotactics,
-            flag_min_confidence=flag_min_confidence,
-            flag_min_char_confidence=flag_min_char_confidence,
+            aligner_config=aligner_config,
         )
         book_results[book] = records
         all_records.extend(records)
@@ -524,40 +431,10 @@ def main():
         help=f"CTC segmentation intrusive penalty for h/' insertion (default: {DEFAULT_INTRUSIVE_PENALTY})",
     )
     parser.add_argument(
-        "--intrusive-penalties",
-        type=str,
-        default=None,
-        help="Per-token intrusive penalty JSON dict or float (e.g. '{\"h\": 0.1, \"'\": 0.5}' or '0.1')",
-    )
-    parser.add_argument(
-        "--intrusive-min-logprobs",
-        type=str,
-        default=None,
-        help="Per-token minimum log-prob JSON dict or float (e.g. '{\"h\": -3.0}' or '-3.0')",
-    )
-    parser.add_argument(
-        "--intrusive-max-stride",
-        type=int,
-        default=1,
-        help="Max stride for intrusive token insertion (default: 1)",
-    )
-    parser.add_argument(
-        "--no-enforce-phonotactics",
-        action="store_true",
-        default=False,
-        help="Disable phonotactic masking for syncope and intrusion",
-    )
-    parser.add_argument(
         "--flag-min-confidence",
         type=float,
         default=0.01,
         help="Minimum word confidence threshold for anomaly flagging (default: 0.01)",
-    )
-    parser.add_argument(
-        "--flag-min-char-confidence",
-        type=float,
-        default=0.005,
-        help="Minimum acoustic character confidence threshold for anomaly flagging (default: 0.005)",
     )
     parser.add_argument(
         "--no-praat",
@@ -580,13 +457,13 @@ def main():
 
     args = parser.parse_args()
 
-    intrusive_penalties = (
-        parse_penalty_param(args.intrusive_penalties)
-        if args.intrusive_penalties is not None
-        else args.intrusive_penalty
+    aligner_config = CTCAlignerConfig(
+        syncope_penalty=args.syncope_penalty,
+        intrusive_penalty=args.intrusive_penalty,
+        flag_min_confidence=args.flag_min_confidence,
+        cache=not args.no_cache,
+        cache_dir=args.cache_dir,
     )
-    intrusive_min_logprobs = parse_penalty_param(args.intrusive_min_logprobs)
-    enforce_phonotactics = not args.no_enforce_phonotactics
 
     if args.book == "all":
         realign_all(
@@ -594,16 +471,7 @@ def main():
             model_repo=args.model_repo,
             model_revision=args.model_revision,
             export_praat=not args.no_praat,
-            cache_dir=args.cache_dir,
-            cache=not args.no_cache,
-            syncope_penalty=args.syncope_penalty,
-            intrusive_penalty=args.intrusive_penalty,
-            intrusive_penalties=intrusive_penalties,
-            intrusive_min_logprobs=intrusive_min_logprobs,
-            intrusive_max_stride=args.intrusive_max_stride,
-            enforce_phonotactics=enforce_phonotactics,
-            flag_min_confidence=args.flag_min_confidence,
-            flag_min_char_confidence=args.flag_min_char_confidence,
+            aligner_config=aligner_config,
         )
     else:
         records, _ = realign_book(
@@ -612,16 +480,7 @@ def main():
             model_repo=args.model_repo,
             model_revision=args.model_revision,
             export_praat=not args.no_praat,
-            cache_dir=args.cache_dir,
-            cache=not args.no_cache,
-            syncope_penalty=args.syncope_penalty,
-            intrusive_penalty=args.intrusive_penalty,
-            intrusive_penalties=intrusive_penalties,
-            intrusive_min_logprobs=intrusive_min_logprobs,
-            intrusive_max_stride=args.intrusive_max_stride,
-            enforce_phonotactics=enforce_phonotactics,
-            flag_min_confidence=args.flag_min_confidence,
-            flag_min_char_confidence=args.flag_min_char_confidence,
+            aligner_config=aligner_config,
         )
         # Also update combined if single book is run
         ALIGNMENTS_DIR.mkdir(parents=True, exist_ok=True)
