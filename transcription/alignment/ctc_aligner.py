@@ -73,7 +73,6 @@ class CTCSegmentationAligner:
         enforce_phonotactics: bool = True,
         flag_min_confidence: float = 0.01,
         flag_min_char_confidence: float = 0.005,
-        flag_min_char_duration_sec: float = 0.03,
         cache: bool = False,
         cache_dir: Optional[Union[str, Path]] = None,
     ):
@@ -88,7 +87,6 @@ class CTCSegmentationAligner:
         self.enforce_phonotactics = bool(enforce_phonotactics)
         self.flag_min_confidence = float(flag_min_confidence)
         self.flag_min_char_confidence = float(flag_min_char_confidence)
-        self.flag_min_char_dur = float(flag_min_char_duration_sec)
         self.index_duration = float(index_duration)
         self.chunk_norm = chunk_normalizer or normalize_phonetics_for_alignment
         self.min_window_size = min_window_size

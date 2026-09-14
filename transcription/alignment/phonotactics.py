@@ -170,7 +170,10 @@ def tokenize_phonemes(text: str) -> List[PhonotacticToken]:
     return tokens
 
 
-def get_syncope_mask(text: str, return_char_mask: bool = True) -> List[bool]:
+def get_syncope_mask(
+    text_or_tokens: Union[str, Sequence[PhonotacticToken]],
+    return_char_mask: bool = True,
+) -> List[bool]:
     """
     Generates a boolean mask indicating positions eligible for vocalic syncope (vowel deletion).
 
@@ -178,20 +181,27 @@ def get_syncope_mask(text: str, return_char_mask: bool = True) -> List[bool]:
     - Short vowels in non-initial syllables or open syllables following an onset consonant
       are phonotactically permitted to delete under fast speech / syncopation.
     - Syncope is blocked if deletion would create an illegal non-laryngeal cluster
-      or violate forbidden cluster constraints (*HH, *ChR).
+      or violate forbidden cluster constraints (*ChR).
 
     Args:
-        text: Input Cherokee phonetic text.
-        return_char_mask: If True, returns mask of length len(text).
+        text_or_tokens: Input Cherokee phonetic text or pre-tokenized sequence of PhonotacticToken.
+        return_char_mask: If True, returns mask of length equal to character count.
                           If False, returns mask aligned to token count.
 
     Returns:
         List[bool] where True marks an eligible syncope site.
     """
-    if not text:
-        return []
+    if isinstance(text_or_tokens, str):
+        if not text_or_tokens:
+            return []
+        tokens = tokenize_phonemes(text_or_tokens)
+        num_chars = len(text_or_tokens)
+    else:
+        tokens = list(text_or_tokens)
+        if not tokens:
+            return []
+        num_chars = max((t.end_idx for t in tokens), default=0)
 
-    tokens = tokenize_phonemes(text)
     num_tokens = len(tokens)
     token_mask: List[bool] = [False] * num_tokens
 
@@ -218,43 +228,27 @@ def get_syncope_mask(text: str, return_char_mask: bool = True) -> List[bool]:
                 and next_tok is not None
                 and next_tok.category == PhonemeCategory.VOICELESS_SONORANT
             ):
-                # Syncope blocked by *ChR constraint
                 continue
-
-            # Check constraint: *HH (adjacent laryngeals)
-            if prev_tok.category in (
-                PhonemeCategory.LARYNGEAL_FRICATIVE,
-                PhonemeCategory.GLOTTAL_STOP,
-            ) or (
-                next_tok is not None
-                and next_tok.category
-                in (
-                    PhonemeCategory.LARYNGEAL_FRICATIVE,
-                    PhonemeCategory.GLOTTAL_STOP,
-                )
-            ):
-                # Syncope between laryngeals would create illegal sequence
-                if prev_tok.category in (
-                    PhonemeCategory.LARYNGEAL_FRICATIVE,
-                    PhonemeCategory.GLOTTAL_STOP,
-                ):
-                    continue
 
             token_mask[idx] = True
 
     if not return_char_mask:
         return token_mask
 
-    char_mask: List[bool] = [False] * len(text)
+    char_mask: List[bool] = [False] * num_chars
     for tok, is_syncope in zip(tokens, token_mask):
         if is_syncope:
             for c_idx in range(tok.start_idx, tok.end_idx):
-                char_mask[c_idx] = True
+                if c_idx < num_chars:
+                    char_mask[c_idx] = True
 
     return char_mask
 
 
-def get_intrusion_site_mask(text: str, return_char_mask: bool = True) -> List[bool]:
+def get_intrusion_site_mask(
+    text_or_tokens: Union[str, Sequence[PhonotacticToken]],
+    return_char_mask: bool = True,
+) -> List[bool]:
     """
     Generates a boolean mask indicating positions eligible for intrusive laryngeals
     (/h/ pre-aspiration, post-aspiration, or /'/ glottalization).
@@ -269,23 +263,29 @@ def get_intrusion_site_mask(text: str, return_char_mask: bool = True) -> List[bo
     2. Plain stop post-aspiration candidate: t->th, k->kh, kw->kwh in non-preaspirated environments.
 
     Args:
-        text: Input Cherokee phonetic text.
-        return_char_mask: If True, returns mask of length len(text).
+        text_or_tokens: Input Cherokee phonetic text or pre-tokenized sequence of PhonotacticToken.
+        return_char_mask: If True, returns mask of length equal to character count.
                           If False, returns mask aligned to token count.
 
     Returns:
         List[bool] where True marks an eligible intrusive laryngeal site.
     """
-    if not text:
-        return []
+    if isinstance(text_or_tokens, str):
+        if not text_or_tokens:
+            return []
+        tokens = tokenize_phonemes(text_or_tokens)
+        num_chars = len(text_or_tokens)
+    else:
+        tokens = list(text_or_tokens)
+        if not tokens:
+            return []
+        num_chars = max((t.end_idx for t in tokens), default=0)
 
-    tokens = tokenize_phonemes(text)
     num_tokens = len(tokens)
     token_mask: List[bool] = [False] * num_tokens
 
     for idx, tok in enumerate(tokens):
         prev_tok = tokens[idx - 1] if idx > 0 else None
-        next_tok = tokens[idx + 1] if idx < num_tokens - 1 else None
 
         # 1. Stop & affricate positions: plain stops are candidate sites for pre-/post-laryngeals
         if tok.category == PhonemeCategory.PLAIN_STOP:
@@ -310,11 +310,12 @@ def get_intrusion_site_mask(text: str, return_char_mask: bool = True) -> List[bo
     if not return_char_mask:
         return token_mask
 
-    char_mask: List[bool] = [False] * len(text)
+    char_mask: List[bool] = [False] * num_chars
     for tok, is_intrusion in zip(tokens, token_mask):
         if is_intrusion:
             for c_idx in range(tok.start_idx, tok.end_idx):
-                char_mask[c_idx] = True
+                if c_idx < num_chars:
+                    char_mask[c_idx] = True
 
     return char_mask
 
@@ -396,10 +397,10 @@ def analyze_phonotactics(text: str) -> PhonotacticAnalysis:
         Immutable PhonotacticAnalysis object with tokens, syncope masks, and intrusion site masks.
     """
     tokens = tuple(tokenize_phonemes(text))
-    char_syncope = tuple(get_syncope_mask(text, return_char_mask=True))
-    char_intrusion = tuple(get_intrusion_site_mask(text, return_char_mask=True))
-    token_syncope = tuple(get_syncope_mask(text, return_char_mask=False))
-    token_intrusion = tuple(get_intrusion_site_mask(text, return_char_mask=False))
+    char_syncope = tuple(get_syncope_mask(tokens, return_char_mask=True))
+    char_intrusion = tuple(get_intrusion_site_mask(tokens, return_char_mask=True))
+    token_syncope = tuple(get_syncope_mask(tokens, return_char_mask=False))
+    token_intrusion = tuple(get_intrusion_site_mask(tokens, return_char_mask=False))
 
     return PhonotacticAnalysis(
         text=text,
@@ -425,7 +426,7 @@ def prepare_cherokee_text(
     masks derived from Cherokee surface phonotactics.
 
     Args:
-        config: An instance of CtcSegmentationParameters.
+        config: An instance of CtcSegmentationParameters (or compatible configuration object).
         text: Input text as a single string, list of words, or list of utterances.
         char_list: Sequence of vocabulary characters/tokens from the ASR model.
         enforce_phonotactics: If True, generates phonotactically accurate syncope and intrusive masks.

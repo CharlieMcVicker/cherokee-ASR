@@ -30,18 +30,6 @@ if str(BASE_DIR) not in sys.path:
     sys.path.insert(0, str(BASE_DIR))
 
 from transcription.alignment.ctc_aligner import CTCSegmentationAligner
-from transcription.alignment.distance_metrics import (
-    ConfusionMatrixCostMetric,
-    DistanceMetric,
-)
-from transcription.alignment.calibrated_distance_metrics import (
-    PhonologicalConfusionCostMetric,
-)
-from transcription.alignment.extractors import (
-    ASREmissionsExtractor,
-    CachedASREmissionsExtractor,
-    CherokeeASRExtractor,
-)
 from transcription.models.asr_model import CherokeeASRModel
 from transcription.new_testament.pipeline import (
     align_chapter,
@@ -128,51 +116,10 @@ def get_default_ctc_aligner(
     return aligner
 
 
-def get_default_extractor_and_metric(
-    model_repo: str = DEFAULT_MODEL_REPO,
-    model_revision: str = DEFAULT_REVISION,
-    cache_dir: Path = BASE_DIR / "runs" / "cache" / "emissions",
-    cost_matrix_path: Path = BASE_DIR
-    / "runs"
-    / "evaluation"
-    / "confusion_cost_matrix_prebible.json",
-) -> Tuple[CachedASREmissionsExtractor, DistanceMetric]:
-    """Legacy helper for DTW distance metric and emissions extractor."""
-    token = os.environ.get("HF_TOKEN", None)
-    asr_model = CherokeeASRModel.from_pretrained_or_best(
-        path_or_repo=model_repo,
-        revision=model_revision,
-        token=token,
-    )
-    base_extractor = CherokeeASRExtractor(model=asr_model, skip_vad=False)
-    prefix_slug = (
-        f"{model_repo.replace('/', '_')}_{model_revision}"
-        if model_revision
-        else model_repo.replace("/", "_")
-    )
-    cached_extractor = CachedASREmissionsExtractor(
-        extractor=base_extractor,
-        cache_dir=cache_dir,
-        cache_key_prefix=prefix_slug,
-    )
-
-    if cost_matrix_path.exists():
-        base_metric = ConfusionMatrixCostMetric.from_json(cost_matrix_path)
-        distance_metric = PhonologicalConfusionCostMetric(base_metric=base_metric)
-    else:
-        raise FileNotFoundError(
-            f"Confusion cost matrix not found at: {cost_matrix_path}"
-        )
-
-    return cached_extractor, distance_metric
-
-
 def realign_book(
     book: str,
     chapter: Optional[int] = None,
     ctc_aligner: Optional[CTCSegmentationAligner] = None,
-    distance_metric: Optional[DistanceMetric] = None,
-    emissions_extractor: Optional[ASREmissionsExtractor] = None,
     model_repo: str = DEFAULT_MODEL_REPO,
     model_revision: str = DEFAULT_REVISION,
     export_praat: bool = True,
@@ -210,7 +157,7 @@ def realign_book(
     ALIGNMENTS_DIR.mkdir(parents=True, exist_ok=True)
     TRAIN_CSVS_DIR.mkdir(parents=True, exist_ok=True)
 
-    if ctc_aligner is None and emissions_extractor is None:
+    if ctc_aligner is None:
         ctc_aligner = get_default_ctc_aligner(
             model_repo=model_repo,
             model_revision=model_revision,
@@ -260,10 +207,8 @@ def realign_book(
             output_dir=ch_out_dir,
             export_praat=export_praat,
             export_manifest=True,
-            engine="ctc" if ctc_aligner is not None else "dtw",
+            engine="ctc",
             ctc_aligner=ctc_aligner,
-            distance_metric=distance_metric,
-            emissions_extractor=emissions_extractor,
             model_path=model_repo,
             model_revision=model_revision,
             cache_dir=cache_dir,
@@ -436,12 +381,6 @@ def realign_book(
     print(
         f"[Artifact] Saved training CSV with {len(saved_csv_rows)} rows to '{train_csv_path}'"
     )
-
-    train_csv_alt = TRAIN_CSVS_DIR / f"{book_key}_train.csv"
-    with open(train_csv_alt, "w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=["path", "sentence"])
-        writer.writeheader()
-        writer.writerows(saved_csv_rows)
 
     if durations_sec:
         total_sec = sum(durations_sec)
