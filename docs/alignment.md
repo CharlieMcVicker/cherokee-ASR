@@ -438,27 +438,37 @@ metric = CustomCallableDistanceMetric(fn=lambda hyp, ref: 0.0 if hyp == ref else
 
 ---
 
-### Representation-Aware Text Normalization (`transcription.alignment.normalizers`)
+### Representation-Aware Text Normalization & Orthography System (`transcription.alignment.normalizers`)
 
-Located in [`transcription/alignment/normalizers.py`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/normalizers.py), normalization functions prepare text for robust acoustic DTW and dynamic programming alignment. Because Cherokee Syllabary orthography does not reliably differentiate aspiration, separate normalizers are provided based on the input representation:
+Located in [`transcription/alignment/normalizers.py`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/normalizers.py) and backed by [`transcription.utils.orthography.Orthography`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/utils/orthography.py), text normalizers ensure deterministic conversions across Cherokee orthographic representations.
 
-#### 1. `normalize_syllabary_for_alignment` (Syllabary Mode)
-Used when aligning Syllabary transliterations (such as Bible verse metadata). Because Syllabary orthography cannot be trusted to mark aspiration consistently, aspiration (`h`) is normalized away:
-1. **Lowercasing and Hyphen Stripping**: `A-da-le-ni-s-gv` $\rightarrow$ `adalenisgv`.
-2. **Digraph Normalization**: Replaces `qu` with `gw`.
-3. **Consonant Respelling**: Calls [`respell_consonants`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/utils/tone_normalization.py) (`t->th`, `d->t`, `k->kh`, `g->k`, etc.).
-4. **Aspiration Stripping**: Strips `/h/` sound markers (`text.replace("h", "")`).
-5. **Punctuation Removal**: Strips standard punctuation (`.,!?;:"'()[]{}` etc.).
-6. **Whitespace Normalization**: Collapses whitespace into single spaces and strips ends.
+#### Orthography Enum System
 
-#### 2. `normalize_phonetics_for_alignment` (Phonetics Mode)
-Used when aligning phonetic transcripts against acoustic ASR token emissions (such as linguistic transcriptions or interview segments). Aspiration (`h`) is **preserved** because both the reference and the ASR emissions contain meaningful phonetic contrast:
-1. **Lowercasing and Hyphen Stripping**: `tsa-ni` $\rightarrow$ `tsani`.
-2. **Digraph Normalization**: Replaces `qu` with `gw`.
-3. **Consonant Respelling**: Applies phonetic consonant mappings without stripping `h`.
-4. **Punctuation Removal & Whitespace**: Sanitizes punctuation and normalizes spacing.
+1. **`Orthography.SYLLABARY`**: Unicode Cherokee characters (`U+13A0`–`U+13FF`, `U+AB70`–`U+ABBF`, e.g. `ᎠᏓᎴᏂᏍᎬ ᏱᏍᏛ ᎧᏃᎮᏛ`).
+2. **`Orthography.DG`**: Base Latin transliteration system (`d, t, g, k, dl, tl, hl, j, ch, qu, gw, hn, hw, hy`) used in Bible chapter transcripts (with hyphens) and dictionary datasets.
+3. **`Orthography.TTH`**: Canonical acoustic phonetic system (`t, th, k, kh, tl, tlh, lh, ts, tsh, nh, wh, yh, s, hs, a, e, i, o, u, v, '`) used in **Wav2Vec2 acoustic emissions (`CherokeeASRModel`)**, training targets (`cim-wav2vec2-*.csv`), and CTC alignment logits.
 
-*Note: [`normalize_text_for_alignment`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/normalizers.py) is retained as a backwards-compatible alias for `normalize_syllabary_for_alignment`.*
+#### Strict T/TH Consonant Inventory
+In the canonical `T/TH` acoustic system:
+- **NO `d` and NO `g`**: Voiced stops are **`t`** and **`k`**; aspirated/voiceless stops are **`th`** and **`kh`**.
+- **NO `ch` and NO `j`**: Voiced affricate is **`ts`**; voiceless/aspirated affricate is **`tsh`**.
+- **Lateral Consonants**:
+  - `dl` (voiced lateral affricate) $\rightarrow$ **`tl`**
+  - `tl` (voiceless/aspirated lateral affricate) $\rightarrow$ **`tlh`**
+  - `hl` (voiceless lateral fricative) $\rightarrow$ **`lh`**
+- **Aspirated Glides & Nasals**: `hn` $\rightarrow$ **`nh`**, `hw` $\rightarrow$ **`wh`**, `hy` $\rightarrow$ **`yh`**.
+- **Pre-aspiration**: Preconsonantal sibilants respelled as **`hs`** (e.g. `sgw` $\rightarrow$ `hskw`).
+- **NO `c`, `q`, `x`, `z`**: Labio-velars use `kw` / `kwh`.
+
+#### Normalization Functions
+
+##### 1. `normalize_phonetics_for_alignment(text: str, source: Orthography = Orthography.DG) -> str`
+Normalizes phonetic Cherokee text into canonical `Orthography.TTH` for ASR acoustic alignment. When `source == Orthography.TTH`, it short-circuits to a pure whitespace/punctuation cleanup without consonant modification.
+
+##### 2. `normalize_syllabary_for_alignment(text: str, source: Orthography = Orthography.SYLLABARY, target: Orthography = Orthography.TTH) -> str`
+Normalizes Cherokee Syllabary (or Latin transliteration) into canonical `Orthography.TTH` alignment phonetics using deterministic character mapping.
+
+*Note: [`normalize_text_for_alignment`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/normalizers.py) is retained as a backwards-compatible alias for `normalize_phonetics_for_alignment`.*
 
 ---
 
@@ -468,7 +478,7 @@ Ingestion utilities load reference text from JSON files, dictionaries, or lists 
 
 ### `prepare_alignment_input` (Sum-Type Dispatcher)
 
-The primary entrypoint for source ingestion. It accepts sum-type arguments (`bible_metadata` vs `chunk_list`), loads the chunks, and resolves the appropriate representation-aware normalizers:
+The primary entrypoint for source ingestion. It accepts sum-type arguments (`bible_metadata` vs `chunk_list`), loads the chunks, and resolves the appropriate normalizers targeting `Orthography.TTH`:
 
 ```python
 from transcription.alignment.ingestion import prepare_alignment_input
@@ -479,8 +489,8 @@ chunks, source_lookup, chunk_normalizer, emissions_normalizer = prepare_alignmen
 )
 ```
 
-- **When `bible_metadata` is supplied**: Returns `(chunks, source_lookup, normalize_syllabary_for_alignment, normalize_syllabary_for_alignment)`.
-- **When `chunk_list` is supplied**: Returns `(chunks, source_lookup, normalize_phonetics_for_alignment, normalize_phonetics_for_alignment)`.
+- **When `bible_metadata` is supplied**: Ingests verse JSON (containing `"cherokee"` in Syllabary and `"phonetic"` in hyphenated `DG`), strips hyphens, converts `DG -> TTH`, and returns `(chunks, source_lookup, normalize_phonetics_for_alignment, normalize_phonetics_for_alignment)`.
+- **When `chunk_list` is supplied**: Ingests generic chunk JSON and returns `(chunks, source_lookup, normalize_phonetics_for_alignment, normalize_phonetics_for_alignment)`.
 
 ---
 
@@ -525,15 +535,15 @@ Loads Bible verse metadata dictionaries:
 
 ```python
 from transcription.alignment.ingestion import load_bible_chunks
-from transcription.alignment.normalizers import normalize_syllabary_for_alignment
+from transcription.alignment.normalizers import normalize_phonetics_for_alignment
 
 chunks, source_lookup = load_bible_chunks(
-    source="data/book_transcripts/02_Mark/0201.json",
-    normalizer=normalize_syllabary_for_alignment,
+    source="cherokee_new_testament/book_transcripts/mark_01.json",
+    normalizer=normalize_phonetics_for_alignment,
 )
 ```
 
-#### Expected Input Format (Key-Value Dict)
+#### Expected Input Format on Disk (Key-Value Dict)
 ```json
 {
   "020101": {
@@ -543,8 +553,8 @@ chunks, source_lookup = load_bible_chunks(
   },
   "020102": {
     "english": "As it is written in the prophets...",
-    "cherokee": "ᎾᏍᎩᏯ ᏥᏂᎬᏅ ᏥᎪᏪᎳ ᎠᎾᏙᎴᎰᏍᎩᏱ...",
-    "phonetic": "Na-s-gi-ya tsi-ni-gv-nv tsi-go-we-la a-na-do-le-ho-s-gi-yi..."
+    "cherokee": "ᎾᏍᎩᏯ ᎯᎠ ᏥᏂᎬᏅ ᏥᎪᏪᎳ ᎠᎾᏙᎴᎰᏍᎩᏱ...",
+    "phonetic": "Na-s-gi-ya hi-a tsi-ni-gv-nv tsi-go-we-la a-na-do-le-ho-s-gi-yi..."
   }
 }
 ```
