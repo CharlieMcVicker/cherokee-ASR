@@ -32,8 +32,15 @@ from transcription.alignment.extractors import (
     CherokeeASRExtractor,
 )
 from transcription.alignment.ingestion import load_bible_chunks
-from transcription.alignment.models import AlignmentOutput, WordInterval
-from transcription.alignment.normalizers import normalize_phonetics_for_alignment
+from transcription.alignment.models import (
+    AlignmentOutput,
+    CTCAlignerConfig,
+    WordInterval,
+)
+from transcription.alignment.normalizers import (
+    normalize_phonetics_for_alignment,
+    normalize_syllabary_for_alignment,
+)
 from transcription.alignment.reconciliation import reconcile_alignment_words
 from transcription.models.asr_model import CherokeeASRModel
 from transcription.syllabary_enrichment import (
@@ -78,6 +85,7 @@ def align_chapter(
     ctc_aligner: Optional[CTCSegmentationAligner] = None,
     asr_model: Optional[CherokeeASRModel] = None,
     cache: bool = True,
+    aligner_config: Optional[CTCAlignerConfig] = None,
 ) -> AlignmentOutput:
     """
     Align a New Testament audio recording with its syllabary transcript end-to-end.
@@ -103,6 +111,7 @@ def align_chapter(
         ctc_aligner: Optional pre-instantiated CTCSegmentationAligner.
         asr_model: Optional pre-instantiated CherokeeASRModel.
         cache: Whether to use disk caching for CTC logits.
+        aligner_config: Optional strongly-typed CTCAlignerConfig for CTC segmentation.
 
     Returns:
         AlignmentOutput object containing aligned chunks, words, and metrics.
@@ -114,7 +123,7 @@ def align_chapter(
 
     if use_ctc:
         chunks, source_lookup = load_bible_chunks(
-            transcript_path, normalizer=normalize_phonetics_for_alignment
+            transcript_path, normalizer=normalize_syllabary_for_alignment
         )
 
         aligner = ctc_aligner
@@ -129,11 +138,15 @@ def align_chapter(
                     revision=rev,
                     token=token,
                 )
-            c_dir = Path(cache_dir) if cache_dir is not None else DEFAULT_CACHE_DIR
+            if aligner_config is None:
+                c_dir = Path(cache_dir) if cache_dir is not None else DEFAULT_CACHE_DIR
+                aligner_config = CTCAlignerConfig(
+                    cache=cache,
+                    cache_dir=c_dir,
+                )
             aligner = CTCSegmentationAligner(
                 model=model,
-                cache=cache,
-                cache_dir=c_dir,
+                config=aligner_config,
             )
 
         alignment = aligner.align(
@@ -152,6 +165,7 @@ def align_chapter(
                     confidence=w.confidence,
                     flagged=w.flagged,
                     emitted_word=w.emitted_word,
+                    min_char_confidence=w.min_char_confidence,
                 )
                 for c in alignment.aligned_chunks
                 for w in c.words

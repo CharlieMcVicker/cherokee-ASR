@@ -26,6 +26,7 @@ from transcription.alignment.models import (
     AlignedChunk,
     AlignmentMetrics,
     AlignmentOutput,
+    CTCAlignerConfig,
     TextChunk,
     TokenEmission,
     WordInterval,
@@ -34,6 +35,7 @@ from transcription.alignment.normalizers import (
     normalize_phonetics_for_alignment,
     normalize_syllabary_for_alignment,
 )
+from transcription.alignment.phonotactics import prepare_cherokee_text
 from transcription.models.asr_model import CherokeeASRModel
 
 logger = logging.getLogger(__name__)
@@ -54,40 +56,39 @@ class CTCSegmentationAligner:
     def __init__(
         self,
         model: Optional[CherokeeASRModel] = None,
-        syncope_tokens: Sequence[str] = DEFAULT_SYNCOPE_TOKENS,
-        syncope_penalty: float = 2.0,
-        index_duration: float = 0.02,
+        config: Optional[CTCAlignerConfig] = None,
         chunk_normalizer: Optional[Callable[[str], str]] = None,
-        min_window_size: int = 8000,
-        max_window_size: int = 100000,
-        buffer_trail_ms: int = 300,
-        buffer_lead_ms: int = 100,
-        chunk_seconds: float = 30.0,
-        margin_seconds: float = 1.0,
-        intrusive_tokens: Sequence[str] = ("h", "'"),
-        intrusive_penalty: float = 0.1,
-        flag_min_confidence: float = 0.01,
-        flag_min_char_duration_sec: float = 0.03,
-        cache: bool = False,
-        cache_dir: Optional[Union[str, Path]] = None,
+        **kwargs: Any,
     ):
         self.model = model
-        self.syncope_tokens = list(syncope_tokens)
-        self.syncope_penalty = float(syncope_penalty)
-        self.intrusive_tokens = list(intrusive_tokens) if intrusive_tokens else []
-        self.intrusive_penalty = float(intrusive_penalty)
-        self.flag_min_confidence = float(flag_min_confidence)
-        self.flag_min_char_dur = float(flag_min_char_duration_sec)
-        self.index_duration = float(index_duration)
-        self.chunk_norm = chunk_normalizer or normalize_phonetics_for_alignment
-        self.min_window_size = min_window_size
-        self.max_window_size = max_window_size
-        self.buffer_trail_ms = buffer_trail_ms
-        self.buffer_lead_ms = buffer_lead_ms
-        self.chunk_seconds = float(chunk_seconds)
-        self.margin_seconds = float(margin_seconds)
-        self.cache = cache
-        self.cache_dir = Path(cache_dir) if cache_dir is not None else DEFAULT_CACHE_DIR
+        self.config = config or CTCAlignerConfig()
+        self.chunk_norm = chunk_normalizer or normalize_syllabary_for_alignment
+
+        self.syncope_tokens = list(self.config.syncope_tokens)
+        self.syncope_penalty = float(self.config.syncope_penalty)
+        self.intrusive_tokens = (
+            list(self.config.intrusive_tokens) if self.config.intrusive_tokens else []
+        )
+        self.intrusive_penalty = float(self.config.intrusive_penalty)
+        self.intrusive_penalties = self.config.intrusive_penalties
+        self.intrusive_min_logprobs = self.config.intrusive_min_logprobs
+        self.intrusive_max_stride = int(self.config.intrusive_max_stride)
+        self.enforce_phonotactics = bool(self.config.enforce_phonotactics)
+        self.flag_min_confidence = float(self.config.flag_min_confidence)
+        self.flag_min_char_confidence = float(self.config.flag_min_char_confidence)
+        self.index_duration = float(self.config.index_duration)
+        self.min_window_size = int(self.config.min_window_size)
+        self.max_window_size = int(self.config.max_window_size)
+        self.buffer_trail_ms = int(self.config.buffer_trail_ms)
+        self.buffer_lead_ms = int(self.config.buffer_lead_ms)
+        self.chunk_seconds = float(self.config.chunk_seconds)
+        self.margin_seconds = float(self.config.margin_seconds)
+        self.cache = bool(self.config.cache)
+        self.cache_dir = (
+            Path(self.config.cache_dir)
+            if self.config.cache_dir is not None
+            else DEFAULT_CACHE_DIR
+        )
 
     def _get_char_list_and_blank(
         self, asr_model: CherokeeASRModel
@@ -434,18 +435,25 @@ class CTCSegmentationAligner:
                 if char_state_lps:
                     mean_logprob = float(np.mean(char_state_lps))
                     word_conf = float(np.exp(mean_logprob))
+                    min_char_prob = float(np.exp(np.min(char_state_lps)))
                 else:
                     word_conf = 0.0
+                    min_char_prob = 0.0
             else:
                 w_start = prev_end
                 w_end = prev_end
                 emitted_chars = []
                 emitted_w = ""
                 word_conf = 0.0
+                min_char_prob = 0.0
 
             is_low_conf = bool(word_conf < self.flag_min_confidence)
+            is_low_char_conf = bool(
+                self.flag_min_char_confidence > 0.0
+                and min_char_prob < self.flag_min_char_confidence
+            )
             is_unaligned = bool(len(w_timings) == 0 or len(emitted_chars) == 0)
-            is_flagged = bool(is_low_conf or is_unaligned)
+            is_flagged = bool(is_low_conf or is_low_char_conf or is_unaligned)
 
             word_intervals.append(
                 WordInterval(
@@ -455,6 +463,7 @@ class CTCSegmentationAligner:
                     confidence=round(word_conf, 6),
                     flagged=is_flagged,
                     emitted_word=emitted_w,
+                    min_char_confidence=round(min_char_prob, 6),
                 )
             )
             prev_end = w_end
@@ -486,7 +495,8 @@ class CTCSegmentationAligner:
         )
         char_list, pad_id = self._get_char_list_and_blank(model)
 
-        norm_text = self.chunk_norm(phonetic_text)
+        target_text = syllabary_text if syllabary_text else phonetic_text
+        norm_text = self.chunk_norm(target_text)
         words = norm_text.split()
 
         if not words or lpz.shape[0] == 0:
@@ -509,12 +519,17 @@ class CTCSegmentationAligner:
             syncope_penalty=self.syncope_penalty,
             intrusive_tokens=valid_intrusive,
             intrusive_penalty=self.intrusive_penalty,
+            intrusive_penalties=self.intrusive_penalties,
+            intrusive_min_logprobs=self.intrusive_min_logprobs,
+            intrusive_max_stride=self.intrusive_max_stride,
             index_duration=self.index_duration,
             score_min_mean_over_L=2,
             replace_spaces_with_blanks=False,
         )
 
-        gt_mat, utt_indices = prepare_text(config, words, char_list)
+        gt_mat, utt_indices = prepare_cherokee_text(
+            config, words, char_list, enforce_phonotactics=self.enforce_phonotactics
+        )
         timings, char_probs, state_list = ctc_segmentation(config, lpz, gt_mat)
 
         word_intervals = self._extract_word_intervals(
@@ -599,6 +614,9 @@ class CTCSegmentationAligner:
             syncope_penalty=self.syncope_penalty,
             intrusive_tokens=valid_intrusive,
             intrusive_penalty=self.intrusive_penalty,
+            intrusive_penalties=self.intrusive_penalties,
+            intrusive_min_logprobs=self.intrusive_min_logprobs,
+            intrusive_max_stride=self.intrusive_max_stride,
             index_duration=self.index_duration,
             min_window_size=self.min_window_size,
             max_window_size=max(self.max_window_size, self.min_window_size * 2),
@@ -641,7 +659,9 @@ class CTCSegmentationAligner:
                 ),
             )
 
-        gt_mat, utt_indices = prepare_text(config, all_words, char_list)
+        gt_mat, utt_indices = prepare_cherokee_text(
+            config, all_words, char_list, enforce_phonotactics=self.enforce_phonotactics
+        )
         timings, char_probs, state_list = ctc_segmentation(config, lpz, gt_mat)
 
         chunk_utt_indices = [utt_indices[s] for s, _ in chunk_word_slices] + [

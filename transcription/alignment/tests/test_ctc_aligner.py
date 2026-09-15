@@ -18,6 +18,8 @@ from transcription.alignment.ctc_aligner import (
     CTCSegmentationAligner,
     get_logits_cached,
 )
+from transcription.alignment.models import CTCAlignerConfig
+from transcription.alignment.phonotactics import prepare_cherokee_text
 
 
 class DummyTokenizer:
@@ -79,7 +81,8 @@ def test_get_logits_cached_hit_and_miss(dummy_audio_file: Path, tmp_path: Path):
     cache_dir = tmp_path / "cache"
     model = DummyASRModel()
     aligner = CTCSegmentationAligner(
-        model=cast(Any, model), cache=True, cache_dir=cache_dir
+        model=cast(Any, model),
+        config=CTCAlignerConfig(cache=True, cache_dir=cache_dir),
     )
 
     assert model.call_count == 0
@@ -106,7 +109,8 @@ def test_get_logits_cached_disabled(dummy_audio_file: Path, tmp_path: Path):
     cache_dir = tmp_path / "cache_disabled"
     model = DummyASRModel()
     aligner = CTCSegmentationAligner(
-        model=cast(Any, model), cache=False, cache_dir=cache_dir
+        model=cast(Any, model),
+        config=CTCAlignerConfig(cache=False, cache_dir=cache_dir),
     )
 
     # First call
@@ -147,7 +151,8 @@ def test_get_logits_cached_ndarray_and_audiosegment(tmp_path: Path):
     cache_dir = tmp_path / "cache_mem"
     model = DummyASRModel()
     aligner = CTCSegmentationAligner(
-        model=cast(Any, model), cache=True, cache_dir=cache_dir
+        model=cast(Any, model),
+        config=CTCAlignerConfig(cache=True, cache_dir=cache_dir),
     )
 
     # Test with AudioSegment
@@ -221,7 +226,8 @@ def test_cherokee_asr_model_get_logits_sliding_window():
 def test_ctc_aligner_sliding_window_cache_key():
     model = DummyASRModel()
     aligner = CTCSegmentationAligner(
-        model=cast(Any, model), chunk_seconds=30.0, margin_seconds=1.0
+        model=cast(Any, model),
+        config=CTCAlignerConfig(chunk_seconds=30.0, margin_seconds=1.0),
     )
     arr = np.zeros(16000, dtype=np.float32)
 
@@ -241,9 +247,11 @@ def test_ctc_aligner_full_chapter_verse_and_word_harvesting():
     # Create aligner with mock model
     aligner = CTCSegmentationAligner(
         model=cast(Any, model),
-        syncope_tokens=["a"],
-        syncope_penalty=2.0,
-        flag_min_confidence=0.1,
+        config=CTCAlignerConfig(
+            syncope_tokens=("a",),
+            syncope_penalty=2.0,
+            flag_min_confidence=0.1,
+        ),
     )
 
     # Audio of 2 seconds
@@ -309,10 +317,12 @@ def test_ctc_aligner_extract_logits_sliding_window_fallback():
     model = DummyASRModel()
     aligner = CTCSegmentationAligner(
         model=cast(Any, model),
-        chunk_seconds=1.0,
-        margin_seconds=0.2,
-        buffer_lead_ms=0,
-        buffer_trail_ms=0,
+        config=CTCAlignerConfig(
+            chunk_seconds=1.0,
+            margin_seconds=0.2,
+            buffer_lead_ms=0,
+            buffer_trail_ms=0,
+        ),
     )
     long_audio = np.zeros(16000 * 3, dtype=np.float32)
 
@@ -332,7 +342,7 @@ def test_ctc_aligner_verse_slice_alignment_and_anomaly_detection(
     model = DummyASRModel()
     aligner = CTCSegmentationAligner(
         model=cast(Any, model),
-        flag_min_confidence=0.1,
+        config=CTCAlignerConfig(flag_min_confidence=0.1),
     )
 
     aligned = aligner.align_verse_slice(
@@ -360,10 +370,12 @@ def test_ctc_aligner_continuous_chapter_multi_verse_monotonicity():
     model = DummyASRModel()
     aligner = CTCSegmentationAligner(
         model=cast(Any, model),
-        syncope_tokens=["a", "e", "i", "o", "u", "v"],
-        syncope_penalty=2.0,
-        intrusive_tokens=["h", "'"],
-        intrusive_penalty=0.1,
+        config=CTCAlignerConfig(
+            syncope_tokens=("a", "e", "i", "o", "u", "v"),
+            syncope_penalty=2.0,
+            intrusive_tokens=("h", "'"),
+            intrusive_penalty=0.1,
+        ),
     )
 
     audio = np.zeros(16000 * 6, dtype=np.float32)
@@ -402,8 +414,10 @@ def test_ctc_aligner_zero_start_timing_preserved(dummy_audio_file: Path):
     model = DummyASRModel()
     aligner = CTCSegmentationAligner(
         model=cast(Any, model),
-        buffer_lead_ms=0,
-        buffer_trail_ms=0,
+        config=CTCAlignerConfig(
+            buffer_lead_ms=0,
+            buffer_trail_ms=0,
+        ),
     )
 
     # Ground truth trellis for 1 word has length 4; word character index is 2
@@ -438,8 +452,10 @@ def test_ctc_aligner_unaligned_word_emissions_and_confidence(dummy_audio_file: P
     model = DummyASRModel()
     aligner = CTCSegmentationAligner(
         model=cast(Any, model),
-        buffer_lead_ms=0,
-        buffer_trail_ms=0,
+        config=CTCAlignerConfig(
+            buffer_lead_ms=0,
+            buffer_trail_ms=0,
+        ),
     )
 
     # Word 1 character aligns at 0.1s (trellis index 2), Word 2 unaligned (trellis index 4)
@@ -479,10 +495,12 @@ def test_ctc_aligner_align_unaligned_word_and_window_size():
     model = DummyASRModel()
     aligner = CTCSegmentationAligner(
         model=cast(Any, model),
-        min_window_size=5000,
-        max_window_size=20000,
-        buffer_lead_ms=0,
-        buffer_trail_ms=0,
+        config=CTCAlignerConfig(
+            min_window_size=5000,
+            max_window_size=20000,
+            buffer_lead_ms=0,
+            buffer_trail_ms=0,
+        ),
     )
 
     audio = np.zeros(16000 * 2, dtype=np.float32)
@@ -532,8 +550,10 @@ def test_ctc_aligner_intra_verse_unaligned_word_isolation(dummy_audio_file: Path
     model = DummyASRModel()
     aligner = CTCSegmentationAligner(
         model=cast(Any, model),
-        buffer_lead_ms=0,
-        buffer_trail_ms=0,
+        config=CTCAlignerConfig(
+            buffer_lead_ms=0,
+            buffer_trail_ms=0,
+        ),
     )
 
     # Word 1 (a) aligns at 0.10s (frame 5)
@@ -579,3 +599,132 @@ def test_ctc_aligner_intra_verse_unaligned_word_isolation(dummy_audio_file: Path
         assert w3.end_sec == 0.32
         assert w3.emitted_word == "a"
         assert w3.flagged is False
+
+
+def test_ctc_aligner_min_char_confidence_flags_mark_1_1_typo(dummy_audio_file: Path):
+    """
+    Assert that Mark 1:1 'yihstv' typo is flagged due to min_char_confidence < 0.005,
+    even when overall geometric/mean confidence is above flag_min_confidence (0.01).
+    """
+    model = DummyASRModel()
+    aligner = CTCSegmentationAligner(
+        model=cast(Any, model),
+        config=CTCAlignerConfig(
+            flag_min_confidence=0.01,
+            flag_min_char_confidence=0.005,
+            buffer_lead_ms=0,
+            buffer_trail_ms=0,
+        ),
+    )
+
+    # Word timings: ground truth trellis length 10, character timings at 0.10, 0.12, 0.14, 0.16
+    fake_timings = np.array(
+        [-1.0, -1.0, 0.10, 0.12, 0.14, 0.16, -1.0, -1.0, -1.0, -1.0],
+        dtype=np.float32,
+    )
+    fake_state_list = [""] * 100
+    fake_char_probs = np.full(100, 0.0, dtype=np.float32)
+
+    # Character states for 'yihstv' across frames 5..8
+    # Suppose 3 characters have logprob -0.5 (prob 0.606), but one typo character has logprob -6.0 (prob 0.00247 < 0.005)
+    for f, ch in zip([5, 6, 7, 8], ["y", "i", "h", "s"]):
+        fake_state_list[f] = ch
+        fake_char_probs[f] = -0.5
+
+    fake_char_probs[7] = -6.0  # low char prob: exp(-6.0) ~= 0.00247875
+
+    with patch(
+        "transcription.alignment.ctc_aligner.ctc_segmentation",
+        return_value=(fake_timings, fake_char_probs, fake_state_list),
+    ):
+        aligned_slice = aligner.align_verse_slice(
+            audio_input=dummy_audio_file,
+            chunk_id="020101",
+            phonetic_text="yihstv",
+            cache=False,
+        )
+
+        assert len(aligned_slice.words) == 1
+        w = aligned_slice.words[0]
+        assert w.word in ("yihstv", "yihsthv")
+        assert w.emitted_word == "yihs"
+        # Mean logprob: (-0.5*3 + -6.0)/4 = -1.875 -> exp(-1.875) ~= 0.153 > 0.01
+        assert w.confidence > 0.01
+        # Minimum char confidence is < 0.005
+        assert w.min_char_confidence is not None
+        assert w.min_char_confidence < 0.005
+        assert round(w.min_char_confidence, 4) == round(float(np.exp(-6.0)), 4)
+        # Therefore flagged should be True!
+        assert w.flagged is True
+
+
+def test_ctc_aligner_parameters_forwarding(dummy_audio_file: Path):
+    """
+    Verify that intrusive_penalties, intrusive_min_logprobs, intrusive_max_stride,
+    and enforce_phonotactics are forwarded to CtcSegmentationParameters and prepare_cherokee_text.
+    """
+    from transcription.alignment.models import TextChunk
+
+    model = DummyASRModel()
+    custom_penalties = {"h": 0.3, "'": 0.8}
+    custom_min_logprobs = {"h": -2.5, "'": -3.0}
+
+    aligner = CTCSegmentationAligner(
+        model=cast(Any, model),
+        config=CTCAlignerConfig(
+            intrusive_penalties=custom_penalties,
+            intrusive_min_logprobs=custom_min_logprobs,
+            intrusive_max_stride=2,
+            enforce_phonotactics=True,
+            flag_min_char_confidence=0.008,
+        ),
+    )
+
+    fake_timings = np.array([-1.0, -1.0, 0.10, -1.0], dtype=np.float32)
+    fake_char_probs = np.full(100, -0.1, dtype=np.float32)
+    fake_state_list = ["a"] * 100
+    fake_segments = [(0.0, 0.5, 0.1)]
+
+    with (
+        patch(
+            "transcription.alignment.ctc_aligner.ctc_segmentation",
+            return_value=(fake_timings, fake_char_probs, fake_state_list),
+        ) as mock_seg,
+        patch(
+            "transcription.alignment.ctc_aligner.determine_utterance_segments",
+            return_value=fake_segments,
+        ),
+        patch(
+            "transcription.alignment.ctc_aligner.prepare_cherokee_text",
+            wraps=prepare_cherokee_text,
+        ) as mock_prep,
+    ):
+        # 1. align_verse_slice
+        aligner.align_verse_slice(
+            audio_input=dummy_audio_file,
+            chunk_id="001",
+            phonetic_text="adalenisgv",
+            cache=False,
+        )
+
+        passed_config = mock_seg.call_args[0][0]
+        assert passed_config.intrusive_penalties == custom_penalties
+        assert passed_config.intrusive_min_logprobs == custom_min_logprobs
+        assert passed_config.intrusive_max_stride == 2
+        assert mock_prep.call_args[1]["enforce_phonotactics"] is True
+        assert hasattr(passed_config, "is_syncope_token")
+        assert hasattr(passed_config, "is_intrusive_site")
+
+        # 2. align
+        mock_seg.reset_mock()
+        mock_prep.reset_mock()
+        audio = np.zeros(16000 * 2, dtype=np.float32)
+        aligner.align(
+            audio, chunks=[TextChunk(chunk_id="v1", text="adalenisgv")], cache=False
+        )
+
+        passed_config2 = mock_seg.call_args[0][0]
+        assert passed_config2.intrusive_penalties == custom_penalties
+        assert passed_config2.intrusive_min_logprobs == custom_min_logprobs
+        assert passed_config2.intrusive_max_stride == 2
+        assert mock_prep.call_args[1]["enforce_phonotactics"] is True

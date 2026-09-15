@@ -6,6 +6,7 @@ title: >-
 status: To Do
 assignee: []
 created_date: '2026-09-12 21:22'
+updated_date: '2026-09-14 13:29'
 labels: []
 dependencies: []
 ordinal: 332000
@@ -24,3 +25,9 @@ Once ctc-segmentation implements per-token intrusive penalties (e.g. intrusive_p
 - [ ] #3 Run benchmark on 100 verses and verify appropriate /h/ and glottal stop insertion without spurious noise
 - [ ] #4 Verify test suite passes with updated parameters
 <!-- AC:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+Superseded by parent TASK-321 (TASK-318 and TASK-319).
+<!-- SECTION:NOTES:END -->

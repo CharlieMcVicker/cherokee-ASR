@@ -19,7 +19,7 @@ import json
 import os
 from pathlib import Path
 import sys
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import numpy as np
 from pydub import AudioSegment
@@ -30,18 +30,7 @@ if str(BASE_DIR) not in sys.path:
     sys.path.insert(0, str(BASE_DIR))
 
 from transcription.alignment.ctc_aligner import CTCSegmentationAligner
-from transcription.alignment.distance_metrics import (
-    ConfusionMatrixCostMetric,
-    DistanceMetric,
-)
-from transcription.alignment.calibrated_distance_metrics import (
-    PhonologicalConfusionCostMetric,
-)
-from transcription.alignment.extractors import (
-    ASREmissionsExtractor,
-    CachedASREmissionsExtractor,
-    CherokeeASRExtractor,
-)
+from transcription.alignment.models import CTCAlignerConfig
 from transcription.models.asr_model import CherokeeASRModel
 from transcription.new_testament.pipeline import (
     align_chapter,
@@ -59,7 +48,7 @@ DEFAULT_CACHE_DIR = BASE_DIR / "runs" / "cache" / "ctc_emissions"
 DEFAULT_MODEL_REPO = "charliemcvicker/length-only-20260704-155307-asr-cherokee-colon"
 DEFAULT_REVISION = "76e62140955f4738abdab345ea34068b02d8d2a2"
 DEFAULT_SYNCOPE_PENALTY = 6.0
-DEFAULT_INTRUSIVE_PENALTY = 2.5
+DEFAULT_INTRUSIVE_PENALTY = 0.1
 
 BOOK_CONFIGS = {
     "mark": {"chapters": 16, "name": "Mark"},
@@ -70,10 +59,7 @@ BOOK_CONFIGS = {
 def get_default_ctc_aligner(
     model_repo: str = DEFAULT_MODEL_REPO,
     model_revision: str = DEFAULT_REVISION,
-    cache_dir: Path = DEFAULT_CACHE_DIR,
-    cache: bool = True,
-    syncope_penalty: float = DEFAULT_SYNCOPE_PENALTY,
-    intrusive_penalty: float = DEFAULT_INTRUSIVE_PENALTY,
+    config: Optional[CTCAlignerConfig] = None,
 ) -> CTCSegmentationAligner:
     """Instantiates default CTCSegmentationAligner with cached emissions."""
     token = os.environ.get("HF_TOKEN", None)
@@ -86,66 +72,19 @@ def get_default_ctc_aligner(
     )
     aligner = CTCSegmentationAligner(
         model=asr_model,
-        cache=cache,
-        cache_dir=cache_dir,
-        syncope_penalty=syncope_penalty,
-        intrusive_penalty=intrusive_penalty,
+        config=config or CTCAlignerConfig(cache_dir=DEFAULT_CACHE_DIR),
     )
     return aligner
-
-
-def get_default_extractor_and_metric(
-    model_repo: str = DEFAULT_MODEL_REPO,
-    model_revision: str = DEFAULT_REVISION,
-    cache_dir: Path = BASE_DIR / "runs" / "cache" / "emissions",
-    cost_matrix_path: Path = BASE_DIR
-    / "runs"
-    / "evaluation"
-    / "confusion_cost_matrix_prebible.json",
-) -> Tuple[CachedASREmissionsExtractor, DistanceMetric]:
-    """Legacy helper for DTW distance metric and emissions extractor."""
-    token = os.environ.get("HF_TOKEN", None)
-    asr_model = CherokeeASRModel.from_pretrained_or_best(
-        path_or_repo=model_repo,
-        revision=model_revision,
-        token=token,
-    )
-    base_extractor = CherokeeASRExtractor(model=asr_model, skip_vad=False)
-    prefix_slug = (
-        f"{model_repo.replace('/', '_')}_{model_revision}"
-        if model_revision
-        else model_repo.replace("/", "_")
-    )
-    cached_extractor = CachedASREmissionsExtractor(
-        extractor=base_extractor,
-        cache_dir=cache_dir,
-        cache_key_prefix=prefix_slug,
-    )
-
-    if cost_matrix_path.exists():
-        base_metric = ConfusionMatrixCostMetric.from_json(cost_matrix_path)
-        distance_metric = PhonologicalConfusionCostMetric(base_metric=base_metric)
-    else:
-        raise FileNotFoundError(
-            f"Confusion cost matrix not found at: {cost_matrix_path}"
-        )
-
-    return cached_extractor, distance_metric
 
 
 def realign_book(
     book: str,
     chapter: Optional[int] = None,
     ctc_aligner: Optional[CTCSegmentationAligner] = None,
-    distance_metric: Optional[DistanceMetric] = None,
-    emissions_extractor: Optional[ASREmissionsExtractor] = None,
     model_repo: str = DEFAULT_MODEL_REPO,
     model_revision: str = DEFAULT_REVISION,
     export_praat: bool = True,
-    cache_dir: Path = DEFAULT_CACHE_DIR,
-    cache: bool = True,
-    syncope_penalty: float = DEFAULT_SYNCOPE_PENALTY,
-    intrusive_penalty: float = DEFAULT_INTRUSIVE_PENALTY,
+    aligner_config: Optional[CTCAlignerConfig] = None,
 ) -> Tuple[List[Dict[str, Any]], List[Dict[str, str]]]:
     book_key = book.lower().strip()
     if book_key not in BOOK_CONFIGS:
@@ -170,14 +109,11 @@ def realign_book(
     ALIGNMENTS_DIR.mkdir(parents=True, exist_ok=True)
     TRAIN_CSVS_DIR.mkdir(parents=True, exist_ok=True)
 
-    if ctc_aligner is None and emissions_extractor is None:
+    if ctc_aligner is None:
         ctc_aligner = get_default_ctc_aligner(
             model_repo=model_repo,
             model_revision=model_revision,
-            cache_dir=cache_dir,
-            cache=cache,
-            syncope_penalty=syncope_penalty,
-            intrusive_penalty=intrusive_penalty,
+            config=aligner_config,
         )
 
     records: List[Dict[str, Any]] = []
@@ -214,14 +150,11 @@ def realign_book(
             output_dir=ch_out_dir,
             export_praat=export_praat,
             export_manifest=True,
-            engine="ctc" if ctc_aligner is not None else "dtw",
+            engine="ctc",
             ctc_aligner=ctc_aligner,
-            distance_metric=distance_metric,
-            emissions_extractor=emissions_extractor,
             model_path=model_repo,
             model_revision=model_revision,
-            cache_dir=cache_dir,
-            cache=cache,
+            aligner_config=aligner_config,
         )
 
         audio_seg = (
@@ -282,6 +215,7 @@ def realign_book(
                     "start_sec": round(w.start_sec, 3),
                     "end_sec": round(w.end_sec, 3),
                     "confidence": w.confidence,
+                    "min_char_confidence": w.min_char_confidence,
                     "flagged": w.flagged,
                     "emitted_word": w.emitted_word or "",
                 }
@@ -382,12 +316,6 @@ def realign_book(
         f"[Artifact] Saved training CSV with {len(saved_csv_rows)} rows to '{train_csv_path}'"
     )
 
-    train_csv_alt = TRAIN_CSVS_DIR / f"{book_key}_train.csv"
-    with open(train_csv_alt, "w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=["path", "sentence"])
-        writer.writeheader()
-        writer.writerows(saved_csv_rows)
-
     if durations_sec:
         total_sec = sum(durations_sec)
         mean_len = float(np.mean(durations_sec))
@@ -409,18 +337,12 @@ def realign_all(
     model_repo: str = DEFAULT_MODEL_REPO,
     model_revision: str = DEFAULT_REVISION,
     export_praat: bool = True,
-    cache_dir: Path = DEFAULT_CACHE_DIR,
-    cache: bool = True,
-    syncope_penalty: float = DEFAULT_SYNCOPE_PENALTY,
-    intrusive_penalty: float = DEFAULT_INTRUSIVE_PENALTY,
+    aligner_config: Optional[CTCAlignerConfig] = None,
 ) -> Dict[str, List[Dict[str, Any]]]:
     ctc_aligner = get_default_ctc_aligner(
         model_repo=model_repo,
         model_revision=model_revision,
-        cache_dir=cache_dir,
-        cache=cache,
-        syncope_penalty=syncope_penalty,
-        intrusive_penalty=intrusive_penalty,
+        config=aligner_config,
     )
 
     all_records: List[Dict[str, Any]] = []
@@ -434,10 +356,7 @@ def realign_all(
             model_repo=model_repo,
             model_revision=model_revision,
             export_praat=export_praat,
-            cache_dir=cache_dir,
-            cache=cache,
-            syncope_penalty=syncope_penalty,
-            intrusive_penalty=intrusive_penalty,
+            aligner_config=aligner_config,
         )
         book_results[book] = records
         all_records.extend(records)
@@ -512,6 +431,12 @@ def main():
         help=f"CTC segmentation intrusive penalty for h/' insertion (default: {DEFAULT_INTRUSIVE_PENALTY})",
     )
     parser.add_argument(
+        "--flag-min-confidence",
+        type=float,
+        default=0.01,
+        help="Minimum word confidence threshold for anomaly flagging (default: 0.01)",
+    )
+    parser.add_argument(
         "--no-praat",
         action="store_true",
         default=False,
@@ -532,16 +457,21 @@ def main():
 
     args = parser.parse_args()
 
+    aligner_config = CTCAlignerConfig(
+        syncope_penalty=args.syncope_penalty,
+        intrusive_penalty=args.intrusive_penalty,
+        flag_min_confidence=args.flag_min_confidence,
+        cache=not args.no_cache,
+        cache_dir=args.cache_dir,
+    )
+
     if args.book == "all":
         realign_all(
             chapter=args.chapter,
             model_repo=args.model_repo,
             model_revision=args.model_revision,
             export_praat=not args.no_praat,
-            cache_dir=args.cache_dir,
-            cache=not args.no_cache,
-            syncope_penalty=args.syncope_penalty,
-            intrusive_penalty=args.intrusive_penalty,
+            aligner_config=aligner_config,
         )
     else:
         records, _ = realign_book(
@@ -550,10 +480,7 @@ def main():
             model_repo=args.model_repo,
             model_revision=args.model_revision,
             export_praat=not args.no_praat,
-            cache_dir=args.cache_dir,
-            cache=not args.no_cache,
-            syncope_penalty=args.syncope_penalty,
-            intrusive_penalty=args.intrusive_penalty,
+            aligner_config=aligner_config,
         )
         # Also update combined if single book is run
         ALIGNMENTS_DIR.mkdir(parents=True, exist_ok=True)

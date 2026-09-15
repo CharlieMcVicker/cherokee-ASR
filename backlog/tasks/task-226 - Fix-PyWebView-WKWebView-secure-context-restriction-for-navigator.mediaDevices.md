@@ -1,11 +1,11 @@
 ---
 id: TASK-226
 title: Fix PyWebView WKWebView secure context restriction for navigator.mediaDevices
-status: In Progress
+status: To Do
 assignee:
   - '@antigravity'
 created_date: '2026-08-12 22:47'
-updated_date: '2026-08-12 22:47'
+updated_date: '2026-09-14 13:26'
 labels: []
 dependencies: []
 ordinal: 217000

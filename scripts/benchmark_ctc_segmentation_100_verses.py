@@ -26,6 +26,7 @@ if str(BASE_DIR) not in sys.path:
     sys.path.insert(0, str(BASE_DIR))
 
 from transcription.alignment.ctc_aligner import CTCSegmentationAligner
+from transcription.alignment.models import CTCAlignerConfig
 from transcription.alignment.normalizers import normalize_syllabary_for_alignment
 from transcription.models.asr_model import CherokeeASRModel
 from transcription.new_testament.pipeline import (
@@ -92,23 +93,23 @@ def run_benchmark(
     model_repo: str = DEFAULT_MODEL_REPO,
     model_revision: str = DEFAULT_REVISION,
     output_json_path: Optional[Path] = None,
-    cache: bool = True,
-    cache_dir: Optional[Path] = None,
+    config: Optional[CTCAlignerConfig] = None,
 ) -> Dict[str, Any]:
     print(f"Loading ASR Model: {model_repo} (rev: {model_revision})...")
     token = os.environ.get("HF_TOKEN", None)
     device = "mps" if torch.backends.mps.is_available() else "cpu"
-    asr_model = CherokeeASRModel.from_pretrained(
+    asr_model = CherokeeASRModel.from_pretrained_or_best(
         path_or_repo=model_repo,
         revision=model_revision,
         device=device,
         token=token,
     )
 
+    aligner_config = config or CTCAlignerConfig(flag_min_char_confidence=0.0)
+
     aligner = CTCSegmentationAligner(
         model=asr_model,
-        cache=cache,
-        cache_dir=cache_dir,
+        config=aligner_config,
     )
 
     # Load existing baseline alignment records
@@ -332,9 +333,14 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    run_benchmark(
-        target_verse_count=args.target_verse_count,
+    aligner_config = CTCAlignerConfig(
         cache=args.cache,
         cache_dir=args.cache_dir,
+        flag_min_char_confidence=0.0,
+    )
+
+    run_benchmark(
+        target_verse_count=args.target_verse_count,
         output_json_path=args.output_json,
+        config=aligner_config,
     )

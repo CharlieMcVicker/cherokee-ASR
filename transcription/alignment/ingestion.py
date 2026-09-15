@@ -47,10 +47,20 @@ def load_bible_chunks(
             verse_id_str = str(verse_id)
             if not isinstance(verse_info, dict):
                 verse_info = {"text": str(verse_info)}
-            raw_phonetic = verse_info.get(
-                "phonetic", verse_info.get("raw_phonetic", verse_info.get("text", ""))
+            raw_text = verse_info.get(
+                "cherokee",
+                verse_info.get(
+                    "syllabary",
+                    verse_info.get(
+                        "reference_sentence",
+                        verse_info.get(
+                            "phonetic",
+                            verse_info.get("raw_phonetic", verse_info.get("text", "")),
+                        ),
+                    ),
+                ),
             )
-            normalized = normalizer(raw_phonetic)
+            normalized = normalizer(raw_text)
             chunks.append(TextChunk(chunk_id=verse_id_str, text=normalized))
             source_lookup[verse_id_str] = verse_info
     elif isinstance(data, list):
@@ -62,10 +72,19 @@ def load_bible_chunks(
                     "line_id", item.get("verse_id", item.get("id", f"{idx + 1:06d}"))
                 )
             )
-            raw_phonetic = item.get(
-                "raw_phonetic", item.get("phonetic", item.get("text", ""))
+            raw_text = item.get(
+                "cherokee",
+                item.get(
+                    "syllabary",
+                    item.get(
+                        "reference_sentence",
+                        item.get(
+                            "raw_phonetic", item.get("phonetic", item.get("text", ""))
+                        ),
+                    ),
+                ),
             )
-            normalized = normalizer(raw_phonetic)
+            normalized = normalizer(raw_text)
             chunks.append(TextChunk(chunk_id=verse_id_str, text=normalized))
             source_lookup[verse_id_str] = item
     else:

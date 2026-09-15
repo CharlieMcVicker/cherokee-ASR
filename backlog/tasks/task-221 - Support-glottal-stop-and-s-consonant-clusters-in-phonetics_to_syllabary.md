@@ -1,11 +1,11 @@
 ---
 id: TASK-221
 title: Support glottal stop and s-consonant clusters in phonetics_to_syllabary
-status: In Progress
+status: To Do
 assignee:
   - '@agent'
 created_date: '2026-08-12 22:12'
-updated_date: '2026-08-12 22:12'
+updated_date: '2026-09-14 13:26'
 labels: []
 dependencies: []
 ordinal: 212000

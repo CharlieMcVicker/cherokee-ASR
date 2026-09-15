@@ -36,9 +36,9 @@ def test_load_bible_chunks_dict():
     chunks, source_lookup = load_bible_chunks(data)
     assert len(chunks) == 2
     assert chunks[0].chunk_id == "020101"
-    assert chunks[0].text == "atalenihskv"
+    assert chunks[0].text == "ataleniskv"
     assert chunks[1].chunk_id == "020102"
-    assert chunks[1].text == "yihstv"
+    assert chunks[1].text == "yistv"
 
     assert source_lookup["020101"]["english"] == "The beginning"
     assert source_lookup["020102"]["cherokee"] == "ᏱᏍᏛ"
@@ -98,7 +98,7 @@ def test_load_bible_chunks_file():
         chunks, source_lookup = load_bible_chunks(json_path)
         assert len(chunks) == 1
         assert chunks[0].chunk_id == "020101"
-        assert chunks[0].text == "atalenihskv"
+        assert chunks[0].text == "ataleniskv"
         assert source_lookup["020101"]["english"] == "The beginning"
 
 
@@ -183,7 +183,7 @@ def test_prepare_alignment_input_bible_metadata():
     )
     assert len(chunks) == 1
     assert chunks[0].chunk_id == "020101"
-    assert chunks[0].text == "atalenihskv"
+    assert chunks[0].text == "ataleniskv"
     assert "020101" in source_lookup
 
     assert chunk_norm is normalize_syllabary_for_alignment

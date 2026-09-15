@@ -1,11 +1,11 @@
 ---
 id: TASK-276
 title: Realign Mark and Matthew with Pre-Bible Model and Confusion Matrix Cost Metric
-status: In Progress
+status: Done
 assignee:
   - '@myself'
 created_date: '2026-09-10 17:50'
-updated_date: '2026-09-10 19:56'
+updated_date: '2026-09-14 13:26'
 labels:
   - alignment
   - new-testament
@@ -28,3 +28,9 @@ Execute audio-transcript alignment across all chapters of Mark (16 chapters) and
 - [ ] #4 Export intermediate alignment records containing verse audio paths, start/end times, reference text, ASR hypothesis text, and cost score
 - [ ] #5 Wrap emissions extraction in CachedASREmissionsExtractor (from TASK-279) to persist chapter ASR outputs to disk
 <!-- AC:END -->
+
+## Final Summary
+
+<!-- SECTION:FINAL_SUMMARY:BEGIN -->
+Superseded by continuous CTC segmentation alignment pipeline (TASK-285 through TASK-320). Full New Testament realignment is tracked and executed under TASK-320.
+<!-- SECTION:FINAL_SUMMARY:END -->

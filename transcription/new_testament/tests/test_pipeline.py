@@ -21,7 +21,12 @@ from transcription.alignment.extractors import (
     CachedASREmissionsExtractor,
     PrecomputedEmissionsExtractor,
 )
-from transcription.alignment.models import AlignmentOutput, TextChunk, TokenEmission
+from transcription.alignment.models import (
+    AlignmentOutput,
+    CTCAlignerConfig,
+    TextChunk,
+    TokenEmission,
+)
 from transcription.audio.segment import AudioChunk
 from transcription.new_testament.pipeline import (
     align_chapter,
@@ -198,8 +203,7 @@ def test_align_chapter_ctc_segmentation_with_mock_aligner(
     mock_model = MockASRModel()
     ctc_aligner = CTCSegmentationAligner(
         model=cast(Any, mock_model),
-        cache=True,
-        cache_dir=tmp_path / "ctc_cache",
+        config=CTCAlignerConfig(cache=True, cache_dir=tmp_path / "ctc_cache"),
     )
 
     out_dir = tmp_path / "output_ctc"
@@ -275,7 +279,7 @@ def test_realign_book_single_chapter(tmp_path: Path, monkeypatch):
     mock_model = MockASRModel()
     ctc_aligner = CTCSegmentationAligner(
         model=cast(Any, mock_model),
-        cache=False,
+        config=CTCAlignerConfig(cache=False),
     )
 
     # Mock paths
@@ -319,7 +323,6 @@ def test_realign_book_single_chapter(tmp_path: Path, monkeypatch):
         book="mark",
         chapter=1,
         ctc_aligner=ctc_aligner,
-        cache=False,
     )
 
     assert len(records) == 1
@@ -465,7 +468,7 @@ def test_realign_book_flags_and_excludes_anomaly_verse_from_train_csv(
         records, csv_rows = rb.realign_book(
             book="mark",
             chapter=1,
-            cache=False,
+            aligner_config=CTCAlignerConfig(cache=False),
         )
 
     # Check alignment records: both verses recorded, but 020101 marked as anomaly
@@ -596,7 +599,7 @@ def test_realign_book_excludes_verse_with_missing_emitted_text_from_train_csv(
         records, csv_rows = rb.realign_book(
             book="mark",
             chapter=1,
-            cache=False,
+            aligner_config=CTCAlignerConfig(cache=False),
         )
 
     # Both recorded in JSON
@@ -615,3 +618,40 @@ def test_realign_book_excludes_verse_with_missing_emitted_text_from_train_csv(
     assert len(rows_on_disk) == 1
     assert any("mark_01_02.wav" in r["path"] for r in rows_on_disk)
     assert not any("mark_01_01.wav" in r["path"] for r in rows_on_disk)
+
+
+def test_align_chapter_forwards_intrusive_and_phonotactic_parameters(
+    tmp_path: Path, dummy_audio_path: Path, dummy_transcript: Path
+):
+    out_dir = tmp_path / "output_forwarding"
+
+    aligner_cfg = CTCAlignerConfig(
+        syncope_penalty=3.5,
+        intrusive_penalty=0.25,
+        intrusive_penalties={"h": 0.4},
+        intrusive_min_logprobs={"h": -2.0},
+        intrusive_max_stride=2,
+        enforce_phonotactics=True,
+        flag_min_confidence=0.02,
+        flag_min_char_confidence=0.006,
+    )
+
+    with patch(
+        "transcription.new_testament.pipeline.CTCSegmentationAligner"
+    ) as mock_aligner_cls:
+        mock_instance = MagicMock()
+        mock_instance.align.return_value = AlignmentOutput(aligned_chunks=[])
+        mock_aligner_cls.return_value = mock_instance
+
+        align_chapter(
+            audio_path=dummy_audio_path,
+            transcript_path=dummy_transcript,
+            output_dir=out_dir,
+            engine="ctc",
+            asr_model=cast(Any, MockASRModel()),
+            aligner_config=aligner_cfg,
+        )
+
+        assert mock_aligner_cls.called
+        kwargs = mock_aligner_cls.call_args[1]
+        assert kwargs["config"] == aligner_cfg

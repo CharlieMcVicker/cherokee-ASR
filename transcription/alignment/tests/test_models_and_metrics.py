@@ -82,6 +82,31 @@ def test_models_instantiation():
     assert output.metrics is not None
 
 
+def test_ctc_aligner_config_defaults():
+    from transcription.alignment.models import CTCAlignerConfig
+
+    cfg = CTCAlignerConfig()
+    assert cfg.syncope_tokens == ("a", "e", "i", "o", "u", "v")
+    assert cfg.syncope_penalty == 6.0
+    assert cfg.intrusive_tokens == ("h", "'")
+    assert cfg.intrusive_penalty == 0.1
+    assert cfg.intrusive_penalties == {"h": 4.5, "'": 0.8}
+    assert cfg.intrusive_min_logprobs == {"h": -1.0498, "'": -1.6094}
+    assert cfg.intrusive_max_stride == 1
+    assert cfg.enforce_phonotactics is True
+    assert cfg.flag_min_confidence == 0.01
+    assert cfg.flag_min_char_confidence == 0.0
+    assert cfg.index_duration == 0.02
+    assert cfg.min_window_size == 8000
+    assert cfg.max_window_size == 100000
+    assert cfg.buffer_trail_ms == 300
+    assert cfg.buffer_lead_ms == 100
+    assert cfg.chunk_seconds == 30.0
+    assert cfg.margin_seconds == 1.0
+    assert cfg.cache is True
+    assert cfg.cache_dir is None
+
+
 def test_default_cer_distance_metric():
     metric = DefaultCERDistanceMetric()
     assert isinstance(metric, DistanceMetric)
