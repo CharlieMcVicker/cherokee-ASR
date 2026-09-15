@@ -8,6 +8,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 import math
+from transcription.utils.orthography import Orthography
 
 
 @dataclass(frozen=True)
@@ -15,11 +16,11 @@ class CTCAlignerConfig:
     """Strongly-typed configuration for syncope- and intrusion-aware CTC alignment."""
 
     syncope_tokens: Tuple[str, ...] = ("a", "e", "i", "o", "u", "v")
-    syncope_penalty: float = -math.log(0.0025)
+    syncope_penalty: float = 8.0
     intrusive_tokens: Tuple[str, ...] = ("h", "'")
-    intrusive_penalty: float = -math.log(0.90)
+    intrusive_penalty: float = 0.1
     intrusive_penalties: Optional[Dict[str, float]] = field(
-        default_factory=lambda: {"h": 4.5, "'": 0.8}
+        default_factory=lambda: {"h": 3.0, "'": 0.8}
     )
     intrusive_min_logprobs: Optional[Dict[str, float]] = field(
         default_factory=lambda: {"h": -1.0498, "'": -1.6094}

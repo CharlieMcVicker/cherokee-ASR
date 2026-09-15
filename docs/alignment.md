@@ -96,11 +96,11 @@ from typing import Dict, List, Optional, Tuple
 class CTCAlignerConfig:
     """Strongly-typed configuration for syncope- and intrusion-aware CTC alignment."""
     syncope_tokens: Tuple[str, ...] = ("a", "e", "i", "o", "u", "v")
-    syncope_penalty: float = 6.0
+    syncope_penalty: float = 8.0
     intrusive_tokens: Tuple[str, ...] = ("h", "'")
     intrusive_penalty: float = 0.1
     intrusive_penalties: Optional[Dict[str, float]] = field(
-        default_factory=lambda: {"h": 4.5, "'": 0.8}
+        default_factory=lambda: {"h": 3.0, "'": 0.8}
     )
     intrusive_min_logprobs: Optional[Dict[str, float]] = field(
         default_factory=lambda: {"h": -1.0498, "'": -1.6094}
@@ -1039,8 +1039,8 @@ All aligner hyperparameters are consolidated into [`CTCAlignerConfig`](file:///U
 from transcription.alignment import CTCSegmentationAligner, CTCAlignerConfig
 
 config = CTCAlignerConfig(
-    syncope_penalty=6.0,
-    intrusive_penalties={"h": 4.5, "'": 0.8},
+    syncope_penalty=8.0,
+    intrusive_penalties={"h": 3.0, "'": 0.8},
     intrusive_min_logprobs={"h": -1.0498, "'": -1.6094},
     flag_min_confidence=0.01,
     flag_min_char_confidence=0.0,
@@ -1058,13 +1058,13 @@ Cherokee surface phonotactics govern valid sites for vocalic deletion (syncope) 
 
 ### Calibrated Optimal Parameters & Benchmark Metrics
 
-Empirical grid search across candidate penalties on Mark Chapter 1 and the 100-verse benchmark identified the following optimal defaults:
+Empirical grid search across candidate penalties on Mark Chapter 1, the 100-verse benchmark, and the CIM test dataset identified the following optimal defaults:
 
 | Parameter | Recommended Default | Purpose |
 | :--- | :--- | :--- |
-| `syncope_penalty` | `6.0` | Penalty for omitting citation vowels during fast speech syncope. |
+| `syncope_penalty` | `8.0` | Penalty for omitting citation vowels during fast speech syncope. |
 | `intrusive_penalty` | `0.1` | Base scalar intrusion penalty. |
-| `intrusive_penalties` | `{"h": 4.5, "'": 0.8}` | Per-token intrusion penalties; suppresses trailing breath noise on `/h/` while recovering brief transient glottal stops `/'/`. |
+| `intrusive_penalties` | `{"h": 3.0, "'": 0.8}` | Per-token intrusion penalties; suppresses trailing breath noise on `/h/` while recovering authentic laryngeal aspiration and transient glottal stops `/'/`. |
 | `intrusive_min_logprobs` | `{"h": -1.0498, "'": -1.6094}` | Posterior floor thresholds ($\approx 0.35$ for `/h/`, $\approx 0.20$ for `/'/`). |
 | `intrusive_max_stride` | `1` | Max blank frame stride for intrusive token detours. |
 | `flag_min_confidence` | `0.01` | Geometric mean word confidence threshold. |

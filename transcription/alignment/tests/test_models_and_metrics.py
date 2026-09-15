@@ -87,10 +87,10 @@ def test_ctc_aligner_config_defaults():
 
     cfg = CTCAlignerConfig()
     assert cfg.syncope_tokens == ("a", "e", "i", "o", "u", "v")
-    assert cfg.syncope_penalty == 6.0
+    assert cfg.syncope_penalty == 8.0
     assert cfg.intrusive_tokens == ("h", "'")
     assert cfg.intrusive_penalty == 0.1
-    assert cfg.intrusive_penalties == {"h": 4.5, "'": 0.8}
+    assert cfg.intrusive_penalties == {"h": 3.0, "'": 0.8}
     assert cfg.intrusive_min_logprobs == {"h": -1.0498, "'": -1.6094}
     assert cfg.intrusive_max_stride == 1
     assert cfg.enforce_phonotactics is True

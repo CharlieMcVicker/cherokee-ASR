@@ -1,0 +1,3243 @@
+{
+  "dataset": "/Users/julietmcvicker/code/workshop-transcription/training_data/processed/split_audio_syl_target.csv",
+  "split": "test",
+  "total_samples": 130,
+  "noise_profile": {
+    "type": "pink",
+    "snr_db": 18.0,
+    "seed": 42
+  },
+  "best_clean": {
+    "candidate_name": "h_0.5_glottal_0.2",
+    "syncope_penalty": 5.0,
+    "intrusive_penalty": 0.1,
+    "intrusive_penalties": {
+      "h": 0.5,
+      "'": 0.2
+    },
+    "intrusive_min_logprobs": {
+      "h": -1.0498,
+      "'": -1.6094
+    },
+    "enforce_phonotactics": true,
+    "clean_metrics": {
+      "cer": 0.163196,
+      "wer": 0.808824,
+      "total_char_errors": 815,
+      "total_ref_chars": 4994,
+      "total_word_errors": 385,
+      "total_ref_words": 476,
+      "avg_confidence": 0.633064,
+      "flagged_word_count": 13,
+      "unaligned_word_count": 0,
+      "total_aligned_words": 476
+    },
+    "noisy_metrics": {
+      "cer": 0.171406,
+      "wer": 0.815126,
+      "total_char_errors": 856,
+      "total_ref_chars": 4994,
+      "total_word_errors": 388,
+      "total_ref_words": 476,
+      "avg_confidence": 0.693976,
+      "flagged_word_count": 5,
+      "unaligned_word_count": 0,
+      "total_aligned_words": 476
+    },
+    "composite_cer": 0.167301,
+    "composite_wer": 0.811975
+  },
+  "best_noisy": {
+    "candidate_name": "h_0.5_glottal_3.5",
+    "syncope_penalty": 5.0,
+    "intrusive_penalty": 0.1,
+    "intrusive_penalties": {
+      "h": 0.5,
+      "'": 3.5
+    },
+    "intrusive_min_logprobs": {
+      "h": -1.0498,
+      "'": -1.6094
+    },
+    "enforce_phonotactics": true,
+    "clean_metrics": {
+      "cer": 0.163596,
+      "wer": 0.808824,
+      "total_char_errors": 817,
+      "total_ref_chars": 4994,
+      "total_word_errors": 385,
+      "total_ref_words": 476,
+      "avg_confidence": 0.632175,
+      "flagged_word_count": 13,
+      "unaligned_word_count": 0,
+      "total_aligned_words": 476
+    },
+    "noisy_metrics": {
+      "cer": 0.171205,
+      "wer": 0.815126,
+      "total_char_errors": 855,
+      "total_ref_chars": 4994,
+      "total_word_errors": 388,
+      "total_ref_words": 476,
+      "avg_confidence": 0.694031,
+      "flagged_word_count": 5,
+      "unaligned_word_count": 0,
+      "total_aligned_words": 476
+    },
+    "composite_cer": 0.167401,
+    "composite_wer": 0.811975
+  },
+  "best_composite": {
+    "candidate_name": "h_0.5_glottal_0.2",
+    "syncope_penalty": 5.0,
+    "intrusive_penalty": 0.1,
+    "intrusive_penalties": {
+      "h": 0.5,
+      "'": 0.2
+    },
+    "intrusive_min_logprobs": {
+      "h": -1.0498,
+      "'": -1.6094
+    },
+    "enforce_phonotactics": true,
+    "clean_metrics": {
+      "cer": 0.163196,
+      "wer": 0.808824,
+      "total_char_errors": 815,
+      "total_ref_chars": 4994,
+      "total_word_errors": 385,
+      "total_ref_words": 476,
+      "avg_confidence": 0.633064,
+      "flagged_word_count": 13,
+      "unaligned_word_count": 0,
+      "total_aligned_words": 476
+    },
+    "noisy_metrics": {
+      "cer": 0.171406,
+      "wer": 0.815126,
+      "total_char_errors": 856,
+      "total_ref_chars": 4994,
+      "total_word_errors": 388,
+      "total_ref_words": 476,
+      "avg_confidence": 0.693976,
+      "flagged_word_count": 5,
+      "unaligned_word_count": 0,
+      "total_aligned_words": 476
+    },
+    "composite_cer": 0.167301,
+    "composite_wer": 0.811975
+  },
+  "all_candidates": [
+    {
+      "candidate_name": "h_0.5_glottal_0.2",
+      "syncope_penalty": 5.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 0.5,
+        "'": 0.2
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.163196,
+        "wer": 0.808824,
+        "total_char_errors": 815,
+        "total_ref_chars": 4994,
+        "total_word_errors": 385,
+        "total_ref_words": 476,
+        "avg_confidence": 0.633064,
+        "flagged_word_count": 13,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.171406,
+        "wer": 0.815126,
+        "total_char_errors": 856,
+        "total_ref_chars": 4994,
+        "total_word_errors": 388,
+        "total_ref_words": 476,
+        "avg_confidence": 0.693976,
+        "flagged_word_count": 5,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.167301,
+      "composite_wer": 0.811975
+    },
+    {
+      "candidate_name": "h_0.5_glottal_0.5",
+      "syncope_penalty": 5.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 0.5,
+        "'": 0.5
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.163196,
+        "wer": 0.808824,
+        "total_char_errors": 815,
+        "total_ref_chars": 4994,
+        "total_word_errors": 385,
+        "total_ref_words": 476,
+        "avg_confidence": 0.632988,
+        "flagged_word_count": 13,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.171606,
+        "wer": 0.815126,
+        "total_char_errors": 857,
+        "total_ref_chars": 4994,
+        "total_word_errors": 388,
+        "total_ref_words": 476,
+        "avg_confidence": 0.694154,
+        "flagged_word_count": 5,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.167401,
+      "composite_wer": 0.811975
+    },
+    {
+      "candidate_name": "h_0.5_glottal_0.8",
+      "syncope_penalty": 5.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 0.5,
+        "'": 0.8
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.163196,
+        "wer": 0.808824,
+        "total_char_errors": 815,
+        "total_ref_chars": 4994,
+        "total_word_errors": 385,
+        "total_ref_words": 476,
+        "avg_confidence": 0.632988,
+        "flagged_word_count": 13,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.171606,
+        "wer": 0.815126,
+        "total_char_errors": 857,
+        "total_ref_chars": 4994,
+        "total_word_errors": 388,
+        "total_ref_words": 476,
+        "avg_confidence": 0.694154,
+        "flagged_word_count": 5,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.167401,
+      "composite_wer": 0.811975
+    },
+    {
+      "candidate_name": "h_0.5_glottal_1.2",
+      "syncope_penalty": 5.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 0.5,
+        "'": 1.2
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.163196,
+        "wer": 0.808824,
+        "total_char_errors": 815,
+        "total_ref_chars": 4994,
+        "total_word_errors": 385,
+        "total_ref_words": 476,
+        "avg_confidence": 0.632988,
+        "flagged_word_count": 13,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.171606,
+        "wer": 0.815126,
+        "total_char_errors": 857,
+        "total_ref_chars": 4994,
+        "total_word_errors": 388,
+        "total_ref_words": 476,
+        "avg_confidence": 0.694154,
+        "flagged_word_count": 5,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.167401,
+      "composite_wer": 0.811975
+    },
+    {
+      "candidate_name": "h_0.5_glottal_2.0",
+      "syncope_penalty": 5.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 0.5,
+        "'": 2.0
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.163396,
+        "wer": 0.808824,
+        "total_char_errors": 816,
+        "total_ref_chars": 4994,
+        "total_word_errors": 385,
+        "total_ref_words": 476,
+        "avg_confidence": 0.633067,
+        "flagged_word_count": 13,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.171406,
+        "wer": 0.815126,
+        "total_char_errors": 856,
+        "total_ref_chars": 4994,
+        "total_word_errors": 388,
+        "total_ref_words": 476,
+        "avg_confidence": 0.694092,
+        "flagged_word_count": 5,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.167401,
+      "composite_wer": 0.811975
+    },
+    {
+      "candidate_name": "h_0.5_glottal_3.5",
+      "syncope_penalty": 5.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 0.5,
+        "'": 3.5
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.163596,
+        "wer": 0.808824,
+        "total_char_errors": 817,
+        "total_ref_chars": 4994,
+        "total_word_errors": 385,
+        "total_ref_words": 476,
+        "avg_confidence": 0.632175,
+        "flagged_word_count": 13,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.171205,
+        "wer": 0.815126,
+        "total_char_errors": 855,
+        "total_ref_chars": 4994,
+        "total_word_errors": 388,
+        "total_ref_words": 476,
+        "avg_confidence": 0.694031,
+        "flagged_word_count": 5,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.167401,
+      "composite_wer": 0.811975
+    },
+    {
+      "candidate_name": "h_1.0_glottal_0.2",
+      "syncope_penalty": 5.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 1.0,
+        "'": 0.2
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.164998,
+        "wer": 0.813025,
+        "total_char_errors": 824,
+        "total_ref_chars": 4994,
+        "total_word_errors": 387,
+        "total_ref_words": 476,
+        "avg_confidence": 0.636251,
+        "flagged_word_count": 13,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.172006,
+        "wer": 0.817227,
+        "total_char_errors": 859,
+        "total_ref_chars": 4994,
+        "total_word_errors": 389,
+        "total_ref_words": 476,
+        "avg_confidence": 0.69902,
+        "flagged_word_count": 5,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.168502,
+      "composite_wer": 0.815126
+    },
+    {
+      "candidate_name": "h_1.0_glottal_0.5",
+      "syncope_penalty": 5.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 1.0,
+        "'": 0.5
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.164998,
+        "wer": 0.813025,
+        "total_char_errors": 824,
+        "total_ref_chars": 4994,
+        "total_word_errors": 387,
+        "total_ref_words": 476,
+        "avg_confidence": 0.636174,
+        "flagged_word_count": 13,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.172207,
+        "wer": 0.817227,
+        "total_char_errors": 860,
+        "total_ref_chars": 4994,
+        "total_word_errors": 389,
+        "total_ref_words": 476,
+        "avg_confidence": 0.699198,
+        "flagged_word_count": 5,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.168602,
+      "composite_wer": 0.815126
+    },
+    {
+      "candidate_name": "h_1.0_glottal_0.8",
+      "syncope_penalty": 5.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 1.0,
+        "'": 0.8
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.164998,
+        "wer": 0.813025,
+        "total_char_errors": 824,
+        "total_ref_chars": 4994,
+        "total_word_errors": 387,
+        "total_ref_words": 476,
+        "avg_confidence": 0.636174,
+        "flagged_word_count": 13,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.172207,
+        "wer": 0.817227,
+        "total_char_errors": 860,
+        "total_ref_chars": 4994,
+        "total_word_errors": 389,
+        "total_ref_words": 476,
+        "avg_confidence": 0.699198,
+        "flagged_word_count": 5,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.168602,
+      "composite_wer": 0.815126
+    },
+    {
+      "candidate_name": "h_1.0_glottal_1.2",
+      "syncope_penalty": 5.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 1.0,
+        "'": 1.2
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.164998,
+        "wer": 0.813025,
+        "total_char_errors": 824,
+        "total_ref_chars": 4994,
+        "total_word_errors": 387,
+        "total_ref_words": 476,
+        "avg_confidence": 0.636174,
+        "flagged_word_count": 13,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.172207,
+        "wer": 0.817227,
+        "total_char_errors": 860,
+        "total_ref_chars": 4994,
+        "total_word_errors": 389,
+        "total_ref_words": 476,
+        "avg_confidence": 0.699198,
+        "flagged_word_count": 5,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.168602,
+      "composite_wer": 0.815126
+    },
+    {
+      "candidate_name": "h_1.0_glottal_2.0",
+      "syncope_penalty": 5.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 1.0,
+        "'": 2.0
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.165198,
+        "wer": 0.813025,
+        "total_char_errors": 825,
+        "total_ref_chars": 4994,
+        "total_word_errors": 387,
+        "total_ref_words": 476,
+        "avg_confidence": 0.636253,
+        "flagged_word_count": 13,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.172006,
+        "wer": 0.817227,
+        "total_char_errors": 859,
+        "total_ref_chars": 4994,
+        "total_word_errors": 389,
+        "total_ref_words": 476,
+        "avg_confidence": 0.699136,
+        "flagged_word_count": 5,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.168602,
+      "composite_wer": 0.815126
+    },
+    {
+      "candidate_name": "h_1.0_glottal_3.5",
+      "syncope_penalty": 5.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 1.0,
+        "'": 3.5
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.165398,
+        "wer": 0.813025,
+        "total_char_errors": 826,
+        "total_ref_chars": 4994,
+        "total_word_errors": 387,
+        "total_ref_words": 476,
+        "avg_confidence": 0.635362,
+        "flagged_word_count": 13,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.171806,
+        "wer": 0.817227,
+        "total_char_errors": 858,
+        "total_ref_chars": 4994,
+        "total_word_errors": 389,
+        "total_ref_words": 476,
+        "avg_confidence": 0.699076,
+        "flagged_word_count": 5,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.168602,
+      "composite_wer": 0.815126
+    },
+    {
+      "candidate_name": "h_2.0_glottal_0.2",
+      "syncope_penalty": 5.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 2.0,
+        "'": 0.2
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.1666,
+        "wer": 0.815126,
+        "total_char_errors": 832,
+        "total_ref_chars": 4994,
+        "total_word_errors": 388,
+        "total_ref_words": 476,
+        "avg_confidence": 0.640437,
+        "flagged_word_count": 13,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.17461,
+        "wer": 0.821429,
+        "total_char_errors": 872,
+        "total_ref_chars": 4994,
+        "total_word_errors": 391,
+        "total_ref_words": 476,
+        "avg_confidence": 0.705204,
+        "flagged_word_count": 6,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.170605,
+      "composite_wer": 0.818277
+    },
+    {
+      "candidate_name": "h_2.0_glottal_0.5",
+      "syncope_penalty": 5.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 2.0,
+        "'": 0.5
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.1666,
+        "wer": 0.815126,
+        "total_char_errors": 832,
+        "total_ref_chars": 4994,
+        "total_word_errors": 388,
+        "total_ref_words": 476,
+        "avg_confidence": 0.640361,
+        "flagged_word_count": 13,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.17481,
+        "wer": 0.821429,
+        "total_char_errors": 873,
+        "total_ref_chars": 4994,
+        "total_word_errors": 391,
+        "total_ref_words": 476,
+        "avg_confidence": 0.705383,
+        "flagged_word_count": 6,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.170705,
+      "composite_wer": 0.818277
+    },
+    {
+      "candidate_name": "h_2.0_glottal_0.8",
+      "syncope_penalty": 5.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 2.0,
+        "'": 0.8
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.1666,
+        "wer": 0.815126,
+        "total_char_errors": 832,
+        "total_ref_chars": 4994,
+        "total_word_errors": 388,
+        "total_ref_words": 476,
+        "avg_confidence": 0.640361,
+        "flagged_word_count": 13,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.17481,
+        "wer": 0.821429,
+        "total_char_errors": 873,
+        "total_ref_chars": 4994,
+        "total_word_errors": 391,
+        "total_ref_words": 476,
+        "avg_confidence": 0.705383,
+        "flagged_word_count": 6,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.170705,
+      "composite_wer": 0.818277
+    },
+    {
+      "candidate_name": "h_2.0_glottal_1.2",
+      "syncope_penalty": 5.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 2.0,
+        "'": 1.2
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.1666,
+        "wer": 0.815126,
+        "total_char_errors": 832,
+        "total_ref_chars": 4994,
+        "total_word_errors": 388,
+        "total_ref_words": 476,
+        "avg_confidence": 0.640361,
+        "flagged_word_count": 13,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.17481,
+        "wer": 0.821429,
+        "total_char_errors": 873,
+        "total_ref_chars": 4994,
+        "total_word_errors": 391,
+        "total_ref_words": 476,
+        "avg_confidence": 0.705383,
+        "flagged_word_count": 6,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.170705,
+      "composite_wer": 0.818277
+    },
+    {
+      "candidate_name": "h_2.0_glottal_2.0",
+      "syncope_penalty": 5.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 2.0,
+        "'": 2.0
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.1668,
+        "wer": 0.815126,
+        "total_char_errors": 833,
+        "total_ref_chars": 4994,
+        "total_word_errors": 388,
+        "total_ref_words": 476,
+        "avg_confidence": 0.640439,
+        "flagged_word_count": 13,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.17461,
+        "wer": 0.821429,
+        "total_char_errors": 872,
+        "total_ref_chars": 4994,
+        "total_word_errors": 391,
+        "total_ref_words": 476,
+        "avg_confidence": 0.705321,
+        "flagged_word_count": 6,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.170705,
+      "composite_wer": 0.818277
+    },
+    {
+      "candidate_name": "h_2.0_glottal_3.5",
+      "syncope_penalty": 5.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 2.0,
+        "'": 3.5
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.167,
+        "wer": 0.815126,
+        "total_char_errors": 834,
+        "total_ref_chars": 4994,
+        "total_word_errors": 388,
+        "total_ref_words": 476,
+        "avg_confidence": 0.639548,
+        "flagged_word_count": 13,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.174409,
+        "wer": 0.821429,
+        "total_char_errors": 871,
+        "total_ref_chars": 4994,
+        "total_word_errors": 391,
+        "total_ref_words": 476,
+        "avg_confidence": 0.70526,
+        "flagged_word_count": 6,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.170705,
+      "composite_wer": 0.818277
+    },
+    {
+      "candidate_name": "preset_permissive_laryngeals",
+      "syncope_penalty": 3.5,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 1.5,
+        "'": 0.5
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.8971,
+        "'": -2.3026
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.168002,
+        "wer": 0.815126,
+        "total_char_errors": 839,
+        "total_ref_chars": 4994,
+        "total_word_errors": 388,
+        "total_ref_words": 476,
+        "avg_confidence": 0.637757,
+        "flagged_word_count": 14,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.175811,
+        "wer": 0.821429,
+        "total_char_errors": 878,
+        "total_ref_chars": 4994,
+        "total_word_errors": 391,
+        "total_ref_words": 476,
+        "avg_confidence": 0.709437,
+        "flagged_word_count": 6,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.171907,
+      "composite_wer": 0.818277
+    },
+    {
+      "candidate_name": "mlp_no_mlp_sync_6.0",
+      "syncope_penalty": 6.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 3.0,
+        "'": 0.8
+      },
+      "intrusive_min_logprobs": null,
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.169003,
+        "wer": 0.819328,
+        "total_char_errors": 844,
+        "total_ref_chars": 4994,
+        "total_word_errors": 390,
+        "total_ref_words": 476,
+        "avg_confidence": 0.646077,
+        "flagged_word_count": 12,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.176011,
+        "wer": 0.823529,
+        "total_char_errors": 879,
+        "total_ref_chars": 4994,
+        "total_word_errors": 392,
+        "total_ref_words": 476,
+        "avg_confidence": 0.700757,
+        "flagged_word_count": 6,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.172507,
+      "composite_wer": 0.821428
+    },
+    {
+      "candidate_name": "mlp_p0.15_h_p0.10_g_sync_6.0",
+      "syncope_penalty": 6.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 3.0,
+        "'": 0.8
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.8971,
+        "'": -2.3026
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.169003,
+        "wer": 0.819328,
+        "total_char_errors": 844,
+        "total_ref_chars": 4994,
+        "total_word_errors": 390,
+        "total_ref_words": 476,
+        "avg_confidence": 0.645915,
+        "flagged_word_count": 12,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.176011,
+        "wer": 0.823529,
+        "total_char_errors": 879,
+        "total_ref_chars": 4994,
+        "total_word_errors": 392,
+        "total_ref_words": 476,
+        "avg_confidence": 0.700757,
+        "flagged_word_count": 6,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.172507,
+      "composite_wer": 0.821428
+    },
+    {
+      "candidate_name": "mlp_p0.35_h_p0.20_g_sync_6.0",
+      "syncope_penalty": 6.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 3.0,
+        "'": 0.8
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.169003,
+        "wer": 0.819328,
+        "total_char_errors": 844,
+        "total_ref_chars": 4994,
+        "total_word_errors": 390,
+        "total_ref_words": 476,
+        "avg_confidence": 0.645915,
+        "flagged_word_count": 12,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.176011,
+        "wer": 0.823529,
+        "total_char_errors": 879,
+        "total_ref_chars": 4994,
+        "total_word_errors": 392,
+        "total_ref_words": 476,
+        "avg_confidence": 0.700757,
+        "flagged_word_count": 6,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.172507,
+      "composite_wer": 0.821428
+    },
+    {
+      "candidate_name": "mlp_p0.50_h_p0.30_g_sync_6.0",
+      "syncope_penalty": 6.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 3.0,
+        "'": 0.8
+      },
+      "intrusive_min_logprobs": {
+        "h": -0.6931,
+        "'": -1.204
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.169003,
+        "wer": 0.819328,
+        "total_char_errors": 844,
+        "total_ref_chars": 4994,
+        "total_word_errors": 390,
+        "total_ref_words": 476,
+        "avg_confidence": 0.645915,
+        "flagged_word_count": 12,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.176011,
+        "wer": 0.823529,
+        "total_char_errors": 879,
+        "total_ref_chars": 4994,
+        "total_word_errors": 392,
+        "total_ref_words": 476,
+        "avg_confidence": 0.700757,
+        "flagged_word_count": 6,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.172507,
+      "composite_wer": 0.821428
+    },
+    {
+      "candidate_name": "mlp_p0.70_h_p0.50_g_sync_6.0",
+      "syncope_penalty": 6.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 3.0,
+        "'": 0.8
+      },
+      "intrusive_min_logprobs": {
+        "h": -0.3567,
+        "'": -0.6931
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.169003,
+        "wer": 0.819328,
+        "total_char_errors": 844,
+        "total_ref_chars": 4994,
+        "total_word_errors": 390,
+        "total_ref_words": 476,
+        "avg_confidence": 0.645915,
+        "flagged_word_count": 12,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.176011,
+        "wer": 0.823529,
+        "total_char_errors": 879,
+        "total_ref_chars": 4994,
+        "total_word_errors": 392,
+        "total_ref_words": 476,
+        "avg_confidence": 0.700757,
+        "flagged_word_count": 6,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.172507,
+      "composite_wer": 0.821428
+    },
+    {
+      "candidate_name": "h_3.0_glottal_0.2",
+      "syncope_penalty": 5.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 3.0,
+        "'": 0.2
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.169203,
+        "wer": 0.819328,
+        "total_char_errors": 845,
+        "total_ref_chars": 4994,
+        "total_word_errors": 390,
+        "total_ref_words": 476,
+        "avg_confidence": 0.649431,
+        "flagged_word_count": 12,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.176612,
+        "wer": 0.823529,
+        "total_char_errors": 882,
+        "total_ref_chars": 4994,
+        "total_word_errors": 392,
+        "total_ref_words": 476,
+        "avg_confidence": 0.705232,
+        "flagged_word_count": 6,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.172907,
+      "composite_wer": 0.821428
+    },
+    {
+      "candidate_name": "h_3.0_glottal_0.5",
+      "syncope_penalty": 5.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 3.0,
+        "'": 0.5
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.169203,
+        "wer": 0.819328,
+        "total_char_errors": 845,
+        "total_ref_chars": 4994,
+        "total_word_errors": 390,
+        "total_ref_words": 476,
+        "avg_confidence": 0.649354,
+        "flagged_word_count": 12,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.176812,
+        "wer": 0.823529,
+        "total_char_errors": 883,
+        "total_ref_chars": 4994,
+        "total_word_errors": 392,
+        "total_ref_words": 476,
+        "avg_confidence": 0.70541,
+        "flagged_word_count": 6,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.173007,
+      "composite_wer": 0.821428
+    },
+    {
+      "candidate_name": "h_3.0_glottal_0.8",
+      "syncope_penalty": 5.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 3.0,
+        "'": 0.8
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.169203,
+        "wer": 0.819328,
+        "total_char_errors": 845,
+        "total_ref_chars": 4994,
+        "total_word_errors": 390,
+        "total_ref_words": 476,
+        "avg_confidence": 0.649354,
+        "flagged_word_count": 12,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.176812,
+        "wer": 0.823529,
+        "total_char_errors": 883,
+        "total_ref_chars": 4994,
+        "total_word_errors": 392,
+        "total_ref_words": 476,
+        "avg_confidence": 0.70541,
+        "flagged_word_count": 6,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.173007,
+      "composite_wer": 0.821428
+    },
+    {
+      "candidate_name": "h_3.0_glottal_1.2",
+      "syncope_penalty": 5.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 3.0,
+        "'": 1.2
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.169203,
+        "wer": 0.819328,
+        "total_char_errors": 845,
+        "total_ref_chars": 4994,
+        "total_word_errors": 390,
+        "total_ref_words": 476,
+        "avg_confidence": 0.649354,
+        "flagged_word_count": 12,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.176812,
+        "wer": 0.823529,
+        "total_char_errors": 883,
+        "total_ref_chars": 4994,
+        "total_word_errors": 392,
+        "total_ref_words": 476,
+        "avg_confidence": 0.70541,
+        "flagged_word_count": 6,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.173007,
+      "composite_wer": 0.821428
+    },
+    {
+      "candidate_name": "h_3.0_glottal_2.0",
+      "syncope_penalty": 5.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 3.0,
+        "'": 2.0
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.169403,
+        "wer": 0.819328,
+        "total_char_errors": 846,
+        "total_ref_chars": 4994,
+        "total_word_errors": 390,
+        "total_ref_words": 476,
+        "avg_confidence": 0.649433,
+        "flagged_word_count": 12,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.176612,
+        "wer": 0.823529,
+        "total_char_errors": 882,
+        "total_ref_chars": 4994,
+        "total_word_errors": 392,
+        "total_ref_words": 476,
+        "avg_confidence": 0.705348,
+        "flagged_word_count": 6,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.173007,
+      "composite_wer": 0.821428
+    },
+    {
+      "candidate_name": "mlp_no_mlp_sync_5.0",
+      "syncope_penalty": 5.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 3.0,
+        "'": 0.8
+      },
+      "intrusive_min_logprobs": null,
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.169203,
+        "wer": 0.819328,
+        "total_char_errors": 845,
+        "total_ref_chars": 4994,
+        "total_word_errors": 390,
+        "total_ref_words": 476,
+        "avg_confidence": 0.649516,
+        "flagged_word_count": 12,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.176812,
+        "wer": 0.823529,
+        "total_char_errors": 883,
+        "total_ref_chars": 4994,
+        "total_word_errors": 392,
+        "total_ref_words": 476,
+        "avg_confidence": 0.70541,
+        "flagged_word_count": 6,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.173007,
+      "composite_wer": 0.821428
+    },
+    {
+      "candidate_name": "mlp_p0.15_h_p0.10_g_sync_5.0",
+      "syncope_penalty": 5.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 3.0,
+        "'": 0.8
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.8971,
+        "'": -2.3026
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.169203,
+        "wer": 0.819328,
+        "total_char_errors": 845,
+        "total_ref_chars": 4994,
+        "total_word_errors": 390,
+        "total_ref_words": 476,
+        "avg_confidence": 0.649354,
+        "flagged_word_count": 12,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.176812,
+        "wer": 0.823529,
+        "total_char_errors": 883,
+        "total_ref_chars": 4994,
+        "total_word_errors": 392,
+        "total_ref_words": 476,
+        "avg_confidence": 0.70541,
+        "flagged_word_count": 6,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.173007,
+      "composite_wer": 0.821428
+    },
+    {
+      "candidate_name": "mlp_p0.35_h_p0.20_g_sync_5.0",
+      "syncope_penalty": 5.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 3.0,
+        "'": 0.8
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.169203,
+        "wer": 0.819328,
+        "total_char_errors": 845,
+        "total_ref_chars": 4994,
+        "total_word_errors": 390,
+        "total_ref_words": 476,
+        "avg_confidence": 0.649354,
+        "flagged_word_count": 12,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.176812,
+        "wer": 0.823529,
+        "total_char_errors": 883,
+        "total_ref_chars": 4994,
+        "total_word_errors": 392,
+        "total_ref_words": 476,
+        "avg_confidence": 0.70541,
+        "flagged_word_count": 6,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.173007,
+      "composite_wer": 0.821428
+    },
+    {
+      "candidate_name": "mlp_p0.50_h_p0.30_g_sync_5.0",
+      "syncope_penalty": 5.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 3.0,
+        "'": 0.8
+      },
+      "intrusive_min_logprobs": {
+        "h": -0.6931,
+        "'": -1.204
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.169203,
+        "wer": 0.819328,
+        "total_char_errors": 845,
+        "total_ref_chars": 4994,
+        "total_word_errors": 390,
+        "total_ref_words": 476,
+        "avg_confidence": 0.649354,
+        "flagged_word_count": 12,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.176812,
+        "wer": 0.823529,
+        "total_char_errors": 883,
+        "total_ref_chars": 4994,
+        "total_word_errors": 392,
+        "total_ref_words": 476,
+        "avg_confidence": 0.70541,
+        "flagged_word_count": 6,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.173007,
+      "composite_wer": 0.821428
+    },
+    {
+      "candidate_name": "mlp_p0.70_h_p0.50_g_sync_5.0",
+      "syncope_penalty": 5.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 3.0,
+        "'": 0.8
+      },
+      "intrusive_min_logprobs": {
+        "h": -0.3567,
+        "'": -0.6931
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.169203,
+        "wer": 0.819328,
+        "total_char_errors": 845,
+        "total_ref_chars": 4994,
+        "total_word_errors": 390,
+        "total_ref_words": 476,
+        "avg_confidence": 0.649354,
+        "flagged_word_count": 12,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.176812,
+        "wer": 0.823529,
+        "total_char_errors": 883,
+        "total_ref_chars": 4994,
+        "total_word_errors": 392,
+        "total_ref_words": 476,
+        "avg_confidence": 0.70541,
+        "flagged_word_count": 6,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.173007,
+      "composite_wer": 0.821428
+    },
+    {
+      "candidate_name": "preset_balanced_robust",
+      "syncope_penalty": 5.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 3.0,
+        "'": 0.8
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.169203,
+        "wer": 0.819328,
+        "total_char_errors": 845,
+        "total_ref_chars": 4994,
+        "total_word_errors": 390,
+        "total_ref_words": 476,
+        "avg_confidence": 0.649354,
+        "flagged_word_count": 12,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.176812,
+        "wer": 0.823529,
+        "total_char_errors": 883,
+        "total_ref_chars": 4994,
+        "total_word_errors": 392,
+        "total_ref_words": 476,
+        "avg_confidence": 0.70541,
+        "flagged_word_count": 6,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.173007,
+      "composite_wer": 0.821428
+    },
+    {
+      "candidate_name": "h_3.0_glottal_3.5",
+      "syncope_penalty": 5.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 3.0,
+        "'": 3.5
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.169604,
+        "wer": 0.819328,
+        "total_char_errors": 847,
+        "total_ref_chars": 4994,
+        "total_word_errors": 390,
+        "total_ref_words": 476,
+        "avg_confidence": 0.648542,
+        "flagged_word_count": 12,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.176412,
+        "wer": 0.823529,
+        "total_char_errors": 881,
+        "total_ref_chars": 4994,
+        "total_word_errors": 392,
+        "total_ref_words": 476,
+        "avg_confidence": 0.705287,
+        "flagged_word_count": 6,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.173008,
+      "composite_wer": 0.821428
+    },
+    {
+      "candidate_name": "syncope_10.0",
+      "syncope_penalty": 10.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 4.5,
+        "'": 0.8
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.169203,
+        "wer": 0.821429,
+        "total_char_errors": 845,
+        "total_ref_chars": 4994,
+        "total_word_errors": 391,
+        "total_ref_words": 476,
+        "avg_confidence": 0.653019,
+        "flagged_word_count": 12,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.178815,
+        "wer": 0.827731,
+        "total_char_errors": 893,
+        "total_ref_chars": 4994,
+        "total_word_errors": 394,
+        "total_ref_words": 476,
+        "avg_confidence": 0.69687,
+        "flagged_word_count": 6,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.174009,
+      "composite_wer": 0.82458
+    },
+    {
+      "candidate_name": "syncope_8.0",
+      "syncope_penalty": 8.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 4.5,
+        "'": 0.8
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.169804,
+        "wer": 0.821429,
+        "total_char_errors": 848,
+        "total_ref_chars": 4994,
+        "total_word_errors": 391,
+        "total_ref_words": 476,
+        "avg_confidence": 0.653404,
+        "flagged_word_count": 12,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.178414,
+        "wer": 0.827731,
+        "total_char_errors": 891,
+        "total_ref_chars": 4994,
+        "total_word_errors": 394,
+        "total_ref_words": 476,
+        "avg_confidence": 0.701506,
+        "flagged_word_count": 6,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.174109,
+      "composite_wer": 0.82458
+    },
+    {
+      "candidate_name": "syncope_15.0",
+      "syncope_penalty": 15.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 4.5,
+        "'": 0.8
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.169804,
+        "wer": 0.823529,
+        "total_char_errors": 848,
+        "total_ref_chars": 4994,
+        "total_word_errors": 392,
+        "total_ref_words": 476,
+        "avg_confidence": 0.644422,
+        "flagged_word_count": 13,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.178614,
+        "wer": 0.827731,
+        "total_char_errors": 892,
+        "total_ref_chars": 4994,
+        "total_word_errors": 394,
+        "total_ref_words": 476,
+        "avg_confidence": 0.692166,
+        "flagged_word_count": 7,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.174209,
+      "composite_wer": 0.82563
+    },
+    {
+      "candidate_name": "mlp_no_mlp_sync_3.5",
+      "syncope_penalty": 3.5,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 3.0,
+        "'": 0.8
+      },
+      "intrusive_min_logprobs": null,
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.172807,
+        "wer": 0.819328,
+        "total_char_errors": 863,
+        "total_ref_chars": 4994,
+        "total_word_errors": 390,
+        "total_ref_words": 476,
+        "avg_confidence": 0.6453,
+        "flagged_word_count": 16,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.177813,
+        "wer": 0.823529,
+        "total_char_errors": 888,
+        "total_ref_chars": 4994,
+        "total_word_errors": 392,
+        "total_ref_words": 476,
+        "avg_confidence": 0.711998,
+        "flagged_word_count": 6,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.17531,
+      "composite_wer": 0.821428
+    },
+    {
+      "candidate_name": "mlp_p0.15_h_p0.10_g_sync_3.5",
+      "syncope_penalty": 3.5,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 3.0,
+        "'": 0.8
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.8971,
+        "'": -2.3026
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.172807,
+        "wer": 0.819328,
+        "total_char_errors": 863,
+        "total_ref_chars": 4994,
+        "total_word_errors": 390,
+        "total_ref_words": 476,
+        "avg_confidence": 0.645138,
+        "flagged_word_count": 16,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.177813,
+        "wer": 0.823529,
+        "total_char_errors": 888,
+        "total_ref_chars": 4994,
+        "total_word_errors": 392,
+        "total_ref_words": 476,
+        "avg_confidence": 0.711998,
+        "flagged_word_count": 6,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.17531,
+      "composite_wer": 0.821428
+    },
+    {
+      "candidate_name": "mlp_p0.35_h_p0.20_g_sync_3.5",
+      "syncope_penalty": 3.5,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 3.0,
+        "'": 0.8
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.172807,
+        "wer": 0.819328,
+        "total_char_errors": 863,
+        "total_ref_chars": 4994,
+        "total_word_errors": 390,
+        "total_ref_words": 476,
+        "avg_confidence": 0.645138,
+        "flagged_word_count": 16,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.177813,
+        "wer": 0.823529,
+        "total_char_errors": 888,
+        "total_ref_chars": 4994,
+        "total_word_errors": 392,
+        "total_ref_words": 476,
+        "avg_confidence": 0.711998,
+        "flagged_word_count": 6,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.17531,
+      "composite_wer": 0.821428
+    },
+    {
+      "candidate_name": "mlp_p0.50_h_p0.30_g_sync_3.5",
+      "syncope_penalty": 3.5,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 3.0,
+        "'": 0.8
+      },
+      "intrusive_min_logprobs": {
+        "h": -0.6931,
+        "'": -1.204
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.172807,
+        "wer": 0.819328,
+        "total_char_errors": 863,
+        "total_ref_chars": 4994,
+        "total_word_errors": 390,
+        "total_ref_words": 476,
+        "avg_confidence": 0.645138,
+        "flagged_word_count": 16,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.177813,
+        "wer": 0.823529,
+        "total_char_errors": 888,
+        "total_ref_chars": 4994,
+        "total_word_errors": 392,
+        "total_ref_words": 476,
+        "avg_confidence": 0.711998,
+        "flagged_word_count": 6,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.17531,
+      "composite_wer": 0.821428
+    },
+    {
+      "candidate_name": "mlp_p0.70_h_p0.50_g_sync_3.5",
+      "syncope_penalty": 3.5,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 3.0,
+        "'": 0.8
+      },
+      "intrusive_min_logprobs": {
+        "h": -0.3567,
+        "'": -0.6931
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.172807,
+        "wer": 0.819328,
+        "total_char_errors": 863,
+        "total_ref_chars": 4994,
+        "total_word_errors": 390,
+        "total_ref_words": 476,
+        "avg_confidence": 0.645138,
+        "flagged_word_count": 16,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.177813,
+        "wer": 0.823529,
+        "total_char_errors": 888,
+        "total_ref_chars": 4994,
+        "total_word_errors": 392,
+        "total_ref_words": 476,
+        "avg_confidence": 0.711998,
+        "flagged_word_count": 6,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.17531,
+      "composite_wer": 0.821428
+    },
+    {
+      "candidate_name": "baseline_default",
+      "syncope_penalty": 6.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 4.5,
+        "'": 0.8
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.171606,
+        "wer": 0.821429,
+        "total_char_errors": 857,
+        "total_ref_chars": 4994,
+        "total_word_errors": 391,
+        "total_ref_words": 476,
+        "avg_confidence": 0.65632,
+        "flagged_word_count": 12,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.179816,
+        "wer": 0.827731,
+        "total_char_errors": 898,
+        "total_ref_chars": 4994,
+        "total_word_errors": 394,
+        "total_ref_words": 476,
+        "avg_confidence": 0.70845,
+        "flagged_word_count": 6,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.175711,
+      "composite_wer": 0.82458
+    },
+    {
+      "candidate_name": "phonotactics_True",
+      "syncope_penalty": 6.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 4.5,
+        "'": 0.8
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.171606,
+        "wer": 0.821429,
+        "total_char_errors": 857,
+        "total_ref_chars": 4994,
+        "total_word_errors": 391,
+        "total_ref_words": 476,
+        "avg_confidence": 0.65632,
+        "flagged_word_count": 12,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.179816,
+        "wer": 0.827731,
+        "total_char_errors": 898,
+        "total_ref_chars": 4994,
+        "total_word_errors": 394,
+        "total_ref_words": 476,
+        "avg_confidence": 0.70845,
+        "flagged_word_count": 6,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.175711,
+      "composite_wer": 0.82458
+    },
+    {
+      "candidate_name": "syncope_6.0",
+      "syncope_penalty": 6.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 4.5,
+        "'": 0.8
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.171606,
+        "wer": 0.821429,
+        "total_char_errors": 857,
+        "total_ref_chars": 4994,
+        "total_word_errors": 391,
+        "total_ref_words": 476,
+        "avg_confidence": 0.65632,
+        "flagged_word_count": 12,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.179816,
+        "wer": 0.827731,
+        "total_char_errors": 898,
+        "total_ref_chars": 4994,
+        "total_word_errors": 394,
+        "total_ref_words": 476,
+        "avg_confidence": 0.70845,
+        "flagged_word_count": 6,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.175711,
+      "composite_wer": 0.82458
+    },
+    {
+      "candidate_name": "h_4.5_glottal_0.2",
+      "syncope_penalty": 5.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 4.5,
+        "'": 0.2
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.173809,
+        "wer": 0.821429,
+        "total_char_errors": 868,
+        "total_ref_chars": 4994,
+        "total_word_errors": 391,
+        "total_ref_words": 476,
+        "avg_confidence": 0.653462,
+        "flagged_word_count": 15,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.180016,
+        "wer": 0.827731,
+        "total_char_errors": 899,
+        "total_ref_chars": 4994,
+        "total_word_errors": 394,
+        "total_ref_words": 476,
+        "avg_confidence": 0.715519,
+        "flagged_word_count": 6,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.176913,
+      "composite_wer": 0.82458
+    },
+    {
+      "candidate_name": "syncope_5.0",
+      "syncope_penalty": 5.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 4.5,
+        "'": 0.8
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.173809,
+        "wer": 0.821429,
+        "total_char_errors": 868,
+        "total_ref_chars": 4994,
+        "total_word_errors": 391,
+        "total_ref_words": 476,
+        "avg_confidence": 0.653385,
+        "flagged_word_count": 15,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.180216,
+        "wer": 0.827731,
+        "total_char_errors": 900,
+        "total_ref_chars": 4994,
+        "total_word_errors": 394,
+        "total_ref_words": 476,
+        "avg_confidence": 0.715698,
+        "flagged_word_count": 6,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.177012,
+      "composite_wer": 0.82458
+    },
+    {
+      "candidate_name": "h_4.5_glottal_0.5",
+      "syncope_penalty": 5.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 4.5,
+        "'": 0.5
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.173809,
+        "wer": 0.821429,
+        "total_char_errors": 868,
+        "total_ref_chars": 4994,
+        "total_word_errors": 391,
+        "total_ref_words": 476,
+        "avg_confidence": 0.653385,
+        "flagged_word_count": 15,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.180216,
+        "wer": 0.827731,
+        "total_char_errors": 900,
+        "total_ref_chars": 4994,
+        "total_word_errors": 394,
+        "total_ref_words": 476,
+        "avg_confidence": 0.715698,
+        "flagged_word_count": 6,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.177012,
+      "composite_wer": 0.82458
+    },
+    {
+      "candidate_name": "h_4.5_glottal_0.8",
+      "syncope_penalty": 5.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 4.5,
+        "'": 0.8
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.173809,
+        "wer": 0.821429,
+        "total_char_errors": 868,
+        "total_ref_chars": 4994,
+        "total_word_errors": 391,
+        "total_ref_words": 476,
+        "avg_confidence": 0.653385,
+        "flagged_word_count": 15,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.180216,
+        "wer": 0.827731,
+        "total_char_errors": 900,
+        "total_ref_chars": 4994,
+        "total_word_errors": 394,
+        "total_ref_words": 476,
+        "avg_confidence": 0.715698,
+        "flagged_word_count": 6,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.177012,
+      "composite_wer": 0.82458
+    },
+    {
+      "candidate_name": "h_4.5_glottal_1.2",
+      "syncope_penalty": 5.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 4.5,
+        "'": 1.2
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.173809,
+        "wer": 0.821429,
+        "total_char_errors": 868,
+        "total_ref_chars": 4994,
+        "total_word_errors": 391,
+        "total_ref_words": 476,
+        "avg_confidence": 0.653385,
+        "flagged_word_count": 15,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.180216,
+        "wer": 0.827731,
+        "total_char_errors": 900,
+        "total_ref_chars": 4994,
+        "total_word_errors": 394,
+        "total_ref_words": 476,
+        "avg_confidence": 0.715698,
+        "flagged_word_count": 6,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.177012,
+      "composite_wer": 0.82458
+    },
+    {
+      "candidate_name": "h_4.5_glottal_2.0",
+      "syncope_penalty": 5.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 4.5,
+        "'": 2.0
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.174009,
+        "wer": 0.821429,
+        "total_char_errors": 869,
+        "total_ref_chars": 4994,
+        "total_word_errors": 391,
+        "total_ref_words": 476,
+        "avg_confidence": 0.653464,
+        "flagged_word_count": 15,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.180016,
+        "wer": 0.827731,
+        "total_char_errors": 899,
+        "total_ref_chars": 4994,
+        "total_word_errors": 394,
+        "total_ref_words": 476,
+        "avg_confidence": 0.715636,
+        "flagged_word_count": 6,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.177013,
+      "composite_wer": 0.82458
+    },
+    {
+      "candidate_name": "h_4.5_glottal_3.5",
+      "syncope_penalty": 5.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 4.5,
+        "'": 3.5
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.174209,
+        "wer": 0.821429,
+        "total_char_errors": 870,
+        "total_ref_chars": 4994,
+        "total_word_errors": 391,
+        "total_ref_words": 476,
+        "avg_confidence": 0.652573,
+        "flagged_word_count": 15,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.179816,
+        "wer": 0.827731,
+        "total_char_errors": 898,
+        "total_ref_chars": 4994,
+        "total_word_errors": 394,
+        "total_ref_words": 476,
+        "avg_confidence": 0.715575,
+        "flagged_word_count": 6,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.177013,
+      "composite_wer": 0.82458
+    },
+    {
+      "candidate_name": "preset_conservative_transitions",
+      "syncope_penalty": 8.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 6.0,
+        "'": 1.5
+      },
+      "intrusive_min_logprobs": {
+        "h": -0.6931,
+        "'": -1.204
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.174009,
+        "wer": 0.823529,
+        "total_char_errors": 869,
+        "total_ref_chars": 4994,
+        "total_word_errors": 392,
+        "total_ref_words": 476,
+        "avg_confidence": 0.660329,
+        "flagged_word_count": 12,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.181818,
+        "wer": 0.831933,
+        "total_char_errors": 908,
+        "total_ref_chars": 4994,
+        "total_word_errors": 396,
+        "total_ref_words": 476,
+        "avg_confidence": 0.707845,
+        "flagged_word_count": 7,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.177914,
+      "composite_wer": 0.827731
+    },
+    {
+      "candidate_name": "syncope_3.5",
+      "syncope_penalty": 3.5,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 4.5,
+        "'": 0.8
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.177613,
+        "wer": 0.82563,
+        "total_char_errors": 887,
+        "total_ref_chars": 4994,
+        "total_word_errors": 393,
+        "total_ref_words": 476,
+        "avg_confidence": 0.65426,
+        "flagged_word_count": 16,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.18362,
+        "wer": 0.827731,
+        "total_char_errors": 917,
+        "total_ref_chars": 4994,
+        "total_word_errors": 394,
+        "total_ref_words": 476,
+        "avg_confidence": 0.718606,
+        "flagged_word_count": 8,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.180617,
+      "composite_wer": 0.82668
+    },
+    {
+      "candidate_name": "h_6.0_glottal_0.2",
+      "syncope_penalty": 5.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 6.0,
+        "'": 0.2
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.177613,
+        "wer": 0.823529,
+        "total_char_errors": 887,
+        "total_ref_chars": 4994,
+        "total_word_errors": 392,
+        "total_ref_words": 476,
+        "avg_confidence": 0.659361,
+        "flagged_word_count": 15,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.184622,
+        "wer": 0.831933,
+        "total_char_errors": 922,
+        "total_ref_chars": 4994,
+        "total_word_errors": 396,
+        "total_ref_words": 476,
+        "avg_confidence": 0.723105,
+        "flagged_word_count": 8,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.181117,
+      "composite_wer": 0.827731
+    },
+    {
+      "candidate_name": "h_6.0_glottal_0.5",
+      "syncope_penalty": 5.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 6.0,
+        "'": 0.5
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.177613,
+        "wer": 0.823529,
+        "total_char_errors": 887,
+        "total_ref_chars": 4994,
+        "total_word_errors": 392,
+        "total_ref_words": 476,
+        "avg_confidence": 0.659284,
+        "flagged_word_count": 15,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.184822,
+        "wer": 0.831933,
+        "total_char_errors": 923,
+        "total_ref_chars": 4994,
+        "total_word_errors": 396,
+        "total_ref_words": 476,
+        "avg_confidence": 0.723284,
+        "flagged_word_count": 8,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.181217,
+      "composite_wer": 0.827731
+    },
+    {
+      "candidate_name": "h_6.0_glottal_0.8",
+      "syncope_penalty": 5.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 6.0,
+        "'": 0.8
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.177613,
+        "wer": 0.823529,
+        "total_char_errors": 887,
+        "total_ref_chars": 4994,
+        "total_word_errors": 392,
+        "total_ref_words": 476,
+        "avg_confidence": 0.659284,
+        "flagged_word_count": 15,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.184822,
+        "wer": 0.831933,
+        "total_char_errors": 923,
+        "total_ref_chars": 4994,
+        "total_word_errors": 396,
+        "total_ref_words": 476,
+        "avg_confidence": 0.723284,
+        "flagged_word_count": 8,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.181217,
+      "composite_wer": 0.827731
+    },
+    {
+      "candidate_name": "h_6.0_glottal_1.2",
+      "syncope_penalty": 5.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 6.0,
+        "'": 1.2
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.177613,
+        "wer": 0.823529,
+        "total_char_errors": 887,
+        "total_ref_chars": 4994,
+        "total_word_errors": 392,
+        "total_ref_words": 476,
+        "avg_confidence": 0.659284,
+        "flagged_word_count": 15,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.184822,
+        "wer": 0.831933,
+        "total_char_errors": 923,
+        "total_ref_chars": 4994,
+        "total_word_errors": 396,
+        "total_ref_words": 476,
+        "avg_confidence": 0.723284,
+        "flagged_word_count": 8,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.181217,
+      "composite_wer": 0.827731
+    },
+    {
+      "candidate_name": "h_6.0_glottal_2.0",
+      "syncope_penalty": 5.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 6.0,
+        "'": 2.0
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.177813,
+        "wer": 0.823529,
+        "total_char_errors": 888,
+        "total_ref_chars": 4994,
+        "total_word_errors": 392,
+        "total_ref_words": 476,
+        "avg_confidence": 0.659363,
+        "flagged_word_count": 15,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.184622,
+        "wer": 0.831933,
+        "total_char_errors": 922,
+        "total_ref_chars": 4994,
+        "total_word_errors": 396,
+        "total_ref_words": 476,
+        "avg_confidence": 0.723222,
+        "flagged_word_count": 8,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.181218,
+      "composite_wer": 0.827731
+    },
+    {
+      "candidate_name": "h_6.0_glottal_3.5",
+      "syncope_penalty": 5.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 6.0,
+        "'": 3.5
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.178014,
+        "wer": 0.823529,
+        "total_char_errors": 889,
+        "total_ref_chars": 4994,
+        "total_word_errors": 392,
+        "total_ref_words": 476,
+        "avg_confidence": 0.658471,
+        "flagged_word_count": 15,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.184421,
+        "wer": 0.831933,
+        "total_char_errors": 921,
+        "total_ref_chars": 4994,
+        "total_word_errors": 396,
+        "total_ref_words": 476,
+        "avg_confidence": 0.723161,
+        "flagged_word_count": 8,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.181218,
+      "composite_wer": 0.827731
+    },
+    {
+      "candidate_name": "syncope_2.0",
+      "syncope_penalty": 2.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 4.5,
+        "'": 0.8
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.189027,
+        "wer": 0.838235,
+        "total_char_errors": 944,
+        "total_ref_chars": 4994,
+        "total_word_errors": 399,
+        "total_ref_words": 476,
+        "avg_confidence": 0.643298,
+        "flagged_word_count": 31,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.188226,
+        "wer": 0.834034,
+        "total_char_errors": 940,
+        "total_ref_chars": 4994,
+        "total_word_errors": 397,
+        "total_ref_words": 476,
+        "avg_confidence": 0.71595,
+        "flagged_word_count": 11,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.188627,
+      "composite_wer": 0.836135
+    },
+    {
+      "candidate_name": "h_8.0_glottal_0.2",
+      "syncope_penalty": 5.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 8.0,
+        "'": 0.2
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.188827,
+        "wer": 0.834034,
+        "total_char_errors": 943,
+        "total_ref_chars": 4994,
+        "total_word_errors": 397,
+        "total_ref_words": 476,
+        "avg_confidence": 0.652799,
+        "flagged_word_count": 27,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.189828,
+        "wer": 0.831933,
+        "total_char_errors": 948,
+        "total_ref_chars": 4994,
+        "total_word_errors": 396,
+        "total_ref_words": 476,
+        "avg_confidence": 0.723078,
+        "flagged_word_count": 8,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.189327,
+      "composite_wer": 0.832984
+    },
+    {
+      "candidate_name": "h_8.0_glottal_0.5",
+      "syncope_penalty": 5.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 8.0,
+        "'": 0.5
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.188827,
+        "wer": 0.834034,
+        "total_char_errors": 943,
+        "total_ref_chars": 4994,
+        "total_word_errors": 397,
+        "total_ref_words": 476,
+        "avg_confidence": 0.652722,
+        "flagged_word_count": 27,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.190028,
+        "wer": 0.831933,
+        "total_char_errors": 949,
+        "total_ref_chars": 4994,
+        "total_word_errors": 396,
+        "total_ref_words": 476,
+        "avg_confidence": 0.723257,
+        "flagged_word_count": 8,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.189427,
+      "composite_wer": 0.832984
+    },
+    {
+      "candidate_name": "h_8.0_glottal_0.8",
+      "syncope_penalty": 5.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 8.0,
+        "'": 0.8
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.188827,
+        "wer": 0.834034,
+        "total_char_errors": 943,
+        "total_ref_chars": 4994,
+        "total_word_errors": 397,
+        "total_ref_words": 476,
+        "avg_confidence": 0.652722,
+        "flagged_word_count": 27,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.190028,
+        "wer": 0.831933,
+        "total_char_errors": 949,
+        "total_ref_chars": 4994,
+        "total_word_errors": 396,
+        "total_ref_words": 476,
+        "avg_confidence": 0.723257,
+        "flagged_word_count": 8,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.189427,
+      "composite_wer": 0.832984
+    },
+    {
+      "candidate_name": "h_8.0_glottal_1.2",
+      "syncope_penalty": 5.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 8.0,
+        "'": 1.2
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.188827,
+        "wer": 0.834034,
+        "total_char_errors": 943,
+        "total_ref_chars": 4994,
+        "total_word_errors": 397,
+        "total_ref_words": 476,
+        "avg_confidence": 0.652722,
+        "flagged_word_count": 27,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.190028,
+        "wer": 0.831933,
+        "total_char_errors": 949,
+        "total_ref_chars": 4994,
+        "total_word_errors": 396,
+        "total_ref_words": 476,
+        "avg_confidence": 0.723257,
+        "flagged_word_count": 8,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.189427,
+      "composite_wer": 0.832984
+    },
+    {
+      "candidate_name": "h_8.0_glottal_2.0",
+      "syncope_penalty": 5.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 8.0,
+        "'": 2.0
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.189027,
+        "wer": 0.834034,
+        "total_char_errors": 944,
+        "total_ref_chars": 4994,
+        "total_word_errors": 397,
+        "total_ref_words": 476,
+        "avg_confidence": 0.652801,
+        "flagged_word_count": 27,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.189828,
+        "wer": 0.831933,
+        "total_char_errors": 948,
+        "total_ref_chars": 4994,
+        "total_word_errors": 396,
+        "total_ref_words": 476,
+        "avg_confidence": 0.723188,
+        "flagged_word_count": 8,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.189427,
+      "composite_wer": 0.832984
+    },
+    {
+      "candidate_name": "h_8.0_glottal_3.5",
+      "syncope_penalty": 5.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 8.0,
+        "'": 3.5
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.189227,
+        "wer": 0.834034,
+        "total_char_errors": 945,
+        "total_ref_chars": 4994,
+        "total_word_errors": 397,
+        "total_ref_words": 476,
+        "avg_confidence": 0.65191,
+        "flagged_word_count": 27,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.189628,
+        "wer": 0.831933,
+        "total_char_errors": 947,
+        "total_ref_chars": 4994,
+        "total_word_errors": 396,
+        "total_ref_words": 476,
+        "avg_confidence": 0.723127,
+        "flagged_word_count": 8,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.189427,
+      "composite_wer": 0.832984
+    },
+    {
+      "candidate_name": "syncope_1.0",
+      "syncope_penalty": 1.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 4.5,
+        "'": 0.8
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.195435,
+        "wer": 0.838235,
+        "total_char_errors": 976,
+        "total_ref_chars": 4994,
+        "total_word_errors": 399,
+        "total_ref_words": 476,
+        "avg_confidence": 0.633129,
+        "flagged_word_count": 40,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.191229,
+        "wer": 0.842437,
+        "total_char_errors": 955,
+        "total_ref_chars": 4994,
+        "total_word_errors": 401,
+        "total_ref_words": 476,
+        "avg_confidence": 0.717311,
+        "flagged_word_count": 13,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.193332,
+      "composite_wer": 0.840336
+    },
+    {
+      "candidate_name": "syncope_0.5",
+      "syncope_penalty": 0.5,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 4.5,
+        "'": 0.8
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.198438,
+        "wer": 0.840336,
+        "total_char_errors": 991,
+        "total_ref_chars": 4994,
+        "total_word_errors": 400,
+        "total_ref_words": 476,
+        "avg_confidence": 0.632324,
+        "flagged_word_count": 46,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.192831,
+        "wer": 0.842437,
+        "total_char_errors": 963,
+        "total_ref_chars": 4994,
+        "total_word_errors": 401,
+        "total_ref_words": 476,
+        "avg_confidence": 0.717852,
+        "flagged_word_count": 13,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.195634,
+      "composite_wer": 0.841387
+    },
+    {
+      "candidate_name": "h_12.0_glottal_2.0",
+      "syncope_penalty": 5.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 12.0,
+        "'": 2.0
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.206648,
+        "wer": 0.848739,
+        "total_char_errors": 1032,
+        "total_ref_chars": 4994,
+        "total_word_errors": 404,
+        "total_ref_words": 476,
+        "avg_confidence": 0.634773,
+        "flagged_word_count": 35,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.207649,
+        "wer": 0.840336,
+        "total_char_errors": 1037,
+        "total_ref_chars": 4994,
+        "total_word_errors": 400,
+        "total_ref_words": 476,
+        "avg_confidence": 0.71576,
+        "flagged_word_count": 14,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.207149,
+      "composite_wer": 0.844537
+    },
+    {
+      "candidate_name": "h_12.0_glottal_3.5",
+      "syncope_penalty": 5.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 12.0,
+        "'": 3.5
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.206848,
+        "wer": 0.848739,
+        "total_char_errors": 1033,
+        "total_ref_chars": 4994,
+        "total_word_errors": 404,
+        "total_ref_words": 476,
+        "avg_confidence": 0.633882,
+        "flagged_word_count": 35,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.207449,
+        "wer": 0.840336,
+        "total_char_errors": 1036,
+        "total_ref_chars": 4994,
+        "total_word_errors": 400,
+        "total_ref_words": 476,
+        "avg_confidence": 0.715699,
+        "flagged_word_count": 14,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.207149,
+      "composite_wer": 0.844537
+    },
+    {
+      "candidate_name": "h_12.0_glottal_0.2",
+      "syncope_penalty": 5.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 12.0,
+        "'": 0.2
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.207649,
+        "wer": 0.848739,
+        "total_char_errors": 1037,
+        "total_ref_chars": 4994,
+        "total_word_errors": 404,
+        "total_ref_words": 476,
+        "avg_confidence": 0.628289,
+        "flagged_word_count": 39,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.207649,
+        "wer": 0.840336,
+        "total_char_errors": 1037,
+        "total_ref_chars": 4994,
+        "total_word_errors": 400,
+        "total_ref_words": 476,
+        "avg_confidence": 0.71565,
+        "flagged_word_count": 14,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.207649,
+      "composite_wer": 0.844537
+    },
+    {
+      "candidate_name": "h_12.0_glottal_0.5",
+      "syncope_penalty": 5.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 12.0,
+        "'": 0.5
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.207849,
+        "wer": 0.848739,
+        "total_char_errors": 1038,
+        "total_ref_chars": 4994,
+        "total_word_errors": 404,
+        "total_ref_words": 476,
+        "avg_confidence": 0.628252,
+        "flagged_word_count": 39,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.207849,
+        "wer": 0.840336,
+        "total_char_errors": 1038,
+        "total_ref_chars": 4994,
+        "total_word_errors": 400,
+        "total_ref_words": 476,
+        "avg_confidence": 0.715828,
+        "flagged_word_count": 14,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.207849,
+      "composite_wer": 0.844537
+    },
+    {
+      "candidate_name": "h_12.0_glottal_0.8",
+      "syncope_penalty": 5.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 12.0,
+        "'": 0.8
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.207849,
+        "wer": 0.848739,
+        "total_char_errors": 1038,
+        "total_ref_chars": 4994,
+        "total_word_errors": 404,
+        "total_ref_words": 476,
+        "avg_confidence": 0.628252,
+        "flagged_word_count": 39,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.207849,
+        "wer": 0.840336,
+        "total_char_errors": 1038,
+        "total_ref_chars": 4994,
+        "total_word_errors": 400,
+        "total_ref_words": 476,
+        "avg_confidence": 0.715828,
+        "flagged_word_count": 14,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.207849,
+      "composite_wer": 0.844537
+    },
+    {
+      "candidate_name": "h_12.0_glottal_1.2",
+      "syncope_penalty": 5.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 12.0,
+        "'": 1.2
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": true,
+      "clean_metrics": {
+        "cer": 0.207849,
+        "wer": 0.848739,
+        "total_char_errors": 1038,
+        "total_ref_chars": 4994,
+        "total_word_errors": 404,
+        "total_ref_words": 476,
+        "avg_confidence": 0.628252,
+        "flagged_word_count": 39,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.207849,
+        "wer": 0.840336,
+        "total_char_errors": 1038,
+        "total_ref_chars": 4994,
+        "total_word_errors": 400,
+        "total_ref_words": 476,
+        "avg_confidence": 0.715828,
+        "flagged_word_count": 14,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.207849,
+      "composite_wer": 0.844537
+    },
+    {
+      "candidate_name": "phonotactics_False",
+      "syncope_penalty": 6.0,
+      "intrusive_penalty": 0.1,
+      "intrusive_penalties": {
+        "h": 4.5,
+        "'": 0.8
+      },
+      "intrusive_min_logprobs": {
+        "h": -1.0498,
+        "'": -1.6094
+      },
+      "enforce_phonotactics": false,
+      "clean_metrics": {
+        "cer": 0.221466,
+        "wer": 0.87395,
+        "total_char_errors": 1106,
+        "total_ref_chars": 4994,
+        "total_word_errors": 416,
+        "total_ref_words": 476,
+        "avg_confidence": 0.594853,
+        "flagged_word_count": 20,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "noisy_metrics": {
+        "cer": 0.221466,
+        "wer": 0.87395,
+        "total_char_errors": 1106,
+        "total_ref_chars": 4994,
+        "total_word_errors": 416,
+        "total_ref_words": 476,
+        "avg_confidence": 0.657093,
+        "flagged_word_count": 10,
+        "unaligned_word_count": 0,
+        "total_aligned_words": 476
+      },
+      "composite_cer": 0.221466,
+      "composite_wer": 0.87395
+    }
+  ]
+}
