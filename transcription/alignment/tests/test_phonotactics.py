@@ -228,3 +228,25 @@ def test_intrusion_site_mask_blocks_preaspirated_sibilants():
             assert (
                 is_intrusive is False
             ), "Post-aspiration should be blocked on vowel following 'hs'"
+
+
+def test_lateral_deaffrication_syncope_mask():
+    """Verify that get_syncope_mask marks the leading 't' in 'tl' and 'tlh' clusters as eligible for deletion."""
+    # Citation 'hatlv' -> 'h', 'a', 't', 'l', 'v'
+    # 't' at index 2 should be marked with is_syncope = True, while 'l' at index 3 is False
+    mask_char = get_syncope_mask("hatlv", return_char_mask=True)
+    assert (
+        mask_char[2] is True
+    ), "Leading 't' in 'tl' should be marked as syncope candidate"
+    assert (
+        mask_char[3] is False
+    ), "'l' in 'tl' should NOT be marked as syncope candidate"
+
+    # Citation 'tlehsti' (word-initial lateral affricate) -> 't' is char 0, 'l' is char 1
+    mask_init = get_syncope_mask("tlehsti", return_char_mask=True)
+    assert (
+        mask_init[0] is True
+    ), "Word-initial 't' in 'tlh' should be marked as syncope candidate"
+    assert (
+        mask_init[1] is False
+    ), "Word-initial 'l' in 'tlh' should NOT be marked as syncope candidate"

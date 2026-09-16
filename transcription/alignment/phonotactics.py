@@ -206,30 +206,32 @@ def get_syncope_mask(
     token_mask: List[bool] = [False] * num_tokens
 
     for idx, tok in enumerate(tokens):
-        if tok.category != PhonemeCategory.VOWEL:
-            continue
+        if tok.category == PhonemeCategory.VOWEL:
+            prev_tok = tokens[idx - 1] if idx > 0 else None
+            next_tok = tokens[idx + 1] if idx < num_tokens - 1 else None
 
-        prev_tok = tokens[idx - 1] if idx > 0 else None
-        next_tok = tokens[idx + 1] if idx < num_tokens - 1 else None
-
-        # Vowel preceded by an onset consonant is candidate for syncope
-        if prev_tok is not None and prev_tok.category in (
-            PhonemeCategory.PLAIN_STOP,
-            PhonemeCategory.ASPIRATED_STOP,
-            PhonemeCategory.SIBILANT,
-            PhonemeCategory.PLAIN_SONORANT,
-            PhonemeCategory.VOICELESS_SONORANT,
-            PhonemeCategory.SIBILANT_CLUSTER,
-        ):
-            # Check constraint: *ChR (stop + voiceless sonorant is forbidden)
-            if (
-                prev_tok.category
-                in (PhonemeCategory.PLAIN_STOP, PhonemeCategory.ASPIRATED_STOP)
-                and next_tok is not None
-                and next_tok.category == PhonemeCategory.VOICELESS_SONORANT
+            # Vowel preceded by an onset consonant is candidate for syncope
+            if prev_tok is not None and prev_tok.category in (
+                PhonemeCategory.PLAIN_STOP,
+                PhonemeCategory.ASPIRATED_STOP,
+                PhonemeCategory.SIBILANT,
+                PhonemeCategory.PLAIN_SONORANT,
+                PhonemeCategory.VOICELESS_SONORANT,
+                PhonemeCategory.SIBILANT_CLUSTER,
             ):
-                continue
+                # Check constraint: *ChR (stop + voiceless sonorant is forbidden)
+                if (
+                    prev_tok.category
+                    in (PhonemeCategory.PLAIN_STOP, PhonemeCategory.ASPIRATED_STOP)
+                    and next_tok is not None
+                    and next_tok.category == PhonemeCategory.VOICELESS_SONORANT
+                ):
+                    continue
 
+                token_mask[idx] = True
+
+        # Lateral deaffrication: leading 't' in lateral affricate clusters ('tl', 'tlh') can delete in spoken Cherokee
+        elif tok.symbol in ("tl", "tlh"):
             token_mask[idx] = True
 
     if not return_char_mask:
@@ -238,9 +240,14 @@ def get_syncope_mask(
     char_mask: List[bool] = [False] * num_chars
     for tok, is_syncope in zip(tokens, token_mask):
         if is_syncope:
-            for c_idx in range(tok.start_idx, tok.end_idx):
-                if c_idx < num_chars:
-                    char_mask[c_idx] = True
+            if tok.symbol in ("tl", "tlh"):
+                # Mark only the initial 't' stop occlusion of the lateral cluster
+                if tok.start_idx < num_chars:
+                    char_mask[tok.start_idx] = True
+            else:
+                for c_idx in range(tok.start_idx, tok.end_idx):
+                    if c_idx < num_chars:
+                        char_mask[c_idx] = True
 
     return char_mask
 

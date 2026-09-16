@@ -86,7 +86,7 @@ def test_ctc_aligner_config_defaults():
     from transcription.alignment.models import CTCAlignerConfig
 
     cfg = CTCAlignerConfig()
-    assert cfg.syncope_tokens == ("a", "e", "i", "o", "u", "v")
+    assert cfg.syncope_tokens == ("a", "e", "i", "o", "u", "v", "t")
     assert cfg.intrusive_tokens == ("h", "'")
     assert cfg.intrusive_max_stride == 4
     assert cfg.enforce_phonotactics is True
