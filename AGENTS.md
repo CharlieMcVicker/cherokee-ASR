@@ -20,7 +20,7 @@
 
 ## Cherokee Orthographies & Phonetic Conventions
 
-Cherokee text in this codebase exists across three primary orthographic representations (`transcription.utils.orthography.Orthography` enum):
+Cherokee text in this codebase exists across three primary orthographic representations (`transcription.utils.orthography.Orthography` enum).
 
 | Orthography Enum | Format & Character Set | Key Usages in Codebase |
 | :--- | :--- | :--- |

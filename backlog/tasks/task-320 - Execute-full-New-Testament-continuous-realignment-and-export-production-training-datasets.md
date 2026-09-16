@@ -3,9 +3,11 @@ id: TASK-320
 title: >-
   Execute full New Testament continuous realignment and export production
   training datasets
-status: To Do
-assignee: []
+status: In Progress
+assignee:
+  - '@myself'
 created_date: '2026-09-14 13:09'
+updated_date: '2026-09-16 17:22'
 labels: []
 dependencies: []
 ordinal: 336000
@@ -24,3 +26,13 @@ Run end-to-end continuous CTC segmentation realignment across all chapters of Ma
 - [ ] #3 Verify Praat TextGrids and combined bible_alignment_records.json are exported
 - [ ] #4 Generate dataset summary metrics (hours, mean verse duration, anomaly counts)
 <!-- AC:END -->
+
+## Implementation Plan
+
+<!-- SECTION:PLAN:BEGIN -->
+1. Execute realign_bible.py across all chapters of Mark and Matthew using cached acoustic emissions and current phonotactics (with lateral deaffrication and laryngeal masking).
+2. Export sliced verse audio, Praat TextGrids, alignment records (cherokee_new_testament/alignments/bible_alignment_records.json), and training CSVs (cherokee_new_testament/train_csvs/).
+3. Verify anomaly filtering exclusions and summarize dataset statistics (total duration, verse count, anomalies, mean/median duration).
+4. Inspect and present detailed alignment sample data to the user.
+5. Finalize task and update acceptance criteria.
+<!-- SECTION:PLAN:END -->

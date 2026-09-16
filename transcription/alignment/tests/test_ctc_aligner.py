@@ -26,17 +26,30 @@ class DummyTokenizer:
     pad_token_id = 0
 
     def get_vocab(self):
-        return {
-            "[PAD]": 0,
-            "a": 1,
-            "e": 2,
-            "i": 3,
-            "o": 4,
-            "u": 5,
-            "v": 6,
-            "h": 7,
-            "'": 8,
-        }
+        chars = [
+            "[PAD]",
+            "a",
+            "e",
+            "i",
+            "o",
+            "u",
+            "v",
+            "h",
+            "'",
+            "y",
+            "s",
+            "t",
+            "k",
+            "d",
+            "g",
+            "l",
+            "m",
+            "n",
+            "w",
+            "q",
+            "j",
+        ]
+        return {ch: i for i, ch in enumerate(chars)}
 
 
 class DummyProcessor:
@@ -53,7 +66,7 @@ class DummyASRModel:
     def get_logits(self, samples: np.ndarray, sample_rate: int = 16000) -> torch.Tensor:
         self.call_count += 1
         num_frames = max(60, len(samples) // 320)
-        vocab_size = 9
+        vocab_size = len(self.processor.tokenizer.get_vocab())
         # Deterministic logits: blank baseline with periodic 'a' activations
         logits = torch.full((num_frames, vocab_size), -5.0, dtype=torch.float32)
         logits[:, 0] = 0.0  # [PAD] / blank baseline
@@ -90,7 +103,7 @@ def test_get_logits_cached_hit_and_miss(dummy_audio_file: Path, tmp_path: Path):
     # 1. First run (miss): forward pass executes and writes to cache
     lpz1, dur1, lead1 = aligner.get_logits_cached(dummy_audio_file)
     assert model.call_count == 1
-    assert lpz1.shape[1] == 9
+    assert lpz1.shape[1] == len(model.processor.tokenizer.get_vocab())
     assert dur1 > 0.0
 
     # Verify cache file exists
@@ -331,7 +344,7 @@ def test_ctc_aligner_extract_logits_sliding_window_fallback():
     assert dur_sec == 3.0
     assert lead_offset == 0.0
     assert lpz.ndim == 2
-    assert lpz.shape[1] == 9
+    assert lpz.shape[1] == len(model.processor.tokenizer.get_vocab())
     assert lpz.shape[0] > 0
 
 

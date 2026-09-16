@@ -36,6 +36,10 @@ from transcription.new_testament.pipeline import (
     align_chapter,
     load_chapter_transcript,
 )
+from transcription.utils.orthography import (
+    clean_punctuation_and_whitespace,
+    strip_tones_and_colons,
+)
 
 NT_DIR = BASE_DIR / "cherokee_new_testament"
 AUDIO_SRC_DIR = NT_DIR / "audio_source"
@@ -190,9 +194,21 @@ def realign_book(
                 print(
                     f"    [Warning] Skipping zero or negative duration audio slice for {verse_id}: [{start_sec}s - {end_sec}s]"
                 )
+                greedy_sentence = ""
+                greedy_conf = 0.0
             else:
                 verse_audio = audio_seg[start_ms:end_ms]
                 verse_audio.export(str(split_out_path), format="wav")
+                try:
+                    greedy_res = ctc_aligner.model.transcribe(str(split_out_path))
+                    greedy_sentence = clean_punctuation_and_whitespace(
+                        strip_tones_and_colons(greedy_res.text)
+                    )
+                    greedy_conf = round(greedy_res.confidence, 4)
+                except Exception as e:
+                    print(f"    [Warning] Greedy decoding failed for {verse_id}: {e}")
+                    greedy_sentence = ""
+                    greedy_conf = 0.0
 
             # Load verse transcript text
             verse_info = ch_data.get(verse_id, {})
@@ -234,11 +250,14 @@ def realign_book(
                 "end_sec": end_sec,
                 "duration_sec": dur,
                 "reference_sentence": cherokee_text,
+                "cherokee_syllabary": cherokee_text,
+                "greedy_hypothesis": greedy_sentence,
+                "greedy_confidence": greedy_conf,
+                "guided_hypothesis": emitted_sentence,
                 "reconciled_phonetics": emitted_sentence,
-                "asr_hypothesis": emitted_sentence,
+                "asr_hypothesis": greedy_sentence,
                 "cost": round(chunk.distance_score, 4),
                 "words": words_list,
-                "cherokee_syllabary": cherokee_text,
                 "phonetic": phonetic_text,
                 "english": english_text,
                 "has_anomalies": bool(chunk.has_anomalies),

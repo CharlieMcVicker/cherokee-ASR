@@ -99,8 +99,8 @@ class CTCAlignerConfig:
     intrusive_tokens: Tuple[str, ...] = ("h", "'")
     intrusive_max_stride: int = 1
     enforce_phonotactics: bool = True
-    flag_min_confidence: float = 0.01
-    flag_min_char_confidence: float = 0.0
+    flag_min_confidence: float = 0.05
+    flag_min_char_confidence: float = 0.0005
     index_duration: float = 0.02
     min_window_size: int = 8000
     max_window_size: int = 100000
@@ -1046,8 +1046,8 @@ config = CTCAlignerConfig(
     intrusive_tokens=("h", "'"),
     intrusive_max_stride=1,
     enforce_phonotactics=True,
-    flag_min_confidence=0.01,
-    flag_min_char_confidence=0.0,
+    flag_min_confidence=0.05,
+    flag_min_char_confidence=0.0005,
 )
 aligner = CTCSegmentationAligner(model=asr_model, config=config)
 ```
@@ -1073,8 +1073,8 @@ Cherokee surface phonotactics govern valid sites for vocalic deletion (syncope) 
 | `syncope_tokens` | `("a", "e", "i", "o", "u", "v")` | Vowels permitted for syncope deletion when acoustics favor next consonant. |
 | `intrusive_tokens` | `("h", "'")` | Laryngeal phonemes licensed for intrusive detour transitions. |
 | `intrusive_max_stride` | `1` | Max blank frame stride bridging intrusive token peaks. |
-| `flag_min_confidence` | `0.01` | Geometric mean word confidence threshold. |
-| `flag_min_char_confidence` | `0.0` | Character-level acoustic confidence threshold (default `0.0` to eliminate false-positive anomaly flagging on clean verses; calibrated to `0.005` for targeted typo audits). |
+| `flag_min_confidence` | `0.05` | Geometric mean word confidence threshold. |
+| `flag_min_char_confidence` | `0.0005` | Character-level acoustic confidence threshold (flags extreme single-character mismatches and typos like Mark 1:1 *yihstv*). |
 | `enforce_phonotactics` | `True` | Applies Cherokee phonotactic rules and site masks. |
 
 ### CLI Example

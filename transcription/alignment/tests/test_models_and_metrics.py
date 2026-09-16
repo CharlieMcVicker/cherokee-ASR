@@ -90,8 +90,8 @@ def test_ctc_aligner_config_defaults():
     assert cfg.intrusive_tokens == ("h", "'")
     assert cfg.intrusive_max_stride == 4
     assert cfg.enforce_phonotactics is True
-    assert cfg.flag_min_confidence == 0.01
-    assert cfg.flag_min_char_confidence == 0.0
+    assert cfg.flag_min_confidence == 0.05
+    assert cfg.flag_min_char_confidence == 0.0005
     assert cfg.index_duration == 0.02
     assert cfg.min_window_size == 8000
     assert cfg.max_window_size == 100000

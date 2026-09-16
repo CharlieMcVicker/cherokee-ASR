@@ -57,12 +57,10 @@ class CTCSegmentationAligner:
         self,
         model: Optional[CherokeeASRModel] = None,
         config: Optional[CTCAlignerConfig] = None,
-        chunk_normalizer: Optional[Callable[[str], str]] = None,
         **kwargs: Any,
     ):
         self.model = model
         self.config = config or CTCAlignerConfig()
-        self.chunk_norm = chunk_normalizer or normalize_phonetics_for_alignment
 
         self.syncope_tokens = list(self.config.syncope_tokens)
         self.intrusive_tokens = (
@@ -424,15 +422,32 @@ class CTCSegmentationAligner:
                 ]
                 emitted_w = "".join(emitted_chars) or raw_w
 
-                char_state_lps = [
-                    char_probs[f]
-                    for f in range(start_f, max(start_f + 1, end_f))
-                    if state_list[f] and state_list[f] not in ("ε", "[PAD]")
-                ]
-                if char_state_lps:
-                    mean_logprob = float(np.mean(char_state_lps))
+                char_peaks: List[float] = []
+                current_char: Optional[str] = None
+                current_lps: List[float] = []
+
+                for f in range(start_f, max(start_f + 1, end_f)):
+                    s = state_list[f] if f < len(state_list) else ""
+                    if s and s not in ("ε", "[PAD]"):
+                        if s == current_char:
+                            current_lps.append(float(char_probs[f]))
+                        else:
+                            if current_char is not None and current_lps:
+                                char_peaks.append(max(current_lps))
+                            current_char = s
+                            current_lps = [float(char_probs[f])]
+                    else:
+                        if current_char is not None and current_lps:
+                            char_peaks.append(max(current_lps))
+                            current_char = None
+                            current_lps = []
+                if current_char is not None and current_lps:
+                    char_peaks.append(max(current_lps))
+
+                if char_peaks:
+                    mean_logprob = float(np.mean(char_peaks))
                     word_conf = float(np.exp(mean_logprob))
-                    min_char_prob = float(np.exp(np.min(char_state_lps)))
+                    min_char_prob = float(np.exp(np.min(char_peaks)))
                 else:
                     word_conf = 0.0
                     min_char_prob = 0.0
@@ -492,9 +507,8 @@ class CTCSegmentationAligner:
         )
         char_list, pad_id = self._get_char_list_and_blank(model)
 
-        target_text = phonetic_text if phonetic_text else syllabary_text
-        norm_text = self.chunk_norm(target_text)
-        words = norm_text.split()
+        target_text = (phonetic_text if phonetic_text else syllabary_text) or ""
+        words = [w for w in target_text.split() if w]
 
         if not words or lpz.shape[0] == 0:
             return AlignedChunk(
@@ -600,6 +614,9 @@ class CTCSegmentationAligner:
         valid_syncope = [t for t in self.syncope_tokens if t in char_list]
         valid_intrusive = [t for t in self.intrusive_tokens if t in char_list]
 
+        win_size = max(self.min_window_size, min(20000, int(lpz.shape[0])))
+        max_win = max(self.max_window_size, win_size * 2)
+
         config = CtcSegmentationParameters(
             char_list=char_list,
             blank=pad_id,
@@ -607,8 +624,8 @@ class CTCSegmentationAligner:
             intrusive_tokens=valid_intrusive,
             intrusive_max_stride=self.intrusive_max_stride,
             index_duration=self.index_duration,
-            min_window_size=self.min_window_size,
-            max_window_size=max(self.max_window_size, self.min_window_size * 2),
+            min_window_size=win_size,
+            max_window_size=max_win,
             score_min_mean_over_L=2,
             replace_spaces_with_blanks=False,
         )
@@ -616,9 +633,9 @@ class CTCSegmentationAligner:
         all_words: List[str] = []
         chunk_word_slices: List[Tuple[int, int]] = []
         for c in chunks:
-            norm_words = self.chunk_norm(c.text).split()
+            chunk_words = [w for w in (c.text or "").split() if w]
             w_start = len(all_words)
-            all_words.extend(norm_words)
+            all_words.extend(chunk_words)
             chunk_word_slices.append((w_start, len(all_words)))
 
         if not all_words or lpz.shape[0] == 0:

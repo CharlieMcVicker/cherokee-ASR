@@ -3,8 +3,12 @@
 """
 view_ctc_comparison.py
 
-Lightweight webview server and UI to inspect CTC segmentation benchmark comparison data,
-anomalous verses, flagged low-confidence words, and listen to verse and word-level audio snippets.
+Lightweight webview server and UI to inspect 3-Way Comparative Alignments:
+1. Native Cherokee Syllabary
+2. Greedy ASR Inference (Unconstrained acoustic emission)
+3. Syllabary-Guided CTC Segmentation (Trellis phonotactics emission)
+
+Supports playing verse and word-level audio snippets, diff highlighting, and anomaly filtering.
 """
 
 import argparse
@@ -15,20 +19,25 @@ from pathlib import Path
 import socket
 import socketserver
 import sys
+from typing import Any, Dict, List, Optional
 import urllib.parse
 import webbrowser
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-DEFAULT_JSON = (
-    BASE_DIR / "runs" / "evaluation" / "ctc_segmentation_100_verses_comparison.json"
-)
+
+# Candidate default JSON files in order of priority
+DEFAULT_CANDIDATE_JSONS = [
+    BASE_DIR / "cherokee_new_testament" / "alignments" / "mark_alignment_records.json",
+    BASE_DIR / "cherokee_new_testament" / "alignments" / "bible_alignment_records.json",
+    BASE_DIR / "runs" / "evaluation" / "ctc_segmentation_100_verses_comparison.json",
+]
 
 HTML_TEMPLATE = r"""<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CTC Segmentation Anomaly & Alignment Viewer</title>
+  <title>Cherokee Alignment 3-Way Inspector (Syllabary vs Greedy vs Guided)</title>
   <style>
     :root {
       --bg: #0d1117;
@@ -40,6 +49,10 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       --text-muted: #6e7681;
       --accent: #58a6ff;
       --accent-glow: rgba(88, 166, 255, 0.15);
+      --greedy-color: #79c0ff;
+      --greedy-bg: rgba(56, 139, 253, 0.12);
+      --guided-color: #d2a8ff;
+      --guided-bg: rgba(187, 128, 247, 0.12);
       --danger: #f85149;
       --danger-bg: rgba(248, 81, 73, 0.15);
       --danger-border: rgba(248, 81, 73, 0.4);
@@ -94,12 +107,11 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
     }
 
     .title-row h1 {
-      font-size: 1.3rem;
+      font-size: 1.25rem;
       font-weight: 700;
       display: flex;
       align-items: center;
       gap: 10px;
-      color: var(--text-primary);
     }
 
     .stats-bar {
@@ -111,20 +123,15 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
     .stat-badge {
       background: var(--surface);
       border: 1px solid var(--surface-border);
-      padding: 6px 14px;
       border-radius: 6px;
-      font-size: 0.84rem;
-      display: inline-flex;
+      padding: 6px 12px;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      display: flex;
       align-items: center;
       gap: 6px;
       cursor: pointer;
       transition: all 0.15s ease;
-      color: var(--text-secondary);
-      user-select: none;
-    }
-
-    .stat-badge strong {
-      color: var(--text-primary);
     }
 
     .stat-badge:hover {
@@ -135,17 +142,11 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
     .stat-badge.active {
       border-color: var(--accent);
       background: var(--accent-glow);
-      color: var(--accent);
+      color: var(--text-primary);
     }
 
     .stat-badge.danger {
       border-color: var(--danger-border);
-      background: var(--danger-bg);
-      color: var(--danger);
-    }
-
-    .stat-badge.danger strong {
-      color: #ff7b72;
     }
 
     .stat-badge.danger.active {
@@ -252,11 +253,12 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       background: var(--surface);
       border: 1px solid var(--surface-border);
       border-radius: var(--card-radius);
-      padding: 22px;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      padding: 20px 24px;
       display: flex;
       flex-direction: column;
-      gap: 18px;
+      gap: 16px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+      transition: border-color 0.2s ease;
     }
 
     .verse-card:hover {
@@ -264,18 +266,18 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
     }
 
     .verse-card.has-anomaly {
-      border-left: 5px solid var(--danger);
-      background: linear-gradient(90deg, rgba(248, 81, 73, 0.03) 0%, var(--surface) 20%);
+      border-left: 4px solid var(--danger);
+      background: linear-gradient(90deg, rgba(248, 81, 73, 0.05) 0%, var(--surface) 12%);
     }
 
     .verse-header {
       display: flex;
-      align-items: center;
       justify-content: space-between;
+      align-items: center;
       flex-wrap: wrap;
       gap: 10px;
       border-bottom: 1px solid var(--surface-border);
-      padding-bottom: 14px;
+      padding-bottom: 12px;
     }
 
     .verse-title-group {
@@ -287,12 +289,12 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
     .verse-id-badge {
       background: var(--tag-bg);
       border: 1px solid var(--surface-border);
-      color: var(--accent);
+      padding: 4px 10px;
+      border-radius: 6px;
       font-weight: 700;
       font-size: 0.95rem;
-      padding: 5px 12px;
-      border-radius: 6px;
-      letter-spacing: 0.5px;
+      color: var(--text-primary);
+      font-family: "SF Mono", Monaco, Menlo, Consolas, monospace;
     }
 
     .verse-meta {
@@ -301,49 +303,52 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
     }
 
     .anomaly-badge {
-      font-size: 0.8rem;
-      font-weight: 600;
-      padding: 5px 12px;
-      border-radius: 20px;
       display: inline-flex;
       align-items: center;
       gap: 6px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.76rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
     .anomaly-badge.danger {
       background: var(--danger-bg);
-      color: #ff7b72;
       border: 1px solid var(--danger-border);
+      color: #ff7b72;
     }
 
     .anomaly-badge.success {
       background: var(--success-bg);
-      color: #7ee787;
       border: 1px solid var(--success-border);
+      color: #7ee787;
     }
 
     .player-container {
+      background: var(--bg);
+      border: 1px solid var(--surface-border);
+      border-radius: 8px;
+      padding: 10px 16px;
       display: flex;
       align-items: center;
       gap: 14px;
-      background: var(--bg);
-      padding: 10px 16px;
-      border-radius: 8px;
-      border: 1px solid var(--surface-border);
     }
 
     .play-btn {
       background: var(--accent);
-      color: #0d1117;
+      color: #000;
       border: none;
-      width: 36px;
-      height: 36px;
+      width: 34px;
+      height: 34px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.95rem;
       cursor: pointer;
+      font-size: 0.95rem;
+      font-weight: bold;
       transition: transform 0.1s ease, background 0.15s ease;
       flex-shrink: 0;
     }
@@ -398,13 +403,66 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       outline: none;
     }
 
-    .text-section {
+    /* 3-Way Comparative Tiers */
+    .comparison-tiers {
       display: flex;
       flex-direction: column;
       gap: 10px;
     }
 
-    .syllabary-text {
+    .tier-card {
+      background: var(--bg);
+      border: 1px solid var(--surface-border);
+      border-radius: 8px;
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .tier-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .tier-label {
+      font-size: 0.74rem;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .tier-badge {
+      font-size: 0.72rem;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-weight: 600;
+      font-family: "SF Mono", Monaco, Menlo, Consolas, monospace;
+    }
+
+    .tier-badge.syllabary {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+
+    .tier-badge.greedy {
+      background: var(--greedy-bg);
+      color: var(--greedy-color);
+      border: 1px solid rgba(88, 166, 255, 0.3);
+    }
+
+    .tier-badge.guided {
+      background: var(--guided-bg);
+      color: var(--guided-color);
+      border: 1px solid rgba(187, 128, 247, 0.3);
+    }
+
+    .syllabary-content {
       font-size: 1.45rem;
       font-weight: 500;
       color: #ffffff;
@@ -413,11 +471,52 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       font-family: "Plantagenet Cherokee", "Noto Sans Cherokee", "Apple Symbols", sans-serif;
     }
 
-    .phonetic-text {
-      font-size: 0.95rem;
-      color: #c9d1d9;
+    .phonetic-content {
+      font-size: 0.96rem;
       font-family: "SF Mono", Monaco, Menlo, Consolas, monospace;
+      line-height: 1.6;
+      word-break: break-word;
+    }
+
+    .phonetic-content.greedy {
+      color: #a5d6ff;
+    }
+
+    .phonetic-content.guided {
+      color: #d2a8ff;
+    }
+
+    .diff-highlight-box {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px dashed var(--surface-border);
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-family: "SF Mono", Monaco, Menlo, Consolas, monospace;
+      font-size: 0.86rem;
       line-height: 1.5;
+    }
+
+    .diff-ins {
+      background: rgba(63, 185, 80, 0.25);
+      color: #7ee787;
+      padding: 1px 3px;
+      border-radius: 3px;
+      font-weight: bold;
+    }
+
+    .diff-del {
+      background: rgba(248, 81, 73, 0.25);
+      color: #ff7b72;
+      text-decoration: line-through;
+      padding: 1px 3px;
+      border-radius: 3px;
+    }
+
+    .diff-sub {
+      background: rgba(210, 153, 34, 0.25);
+      color: #e3b341;
+      padding: 1px 3px;
+      border-radius: 3px;
     }
 
     .flagged-callout {
@@ -458,65 +557,6 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       border-radius: 6px;
       font-family: "SF Mono", Monaco, Menlo, Consolas, monospace;
       font-size: 0.84rem;
-    }
-
-    .flagged-item-row .target-word {
-      font-weight: 700;
-      color: var(--text-primary);
-    }
-
-    .flagged-item-row .emitted-word-val {
-      color: #ff7b72;
-      font-weight: 700;
-    }
-
-    .details-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 12px;
-      font-size: 0.84rem;
-    }
-
-    .detail-box {
-      background: var(--bg);
-      border: 1px solid var(--surface-border);
-      border-radius: 6px;
-      padding: 12px 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .detail-box .label {
-      color: var(--text-muted);
-      font-size: 0.74rem;
-      text-transform: uppercase;
-      letter-spacing: 0.6px;
-      font-weight: 600;
-    }
-
-    .detail-box .val {
-      font-family: "SF Mono", Monaco, Menlo, Consolas, monospace;
-      color: var(--text-secondary);
-      word-break: break-all;
-      line-height: 1.4;
-    }
-
-    .diff-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 2px;
-    }
-
-    .diff-tag {
-      background: var(--tag-bg);
-      border: 1px solid var(--surface-border);
-      color: #a5d6ff;
-      font-size: 0.74rem;
-      padding: 3px 8px;
-      border-radius: 4px;
-      font-family: "SF Mono", Monaco, Menlo, Consolas, monospace;
     }
 
     .words-section {
@@ -600,51 +640,42 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
 
     .emitted-word {
       font-size: 0.82rem;
-      color: var(--text-secondary);
       font-family: "SF Mono", Monaco, Menlo, Consolas, monospace;
-    }
-
-    .word-chip.flagged .emitted-word {
-      color: #ff7b72;
-      font-weight: 600;
+      color: var(--guided-color);
     }
 
     .word-footer {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 6px;
       font-size: 0.74rem;
-      color: var(--text-muted);
-      border-top: 1px solid rgba(255, 255, 255, 0.08);
-      padding-top: 4px;
-      margin-top: 2px;
     }
 
     .conf-badge {
-      font-weight: 600;
-      padding: 1px 6px;
-      border-radius: 4px;
-      font-size: 0.7rem;
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-family: "SF Mono", Monaco, Menlo, Consolas, monospace;
     }
 
     .conf-high {
-      color: #7ee787;
       background: var(--success-bg);
+      color: #7ee787;
     }
 
     .conf-mid {
-      color: #d29922;
       background: var(--warning-bg);
+      color: #e3b341;
     }
 
     .conf-low {
-      color: #ff7b72;
       background: var(--danger-bg);
-      font-weight: 700;
+      color: #ff7b72;
+      font-weight: bold;
     }
 
     .time-badge {
-      font-variant-numeric: tabular-nums;
+      color: var(--text-muted);
       font-family: "SF Mono", Monaco, Menlo, Consolas, monospace;
     }
 
@@ -661,7 +692,7 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
     <div class="header-content">
       <div class="title-row">
         <h1>
-          <span>📖</span> CTC Segmentation Benchmark & Anomaly Viewer
+          <span>📖</span> Cherokee Alignment 3-Way Inspector
         </h1>
         <div class="stats-bar">
           <div class="stat-badge" id="stat-total" onclick="setFilter('all')">
@@ -673,8 +704,8 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
           <div class="stat-badge" id="stat-flagged" onclick="setFilter('anomalies')">
             🚩 Flagged Words: <strong id="val-flagged">0</strong>
           </div>
-          <div class="stat-badge" id="stat-diff">
-            Diff Rate: <strong id="val-diff">0%</strong>
+          <div class="stat-badge" id="stat-divergent" onclick="setFilter('divergent')">
+            ⚡ Greedy ≠ Guided: <strong id="val-divergent">0</strong>
           </div>
         </div>
       </div>
@@ -688,11 +719,13 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
         <div class="filter-tabs">
           <button class="tab-btn" id="tab-all" onclick="setFilter('all')">All Verses</button>
           <button class="tab-btn active anomalies" id="tab-anomalies" onclick="setFilter('anomalies')">⚠️ Anomalies Only</button>
+          <button class="tab-btn" id="tab-divergent" onclick="setFilter('divergent')">⚡ Divergent Only</button>
           <button class="tab-btn" id="tab-clean" onclick="setFilter('clean')">✅ Clean Verses</button>
         </div>
 
         <select class="sort-select" id="sort-select" onchange="render()">
           <option value="anomalies-desc" selected>Sort: Flagged Words (Most First)</option>
+          <option value="divergent-first">Sort: Greedy ≠ Guided Divergence First</option>
           <option value="id-asc">Sort: Verse ID (Asc)</option>
           <option value="id-desc">Sort: Verse ID (Desc)</option>
           <option value="confidence-asc">Sort: Lowest Word Confidence</option>
@@ -703,14 +736,45 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
   </header>
 
   <main id="verse-container">
-    <div class="empty-state">Loading benchmark data...</div>
+    <div class="empty-state">Loading alignment records...</div>
   </main>
 
   <script>
     let globalData = null;
-    let currentFilter = 'anomalies'; // 'all', 'anomalies', 'clean'
+    let currentFilter = 'anomalies'; // 'all', 'anomalies', 'clean', 'divergent'
     const audioPlayers = new Map(); // verse_id -> Audio instance
     let activeSnippetTimeout = null;
+
+    // Simple LCS character diff between greedy and guided
+    function computeCharDiffHtml(s1, s2) {
+      if (!s1 || !s2) return '';
+      if (s1 === s2) return `<span style="color: var(--text-muted);">(Greedy & Guided match exactly)</span>`;
+
+      // Word level comparison
+      const w1 = s1.split(/\s+/);
+      const w2 = s2.split(/\s+/);
+      
+      let html = '<div style="display: flex; flex-direction: column; gap: 4px;">';
+      html += '<div><strong>Greedy:</strong> ';
+      html += w1.map(word => {
+        if (!w2.includes(word)) {
+          return `<span class="diff-del">${word}</span>`;
+        }
+        return `<span>${word}</span>`;
+      }).join(' ');
+      html += '</div>';
+
+      html += '<div><strong>Guided:</strong> ';
+      html += w2.map(word => {
+        if (!w1.includes(word)) {
+          return `<span class="diff-ins">${word}</span>`;
+        }
+        return `<span>${word}</span>`;
+      }).join(' ');
+      html += '</div></div>';
+
+      return html;
+    }
 
     async function init() {
       try {
@@ -718,11 +782,33 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
           const res = await fetch('/api/data');
           globalData = await res.json();
         }
+
+        // Normalize if list
+        if (Array.isArray(globalData)) {
+          const total = globalData.length;
+          const anomalies = globalData.filter(r => r.has_anomalies);
+          const totalFlagged = globalData.reduce((acc, r) => {
+            return acc + (r.words ? r.words.filter(w => w.flagged).length : 0);
+          }, 0);
+          const divergent = globalData.filter(r => {
+            const gr = (r.greedy_hypothesis || '').trim();
+            const gd = (r.guided_hypothesis || r.reconciled_phonetics || '').trim();
+            return gr && gd && gr !== gd;
+          }).length;
+
+          globalData = {
+            total_verses: total,
+            verses_with_anomalies: anomalies.length,
+            total_flagged_words: totalFlagged,
+            divergent_verses: divergent,
+            results: globalData,
+          };
+        }
         
         document.getElementById('val-total').textContent = globalData.total_verses || (globalData.results ? globalData.results.length : 0);
         document.getElementById('val-anomalies').textContent = globalData.verses_with_anomalies || (globalData.anomalous_verses ? globalData.anomalous_verses.length : 0);
         document.getElementById('val-flagged').textContent = globalData.total_flagged_words || 0;
-        document.getElementById('val-diff').textContent = (globalData.diff_percentage !== undefined ? globalData.diff_percentage.toFixed(1) : '100') + '%';
+        document.getElementById('val-divergent').textContent = globalData.divergent_verses || (globalData.results ? globalData.results.filter(r => (r.greedy_hypothesis||'').trim() !== (r.guided_hypothesis||r.reconciled_phonetics||'').trim()).length : 0);
 
         render();
       } catch (err) {
@@ -735,10 +821,12 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       currentFilter = filter;
       document.getElementById('tab-all').classList.toggle('active', filter === 'all');
       document.getElementById('tab-anomalies').classList.toggle('active', filter === 'anomalies');
+      document.getElementById('tab-divergent').classList.toggle('active', filter === 'divergent');
       document.getElementById('tab-clean').classList.toggle('active', filter === 'clean');
 
       document.getElementById('stat-total').classList.toggle('active', filter === 'all');
       document.getElementById('stat-anomalies').classList.toggle('active', filter === 'anomalies');
+      document.getElementById('stat-divergent').classList.toggle('active', filter === 'divergent');
       render();
     }
 
@@ -876,37 +964,48 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       const container = document.getElementById('verse-container');
 
       let filtered = globalData.results.filter(v => {
+        const isDivergent = (v.greedy_hypothesis || '').trim() !== (v.guided_hypothesis || v.reconciled_phonetics || '').trim();
         if (currentFilter === 'anomalies' && !v.has_anomalies) return false;
+        if (currentFilter === 'divergent' && !isDivergent) return false;
         if (currentFilter === 'clean' && v.has_anomalies) return false;
 
         if (query) {
           const matchId = (v.verse_id || '').toLowerCase().includes(query);
-          const matchSyllabary = (v.reference_syllabary || '').toLowerCase().includes(query);
-          const matchPhonetic = (v.phonetic_citation || '').toLowerCase().includes(query);
-          const matchDiff = (v.diff_details || []).some(d => d.toLowerCase().includes(query));
-          const matchWords = (v.words_ctc_aligned || []).some(w => 
+          const matchSyllabary = (v.cherokee_syllabary || v.reference_syllabary || '').toLowerCase().includes(query);
+          const matchGreedy = (v.greedy_hypothesis || '').toLowerCase().includes(query);
+          const matchGuided = (v.guided_hypothesis || v.reconciled_phonetics || '').toLowerCase().includes(query);
+          const matchWords = (v.words || v.words_ctc_aligned || []).some(w => 
             (w.word || '').toLowerCase().includes(query) || ((w.emitted_word || '').toLowerCase().includes(query))
           );
-          return matchId || matchSyllabary || matchPhonetic || matchDiff || matchWords;
+          return matchId || matchSyllabary || matchGreedy || matchGuided || matchWords;
         }
         return true;
       });
 
       filtered.sort((a, b) => {
+        const aWords = a.words || a.words_ctc_aligned || [];
+        const bWords = b.words || b.words_ctc_aligned || [];
+        const aFlagged = aWords.filter(w => w.flagged).length;
+        const bFlagged = bWords.filter(w => w.flagged).length;
+
         if (sortMode === 'anomalies-desc') {
-          const aCount = (a.flagged_words || []).length;
-          const bCount = (b.flagged_words || []).length;
-          if (bCount !== aCount) return bCount - aCount;
+          if (bFlagged !== aFlagged) return bFlagged - aFlagged;
+          return (a.verse_id || '').localeCompare(b.verse_id || '');
+        }
+        if (sortMode === 'divergent-first') {
+          const aDiv = (a.greedy_hypothesis || '').trim() !== (a.guided_hypothesis || a.reconciled_phonetics || '').trim();
+          const bDiv = (b.greedy_hypothesis || '').trim() !== (b.guided_hypothesis || b.reconciled_phonetics || '').trim();
+          if (aDiv !== bDiv) return aDiv ? -1 : 1;
           return (a.verse_id || '').localeCompare(b.verse_id || '');
         }
         if (sortMode === 'id-asc') return (a.verse_id || '').localeCompare(b.verse_id || '');
         if (sortMode === 'id-desc') return (b.verse_id || '').localeCompare(a.verse_id || '');
         if (sortMode === 'confidence-asc') {
-          const getMinConf = (item) => {
-            if (!item.words_ctc_aligned || item.words_ctc_aligned.length === 0) return 1.0;
-            return Math.min(...item.words_ctc_aligned.map(w => w.confidence ?? 1.0));
+          const getMinConf = (words) => {
+            if (!words || words.length === 0) return 1.0;
+            return Math.min(...words.map(w => w.confidence ?? 1.0));
           };
-          return getMinConf(a) - getMinConf(b);
+          return getMinConf(aWords) - getMinConf(bWords);
         }
         if (sortMode === 'duration-desc') return (b.duration_sec || 0) - (a.duration_sec || 0);
         return 0;
@@ -919,8 +1018,13 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
 
       container.innerHTML = filtered.map(v => {
         const hasAnomaly = v.has_anomalies;
-        const flaggedCount = (v.flagged_words || []).length;
-        const diffCategories = v.diff_categories || [];
+        const wordsList = v.words || v.words_ctc_aligned || [];
+        const flaggedWords = wordsList.filter(w => w.flagged);
+        const flaggedCount = flaggedWords.length;
+        const syllabary = v.cherokee_syllabary || v.reference_syllabary || '';
+        const greedyHyp = v.greedy_hypothesis || v.asr_hypothesis || '';
+        const guidedHyp = v.guided_hypothesis || v.reconciled_phonetics || v.new_reconciled_phonetics || '';
+        const diffHtml = computeCharDiffHtml(greedyHyp, guidedHyp);
 
         return `
           <div class="verse-card ${hasAnomaly ? 'has-anomaly' : ''}" id="card-${v.verse_id}">
@@ -946,6 +1050,7 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
                 <div class="time-display" id="time-${v.verse_id}">0.00s / ${(v.duration_sec || 0).toFixed(2)}s</div>
               </div>
               <select class="speed-select" id="speed-${v.verse_id}" onchange="setPlaybackSpeed('${v.verse_id}', '${v.audio_path}', this.value)">
+                <option value="0.5">0.5x</option>
                 <option value="0.75">0.75x</option>
                 <option value="1" selected>1.0x</option>
                 <option value="1.25">1.25x</option>
@@ -953,9 +1058,42 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
               </select>
             </div>
 
-            <div class="text-section">
-              <div class="syllabary-text">${v.reference_syllabary || ''}</div>
-              <div class="phonetic-text">${v.phonetic_citation || ''}</div>
+            <!-- 3-Way Comparative Tiers -->
+            <div class="comparison-tiers">
+              <!-- Tier 1: Syllabary -->
+              <div class="tier-card">
+                <div class="tier-header">
+                  <span class="tier-label" style="color: #ffffff;"><span>📜</span> 1. Native Cherokee Syllabary</span>
+                  <span class="tier-badge syllabary">Ground Truth Syllabary</span>
+                </div>
+                <div class="syllabary-content">${syllabary}</div>
+              </div>
+
+              <!-- Tier 2: Greedy Inference -->
+              <div class="tier-card" style="border-left: 3px solid var(--greedy-color);">
+                <div class="tier-header">
+                  <span class="tier-label" style="color: var(--greedy-color);"><span>🎙️</span> 2. Greedy ASR Inference</span>
+                  <span class="tier-badge greedy">Unconstrained Acoustic Emission ${v.greedy_confidence !== undefined ? `(${v.greedy_confidence})` : ''}</span>
+                </div>
+                <div class="phonetic-content greedy">${greedyHyp || '<span style="color: var(--text-muted);">(No greedy hypothesis recorded)</span>'}</div>
+              </div>
+
+              <!-- Tier 3: Guided Inference -->
+              <div class="tier-card" style="border-left: 3px solid var(--guided-color);">
+                <div class="tier-header">
+                  <span class="tier-label" style="color: var(--guided-color);"><span>✨</span> 3. Syllabary-Guided CTC Segmentation</span>
+                  <span class="tier-badge guided">Trellis Reconciled Phonotactics ${v.cost !== undefined ? `(Cost: ${v.cost})` : ''}</span>
+                </div>
+                <div class="phonetic-content guided">${guidedHyp || '<span style="color: var(--text-muted);">(No guided hypothesis recorded)</span>'}</div>
+              </div>
+
+              <!-- Comparative Diff Highlight -->
+              <div class="diff-highlight-box">
+                <div style="font-size: 0.74rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; font-weight: 600;">
+                  🔍 Greedy vs Guided Word Diff Comparison:
+                </div>
+                ${diffHtml}
+              </div>
             </div>
 
             ${hasAnomaly && flaggedCount > 0 ? `
@@ -964,42 +1102,24 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
                   <span>🚨</span> Flagged Low-Confidence Words / Anomalies (${flaggedCount})
                 </div>
                 <div class="flagged-items-grid">
-                  ${(v.flagged_words || []).map(f => `
+                  ${flaggedWords.map(f => `
                     <div class="flagged-item-row">
-                      <span>Target: <span class="target-word">${f.word}</span></span>
-                      <span>→ Emitted: <span class="emitted-word-val">${f.emitted_word || f.word}</span></span>
+                      <span>Target: <strong style="color: var(--text-primary);">${f.word}</strong></span>
+                      <span>→ Emitted: <strong style="color: #ff7b72;">${f.emitted_word || f.word}</strong></span>
                       <span class="conf-badge conf-low">Confidence: ${(f.confidence || 0).toFixed(6)}</span>
-                      <span style="font-size: 0.76rem; color: var(--text-muted);">${(f.duration_sec || 0).toFixed(2)}s</span>
+                      <span style="font-size: 0.76rem; color: var(--text-muted);">${(f.start_sec || 0).toFixed(2)}s – ${(f.end_sec || 0).toFixed(2)}s</span>
                     </div>
                   `).join('')}
                 </div>
               </div>
             ` : ''}
 
-            <div class="details-grid">
-              <div class="detail-box">
-                <div class="label">New CTC Reconciled Hypothesis</div>
-                <div class="val">${v.new_reconciled_phonetics || v.new_asr_hypothesis || '—'}</div>
-              </div>
-              <div class="detail-box">
-                <div class="label">Diff Categories & Details</div>
-                <div class="val">
-                  <div class="diff-tags">
-                    ${diffCategories.length > 0 
-                      ? diffCategories.map(cat => `<span class="diff-tag">${cat}</span>`).join('')
-                      : '<span style="color: var(--text-muted);">None</span>'
-                    }
-                  </div>
-                </div>
-              </div>
-            </div>
-
             <div class="words-section">
               <div class="section-subtitle">
-                <span>⚡</span> Aligned Words (${(v.words_ctc_aligned || []).length} words, click any word chip to play audio segment)
+                <span>⚡</span> Word-Level Alignment Chips (${wordsList.length} words, click any chip to play audio)
               </div>
               <div class="words-grid">
-                ${(v.words_ctc_aligned || []).map((w) => {
+                ${wordsList.map((w) => {
                   const isFlagged = w.flagged || (w.confidence !== undefined && w.confidence < 0.1);
                   const confCls = getConfidenceClass(w.confidence);
                   return `
@@ -1049,51 +1169,13 @@ class RangeRequestHandler(http.server.SimpleHTTPRequestHandler):
     serving the embedded interactive HTML UI, and serving the comparison JSON.
     """
 
-    def __init__(self, *args, json_data: dict, **kwargs):
+    def __init__(self, *args, json_data=None, **kwargs):
         self.json_data = json_data
         super().__init__(*args, **kwargs)
 
-    def do_HEAD(self):
-        parsed = urllib.parse.urlparse(self.path)
-        path = parsed.path
-
-        if path in ("/", "/index.html"):
-            self.send_response(200)
-            self.send_header("Content-Type", "text/html; charset=utf-8")
-            content = HTML_TEMPLATE.encode("utf-8")
-            self.send_header("Content-Length", str(len(content)))
-            self.end_headers()
-            return
-
-        if path == "/api/data":
-            self.send_response(200)
-            self.send_header("Content-Type", "application/json; charset=utf-8")
-            content = json.dumps(self.json_data).encode("utf-8")
-            self.send_header("Content-Length", str(len(content)))
-            self.end_headers()
-            return
-
-        if path.startswith("/audio/"):
-            audio_rel_path = urllib.parse.unquote(path[len("/audio/") :])
-            audio_full_path = (BASE_DIR / audio_rel_path).resolve()
-            try:
-                audio_full_path.relative_to(BASE_DIR)
-            except ValueError:
-                self.send_error(403, "Forbidden")
-                return
-
-            if not audio_full_path.exists() or not audio_full_path.is_file():
-                self.send_error(404, f"Audio file not found: {audio_rel_path}")
-                return
-
-            self.serve_audio_file(audio_full_path, head_only=True)
-            return
-
-        super().do_HEAD()
-
     def do_GET(self):
-        parsed = urllib.parse.urlparse(self.path)
-        path = parsed.path
+        parsed_url = urllib.parse.urlparse(self.path)
+        path = parsed_url.path
 
         if path in ("/", "/index.html"):
             self.send_response(200)
@@ -1186,15 +1268,23 @@ def find_free_port(start_port: int = 8080, max_attempts: int = 50) -> int:
     return start_port
 
 
+def resolve_default_json_path() -> Path:
+    for cand in DEFAULT_CANDIDATE_JSONS:
+        if cand.exists():
+            return cand
+    return DEFAULT_CANDIDATE_JSONS[0]
+
+
 def main():
+    default_json = resolve_default_json_path()
     parser = argparse.ArgumentParser(
-        description="Launch CTC Segmentation Anomaly Webview Viewer"
+        description="Launch Cherokee Alignment 3-Way Comparative Inspector"
     )
     parser.add_argument(
         "--json-path",
         type=Path,
-        default=DEFAULT_JSON,
-        help=f"Path to comparison JSON file (default: {DEFAULT_JSON})",
+        default=default_json,
+        help=f"Path to alignment/comparison JSON file (default: {default_json})",
     )
     parser.add_argument(
         "--port",
@@ -1242,16 +1332,16 @@ def main():
     socketserver.TCPServer.allow_reuse_address = True
     with socketserver.TCPServer(("127.0.0.1", port), handler) as httpd:
         url = f"http://localhost:{port}"
-        print("=" * 70)
-        print(" CTC Segmentation Anomaly & Alignment Webview")
-        print("=" * 70)
-        print(
-            f" Total Verses:          {json_data.get('total_verses', len(json_data.get('results', [])))}"
+        total_count = (
+            len(json_data)
+            if isinstance(json_data, list)
+            else json_data.get("total_verses", len(json_data.get("results", [])))
         )
-        print(
-            f" Verses with Anomalies: {json_data.get('verses_with_anomalies', len(json_data.get('anomalous_verses', [])))}"
-        )
-        print(f" Flagged Words:         {json_data.get('total_flagged_words', 0)}")
+        print("=" * 70)
+        print(" Cherokee Alignment 3-Way Comparative Inspector")
+        print("=" * 70)
+        print(f" Total Verses:          {total_count}")
+        print(f" Dataset Path:          {args.json_path}")
         print(f"\n Server running at:     {url}")
         print(" Press Ctrl+C to stop server.")
         print("=" * 70)

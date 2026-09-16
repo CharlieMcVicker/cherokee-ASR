@@ -19,8 +19,8 @@ class CTCAlignerConfig:
     intrusive_tokens: Tuple[str, ...] = ("h", "'")
     intrusive_max_stride: int = 4
     enforce_phonotactics: bool = True
-    flag_min_confidence: float = 0.01
-    flag_min_char_confidence: float = 0.0
+    flag_min_confidence: float = 0.05
+    flag_min_char_confidence: float = 0.0005
     index_duration: float = 0.02
     min_window_size: int = 8000
     max_window_size: int = 100000
