@@ -288,23 +288,43 @@ def get_intrusion_site_mask(
         prev_tok = tokens[idx - 1] if idx > 0 else None
 
         # 1. Coda laryngeals / Pre-consonantal intrusions (before consonants):
-        if tok.category in (
-            PhonemeCategory.PLAIN_STOP,
-            PhonemeCategory.PLAIN_SONORANT,
-            PhonemeCategory.SIBILANT,
+        if (
+            tok.category
+            in (
+                PhonemeCategory.PLAIN_STOP,
+                PhonemeCategory.ASPIRATED_STOP,
+                PhonemeCategory.PLAIN_SONORANT,
+                PhonemeCategory.VOICELESS_SONORANT,
+                PhonemeCategory.SIBILANT,
+            )
+            and not tok.symbol.startswith("h")
+            and not tok.symbol.startswith("'")
         ):
-            if prev_tok is None or prev_tok.category not in (
-                PhonemeCategory.LARYNGEAL_FRICATIVE,
-                PhonemeCategory.GLOTTAL_STOP,
-                PhonemeCategory.SIBILANT_CLUSTER,
+            if prev_tok is not None and (
+                prev_tok.category
+                not in (
+                    PhonemeCategory.LARYNGEAL_FRICATIVE,
+                    PhonemeCategory.GLOTTAL_STOP,
+                    PhonemeCategory.SIBILANT_CLUSTER,
+                )
+                and not prev_tok.symbol.endswith("h")
+                and not prev_tok.symbol.endswith("'")
+                and prev_tok.symbol != "hs"
             ):
                 token_mask[idx] = True
 
-        # 2. Post-consonantal aspiration (on vowels following plain consonants):
+        # 2. Post-consonantal aspiration (on vowels following plain consonants) and word-initial vowel onsets:
         elif tok.category == PhonemeCategory.VOWEL:
-            if prev_tok is not None and prev_tok.category in (
-                PhonemeCategory.PLAIN_SONORANT,
-                PhonemeCategory.PLAIN_STOP,
+            if prev_tok is None:
+                token_mask[idx] = True
+            elif (
+                prev_tok.category
+                in (
+                    PhonemeCategory.PLAIN_SONORANT,
+                    PhonemeCategory.PLAIN_STOP,
+                )
+                and not prev_tok.symbol.endswith("h")
+                and not prev_tok.symbol.startswith("h")
             ):
                 token_mask[idx] = True
 

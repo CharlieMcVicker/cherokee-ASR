@@ -211,3 +211,20 @@ def test_intrusion_site_mask_post_aspiration_and_coda_laryngeals():
     assert token_map["a"] is True  # Post-consonantal aspiration w -> h -> a
     assert token_map["l"] is True  # Pre-consonantal before l
     assert token_map["i"] is True  # Post-consonantal aspiration l -> h -> i (ukvwalhi)
+
+
+def test_intrusion_site_mask_blocks_preaspirated_sibilants():
+    """Verify that get_intrusion_site_mask prohibits intrusive laryngeals before 'hs' and 'hsk'."""
+    word = "kvnohsahsti"
+    tokens = tokenize_phonemes(word)
+    mask = get_intrusion_site_mask(word, return_char_mask=False)
+
+    for tok, is_intrusive in zip(tokens, mask):
+        if tok.symbol in ("hs", "hsk", "hst", "hsl"):
+            assert (
+                is_intrusive is False
+            ), f"Intrusion should be blocked on pre-aspirated '{tok.symbol}'"
+        if tok.symbol == "a" and tokens[tokens.index(tok) - 1].symbol == "hs":
+            assert (
+                is_intrusive is False
+            ), "Post-aspiration should be blocked on vowel following 'hs'"
