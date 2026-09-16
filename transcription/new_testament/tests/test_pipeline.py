@@ -626,10 +626,7 @@ def test_align_chapter_forwards_intrusive_and_phonotactic_parameters(
     out_dir = tmp_path / "output_forwarding"
 
     aligner_cfg = CTCAlignerConfig(
-        syncope_penalty=3.5,
-        intrusive_penalty=0.25,
-        intrusive_penalties={"h": 0.4},
-        intrusive_min_logprobs={"h": -2.0},
+        intrusive_tokens=("h", "'"),
         intrusive_max_stride=2,
         enforce_phonotactics=True,
         flag_min_confidence=0.02,

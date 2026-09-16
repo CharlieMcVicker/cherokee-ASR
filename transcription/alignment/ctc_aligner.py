@@ -65,13 +65,9 @@ class CTCSegmentationAligner:
         self.chunk_norm = chunk_normalizer or normalize_phonetics_for_alignment
 
         self.syncope_tokens = list(self.config.syncope_tokens)
-        self.syncope_penalty = float(self.config.syncope_penalty)
         self.intrusive_tokens = (
             list(self.config.intrusive_tokens) if self.config.intrusive_tokens else []
         )
-        self.intrusive_penalty = float(self.config.intrusive_penalty)
-        self.intrusive_penalties = self.config.intrusive_penalties
-        self.intrusive_min_logprobs = self.config.intrusive_min_logprobs
         self.intrusive_max_stride = int(self.config.intrusive_max_stride)
         self.enforce_phonotactics = bool(self.config.enforce_phonotactics)
         self.flag_min_confidence = float(self.config.flag_min_confidence)
@@ -517,11 +513,7 @@ class CTCSegmentationAligner:
             char_list=char_list,
             blank=pad_id,
             syncope_tokens=valid_syncope,
-            syncope_penalty=self.syncope_penalty,
             intrusive_tokens=valid_intrusive,
-            intrusive_penalty=self.intrusive_penalty,
-            intrusive_penalties=self.intrusive_penalties,
-            intrusive_min_logprobs=self.intrusive_min_logprobs,
             intrusive_max_stride=self.intrusive_max_stride,
             index_duration=self.index_duration,
             score_min_mean_over_L=2,
@@ -612,11 +604,7 @@ class CTCSegmentationAligner:
             char_list=char_list,
             blank=pad_id,
             syncope_tokens=valid_syncope,
-            syncope_penalty=self.syncope_penalty,
             intrusive_tokens=valid_intrusive,
-            intrusive_penalty=self.intrusive_penalty,
-            intrusive_penalties=self.intrusive_penalties,
-            intrusive_min_logprobs=self.intrusive_min_logprobs,
             intrusive_max_stride=self.intrusive_max_stride,
             index_duration=self.index_duration,
             min_window_size=self.min_window_size,

@@ -16,16 +16,8 @@ class CTCAlignerConfig:
     """Strongly-typed configuration for syncope- and intrusion-aware CTC alignment."""
 
     syncope_tokens: Tuple[str, ...] = ("a", "e", "i", "o", "u", "v")
-    syncope_penalty: float = 8.0
     intrusive_tokens: Tuple[str, ...] = ("h", "'")
-    intrusive_penalty: float = 0.1
-    intrusive_penalties: Optional[Dict[str, float]] = field(
-        default_factory=lambda: {"h": 3.0, "'": 0.8}
-    )
-    intrusive_min_logprobs: Optional[Dict[str, float]] = field(
-        default_factory=lambda: {"h": -1.0498, "'": -1.6094}
-    )
-    intrusive_max_stride: int = 1
+    intrusive_max_stride: int = 4
     enforce_phonotactics: bool = True
     flag_min_confidence: float = 0.01
     flag_min_char_confidence: float = 0.0

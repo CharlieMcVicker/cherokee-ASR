@@ -249,7 +249,6 @@ def test_ctc_aligner_full_chapter_verse_and_word_harvesting():
         model=cast(Any, model),
         config=CTCAlignerConfig(
             syncope_tokens=("a",),
-            syncope_penalty=2.0,
             flag_min_confidence=0.1,
         ),
     )
@@ -372,9 +371,7 @@ def test_ctc_aligner_continuous_chapter_multi_verse_monotonicity():
         model=cast(Any, model),
         config=CTCAlignerConfig(
             syncope_tokens=("a", "e", "i", "o", "u", "v"),
-            syncope_penalty=2.0,
             intrusive_tokens=("h", "'"),
-            intrusive_penalty=0.1,
         ),
     )
 
@@ -660,20 +657,18 @@ def test_ctc_aligner_min_char_confidence_flags_mark_1_1_typo(dummy_audio_file: P
 
 def test_ctc_aligner_parameters_forwarding(dummy_audio_file: Path):
     """
-    Verify that intrusive_penalties, intrusive_min_logprobs, intrusive_max_stride,
+    Verify that intrusive_tokens, syncope_tokens, intrusive_max_stride,
     and enforce_phonotactics are forwarded to CtcSegmentationParameters and prepare_cherokee_text.
     """
     from transcription.alignment.models import TextChunk
 
     model = DummyASRModel()
-    custom_penalties = {"h": 0.3, "'": 0.8}
-    custom_min_logprobs = {"h": -2.5, "'": -3.0}
 
     aligner = CTCSegmentationAligner(
         model=cast(Any, model),
         config=CTCAlignerConfig(
-            intrusive_penalties=custom_penalties,
-            intrusive_min_logprobs=custom_min_logprobs,
+            syncope_tokens=("a", "e"),
+            intrusive_tokens=("h", "'"),
             intrusive_max_stride=2,
             enforce_phonotactics=True,
             flag_min_char_confidence=0.008,
@@ -708,8 +703,8 @@ def test_ctc_aligner_parameters_forwarding(dummy_audio_file: Path):
         )
 
         passed_config = mock_seg.call_args[0][0]
-        assert passed_config.intrusive_penalties == custom_penalties
-        assert passed_config.intrusive_min_logprobs == custom_min_logprobs
+        assert passed_config.syncope_tokens == ["a", "e"]
+        assert passed_config.intrusive_tokens == ["h", "'"]
         assert passed_config.intrusive_max_stride == 2
         assert mock_prep.call_args[1]["enforce_phonotactics"] is True
         assert hasattr(passed_config, "is_syncope_token")
@@ -724,8 +719,8 @@ def test_ctc_aligner_parameters_forwarding(dummy_audio_file: Path):
         )
 
         passed_config2 = mock_seg.call_args[0][0]
-        assert passed_config2.intrusive_penalties == custom_penalties
-        assert passed_config2.intrusive_min_logprobs == custom_min_logprobs
+        assert passed_config2.syncope_tokens == ["a", "e"]
+        assert passed_config2.intrusive_tokens == ["h", "'"]
         assert passed_config2.intrusive_max_stride == 2
         assert mock_prep.call_args[1]["enforce_phonotactics"] is True
 

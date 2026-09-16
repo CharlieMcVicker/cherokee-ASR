@@ -96,15 +96,7 @@ from typing import Dict, List, Optional, Tuple
 class CTCAlignerConfig:
     """Strongly-typed configuration for syncope- and intrusion-aware CTC alignment."""
     syncope_tokens: Tuple[str, ...] = ("a", "e", "i", "o", "u", "v")
-    syncope_penalty: float = 8.0
     intrusive_tokens: Tuple[str, ...] = ("h", "'")
-    intrusive_penalty: float = 0.1
-    intrusive_penalties: Optional[Dict[str, float]] = field(
-        default_factory=lambda: {"h": 3.0, "'": 0.8}
-    )
-    intrusive_min_logprobs: Optional[Dict[str, float]] = field(
-        default_factory=lambda: {"h": -1.0498, "'": -1.6094}
-    )
     intrusive_max_stride: int = 1
     enforce_phonotactics: bool = True
     flag_min_confidence: float = 0.01
@@ -114,6 +106,7 @@ class CTCAlignerConfig:
     max_window_size: int = 100000
     buffer_trail_ms: int = 300
     buffer_lead_ms: int = 100
+    boundary_pad_sec: float = 0.1
     chunk_seconds: float = 30.0
     margin_seconds: float = 1.0
     cache: bool = True
@@ -1039,24 +1032,31 @@ finder.export_results(metrics, "runs/evaluation/alignment_threshold.json")
 
 ## 11. Continuous CTC Segmentation & Phonotactic Calibration (`CTCSegmentationAligner`)
 
-The [`CTCSegmentationAligner`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/ctc_aligner.py) provides syncope- and intrusion-aware CTC trellis segmentation operating directly on continuous chapter audio.
+The [`CTCSegmentationAligner`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/ctc_aligner.py) provides syncope- and intrusion-aware CTC trellis segmentation operating directly on continuous chapter audio using Relative Contrastive Acoustic Gating (zero-hyperparameter formulation from `ctc-segmentation` PR #7).
 
 ### Strongly-Typed Configuration (`CTCAlignerConfig`)
 
-All aligner hyperparameters are consolidated into [`CTCAlignerConfig`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/models.py):
+All aligner configurations are consolidated into [`CTCAlignerConfig`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/models.py):
 
 ```python
 from transcription.alignment import CTCSegmentationAligner, CTCAlignerConfig
 
 config = CTCAlignerConfig(
-    syncope_penalty=8.0,
-    intrusive_penalties={"h": 3.0, "'": 0.8},
-    intrusive_min_logprobs={"h": -1.0498, "'": -1.6094},
+    syncope_tokens=("a", "e", "i", "o", "u", "v"),
+    intrusive_tokens=("h", "'"),
+    intrusive_max_stride=1,
+    enforce_phonotactics=True,
     flag_min_confidence=0.01,
     flag_min_char_confidence=0.0,
 )
 aligner = CTCSegmentationAligner(model=asr_model, config=config)
 ```
+
+### Relative Contrastive Acoustic Gating
+
+Rather than requiring manually tuned transition penalties or fixed posterior thresholds, `ctc-segmentation` dynamically evaluates relative contrastive acoustic evidence in log-probability space:
+1. **Syncope Gate**: Evaluates whether the arrival frame acoustics favor the incoming anchor token over the skipped vowel ($P(t, L_{\text{anchor}}) > P(t, L_{\text{vowel}})$).
+2. **Intrusive Detour Gate**: Evaluates whether the detour frame acoustics favor the intrusive candidate over the expected target anchor ($P(t_{\text{detour}}, j) > P(t_{\text{detour}}, L_{\text{anchor}})$).
 
 ### Phonotactic Text Preparation & Site Masking
 
@@ -1066,35 +1066,23 @@ Cherokee surface phonotactics govern valid sites for vocalic deletion (syncope) 
 1. `config.is_syncope_token`: 1D boolean/int8 mask indicating positions eligible for vocalic syncope without violating forbidden cluster constraints (`*HH`, `*ChR`).
 2. `config.is_intrusive_site`: 1D boolean/int8 mask licensing candidate sites for intrusive `/h/` and `/'/` detours.
 
-### Calibrated Optimal Parameters & Benchmark Metrics
-
-Empirical grid search across candidate penalties on Mark Chapter 1, the 100-verse benchmark, and the CIM test dataset identified the following optimal defaults:
+### Parameters Summary
 
 | Parameter | Recommended Default | Purpose |
 | :--- | :--- | :--- |
-| `syncope_penalty` | `8.0` | Penalty for omitting citation vowels during fast speech syncope. |
-| `intrusive_penalty` | `0.1` | Base scalar intrusion penalty. |
-| `intrusive_penalties` | `{"h": 3.0, "'": 0.8}` | Per-token intrusion penalties; suppresses trailing breath noise on `/h/` while recovering authentic laryngeal aspiration and transient glottal stops `/'/`. |
-| `intrusive_min_logprobs` | `{"h": -1.0498, "'": -1.6094}` | Posterior floor thresholds ($\approx 0.35$ for `/h/`, $\approx 0.20$ for `/'/`). |
-| `intrusive_max_stride` | `1` | Max blank frame stride for intrusive token detours. |
+| `syncope_tokens` | `("a", "e", "i", "o", "u", "v")` | Vowels permitted for syncope deletion when acoustics favor next consonant. |
+| `intrusive_tokens` | `("h", "'")` | Laryngeal phonemes licensed for intrusive detour transitions. |
+| `intrusive_max_stride` | `1` | Max blank frame stride bridging intrusive token peaks. |
 | `flag_min_confidence` | `0.01` | Geometric mean word confidence threshold. |
 | `flag_min_char_confidence` | `0.0` | Character-level acoustic confidence threshold (default `0.0` to eliminate false-positive anomaly flagging on clean verses; calibrated to `0.005` for targeted typo audits). |
 | `enforce_phonotactics` | `True` | Applies Cherokee phonotactic rules and site masks. |
-
-#### Benchmark Results (100 Verses):
-- **Total Verses Realigned**: 100
-- **Verses with Anomalies**: 12 (Total flagged words: 81)
-- **Mean Verse Alignment Latency**: 10.8 ms/verse
-- **Suspected Transcript Typos Detected**: Reliably flags corrupted forms such as Mark 1:1 `yihstv` ($\text{conf} = 0.0012$).
 
 ### CLI Example
 
 ```bash
 python scripts/realign_bible.py \
     --book mark \
-    --chapter 1 \
-    --syncope-penalty 6.0 \
-    --intrusive-penalty 0.1
+    --chapter 1
 ```
 
 
