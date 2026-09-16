@@ -23,8 +23,8 @@ def test_normalize_syllabary_hiatus_glottal_stops():
     # Syllabary with adjacent vowels receives hiatus glottal stop
     assert normalize_syllabary_for_alignment("ᎢᎾᎨᎢ") == "inake'i"
     assert normalize_syllabary_for_alignment("ᎯᎠ") == "hi'a"
-    assert normalize_syllabary_for_alignment("ᎠᏍᎦᏅᏨᎢ") == "askanvtsv'i"
-    assert normalize_syllabary_for_alignment("ᎣᏏᏲ") == "osiyo"
+    assert normalize_syllabary_for_alignment("ᎠᏍᎦᏅᏨᎢ") == "ahskanvtsv'i"
+    assert normalize_syllabary_for_alignment("ᎣᏏᏲ") == "ohsiyo"
 
 
 def test_normalize_phonetics_for_alignment_preserves_h():

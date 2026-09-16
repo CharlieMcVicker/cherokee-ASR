@@ -21,11 +21,11 @@ class TestSyllabaryMap(unittest.TestCase):
 
     def test_cherokee_to_bad_phonetics(self):
         """Ensure transliteration function converts syllabary while preserving punctuation/unknown chars and inserting hiatus glottals."""
-        self.assertEqual(cherokee_to_bad_phonetics("ᎣᏏᏲ"), "osiyo")
+        self.assertEqual(cherokee_to_bad_phonetics("ᎣᏏᏲ"), "ohsiyo")
         self.assertEqual(cherokee_to_bad_phonetics("Ꮏ!"), "nha!")
         self.assertEqual(cherokee_to_bad_phonetics("ᎢᎾᎨᎢ"), "inake'i")
         self.assertEqual(cherokee_to_bad_phonetics("ᎯᎠ"), "hi'a")
-        self.assertEqual(cherokee_to_bad_phonetics("ᎠᏍᎦᏅᏨᎢ"), "askanvtsv'i")
+        self.assertEqual(cherokee_to_bad_phonetics("ᎠᏍᎦᏅᏨᎢ"), "ahskanvtsv'i")
 
     def test_phonetics_to_syllabary_direct_matches(self):
         """Test phonetic transliteration to Cherokee syllabary conversion."""

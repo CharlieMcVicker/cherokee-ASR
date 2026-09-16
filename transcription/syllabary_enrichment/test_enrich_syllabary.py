@@ -17,22 +17,22 @@ class TestEnrichSyllabary(unittest.TestCase):
     def test_reconcile_phonetics_syncopation(self):
         """Rule 1: Vowel deletion / syncopation based on aligned ASR window."""
         syllabary = "ᎠᏓᎴᏂᏍᎬ"
-        base_trans = get_base_transliteration(syllabary)  # "ataleniskv"
+        base_trans = get_base_transliteration(syllabary)  # "atalenihskv"
 
-        # Suppose ASR emitted 'atalenisk' where final vowel 'v' is dropped (syncopated)
+        # Suppose ASR emitted 'atalenihsk' where final vowel 'v' is dropped (syncopated)
         aligned_pairs = [
             ("Ꭰ", "a"),
             ("Ꮣ", "ta"),
             ("Ꮄ", "le"),
             ("Ꮒ", "ni"),
-            ("Ꮝ", "s"),
+            ("Ꮝ", "hs"),
             ("Ꭼ", "k"),  # ASR emitted 'k' without vowel 'v'
         ]
 
         enriched = reconcile_phonetics(
-            syllabary, base_trans, "atalenisk", aligned_pairs
+            syllabary, base_trans, "atalenihsk", aligned_pairs
         )
-        self.assertEqual(enriched, "atalenisk")
+        self.assertEqual(enriched, "atalenihsk")
 
     def test_reconcile_phonetics_glottals_and_preaspiration(self):
         """Rule 2: Pre-aspiration 'h' and glottal stop ''' transfer from ASR."""
@@ -66,13 +66,13 @@ class TestEnrichSyllabary(unittest.TestCase):
     def test_reconcile_phonetics_combined_rules(self):
         """Combined test covering syncopation, glottal injection, and laryngeal toggles."""
         syllabary = "ᏱᏍᏛ"
-        base_trans = "yistv"  # base transliteration
+        base_trans = "yihstv"  # base transliteration
 
-        # ASR emits 'yisth' (laryngeal toggle t->th and vowel syncopation v dropped)
-        aligned_pairs = align_character_syllable(syllabary, "yisth")
+        # ASR emits 'yihsth' (laryngeal toggle t->th and vowel syncopation v dropped)
+        aligned_pairs = align_character_syllable(syllabary, "yihsth")
 
-        enriched = reconcile_phonetics(syllabary, base_trans, "yisth", aligned_pairs)
-        self.assertEqual(enriched, "yisth")
+        enriched = reconcile_phonetics(syllabary, base_trans, "yihsth", aligned_pairs)
+        self.assertEqual(enriched, "yihsth")
 
     def test_reconcile_post_vocalic_aspiration_h(self):
         """Preserve post-vocalic or vocalic aspiration 'h' emitted by ASR."""

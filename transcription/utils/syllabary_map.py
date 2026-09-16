@@ -100,9 +100,16 @@ _BASE_CHEROKEE_SYLLABARY_MAP: Dict[str, str] = {
 }
 
 # Authoritative centralized Cherokee Syllabary mapping
-# Derived from base transliterations with respell_consonants rules (specifically Ꮏ -> nha instead of hna)
+# Derived from base transliterations with respell_consonants rules (specifically Ꮏ -> nha, s-series -> hs)
 CHEROKEE_SYLLABARY_MAP: Dict[str, str] = dict(_BASE_CHEROKEE_SYLLABARY_MAP)
 CHEROKEE_SYLLABARY_MAP["Ꮏ"] = "nha"
+CHEROKEE_SYLLABARY_MAP["Ꮜ"] = "hsa"
+CHEROKEE_SYLLABARY_MAP["Ꮝ"] = "hs"
+CHEROKEE_SYLLABARY_MAP["Ꮞ"] = "hse"
+CHEROKEE_SYLLABARY_MAP["Ꮟ"] = "hsi"
+CHEROKEE_SYLLABARY_MAP["Ꮠ"] = "hso"
+CHEROKEE_SYLLABARY_MAP["Ꮡ"] = "hsu"
+CHEROKEE_SYLLABARY_MAP["Ꮢ"] = "hsv"
 
 
 import re
@@ -111,6 +118,14 @@ import re
 PHONETIC_TO_SYLLABARY_MAP: Dict[str, str] = {
     phon: char for char, phon in CHEROKEE_SYLLABARY_MAP.items()
 }
+PHONETIC_TO_SYLLABARY_MAP["s"] = "Ꮝ"
+PHONETIC_TO_SYLLABARY_MAP["hs"] = "Ꮝ"
+PHONETIC_TO_SYLLABARY_MAP["sa"] = "Ꮜ"
+PHONETIC_TO_SYLLABARY_MAP["se"] = "Ꮞ"
+PHONETIC_TO_SYLLABARY_MAP["si"] = "Ꮟ"
+PHONETIC_TO_SYLLABARY_MAP["so"] = "Ꮠ"
+PHONETIC_TO_SYLLABARY_MAP["su"] = "Ꮡ"
+PHONETIC_TO_SYLLABARY_MAP["sv"] = "Ꮢ"
 
 
 # Add common voiced/unvoiced variants

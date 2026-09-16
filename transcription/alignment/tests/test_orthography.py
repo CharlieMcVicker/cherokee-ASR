@@ -40,7 +40,7 @@ def test_syllabary_to_tth_conversion():
     converted = convert_orthography(
         syl, source=Orthography.SYLLABARY, target=Orthography.TTH
     )
-    assert converted == "na otla akvskwostoti eskvsi"
+    assert converted == "na otla akvhskwohstoti ehskvhsi"
     assert "hh" not in converted
 
 

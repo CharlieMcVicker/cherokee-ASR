@@ -26,7 +26,7 @@ class TestAlignmentEngine(unittest.TestCase):
 
     def test_get_base_transliteration(self):
         syl = "ᎠᏓᎴᏂᏍᎬ"
-        expected = "ataleniskv"
+        expected = "atalenihskv"
         self.assertEqual(get_base_transliteration(syl), expected)
 
     def test_align_character_syllable_basic(self):
