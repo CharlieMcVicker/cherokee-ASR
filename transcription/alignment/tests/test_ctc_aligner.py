@@ -797,3 +797,129 @@ def test_ctc_aligner_padded_midpoint_boundaries():
         assert c1.end_sec >= c1.words[-1].end_sec
         assert c2.start_sec <= c2.words[0].start_sec
         assert c2.end_sec >= c2.words[-1].end_sec
+
+
+def test_syncope_class_prevents_kwo_vowel_clipping():
+    """
+    Verify that when the acoustic model outputs 'u' with high probability (argmax)
+    for a word-final 'kwo' (e.g. 'nahskwo' in Mark 2:28 pronounced 'nahskwu'):
+    1. In the logits around the final syllable, 'u' is likely and probability of 'u' is argmax.
+    2. Flat syncope configuration (unpooled vowels) clips 'nahskwo' to 'nhskw' because
+       the contrastive gate compares blank against near-zero 'o' probability.
+    3. Syncope token class pooling (('a', 'e', 'i', 'o', 'u', 'v'), 't') pools vowel evidence,
+       keeping the syncope gate closed and preserving the ground-truth word 'nahskwo'.
+    """
+    from ctc_segmentation import (  # type: ignore
+        CtcSegmentationParameters,
+        ctc_segmentation,
+    )
+
+    vocab = {
+        "|": 0,
+        "'": 1,
+        "a": 2,
+        "e": 3,
+        "h": 4,
+        "i": 5,
+        "k": 6,
+        "l": 7,
+        "m": 8,
+        "n": 9,
+        "o": 10,
+        "s": 11,
+        "t": 12,
+        "u": 13,
+        "v": 14,
+        "w": 15,
+        "y": 16,
+        "[UNK]": 17,
+        "[PAD]": 18,
+    }
+    inv_vocab = {v: k for k, v in vocab.items()}
+    char_list = [inv_vocab[i] for i in range(len(vocab))]
+    pad_id = vocab["[PAD]"]
+    u_idx = vocab["u"]
+    o_idx = vocab["o"]
+
+    npz_path = Path("runs/cache/ctc_emissions/mark_02_e16d242d3b719b06.npz")
+    if npz_path.exists():
+        data = np.load(npz_path)
+        lpz = data["lpz"][23250:23750]  # Mark 2:28 slice
+    else:
+        # Fallback synthetic logits
+        T = 500
+        lpz = np.full((T, len(vocab)), -15.0, dtype=np.float32)
+        lpz[:, pad_id] = 0.0
+
+    # Locate the vowel frame around the final syllable of 'nahskwo' in the slice (frame 258)
+    vowel_frame = 258
+    assert int(np.argmax(lpz[vowel_frame])) == u_idx
+    assert lpz[vowel_frame, u_idx] > -0.05  # 'u' is highly likely (p > 0.95)
+    assert lpz[vowel_frame, o_idx] < -10.0  # 'o' has near-zero log-posterior
+
+    verse_text = [
+        "nahski",
+        "ihyvno",
+        "yvwi",
+        "uwetsi",
+        "nahskwo",
+        "ukvwiyuhsv",
+        "unolvhitvhi",
+    ]
+
+    # 1. Flat syncope configuration (vowels unpooled):
+    params_flat = CtcSegmentationParameters(
+        char_list=char_list,
+        blank=pad_id,
+        syncope_tokens=["a", "e", "i", "o", "u", "v", "t"],
+        intrusive_tokens=["h", "'"],
+        intrusive_max_stride=4,
+        index_duration=0.02,
+        score_min_mean_over_L=2,
+        replace_spaces_with_blanks=False,
+    )
+    gt_mat1, utt_indices1 = prepare_cherokee_text(params_flat, verse_text, char_list)
+    timings1, char_probs1, state_list1 = ctc_segmentation(params_flat, lpz, gt_mat1)
+
+    aligner = CTCSegmentationAligner()
+    res_flat = aligner._extract_word_intervals(
+        words=verse_text,
+        timings=timings1,
+        char_probs=char_probs1,
+        state_list=state_list1,
+        utt_indices=utt_indices1,
+        start_word_idx=0,
+        dur_sec=10.0,
+        lead_offset_sec=0.0,
+    )
+    nahskwo_flat = next(w for w in res_flat if w.word == "nahskwo")
+    # Flat syncope erroneously clips 'o' to 'kw'
+    assert nahskwo_flat.emitted_word == "nhskw"
+
+    # 2. Class-pooled syncope configuration:
+    params_class = CtcSegmentationParameters(
+        char_list=char_list,
+        blank=pad_id,
+        syncope_tokens=[["a", "e", "i", "o", "u", "v"], "t"],
+        intrusive_tokens=["h", "'"],
+        intrusive_max_stride=4,
+        index_duration=0.02,
+        score_min_mean_over_L=2,
+        replace_spaces_with_blanks=False,
+    )
+    gt_mat2, utt_indices2 = prepare_cherokee_text(params_class, verse_text, char_list)
+    timings2, char_probs2, state_list2 = ctc_segmentation(params_class, lpz, gt_mat2)
+
+    res_class = aligner._extract_word_intervals(
+        words=verse_text,
+        timings=timings2,
+        char_probs=char_probs2,
+        state_list=state_list2,
+        utt_indices=utt_indices2,
+        start_word_idx=0,
+        dur_sec=10.0,
+        lead_offset_sec=0.0,
+    )
+    nahskwo_class = next(w for w in res_class if w.word == "nahskwo")
+    # Class syncope pooling retains 'o' on canonical path
+    assert nahskwo_class.emitted_word == "nahskwo"

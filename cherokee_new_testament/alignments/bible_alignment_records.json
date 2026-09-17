@@ -101,14 +101,14 @@
     "verse_idx": 2,
     "audio_path": "cherokee_new_testament/split_audio/mark_01_02.wav",
     "start_sec": 15.6,
-    "end_sec": 34.39,
-    "duration_sec": 18.79,
+    "end_sec": 34.42,
+    "duration_sec": 18.82,
     "reference_sentence": "ᎾᏍᎩᏯ ᎯᎠ ᏥᏂᎬᏅ ᏥᎪᏪᎳ ᎠᎾᏙᎴᎰᏍᎩᏱ; ᎬᏂᏳᏉ, ᏥᏅᎵ ᏥᏅᏏᏓᏍᏗ ᏣᎧᏛ ᎢᎬᏱᏗᏢ, ᎾᏍᎩ ᏓᏣᏛᏅᎢᏍᏓᏁᎵ ᏣᎶᎯᏍᏗᏱ ᎢᎬᏱᏗᏢ.",
     "cherokee_syllabary": "ᎾᏍᎩᏯ ᎯᎠ ᏥᏂᎬᏅ ᏥᎪᏪᎳ ᎠᎾᏙᎴᎰᏍᎩᏱ; ᎬᏂᏳᏉ, ᏥᏅᎵ ᏥᏅᏏᏓᏍᏗ ᏣᎧᏛ ᎢᎬᏱᏗᏢ, ᎾᏍᎩ ᏓᏣᏛᏅᎢᏍᏓᏁᎵ ᏣᎶᎯᏍᏗᏱ ᎢᎬᏱᏗᏢ.",
     "greedy_hypothesis": "nvhskayahi'a tsinikvnhv tsikowhela anatolehohskiye khvnhiyukwu tsinvli tsinvhsitahsti tsakhathv ikvylatitla nvhski tatsatvno'ihstaneli tsalohihstiyi ikvyititla",
-    "greedy_confidence": 0.9559,
-    "guided_hypothesis": "nahskiy hi'a tsinikvnhv tsikowhela anatolehohskiyi khvnhiyukw tsinvli tsinvhsitahsti tsakhathv ikvyititlv nhski tatsatvn'ihstaneli tsalohihstiyi ikvyititl",
-    "reconciled_phonetics": "nahskiy hi'a tsinikvnhv tsikowhela anatolehohskiyi khvnhiyukw tsinvli tsinvhsitahsti tsakhathv ikvyititlv nhski tatsatvn'ihstaneli tsalohihstiyi ikvyititl",
+    "greedy_confidence": 0.953,
+    "guided_hypothesis": "nahskiy hi'a tsinikvnhv tsikowhela anatolehohskiyi khvnhiyukw tsinvli tsinvhsitahsti tsakhathv ikvyititlv nhski tatsatvn'ihstaneli tsalohihstiyi ikvyititlv",
+    "reconciled_phonetics": "nahskiy hi'a tsinikvnhv tsikowhela anatolehohskiyi khvnhiyukw tsinvli tsinvhsitahsti tsakhathv ikvyititlv nhski tatsatvn'ihstaneli tsalohihstiyi ikvyititlv",
     "asr_hypothesis": "nvhskayahi'a tsinikvnhv tsikowhela anatolehohskiye khvnhiyukwu tsinvli tsinvhsitahsti tsakhathv ikvylatitla nvhski tatsatvno'ihstaneli tsalohihstiyi ikvyititla",
     "cost": -10.1034,
     "words": [
@@ -232,11 +232,11 @@
       {
         "word": "ikvyititlv",
         "start_sec": 32.94,
-        "end_sec": 33.7,
-        "confidence": 0.997533,
-        "min_char_confidence": 0.979002,
+        "end_sec": 33.76,
+        "confidence": 0.478001,
+        "min_char_confidence": 0.000637,
         "flagged": false,
-        "emitted_word": "ikvyititl"
+        "emitted_word": "ikvyititlv"
       }
     ],
     "phonetic": "Na-s-gi-ya hi-a tsi-ni-gv-nv tsi-go-we-la a-na-do-le-ho-s-gi-yi; Gv-ni-yu-quo, tsi-nv-li tsi-nv-si-da-s-di tsa-ka-dv i-gv-yi-di-tlv, na-s-gi da-tsa-dv-nv-i-s-da-ne-li tsa-lo-hi-s-di-yi i-gv-yi-di-tlv.",
@@ -249,16 +249,16 @@
     "chapter": 1,
     "verse_idx": 3,
     "audio_path": "cherokee_new_testament/split_audio/mark_01_03.wav",
-    "start_sec": 34.39,
+    "start_sec": 34.42,
     "end_sec": 46.63,
-    "duration_sec": 12.24,
+    "duration_sec": 12.21,
     "reference_sentence": "ᎤᏪᎷᎦ ᎩᎶ ᎢᎾᎨᎢ, ᎯᎠ ᏂᎦᏪᎭ; ᎡᏣᏛᏅᎢᏍᏓᏏ ᏱᎰᏩ ᎤᎶᎯᏍᏗᏱ, ᏚᏅᏅ ᏗᏥᏥᏃᎯᏍᏓ.",
     "cherokee_syllabary": "ᎤᏪᎷᎦ ᎩᎶ ᎢᎾᎨᎢ, ᎯᎠ ᏂᎦᏪᎭ; ᎡᏣᏛᏅᎢᏍᏓᏏ ᏱᎰᏩ ᎤᎶᎯᏍᏗᏱ, ᏚᏅᏅ ᏗᏥᏥᏃᎯᏍᏓ.",
-    "greedy_hypothesis": "uwelhuhka khilo inake'i hi'anikweha etsatvnho'ihstahsi yihowa ulohihstiyi tunvnhv tikitshinohvhsta",
-    "greedy_confidence": 0.9593,
+    "greedy_hypothesis": "uwelhuhka khilo inake'i hi'anikaweha etsatvnhv'ihstahsi yihowa ulohihstiy tunvnhv tikilhinohvhsta",
+    "greedy_confidence": 0.9602,
     "guided_hypothesis": "uwelhuhka khilo inake'i hi'a nikweha etsatvnhv'ihstahsi yihowa ulohihstiy tunvnhv titsitshinohihsta",
     "reconciled_phonetics": "uwelhuhka khilo inake'i hi'a nikweha etsatvnhv'ihstahsi yihowa ulohihstiy tunvnhv titsitshinohihsta",
-    "asr_hypothesis": "uwelhuhka khilo inake'i hi'anikweha etsatvnho'ihstahsi yihowa ulohihstiyi tunvnhv tikitshinohvhsta",
+    "asr_hypothesis": "uwelhuhka khilo inake'i hi'anikaweha etsatvnhv'ihstahsi yihowa ulohihstiy tunvnhv tikilhinohvhsta",
     "cost": -10.2324,
     "words": [
       {
@@ -518,8 +518,8 @@
     "cherokee_syllabary": "ᎠᎴ ᏫᎬᏩᎷᏤᎴ ᏂᎬᎾᏛ ᏧᏗᏱ ᎠᎴ ᏥᎷᏏᎵᎻ ᎠᏁᎯ, ᎠᎴ ᏂᎦᏛ ᎾᏍᎩ ᏚᎾᏬᎡ ᏦᏓᏂ ᎤᏪᏴᎢ, ᎤᏂᏍᎦᏅᏨ ᎠᏂᏃᎲᏍᎨᎢ.",
     "greedy_hypothesis": "ale wikvwaluhtshele nikvnathv tsutiyi ale tsaluhsalni'anehi ala nikata nvhski tunhawo'e tsotani uweyv'i unihskanvtsv aninhohvhske'i",
     "greedy_confidence": 0.9575,
-    "guided_hypothesis": "ale wikvwaluhtshele nikvnathv tsutiyi ale tsiluhslmi anehi al nikatv nhski tunhawo'e tsotani uweyv'i unihskanvts aninhohvhske'i",
-    "reconciled_phonetics": "ale wikvwaluhtshele nikvnathv tsutiyi ale tsiluhslmi anehi al nikatv nhski tunhawo'e tsotani uweyv'i unihskanvts aninhohvhske'i",
+    "guided_hypothesis": "ale wikvwaluhtshele nikvnathv tsutiyi ale tsiluhslmi anehi al nikatv nhski tunhawo'e tsotani uweyv'i unihskanvtsv aninhohvhske'i",
+    "reconciled_phonetics": "ale wikvwaluhtshele nikvnathv tsutiyi ale tsiluhslmi anehi al nikatv nhski tunhawo'e tsotani uweyv'i unihskanvtsv aninhohvhske'i",
     "asr_hypothesis": "ale wikvwaluhtshele nikvnathv tsutiyi ale tsaluhsalni'anehi ala nikata nvhski tunhawo'e tsotani uweyv'i unihskanvtsv aninhohvhske'i",
     "cost": -10.7154,
     "words": [
@@ -643,11 +643,11 @@
       {
         "word": "unihskanvtsv",
         "start_sec": 78.46,
-        "end_sec": 79.2,
-        "confidence": 0.938689,
-        "min_char_confidence": 0.539176,
+        "end_sec": 79.3,
+        "confidence": 0.866192,
+        "min_char_confidence": 0.357792,
         "flagged": false,
-        "emitted_word": "unihskanvts"
+        "emitted_word": "unihskanvtsv"
       },
       {
         "word": "aninohvhske'i",
@@ -807,8 +807,8 @@
     "cherokee_syllabary": "ᎠᎵᏥᏙᎲᏍᎨᏃ ᎯᎠ ᏂᎦᏪᏍᎨᎢ; ᎤᏟ ᎤᎵᏂᎩᏗᏳ ᎡᏍᎦᏉ ᎠᏴ ᎣᏂ ᏓᏯᎢ, ᎾᏍᎩ ᏧᎳᏑᎶᎩᎯ ᏓᎧᏁᏌᏛ ᎥᏝ ᏰᎵ ᏱᏂᎪᎢ ᎠᏆᏗᏌᏓᏗᏍᏗᏱ ᎠᎴ ᏗᎩᎧᏁᏴᏗᏱ.",
     "greedy_hypothesis": "alhtsatohvhskenho hi'a nikawehskv'i utli ulhaniktiyu ehskakwu ayv onhi tsatvya'i nvhski tsulahsuloki takhanehsa'tv vlha yeli yiniko'i akwatihsatihstiy ale i tikikhaneyhvhtiyi",
     "greedy_confidence": 0.9633,
-    "guided_hypothesis": "alhitsitohvhskenho hi'a nikawehske'i utli ulhiniktiyu ehskakwo ayv onhi tya'i nahski tsulahsulokihi takhanehsa'tv vlha yeli yiniko'i akwatihsattihstiy ale tikikhaneyhvhtiyi",
-    "reconciled_phonetics": "alhitsitohvhskenho hi'a nikawehske'i utli ulhiniktiyu ehskakwo ayv onhi tya'i nahski tsulahsulokihi takhanehsa'tv vlha yeli yiniko'i akwatihsattihstiy ale tikikhaneyhvhtiyi",
+    "guided_hypothesis": "alhitsitohvhskenho hi'a nikawehske'i utli ulhiniktiyu ehskakwo ayv onhi tya'i nahski tsulahsulokihi takhanehsa'tv vlha yeli yiniko'i akwatihsattihstiyi ale tikikhaneyhvhtiyi",
+    "reconciled_phonetics": "alhitsitohvhskenho hi'a nikawehske'i utli ulhiniktiyu ehskakwo ayv onhi tya'i nahski tsulahsulokihi takhanehsa'tv vlha yeli yiniko'i akwatihsattihstiyi ale tikikhaneyhvhtiyi",
     "asr_hypothesis": "alhtsatohvhskenho hi'a nikawehskv'i utli ulhaniktiyu ehskakwu ayv onhi tsatvya'i nvhski tsulahsuloki takhanehsa'tv vlha yeli yiniko'i akwatihsatihstiy ale i tikikhaneyhvhtiyi",
     "cost": -9.8444,
     "words": [
@@ -950,11 +950,11 @@
       {
         "word": "akwatihsatatihstiyi",
         "start_sec": 110.36,
-        "end_sec": 111.7,
-        "confidence": 0.954184,
-        "min_char_confidence": 0.513871,
+        "end_sec": 111.78,
+        "confidence": 0.802287,
+        "min_char_confidence": 0.05006,
         "flagged": false,
-        "emitted_word": "akwatihsattihstiy"
+        "emitted_word": "akwatihsattihstiyi"
       },
       {
         "word": "ale",
@@ -1516,8 +1516,8 @@
     "cherokee_syllabary": "ᎩᎳᏉᏃ ᎢᏴᏛ ᎠᏓᏅᏙ ᎢᎾᎨ ᏭᏘᏅᏍᏔᏁᎢ.",
     "greedy_hypothesis": "khioakwanoyvta atanhto'inake wulhinhvhsthane'i",
     "greedy_confidence": 0.95,
-    "guided_hypothesis": "kilakwono iyvt atanto inake wuthinhvhsthane'i",
-    "reconciled_phonetics": "kilakwono iyvt atanto inake wuthinhvhsthane'i",
+    "guided_hypothesis": "kilakwono iyvtv atanto inake wuthinhvhsthane'i",
+    "reconciled_phonetics": "kilakwono iyvtv atanto inake wuthinhvhsthane'i",
     "asr_hypothesis": "khioakwanoyvta atanhto'inake wulhinhvhsthane'i",
     "cost": -8.1232,
     "words": [
@@ -1533,11 +1533,11 @@
       {
         "word": "iyvtv",
         "start_sec": 166.34,
-        "end_sec": 166.72,
-        "confidence": 0.170643,
+        "end_sec": 166.76,
+        "confidence": 0.066627,
         "min_char_confidence": 0.001286,
         "flagged": false,
-        "emitted_word": "iyvt"
+        "emitted_word": "iyvtv"
       },
       {
         "word": "atanvto",
@@ -1584,8 +1584,8 @@
     "cherokee_syllabary": "ᎾᎿᎭᏃ ᎢᎾᎨ ᎡᏙᎮ ᏅᎦᏍᎪᎯ ᏧᏒᎯᏛ, ᏎᏓᏂ ᎤᎪᎵᏰᏍᎨᎢ; ᎠᎴ ᎢᎾᎨ ᎡᎿᎭᎢ ᏕᎨᎳᏗᏙᎮᎢ; ᎠᎴ ᏗᏂᎧᎿᎭᏩᏗᏙᎯ ᎬᏩᏍᏕᎸᎯᏙᎮᎢ.",
     "greedy_hypothesis": "nanhonho inake etohe na kvhskohi tsuhsvhita hsetani ukoliyehske ila inake vnehi likhelatitohe'i le titikhanhvwatitohi kvwhstelvhitohe'i",
     "greedy_confidence": 0.9467,
-    "guided_hypothesis": "nanhanho inake etohe nkhskohi tsuhsvhitv hsetani ukoliyehske'i al inake enha'i tekhelatitohe'i ale tinikhanhwatitohi kvwhstelvhitohe'i",
-    "reconciled_phonetics": "nanhanho inake etohe nkhskohi tsuhsvhitv hsetani ukoliyehske'i al inake enha'i tekhelatitohe'i ale tinikhanhwatitohi kvwhstelvhitohe'i",
+    "guided_hypothesis": "nanhanho inake etohe nkhskohi tsuhsvhitv hsetani ukoliyehske'i ale inake enha'i tekhelatitohe'i ale tinikhanhwatitohi kvwhstelvhitohe'i",
+    "reconciled_phonetics": "nanhanho inake etohe nkhskohi tsuhsvhitv hsetani ukoliyehske'i ale inake enha'i tekhelatitohe'i ale tinikhanhwatitohi kvwhstelvhitohe'i",
     "asr_hypothesis": "nanhonho inake etohe na kvhskohi tsuhsvhita hsetani ukoliyehske ila inake vnehi likhelatitohe'i le titikhanhvwatitohi kvwhstelvhitohe'i",
     "cost": -13.142,
     "words": [
@@ -1655,11 +1655,11 @@
       {
         "word": "ale",
         "start_sec": 178.4,
-        "end_sec": 178.5,
-        "confidence": 0.117805,
-        "min_char_confidence": 0.080851,
-        "flagged": false,
-        "emitted_word": "al"
+        "end_sec": 178.56,
+        "confidence": 0.009644,
+        "min_char_confidence": 6.5e-05,
+        "flagged": true,
+        "emitted_word": "ale"
       },
       {
         "word": "inake",
@@ -1733,8 +1733,8 @@
     "cherokee_syllabary": "ᏣᏂᏃ ᏗᏓᏍᏚᏗᏱ ᎾᏥᏴᏔᏁᎢ, ᏥᏌ ᎨᎵᎵ ᎤᎷᏤᎢ, ᎠᎵᏥᏙᎲᏍᎨ ᎣᏍᏛ ᎧᏃᎮᏛ ᎤᏁᎳᏅᎯ ᎤᎬᏫᏳᎯ ᎨᏒ ᎤᎬᏩᎵ,",
     "greedy_hypothesis": "tsaninho titahstutiy natsiyvthane'i tsihsla kelati uluhtse'i alhtsatohvhski ohsta khanoheta unelhanvhi ukvwiyuhikehsv ukvwalhi",
     "greedy_confidence": 0.9587,
-    "guided_hypothesis": "tsaninho titahstutiy natsiyvthane'i tsihsa kelli uluhtse'i alihtstohvhske ohstv khanohet unlanvhi ukvwiyuhi kehsv ukvwalhi",
-    "reconciled_phonetics": "tsaninho titahstutiy natsiyvthane'i tsihsa kelli uluhtse'i alihtstohvhske ohstv khanohet unlanvhi ukvwiyuhi kehsv ukvwalhi",
+    "guided_hypothesis": "tsaninho titahstutiy natsiyvthane'i tsihsa kelli uluhtse'i alihtstohvhske ohstv khanohetv unlanvhi ukvwiyuhi kehsv ukvwalhi",
+    "reconciled_phonetics": "tsaninho titahstutiy natsiyvthane'i tsihsa kelli uluhtse'i alihtstohvhske ohstv khanohetv unlanvhi ukvwiyuhi kehsv ukvwalhi",
     "asr_hypothesis": "tsaninho titahstutiy natsiyvthane'i tsihsla kelati uluhtse'i alhtsatohvhski ohsta khanoheta unelhanvhi ukvwiyuhikehsv ukvwalhi",
     "cost": -8.7489,
     "words": [
@@ -1813,11 +1813,11 @@
       {
         "word": "khanohetv",
         "start_sec": 195.76,
-        "end_sec": 196.4,
-        "confidence": 0.895893,
-        "min_char_confidence": 0.594543,
+        "end_sec": 196.46,
+        "confidence": 0.579943,
+        "min_char_confidence": 0.017882,
         "flagged": false,
-        "emitted_word": "khanohet"
+        "emitted_word": "khanohetv"
       },
       {
         "word": "unelanvhi",
@@ -1873,8 +1873,8 @@
     "cherokee_syllabary": "ᎠᎴ ᎯᎠ ᏂᎦᏪᏍᎨᎢ, ᎿᎭᏉ ᎠᎵᏱᎶᎦ, ᎠᎴ ᎤᏁᎳᏅᎯ ᎤᎬᏫᏳᎯ ᎨᏒ ᎡᏍᎦᏂᏳ ᏓᏯᎢ; ᏗᏥᏁᏟᏴᎾ ᏕᏣᏓᏅᏛᎢ, ᎠᎴ ᎢᏦᎯᏳᎲᎦ ᎣᏍᏛ ᎧᏃᎮᏛ.",
     "greedy_hypothesis": "ilhi'a nikawehskei nakwu alhiloka le unelhanvhi ukvwiyuhi ikelhv ehskanhiyutayvh'i titsineiyvn tetsatanvhthv'i ale itsohiyuhvka ohsta khanoheta",
     "greedy_confidence": 0.9529,
-    "guided_hypothesis": "al hi'a nikawehske'i nhakw alhiyloka ale unelhanvhi ukvwiyuhi kehsv ehskanhiyu tay'i titsineliyvn tetsatanvhthv'i ale itsohiyuhvka ohstv khanohetv",
-    "reconciled_phonetics": "al hi'a nikawehske'i nhakw alhiyloka ale unelhanvhi ukvwiyuhi kehsv ehskanhiyu tay'i titsineliyvn tetsatanvhthv'i ale itsohiyuhvka ohstv khanohetv",
+    "guided_hypothesis": "al hi'a nikawehske'i nhakwo alhiyloka ale unelhanvhi ukvwiyuhi kehsv ehskanhiyu tay'i titsineliyvn tetsatanvhthv'i ale itsohiyuhvka ohstv khanohetv",
+    "reconciled_phonetics": "al hi'a nikawehske'i nhakwo alhiyloka ale unelhanvhi ukvwiyuhi kehsv ehskanhiyu tay'i titsineliyvn tetsatanvhthv'i ale itsohiyuhvka ohstv khanohetv",
     "asr_hypothesis": "ilhi'a nikawehskei nakwu alhiloka le unelhanvhi ukvwiyuhi ikelhv ehskanhiyutayvh'i titsineiyvn tetsatanvhthv'i ale itsohiyuhvka ohsta khanoheta",
     "cost": -10.9375,
     "words": [
@@ -1908,11 +1908,11 @@
       {
         "word": "nhakwo",
         "start_sec": 202.66,
-        "end_sec": 203.0,
-        "confidence": 0.091067,
-        "min_char_confidence": 1.5e-05,
+        "end_sec": 203.12,
+        "confidence": 0.01388,
+        "min_char_confidence": 1e-06,
         "flagged": true,
-        "emitted_word": "nhakw"
+        "emitted_word": "nhakwo"
       },
       {
         "word": "aliyiloka",
@@ -2361,8 +2361,8 @@
     "cherokee_syllabary": "ᎾᎿᎭᏃ ᏫᎤᏪᏅ ᎤᏍᏗᎩᏛ, ᏚᎪᎮ ᏥᎻ, ᏤᏈᏗ ᎤᏪᏥ, ᏣᏂᏃ ᎾᏍᎩ ᏗᎾᏓᏅᏟ, ᎾᏍᎩᏃ ᎾᏍᏉ ᎤᎾᏣᎡ ᏥᏳᎯ ᏓᏃᏢᎯᏏᏍᎨ ᏧᏂᎦᏯᎷᏗ.",
     "greedy_hypothesis": "nanhvnhokwi uwena uhstikhitv tukohe tsimi tsekwita uwetsi tsaninho nvhskitinatanhvlhi nvhskino nahskwu unvtsa'e tsiyuhi tanolhvhihsihske tsunikvyaluti",
     "greedy_confidence": 0.9663,
-    "guided_hypothesis": "nanhnho wi'uwenv uhstikhitv tukohe tsimi tsekwit uwetsi tsaninho nhski tinatanhvlhi nahskinho nahskw untsa'e tsiyuhi tanotlvhihsihske tsunikayaluti",
-    "reconciled_phonetics": "nanhnho wi'uwenv uhstikhitv tukohe tsimi tsekwit uwetsi tsaninho nhski tinatanhvlhi nahskinho nahskw untsa'e tsiyuhi tanotlvhihsihske tsunikayaluti",
+    "guided_hypothesis": "nanhnho wi'uwenv uhstikhitv tukohe tsimi tsekwiti uwetsi tsaninho nhski tinatanhvlhi nahskinho nahskwo untsa'e tsiyuhi tanotlvhihsihske tsunikayaluti",
+    "reconciled_phonetics": "nanhnho wi'uwenv uhstikhitv tukohe tsimi tsekwiti uwetsi tsaninho nhski tinatanhvlhi nahskinho nahskwo untsa'e tsiyuhi tanotlvhihsihske tsunikayaluti",
     "asr_hypothesis": "nanhvnhokwi uwena uhstikhitv tukohe tsimi tsekwita uwetsi tsaninho nvhskitinatanhvlhi nvhskino nahskwu unvtsa'e tsiyuhi tanolhvhihsihske tsunikvyaluti",
     "cost": -10.2012,
     "words": [
@@ -2414,11 +2414,11 @@
       {
         "word": "tsekwiti",
         "start_sec": 256.1,
-        "end_sec": 256.54,
-        "confidence": 0.940272,
-        "min_char_confidence": 0.6537,
-        "flagged": false,
-        "emitted_word": "tsekwit"
+        "end_sec": 256.6,
+        "confidence": 0.292387,
+        "min_char_confidence": 8.2e-05,
+        "flagged": true,
+        "emitted_word": "tsekwiti"
       },
       {
         "word": "uwetsi",
@@ -2468,19 +2468,19 @@
       {
         "word": "nahskwo",
         "start_sec": 261.74,
-        "end_sec": 262.06,
-        "confidence": 0.86391,
-        "min_char_confidence": 0.599993,
-        "flagged": false,
-        "emitted_word": "nahskw"
+        "end_sec": 262.16,
+        "confidence": 0.1507,
+        "min_char_confidence": 4e-06,
+        "flagged": true,
+        "emitted_word": "nahskwo"
       },
       {
         "word": "unatsa'e",
-        "start_sec": 262.14,
+        "start_sec": 262.36,
         "end_sec": 264.1,
-        "confidence": 0.995807,
-        "min_char_confidence": 0.989191,
-        "flagged": false,
+        "confidence": 0.220489,
+        "min_char_confidence": 2.6e-05,
+        "flagged": true,
         "emitted_word": "untsa'e"
       },
       {
@@ -3287,8 +3287,8 @@
     "cherokee_syllabary": "ᎦᏓᎭᏃ ᎠᏓᏅᏙ ᎤᎸᏕᏍᏔᏅ, ᎠᎴ ᎠᏍᏓᏯ ᎤᏪᎷᏅ, ᎤᏄᎪᏤᎢ.",
     "greedy_hypothesis": "katahvo atatsalvtehsthanv ale ahstayi uwelhinha unvkotse'i",
     "greedy_confidence": 0.9553,
-    "guided_hypothesis": "katahanho atant ulvtehsthanv ale ahstaya uwelhunhv unkotse'i",
-    "reconciled_phonetics": "katahanho atant ulvtehsthanv ale ahstaya uwelhunhv unkotse'i",
+    "guided_hypothesis": "katahanho atanto ulvtehsthanv ale ahstaya uwelhunhv unkotse'i",
+    "reconciled_phonetics": "katahanho atanto ulvtehsthanv ale ahstaya uwelhunhv unkotse'i",
     "asr_hypothesis": "katahvo atatsalvtehsthanv ale ahstayi uwelhinha unvkotse'i",
     "cost": -9.5028,
     "words": [
@@ -3304,18 +3304,18 @@
       {
         "word": "atanvto",
         "start_sec": 352.44,
-        "end_sec": 352.78,
-        "confidence": 0.874851,
-        "min_char_confidence": 0.675191,
+        "end_sec": 352.84,
+        "confidence": 0.290274,
+        "min_char_confidence": 0.001167,
         "flagged": false,
-        "emitted_word": "atant"
+        "emitted_word": "atanto"
       },
       {
         "word": "ulvtehsthanv",
-        "start_sec": 352.8,
+        "start_sec": 352.9,
         "end_sec": 353.66,
-        "confidence": 0.449323,
-        "min_char_confidence": 0.000102,
+        "confidence": 0.442229,
+        "min_char_confidence": 8.5e-05,
         "flagged": true,
         "emitted_word": "ulvtehsthanv"
       },
@@ -3621,19 +3621,19 @@
     "cherokee_syllabary": "ᎩᎳᏉᏃ ᎢᏴᏛ ᎾᏍᎩ ᏕᎦᏃᏣᎸ ᏚᏰᎵᏎ ᎨᎵᎵ ᎾᎿᎭᎬᏩᏚᏫᏛ ᎨᏒᎢ.",
     "greedy_hypothesis": "khilakwuno iyvnvhski tekanotsalhv tuyelihse kelili nanhv kvwhathuwatvkelhv'i",
     "greedy_confidence": 0.9716,
-    "guided_hypothesis": "khilakwn iyvt nhski tekanotsalhv tuyelihse kelili nanha kvwhathuwitv kehsv'i",
-    "reconciled_phonetics": "khilakwn iyvt nhski tekanotsalhv tuyelihse kelili nanha kvwhathuwitv kehsv'i",
+    "guided_hypothesis": "khilakwno iyvt nhski tekanotsalhv tuyelihse kelili nanha kvwhathuwitv kehsv'i",
+    "reconciled_phonetics": "khilakwno iyvt nhski tekanotsalhv tuyelihse kelili nanha kvwhathuwitv kehsv'i",
     "asr_hypothesis": "khilakwuno iyvnvhski tekanotsalhv tuyelihse kelili nanhv kvwhathuwatvkelhv'i",
     "cost": -9.4218,
     "words": [
       {
         "word": "kilakwono",
         "start_sec": 383.18,
-        "end_sec": 383.58,
-        "confidence": 0.860694,
-        "min_char_confidence": 0.640027,
+        "end_sec": 383.64,
+        "confidence": 0.789425,
+        "min_char_confidence": 0.395373,
         "flagged": false,
-        "emitted_word": "khilakwn"
+        "emitted_word": "khilakwno"
       },
       {
         "word": "iyvtv",
@@ -4718,15 +4718,15 @@
     "verse_idx": 38,
     "audio_path": "cherokee_new_testament/split_audio/mark_01_38.wav",
     "start_sec": 493.9,
-    "end_sec": 505.89,
-    "duration_sec": 11.99,
+    "end_sec": 506.58,
+    "duration_sec": 12.68,
     "reference_sentence": "ᎯᎠᏃ ᏂᏚᏪᏎᎴᎢ, ᏗᏐᎢ ᏙᏗᎦᏚᎲ ᏫᏗᎶᎯ, ᎾᎿᎭᎾᏍᏉ ᎦᎵᏥᏙᏂᏙᎸᎭ; ᎾᏍᎩᏰᏃ ᎢᏳᏍᏗ ᎠᎩᎷᏥᎸ.",
     "cherokee_syllabary": "ᎯᎠᏃ ᏂᏚᏪᏎᎴᎢ, ᏗᏐᎢ ᏙᏗᎦᏚᎲ ᏫᏗᎶᎯ, ᎾᎿᎭᎾᏍᏉ ᎦᎵᏥᏙᏂᏙᎸᎭ; ᎾᏍᎩᏰᏃ ᎢᏳᏍᏗ ᎠᎩᎷᏥᎸ.",
-    "greedy_hypothesis": "hi'anvntakwehsele'i tihso'i totikatuhv witilohi nvnhv nahskwu kalitsatonitolvha nvhskiyhvnho iyuhsti aki'lu",
-    "greedy_confidence": 0.9507,
-    "guided_hypothesis": "hi'an nituwehsele'i tihso'i totikatuhv witilohi nanha nahskwo kalitstonitolvha nhskiynho iyuhsti aki'luhthsil",
-    "reconciled_phonetics": "hi'an nituwehsele'i tihso'i totikatuhv witilohi nanha nahskwo kalitstonitolvha nhskiynho iyuhsti aki'luhthsil",
-    "asr_hypothesis": "hi'anvntakwehsele'i tihso'i totikatuhv witilohi nvnhv nahskwu kalitsatonitolvha nvhskiyhvnho iyuhsti aki'lu",
+    "greedy_hypothesis": "hi'anvntakwehsele'i tihso'i totikatuhv witilohi nvnha nahskwu kalitsatonitolvha nvhskiyhvnho iyuhsti aki'luhsilha",
+    "greedy_confidence": 0.9392,
+    "guided_hypothesis": "hi'an nituwehsele'i tihso'i totikatuhv witilohi nanha nahskwo kalitstonitolvha nhskiynho iyuhsti aki'luhthsilhv",
+    "reconciled_phonetics": "hi'an nituwehsele'i tihso'i totikatuhv witilohi nanha nahskwo kalitstonitolvha nhskiynho iyuhsti aki'luhthsilhv",
+    "asr_hypothesis": "hi'anvntakwehsele'i tihso'i totikatuhv witilohi nvnha nahskwu kalitsatonitolvha nvhskiyhvnho iyuhsti aki'luhsilha",
     "cost": -8.7521,
     "words": [
       {
@@ -4822,11 +4822,11 @@
       {
         "word": "akilutsilv",
         "start_sec": 504.94,
-        "end_sec": 505.86,
-        "confidence": 0.598446,
-        "min_char_confidence": 0.002505,
-        "flagged": false,
-        "emitted_word": "aki'luhthsil"
+        "end_sec": 505.94,
+        "confidence": 0.355483,
+        "min_char_confidence": 0.000245,
+        "flagged": true,
+        "emitted_word": "aki'luhthsilhv"
       }
     ],
     "phonetic": "Hi-a-no ni-du-we-se-le-i, Di-so-i do-di-ga-du-hv wi-di-lo-hi, na-hna na-s-quo ga-li-tsi-do-ni-do-lv-ha; na-s-gi-ye-no i-yu-s-di a-gi-lu-tsi-lv.",
@@ -4839,23 +4839,23 @@
     "chapter": 1,
     "verse_idx": 39,
     "audio_path": "cherokee_new_testament/split_audio/mark_01_39.wav",
-    "start_sec": 505.89,
+    "start_sec": 506.58,
     "end_sec": 516.44,
-    "duration_sec": 10.55,
+    "duration_sec": 9.86,
     "reference_sentence": "ᎠᎵᏥᏙᏂᏙᎮᏃ ᏧᏂᎳᏫᎢᏍᏗᏱ ᏂᎬᎾᏛ ᎨᎵᎵ, ᎠᎴ ᎠᏂᏍᎩᎾ ᏕᎦᏄᎪᏫᏍᎨᎢ.",
     "cherokee_syllabary": "ᎠᎵᏥᏙᏂᏙᎮᏃ ᏧᏂᎳᏫᎢᏍᏗᏱ ᏂᎬᎾᏛ ᎨᎵᎵ, ᎠᎴ ᎠᏂᏍᎩᎾ ᏕᎦᏄᎪᏫᏍᎨᎢ.",
-    "greedy_hypothesis": "silha alhtsatonhitohenho tsunilawiihstiy yikvnathv keli'li ale anihskina tekanvkowhihske'i",
-    "greedy_confidence": 0.9657,
+    "greedy_hypothesis": "alhtsatonhitohenho tsunilawiihstiy yikvnathv keli'li ile anihskina tekanvkowhihske'i",
+    "greedy_confidence": 0.9707,
     "guided_hypothesis": "alihtstonhitohenho tsunilawi'ihstiy nikvnathv kelili ale anihskina tekanukowhihske'i",
     "reconciled_phonetics": "alihtstonhitohenho tsunilawi'ihstiy nikvnathv kelili ale anihskina tekanukowhihske'i",
-    "asr_hypothesis": "silha alhtsatonhitohenho tsunilawiihstiy yikvnathv keli'li ale anihskina tekanvkowhihske'i",
+    "asr_hypothesis": "alhtsatonhitohenho tsunilawiihstiy yikvnathv keli'li ile anihskina tekanvkowhihske'i",
     "cost": -9.9066,
     "words": [
       {
         "word": "alitsitonitoheno",
-        "start_sec": 505.92,
+        "start_sec": 507.22,
         "end_sec": 508.9,
-        "confidence": 0.753749,
+        "confidence": 0.75376,
         "min_char_confidence": 0.009956,
         "flagged": false,
         "emitted_word": "alihtstonhitohenho"
@@ -5203,8 +5203,8 @@
     "cherokee_syllabary": "ᎤᏁᏨᏉᏃ ᎩᎳᏉ ᎢᏴᏛ ᎠᏓᏰᏍᎩ ᎤᏢᎬ ᎤᎵᏛᏔᏁᎢ, ᎠᎴ ᎤᏓᏅᎦᎸᏛ ᎨᏎᎢ.",
     "greedy_hypothesis": "sehsti unhe tsukwunhokhilakwu iyvta atayehski utlvkv uliyhthvnhthane'i ale utanvkalvta kelhe'i",
     "greedy_confidence": 0.9547,
-    "guided_hypothesis": "unhetskwnho khilakw iyvt atayehski utlvkv ulihthvhthane'i ale utanvkalvtv kehse'i",
-    "reconciled_phonetics": "unhetskwnho khilakw iyvt atayehski utlvkv ulihthvhthane'i ale utanvkalvtv kehse'i",
+    "guided_hypothesis": "unhetskwnho khilakwo iyvtv atayehski utlvkv ulihthvhthane'i ale utanvkalvtv kehse'i",
+    "reconciled_phonetics": "unhetskwnho khilakwo iyvtv atayehski utlvkv ulihthvhthane'i ale utanvkalvtv kehse'i",
     "asr_hypothesis": "sehsti unhe tsukwunhokhilakwu iyvta atayehski utlvkv uliyhthvnhthane'i ale utanvkalvta kelhe'i",
     "cost": -11.8667,
     "words": [
@@ -5220,27 +5220,27 @@
       {
         "word": "kilakwo",
         "start_sec": 545.28,
-        "end_sec": 545.6,
-        "confidence": 0.989195,
-        "min_char_confidence": 0.944766,
-        "flagged": false,
-        "emitted_word": "khilakw"
+        "end_sec": 545.64,
+        "confidence": 0.224858,
+        "min_char_confidence": 7e-06,
+        "flagged": true,
+        "emitted_word": "khilakwo"
       },
       {
         "word": "iyvtv",
         "start_sec": 545.76,
-        "end_sec": 546.14,
-        "confidence": 0.966913,
-        "min_char_confidence": 0.874666,
-        "flagged": false,
-        "emitted_word": "iyvt"
+        "end_sec": 546.2,
+        "confidence": 0.140934,
+        "min_char_confidence": 6.4e-05,
+        "flagged": true,
+        "emitted_word": "iyvtv"
       },
       {
         "word": "atayehski",
-        "start_sec": 546.18,
+        "start_sec": 546.62,
         "end_sec": 547.46,
-        "confidence": 0.998789,
-        "min_char_confidence": 0.994689,
+        "confidence": 0.997453,
+        "min_char_confidence": 0.987901,
         "flagged": false,
         "emitted_word": "atayehski"
       },
@@ -5307,19 +5307,19 @@
     "cherokee_syllabary": "ᎤᎵᏂᎩᏛᏃ ᎤᏁᏤᎸ, ᎩᎳᏉ ᎢᏴᏛ ᎤᏁᏤᎴ ᎤᏓᏅᏍᏗᏱ;",
     "greedy_hypothesis": "ulhanikitav unhetshela khilakwu iyvta unhetsela utanvhstiy",
     "greedy_confidence": 0.9593,
-    "guided_hypothesis": "ulhiniktn unhetshel khilakwo iyvt unhetsele utanvhstiyi",
-    "reconciled_phonetics": "ulhiniktn unhetshel khilakwo iyvt unhetsele utanvhstiyi",
+    "guided_hypothesis": "ulhiniktnho unhetshel khilakwo iyvtv unhetsele utanvhstiyi",
+    "reconciled_phonetics": "ulhiniktnho unhetshel khilakwo iyvtv unhetsele utanvhstiyi",
     "asr_hypothesis": "ulhanikitav unhetshela khilakwu iyvta unhetsela utanvhstiy",
     "cost": -9.1229,
     "words": [
       {
         "word": "ulinikitvno",
         "start_sec": 553.6,
-        "end_sec": 554.3,
-        "confidence": 0.462757,
+        "end_sec": 554.4,
+        "confidence": 0.371882,
         "min_char_confidence": 0.003427,
         "flagged": false,
-        "emitted_word": "ulhiniktn"
+        "emitted_word": "ulhiniktnho"
       },
       {
         "word": "unetselv",
@@ -5342,11 +5342,11 @@
       {
         "word": "iyvtv",
         "start_sec": 556.16,
-        "end_sec": 556.48,
-        "confidence": 0.999207,
-        "min_char_confidence": 0.997228,
-        "flagged": false,
-        "emitted_word": "iyvt"
+        "end_sec": 556.52,
+        "confidence": 0.198902,
+        "min_char_confidence": 0.000312,
+        "flagged": true,
+        "emitted_word": "iyvtv"
       },
       {
         "word": "unetsele",
@@ -5378,15 +5378,15 @@
     "verse_idx": 44,
     "audio_path": "cherokee_new_testament/split_audio/mark_01_44.wav",
     "start_sec": 559.12,
-    "end_sec": 585.47,
-    "duration_sec": 26.35,
+    "end_sec": 585.98,
+    "duration_sec": 26.86,
     "reference_sentence": "ᎠᎴ ᎯᎠ ᏄᏪᏎᎴᎢ, ᎮᏯᏔᎮᏍᏗ ᏞᏍᏗ ᎩᎶ ᎪᎱᏍᏗ ᏥᎯᏃᏁᎵ; ᎮᎾᏉᏍᎩᏂ, ᎬᏂᎨᏒ ᏫᏂᏯᏛᏂᏏ ᎠᏥᎸᎨᎶᎯ, ᎠᎴ ᏩᎵᏍᎪᎸᏓ ᏣᏓᏅᎦᎸᎲ ᎤᎬᏩᎵ, ᎾᏍᎩ ᎼᏏ ᎤᏁᏨ ᎠᎵᏍᎪᎸᏙᏗᏱ, ᎾᏍᎩ ᎤᎾᏙᎯᏳᎾᏁᏗᏱ.",
     "cherokee_syllabary": "ᎠᎴ ᎯᎠ ᏄᏪᏎᎴᎢ, ᎮᏯᏔᎮᏍᏗ ᏞᏍᏗ ᎩᎶ ᎪᎱᏍᏗ ᏥᎯᏃᏁᎵ; ᎮᎾᏉᏍᎩᏂ, ᎬᏂᎨᏒ ᏫᏂᏯᏛᏂᏏ ᎠᏥᎸᎨᎶᎯ, ᎠᎴ ᏩᎵᏍᎪᎸᏓ ᏣᏓᏅᎦᎸᎲ ᎤᎬᏩᎵ, ᎾᏍᎩ ᎼᏏ ᎤᏁᏨ ᎠᎵᏍᎪᎸᏙᏗᏱ, ᎾᏍᎩ ᎤᎾᏙᎯᏳᎾᏁᏗᏱ.",
-    "greedy_hypothesis": "ilehi'a nikwahsele'i eyhahthahehsti lhehsti khilo kohuhsti tsihinonheli henakwuhskini khvnakehsv wuniytvnhihsi atsilakelhohi ale walhskwalta tsatatsatanvkalvhv ukvwalhi nvhskiwohs unhetsv alhskwolhtohtiyi nvhski unatohiyunani",
-    "greedy_confidence": 0.9588,
-    "guided_hypothesis": "ale hi'a nwehsele'i heyhahthahehsti lhehsti khilo kohuhsti tsihinonheli henakwhskini khvnikehsv winiyatvnhihsi atsilkelhohi ale walhskolta tsatanvkalvhv ukvwalhi nahski mohsi unhetsv alhskolhvhtohtiyi nahski unatohiyunanhetiy",
-    "reconciled_phonetics": "ale hi'a nwehsele'i heyhahthahehsti lhehsti khilo kohuhsti tsihinonheli henakwhskini khvnikehsv winiyatvnhihsi atsilkelhohi ale walhskolta tsatanvkalvhv ukvwalhi nahski mohsi unhetsv alhskolhvhtohtiyi nahski unatohiyunanhetiy",
-    "asr_hypothesis": "ilehi'a nikwahsele'i eyhahthahehsti lhehsti khilo kohuhsti tsihinonheli henakwuhskini khvnakehsv wuniytvnhihsi atsilakelhohi ale walhskwalta tsatatsatanvkalvhv ukvwalhi nvhskiwohs unhetsv alhskwolhtohtiyi nvhski unatohiyunani",
+    "greedy_hypothesis": "ilehi'a nikwahsele'i eyhahthahehsti lhehsti khilo kohuhsti tsihinonheli henakwuhskini khvnakehsv wuniytvnhihsi atsilakelhohi ale walhskwalta tsatatsatanvkalvhv ukvwalhi nvhskiwohs unhetsv alhskwolhtohtiyi nvhski unatohiyunanhhtiye",
+    "greedy_confidence": 0.9596,
+    "guided_hypothesis": "ale hi'a nwehsele'i heyhahthahehsti lhehsti khilo kohuhsti tsihinonheli henakwhskini khvnikehsv winiyatvnhihsi atsilkelhohi ale walhskolta tsatanvkalvhv ukvwalhi nahski mohsi unhetsv alhskolhvhtohtiyi nahski unatohiyunanhetiyi",
+    "reconciled_phonetics": "ale hi'a nwehsele'i heyhahthahehsti lhehsti khilo kohuhsti tsihinonheli henakwhskini khvnikehsv winiyatvnhihsi atsilkelhohi ale walhskolta tsatanvkalvhv ukvwalhi nahski mohsi unhetsv alhskolhvhtohtiyi nahski unatohiyunanhetiyi",
+    "asr_hypothesis": "ilehi'a nikwahsele'i eyhahthahehsti lhehsti khilo kohuhsti tsihinonheli henakwuhskini khvnakehsv wuniytvnhihsi atsilakelhohi ale walhskwalta tsatatsatanvkalvhv ukvwalhi nvhskiwohs unhetsv alhskwolhtohtiyi nvhski unatohiyunanhhtiye",
     "cost": -11.4835,
     "words": [
       {
@@ -5581,11 +5581,11 @@
       {
         "word": "unatohiyunanetiyi",
         "start_sec": 583.86,
-        "end_sec": 585.44,
-        "confidence": 0.973652,
-        "min_char_confidence": 0.703304,
+        "end_sec": 585.52,
+        "confidence": 0.654258,
+        "min_char_confidence": 0.00076,
         "flagged": false,
-        "emitted_word": "unatohiyunanhetiy"
+        "emitted_word": "unatohiyunanhetiyi"
       }
     ],
     "phonetic": "A-le hi-a nu-we-se-le-i, He-ya-ta-he-s-di tle-s-di gi-lo go-hu-s-di tsi-hi-no-ne-li; he-na-quo-s-gi-ni, gv-ni-ge-sv wi-ni-ya-dv-ni-si a-tsi-lv-ge-lo-hi, a-le wa-li-s-go-lv-da tsa-da-nv-ga-lv-hv u-gv-wa-li, na-s-gi Mo-si u-ne-tsv a-li-s-go-lv-do-di-yi, na-s-gi u-na-do-hi-yu-na-ne-di-yi.",
@@ -5598,24 +5598,24 @@
     "chapter": 1,
     "verse_idx": 45,
     "audio_path": "cherokee_new_testament/split_audio/mark_01_45.wav",
-    "start_sec": 585.47,
-    "end_sec": 615.74,
-    "duration_sec": 30.27,
+    "start_sec": 585.98,
+    "end_sec": 603.06,
+    "duration_sec": 17.08,
     "reference_sentence": "ᎠᏎᏃ ᎤᏄᎪᏨ, ᎤᎴᏅᎮ ᎤᏣᏘ ᏚᏰᎵᎯᏍᏔᏁᎢ, ᎠᎴ ᏚᏃᏣᎳᏁ ᎾᏍᎩ, ᎾᏍᎩᏃ ᎢᏳᏍᏗ ᏥᏌ ᎥᏝ ᎿᎭᏉ ᎬᏂᎨᏒ ᏫᎬᏩᏴᏍᏗ ᏱᎨᏎ ᎦᏚᎲᎢ, ᏙᏱᏗᏢᏉᏍᎩᏂ ᎢᎾᎨ ᏕᎨᏌᏗᏒ ᎡᏙᎮᎢ; ᏂᎬᎾᏛᏉᏃ ᏂᏙᏓᏳᏂᎶᏒᎯ ᎬᏩᎷᏤᎮᎢ.",
     "cherokee_syllabary": "ᎠᏎᏃ ᎤᏄᎪᏨ, ᎤᎴᏅᎮ ᎤᏣᏘ ᏚᏰᎵᎯᏍᏔᏁᎢ, ᎠᎴ ᏚᏃᏣᎳᏁ ᎾᏍᎩ, ᎾᏍᎩᏃ ᎢᏳᏍᏗ ᏥᏌ ᎥᏝ ᎿᎭᏉ ᎬᏂᎨᏒ ᏫᎬᏩᏴᏍᏗ ᏱᎨᏎ ᎦᏚᎲᎢ, ᏙᏱᏗᏢᏉᏍᎩᏂ ᎢᎾᎨ ᏕᎨᏌᏗᏒ ᎡᏙᎮᎢ; ᏂᎬᎾᏛᏉᏃ ᏂᏙᏓᏳᏂᎶᏒᎯ ᎬᏩᎷᏤᎮᎢ.",
-    "greedy_hypothesis": "htiye ahsenho unvkotsa ulenvhe utsathi tuyelihsthane'i aletunhonhele'nvhski nvhskinho iyuhsti tsihsa'v lha nakwu khvnikehsv wikvwiyvhsti ikelhse katuhv'i toyatitlakwuhskini inake tekehsatihsv etohe'i nikvnathvkwunho yitotayunilohsvhi kvwaluhtse",
-    "greedy_confidence": 0.9642,
-    "guided_hypothesis": "ahsenho unkotsv ulenvhe utsathi tuyelihihsthane'i ale tunhothslne nahski nahskinho iyuhsti tsihsa vlha nhakw khvnikehsv wikvwayvhsti yikehse katuhv'i toyititlvkwohskini inake tekehsatihsv etohe'i nikvnathvkwnho nitotayunilohsvhi kvwaluhtshehe'i",
-    "reconciled_phonetics": "ahsenho unkotsv ulenvhe utsathi tuyelihihsthane'i ale tunhothslne nahski nahskinho iyuhsti tsihsa vlha nhakw khvnikehsv wikvwayvhsti yikehse katuhv'i toyititlvkwohskini inake tekehsatihsv etohe'i nikvnathvkwnho nitotayunilohsvhi kvwaluhtshehe'i",
-    "asr_hypothesis": "htiye ahsenho unvkotsa ulenvhe utsathi tuyelihsthane'i aletunhonhele'nvhski nvhskinho iyuhsti tsihsa'v lha nakwu khvnikehsv wikvwiyvhsti ikelhse katuhv'i toyatitlakwuhskini inake tekehsatihsv etohe'i nikvnathvkwunho yitotayunilohsvhi kvwaluhtse",
-    "cost": -11.5308,
+    "greedy_hypothesis": "ahsenho unvkotsa ulenvhe utsathi tuyelihsthane'i aletunhonhele'nvhske nahskinho iyuhsti tsihsa'v lhanakwu khvnikehsv wikvwiyvhsti yikehse katu",
+    "greedy_confidence": 0.9685,
+    "guided_hypothesis": "ahsenho unkotsv ulenvhe utsathi tuyelihihsthane'i ale tnotslane nahsk nhsknho iyhst tshsa vl nhakw kvnkhs wikhv'wyhsti ykhs kathv'i toyhitilkwohskni inke tkhsathsv etohe'i nkvnatkwonho nttayunlhsvhi kvwaltshe'i",
+    "reconciled_phonetics": "ahsenho unkotsv ulenvhe utsathi tuyelihihsthane'i ale tnotslane nahsk nhsknho iyhst tshsa vl nhakw kvnkhs wikhv'wyhsti ykhs kathv'i toyhitilkwohskni inke tkhsathsv etohe'i nkvnatkwonho nttayunlhsvhi kvwaltshe'i",
+    "asr_hypothesis": "ahsenho unvkotsa ulenvhe utsathi tuyelihsthane'i aletunhonhele'nvhske nahskinho iyuhsti tsihsa'v lhanakwu khvnikehsv wikvwiyvhsti yikehse katu",
+    "cost": -15.9599,
     "words": [
       {
         "word": "ahseno",
-        "start_sec": 585.5,
+        "start_sec": 586.44,
         "end_sec": 586.8,
-        "confidence": 0.376617,
-        "min_char_confidence": 0.001115,
+        "confidence": 0.994711,
+        "min_char_confidence": 0.96594,
         "flagged": false,
         "emitted_word": "ahsenho"
       },
@@ -5657,174 +5657,174 @@
       },
       {
         "word": "ale",
-        "start_sec": 592.8,
-        "end_sec": 592.96,
-        "confidence": 0.953392,
-        "min_char_confidence": 0.876004,
-        "flagged": false,
+        "start_sec": 591.8,
+        "end_sec": 591.86,
+        "confidence": 2e-06,
+        "min_char_confidence": 1e-06,
+        "flagged": true,
         "emitted_word": "ale"
       },
       {
         "word": "tunotsalane",
-        "start_sec": 593.12,
-        "end_sec": 593.9,
-        "confidence": 0.019002,
+        "start_sec": 592.14,
+        "end_sec": 592.96,
+        "confidence": 4.3e-05,
         "min_char_confidence": 0.0,
         "flagged": true,
-        "emitted_word": "tunhothslne"
+        "emitted_word": "tnotslane"
       },
       {
         "word": "nahski",
-        "start_sec": 594.22,
-        "end_sec": 594.62,
-        "confidence": 0.136169,
-        "min_char_confidence": 1.6e-05,
+        "start_sec": 593.04,
+        "end_sec": 593.2,
+        "confidence": 6e-06,
+        "min_char_confidence": 1e-06,
         "flagged": true,
-        "emitted_word": "nahski"
+        "emitted_word": "nahsk"
       },
       {
         "word": "nahskino",
-        "start_sec": 595.84,
-        "end_sec": 596.32,
-        "confidence": 0.913578,
-        "min_char_confidence": 0.745645,
-        "flagged": false,
-        "emitted_word": "nahskinho"
+        "start_sec": 593.28,
+        "end_sec": 593.58,
+        "confidence": 0.006464,
+        "min_char_confidence": 1e-06,
+        "flagged": true,
+        "emitted_word": "nhsknho"
       },
       {
         "word": "iyuhsti",
-        "start_sec": 596.46,
-        "end_sec": 596.9,
-        "confidence": 0.999202,
-        "min_char_confidence": 0.995526,
-        "flagged": false,
-        "emitted_word": "iyuhsti"
+        "start_sec": 593.62,
+        "end_sec": 593.78,
+        "confidence": 1e-06,
+        "min_char_confidence": 0.0,
+        "flagged": true,
+        "emitted_word": "iyhst"
       },
       {
         "word": "tsihsa",
-        "start_sec": 597.0,
-        "end_sec": 597.34,
-        "confidence": 0.991326,
-        "min_char_confidence": 0.97671,
-        "flagged": false,
-        "emitted_word": "tsihsa"
+        "start_sec": 593.78,
+        "end_sec": 593.9,
+        "confidence": 4e-06,
+        "min_char_confidence": 1e-06,
+        "flagged": true,
+        "emitted_word": "tshsa"
       },
       {
         "word": "vtla",
-        "start_sec": 597.5,
-        "end_sec": 597.94,
-        "confidence": 0.988805,
-        "min_char_confidence": 0.965898,
-        "flagged": false,
-        "emitted_word": "vlha"
+        "start_sec": 594.0,
+        "end_sec": 594.22,
+        "confidence": 0.000182,
+        "min_char_confidence": 0.000102,
+        "flagged": true,
+        "emitted_word": "vl"
       },
       {
         "word": "nhakwo",
-        "start_sec": 597.98,
-        "end_sec": 598.26,
-        "confidence": 0.312123,
-        "min_char_confidence": 0.008041,
-        "flagged": false,
+        "start_sec": 594.22,
+        "end_sec": 594.54,
+        "confidence": 0.000192,
+        "min_char_confidence": 0.0,
+        "flagged": true,
         "emitted_word": "nhakw"
       },
       {
         "word": "kvnikehsv",
-        "start_sec": 598.84,
-        "end_sec": 599.58,
-        "confidence": 0.997257,
-        "min_char_confidence": 0.981692,
-        "flagged": false,
-        "emitted_word": "khvnikehsv"
+        "start_sec": 594.54,
+        "end_sec": 596.04,
+        "confidence": 0.009148,
+        "min_char_confidence": 2.7e-05,
+        "flagged": true,
+        "emitted_word": "kvnkhs"
       },
       {
         "word": "wikvwayvhsti",
-        "start_sec": 599.9,
-        "end_sec": 600.68,
-        "confidence": 0.556492,
-        "min_char_confidence": 0.002339,
-        "flagged": false,
-        "emitted_word": "wikvwayvhsti"
+        "start_sec": 596.1,
+        "end_sec": 596.9,
+        "confidence": 0.009129,
+        "min_char_confidence": 0.0,
+        "flagged": true,
+        "emitted_word": "wikhv'wyhsti"
       },
       {
         "word": "yikehse",
-        "start_sec": 600.86,
-        "end_sec": 601.42,
-        "confidence": 0.640859,
-        "min_char_confidence": 0.080412,
-        "flagged": false,
-        "emitted_word": "yikehse"
+        "start_sec": 597.0,
+        "end_sec": 597.28,
+        "confidence": 0.00496,
+        "min_char_confidence": 8e-06,
+        "flagged": true,
+        "emitted_word": "ykhs"
       },
       {
         "word": "katuhv'i",
-        "start_sec": 602.28,
-        "end_sec": 602.96,
-        "confidence": 0.990741,
-        "min_char_confidence": 0.949687,
-        "flagged": false,
-        "emitted_word": "katuhv'i"
+        "start_sec": 597.28,
+        "end_sec": 597.72,
+        "confidence": 0.000257,
+        "min_char_confidence": 1e-06,
+        "flagged": true,
+        "emitted_word": "kathv'i"
       },
       {
         "word": "toyititlvkwohskini",
-        "start_sec": 603.92,
-        "end_sec": 605.16,
-        "confidence": 0.24473,
-        "min_char_confidence": 4e-06,
+        "start_sec": 597.8,
+        "end_sec": 599.08,
+        "confidence": 0.000674,
+        "min_char_confidence": 0.0,
         "flagged": true,
-        "emitted_word": "toyititlvkwohskini"
+        "emitted_word": "toyhitilkwohskni"
       },
       {
         "word": "inake",
-        "start_sec": 605.56,
-        "end_sec": 605.96,
-        "confidence": 0.999915,
-        "min_char_confidence": 0.999844,
-        "flagged": false,
-        "emitted_word": "inake"
+        "start_sec": 599.1,
+        "end_sec": 599.2,
+        "confidence": 0.001968,
+        "min_char_confidence": 3e-06,
+        "flagged": true,
+        "emitted_word": "inke"
       },
       {
         "word": "tekehsatihsv",
-        "start_sec": 606.94,
-        "end_sec": 607.82,
-        "confidence": 0.99358,
-        "min_char_confidence": 0.942646,
-        "flagged": false,
-        "emitted_word": "tekehsatihsv"
+        "start_sec": 599.28,
+        "end_sec": 599.58,
+        "confidence": 0.001185,
+        "min_char_confidence": 2e-06,
+        "flagged": true,
+        "emitted_word": "tkhsathsv"
       },
       {
         "word": "etohe'i",
-        "start_sec": 607.96,
-        "end_sec": 608.62,
-        "confidence": 0.999157,
-        "min_char_confidence": 0.996933,
-        "flagged": false,
+        "start_sec": 599.72,
+        "end_sec": 600.0,
+        "confidence": 4e-06,
+        "min_char_confidence": 0.0,
+        "flagged": true,
         "emitted_word": "etohe'i"
       },
       {
         "word": "nikvnatvkwono",
-        "start_sec": 609.76,
-        "end_sec": 610.92,
-        "confidence": 0.936939,
-        "min_char_confidence": 0.63642,
-        "flagged": false,
-        "emitted_word": "nikvnathvkwnho"
+        "start_sec": 600.04,
+        "end_sec": 600.56,
+        "confidence": 0.000147,
+        "min_char_confidence": 0.0,
+        "flagged": true,
+        "emitted_word": "nkvnatkwonho"
       },
       {
         "word": "nitotayunilohsvhi",
-        "start_sec": 612.16,
-        "end_sec": 613.72,
-        "confidence": 0.787299,
-        "min_char_confidence": 0.113864,
-        "flagged": false,
-        "emitted_word": "nitotayunilohsvhi"
+        "start_sec": 600.58,
+        "end_sec": 601.58,
+        "confidence": 0.000202,
+        "min_char_confidence": 0.0,
+        "flagged": true,
+        "emitted_word": "nttayunlhsvhi"
       },
       {
         "word": "kvwalutsehe'i",
-        "start_sec": 614.44,
-        "end_sec": 615.64,
-        "confidence": 0.894389,
-        "min_char_confidence": 0.339325,
-        "flagged": false,
-        "emitted_word": "kvwaluhtshehe'i"
+        "start_sec": 602.28,
+        "end_sec": 602.96,
+        "confidence": 0.001742,
+        "min_char_confidence": 0.0,
+        "flagged": true,
+        "emitted_word": "kvwaltshe'i"
       }
     ],
     "phonetic": "A-se-no u-nu-go-tsv, u-le-nv-he u-tsa-ti du-ye-li-hi-s-ta-ne-i, a-le du-no-tsa-la-ne na-s-gi, na-s-gi-no i-yu-s-di Tsi-sa v-tla hna-quo gv-ni-ge-sv wi-gv-wa-yv-s-di yi-ge-se ga-du-hv-i, do-yi-di-tlv-quo-s-gi-ni i-na-ge de-ge-sa-di-sv e-do-he-i; ni-gv-na-dv-quo-no ni-do-da-yu-ni-lo-sv-hi gv-wa-lu-tse-he-i.",

@@ -213,19 +213,12 @@ def evaluate_candidate(
     Evaluates a candidate CTCAlignerConfig on cached logits across all dataset samples.
     Measures CER/WER of emitted path against gt_target.
     """
-    valid_syncope = [t for t in config.syncope_tokens if t in char_list]
-    valid_intrusive = (
-        [t for t in config.intrusive_tokens if t in char_list]
-        if config.intrusive_tokens
-        else []
-    )
-
     ctc_params = CtcSegmentationParameters(
         char_list=char_list,
         blank=pad_id,
-        syncope_tokens=valid_syncope,
+        syncope_tokens=config.syncope_tokens,
         syncope_penalty=float(config.syncope_penalty),
-        intrusive_tokens=valid_intrusive,
+        intrusive_tokens=config.intrusive_tokens,
         intrusive_penalty=float(config.intrusive_penalty),
         intrusive_penalties=config.intrusive_penalties,
         intrusive_min_logprobs=config.intrusive_min_logprobs,

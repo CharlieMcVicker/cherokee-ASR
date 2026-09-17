@@ -15,7 +15,17 @@ from transcription.utils.orthography import Orthography
 class CTCAlignerConfig:
     """Strongly-typed configuration for syncope- and intrusion-aware CTC alignment."""
 
-    syncope_tokens: Tuple[str, ...] = ("a", "e", "i", "o", "u", "v", "t")
+    syncope_tokens: Tuple[Tuple[str, ...] | str, ...] = (
+        (
+            "a",
+            "e",
+            "i",
+            "o",
+            "u",
+            "v",
+        ),
+        "t",
+    )
     intrusive_tokens: Tuple[str, ...] = ("h", "'")
     intrusive_max_stride: int = 4
     enforce_phonotactics: bool = True

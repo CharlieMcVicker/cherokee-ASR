@@ -4,9 +4,9 @@
     "total_chunks": 45,
     "matched_chunks": 45,
     "match_ratio": 1.0,
-    "mean_distance_score": -10.1505,
+    "mean_distance_score": -10.249,
     "total_ground_truth_chars": 4948,
-    "total_emitted_chars": 4991
+    "total_emitted_chars": 4976
   },
   "lines": [
     {
@@ -233,9 +233,9 @@
       "text": "",
       "english": "As it is written in the prophets, Behold, I send my messenger before thy face, which shall prepare thy way before thee.",
       "start": 15.6,
-      "end": 34.39,
+      "end": 34.42,
       "cer": -10.1034,
-      "emitted_text": "nahskiy hi'a tsinikvnhv tsikowhela anatolehohskiyi khvnhiyukw tsinvli tsinvhsitahsti tsakhathv ikvyititlv nhski tatsatvn'ihstaneli tsalohihstiyi ikvyititl",
+      "emitted_text": "nahskiy hi'a tsinikvnhv tsikowhela anatolehohskiyi khvnhiyukw tsinvli tsinvhsitahsti tsakhathv ikvyititlv nhski tatsatvn'ihstaneli tsalohihstiyi ikvyititlv",
       "words": [
         {
           "word": "nahskiya",
@@ -357,11 +357,11 @@
         {
           "word": "ikvyititlv",
           "start": 32.94,
-          "end": 33.7,
-          "confidence": 0.997533,
+          "end": 33.76,
+          "confidence": 0.478001,
           "flagged": false,
-          "emitted_word": "ikvyititl",
-          "reconciled_word": "ikvyititl"
+          "emitted_word": "ikvyititlv",
+          "reconciled_word": "ikvyititlv"
         }
       ],
       "additional_word_tiers": {
@@ -471,12 +471,12 @@
             "emitted_word": "tsalohihstiyi"
           },
           {
-            "word": "ikvyititl",
+            "word": "ikvyititlv",
             "start": 32.94,
-            "end": 33.7,
-            "confidence": 0.997533,
+            "end": 33.76,
+            "confidence": 0.478001,
             "flagged": false,
-            "emitted_word": "ikvyititl"
+            "emitted_word": "ikvyititlv"
           }
         ]
       },
@@ -586,12 +586,12 @@
           "emitted_word": "tsalohihstiyi"
         },
         {
-          "word": "ikvyititl",
+          "word": "ikvyititlv",
           "start": 32.94,
-          "end": 33.7,
-          "confidence": 0.997533,
+          "end": 33.76,
+          "confidence": 0.478001,
           "flagged": false,
-          "emitted_word": "ikvyititl"
+          "emitted_word": "ikvyititlv"
         }
       ]
     },
@@ -600,7 +600,7 @@
       "cherokee_syllabary": "ᎤᏪᎷᎦ ᎩᎶ ᎢᎾᎨᎢ, ᎯᎠ ᏂᎦᏪᎭ; ᎡᏣᏛᏅᎢᏍᏓᏏ ᏱᎰᏩ ᎤᎶᎯᏍᏗᏱ, ᏚᏅᏅ ᏗᏥᏥᏃᎯᏍᏓ.",
       "text": "",
       "english": "The voice of one crying in the wilderness, Prepare ye the way of the Lord, make his paths straight.",
-      "start": 34.39,
+      "start": 34.42,
       "end": 46.63,
       "cer": -10.2324,
       "emitted_text": "uwelhuhka khilo inake'i hi'a nikweha etsatvnhv'ihstahsi yihowa ulohihstiy tunvnhv titsitshinohihsta",
@@ -1239,7 +1239,7 @@
       "start": 64.79,
       "end": 81.11,
       "cer": -10.7154,
-      "emitted_text": "ale wikvwaluhtshele nikvnathv tsutiyi ale tsiluhslmi anehi al nikatv nhski tunhawo'e tsotani uweyv'i unihskanvts aninhohvhske'i",
+      "emitted_text": "ale wikvwaluhtshele nikvnathv tsutiyi ale tsiluhslmi anehi al nikatv nhski tunhawo'e tsotani uweyv'i unihskanvtsv aninhohvhske'i",
       "words": [
         {
           "word": "ale",
@@ -1361,11 +1361,11 @@
         {
           "word": "unihskanvtsv",
           "start": 78.46,
-          "end": 79.2,
-          "confidence": 0.938689,
+          "end": 79.3,
+          "confidence": 0.866192,
           "flagged": false,
-          "emitted_word": "unihskanvts",
-          "reconciled_word": "unihskanvts"
+          "emitted_word": "unihskanvtsv",
+          "reconciled_word": "unihskanvtsv"
         },
         {
           "word": "aninohvhske'i",
@@ -1484,12 +1484,12 @@
             "emitted_word": "uweyv'i"
           },
           {
-            "word": "unihskanvts",
+            "word": "unihskanvtsv",
             "start": 78.46,
-            "end": 79.2,
-            "confidence": 0.938689,
+            "end": 79.3,
+            "confidence": 0.866192,
             "flagged": false,
-            "emitted_word": "unihskanvts"
+            "emitted_word": "unihskanvtsv"
           },
           {
             "word": "aninhohvhske'i",
@@ -1607,12 +1607,12 @@
           "emitted_word": "uweyv'i"
         },
         {
-          "word": "unihskanvts",
+          "word": "unihskanvtsv",
           "start": 78.46,
-          "end": 79.2,
-          "confidence": 0.938689,
+          "end": 79.3,
+          "confidence": 0.866192,
           "flagged": false,
-          "emitted_word": "unihskanvts"
+          "emitted_word": "unihskanvtsv"
         },
         {
           "word": "aninhohvhske'i",
@@ -1950,7 +1950,7 @@
       "start": 94.63,
       "end": 114.8,
       "cer": -9.8444,
-      "emitted_text": "alhitsitohvhskenho hi'a nikawehske'i utli ulhiniktiyu ehskakwo ayv onhi tya'i nahski tsulahsulokihi takhanehsa'tv vlha yeli yiniko'i akwatihsattihstiy ale tikikhaneyhvhtiyi",
+      "emitted_text": "alhitsitohvhskenho hi'a nikawehske'i utli ulhiniktiyu ehskakwo ayv onhi tya'i nahski tsulahsulokihi takhanehsa'tv vlha yeli yiniko'i akwatihsattihstiyi ale tikikhaneyhvhtiyi",
       "words": [
         {
           "word": "alitsitohvhskeno",
@@ -2090,11 +2090,11 @@
         {
           "word": "akwatihsatatihstiyi",
           "start": 110.36,
-          "end": 111.7,
-          "confidence": 0.954184,
+          "end": 111.78,
+          "confidence": 0.802287,
           "flagged": false,
-          "emitted_word": "akwatihsattihstiy",
-          "reconciled_word": "akwatihsattihstiy"
+          "emitted_word": "akwatihsattihstiyi",
+          "reconciled_word": "akwatihsattihstiyi"
         },
         {
           "word": "ale",
@@ -2238,12 +2238,12 @@
             "emitted_word": "yiniko'i"
           },
           {
-            "word": "akwatihsattihstiy",
+            "word": "akwatihsattihstiyi",
             "start": 110.36,
-            "end": 111.7,
-            "confidence": 0.954184,
+            "end": 111.78,
+            "confidence": 0.802287,
             "flagged": false,
-            "emitted_word": "akwatihsattihstiy"
+            "emitted_word": "akwatihsattihstiyi"
           },
           {
             "word": "ale",
@@ -2385,12 +2385,12 @@
           "emitted_word": "yiniko'i"
         },
         {
-          "word": "akwatihsattihstiy",
+          "word": "akwatihsattihstiyi",
           "start": 110.36,
-          "end": 111.7,
-          "confidence": 0.954184,
+          "end": 111.78,
+          "confidence": 0.802287,
           "flagged": false,
-          "emitted_word": "akwatihsattihstiy"
+          "emitted_word": "akwatihsattihstiyi"
         },
         {
           "word": "ale",
@@ -3690,7 +3690,7 @@
       "start": 165.29,
       "end": 170.83,
       "cer": -8.1232,
-      "emitted_text": "kilakwono iyvt atanto inake wuthinhvhsthane'i",
+      "emitted_text": "kilakwono iyvtv atanto inake wuthinhvhsthane'i",
       "words": [
         {
           "word": "kilakwono",
@@ -3704,11 +3704,11 @@
         {
           "word": "iyvtv",
           "start": 166.34,
-          "end": 166.72,
-          "confidence": 0.170643,
+          "end": 166.76,
+          "confidence": 0.066627,
           "flagged": false,
-          "emitted_word": "iyvt",
-          "reconciled_word": "iyvt"
+          "emitted_word": "iyvtv",
+          "reconciled_word": "iyvtv"
         },
         {
           "word": "atanvto",
@@ -3749,12 +3749,12 @@
             "emitted_word": "kilakwono"
           },
           {
-            "word": "iyvt",
+            "word": "iyvtv",
             "start": 166.34,
-            "end": 166.72,
-            "confidence": 0.170643,
+            "end": 166.76,
+            "confidence": 0.066627,
             "flagged": false,
-            "emitted_word": "iyvt"
+            "emitted_word": "iyvtv"
           },
           {
             "word": "atanto",
@@ -3792,12 +3792,12 @@
           "emitted_word": "kilakwono"
         },
         {
-          "word": "iyvt",
+          "word": "iyvtv",
           "start": 166.34,
-          "end": 166.72,
-          "confidence": 0.170643,
+          "end": 166.76,
+          "confidence": 0.066627,
           "flagged": false,
-          "emitted_word": "iyvt"
+          "emitted_word": "iyvtv"
         },
         {
           "word": "atanto",
@@ -3833,7 +3833,7 @@
       "start": 170.83,
       "end": 187.06,
       "cer": -13.142,
-      "emitted_text": "nanhanho inake etohe nkhskohi tsuhsvhitv hsetani ukoliyehske'i al inake enha'i tekhelatitohe'i ale tinikhanhwatitohi kvwhstelvhitohe'i",
+      "emitted_text": "nanhanho inake etohe nkhskohi tsuhsvhitv hsetani ukoliyehske'i ale inake enha'i tekhelatitohe'i ale tinikhanhwatitohi kvwhstelvhitohe'i",
       "words": [
         {
           "word": "nanhano",
@@ -3901,11 +3901,11 @@
         {
           "word": "ale",
           "start": 178.4,
-          "end": 178.5,
-          "confidence": 0.117805,
-          "flagged": false,
-          "emitted_word": "al",
-          "reconciled_word": "al"
+          "end": 178.56,
+          "confidence": 0.009644,
+          "flagged": true,
+          "emitted_word": "ale",
+          "reconciled_word": "ale"
         },
         {
           "word": "inake",
@@ -4021,12 +4021,12 @@
             "emitted_word": "ukoliyehske'i"
           },
           {
-            "word": "al",
+            "word": "ale",
             "start": 178.4,
-            "end": 178.5,
-            "confidence": 0.117805,
-            "flagged": false,
-            "emitted_word": "al"
+            "end": 178.56,
+            "confidence": 0.009644,
+            "flagged": true,
+            "emitted_word": "ale"
           },
           {
             "word": "inake",
@@ -4136,12 +4136,12 @@
           "emitted_word": "ukoliyehske'i"
         },
         {
-          "word": "al",
+          "word": "ale",
           "start": 178.4,
-          "end": 178.5,
-          "confidence": 0.117805,
-          "flagged": false,
-          "emitted_word": "al"
+          "end": 178.56,
+          "confidence": 0.009644,
+          "flagged": true,
+          "emitted_word": "ale"
         },
         {
           "word": "inake",
@@ -4201,7 +4201,7 @@
       "start": 187.06,
       "end": 200.44,
       "cer": -8.7489,
-      "emitted_text": "tsaninho titahstutiy natsiyvthane'i tsihsa kelli uluhtse'i alihtstohvhske ohstv khanohet unlanvhi ukvwiyuhi kehsv ukvwalhi",
+      "emitted_text": "tsaninho titahstutiy natsiyvthane'i tsihsa kelli uluhtse'i alihtstohvhske ohstv khanohetv unlanvhi ukvwiyuhi kehsv ukvwalhi",
       "words": [
         {
           "word": "tsanino",
@@ -4278,11 +4278,11 @@
         {
           "word": "khanohetv",
           "start": 195.76,
-          "end": 196.4,
-          "confidence": 0.895893,
+          "end": 196.46,
+          "confidence": 0.579943,
           "flagged": false,
-          "emitted_word": "khanohet",
-          "reconciled_word": "khanohet"
+          "emitted_word": "khanohetv",
+          "reconciled_word": "khanohetv"
         },
         {
           "word": "unelanvhi",
@@ -4388,12 +4388,12 @@
             "emitted_word": "ohstv"
           },
           {
-            "word": "khanohet",
+            "word": "khanohetv",
             "start": 195.76,
-            "end": 196.4,
-            "confidence": 0.895893,
+            "end": 196.46,
+            "confidence": 0.579943,
             "flagged": false,
-            "emitted_word": "khanohet"
+            "emitted_word": "khanohetv"
           },
           {
             "word": "unlanvhi",
@@ -4495,12 +4495,12 @@
           "emitted_word": "ohstv"
         },
         {
-          "word": "khanohet",
+          "word": "khanohetv",
           "start": 195.76,
-          "end": 196.4,
-          "confidence": 0.895893,
+          "end": 196.46,
+          "confidence": 0.579943,
           "flagged": false,
-          "emitted_word": "khanohet"
+          "emitted_word": "khanohetv"
         },
         {
           "word": "unlanvhi",
@@ -4544,7 +4544,7 @@
       "start": 200.44,
       "end": 217.0,
       "cer": -10.9375,
-      "emitted_text": "al hi'a nikawehske'i nhakw alhiyloka ale unelhanvhi ukvwiyuhi kehsv ehskanhiyu tay'i titsineliyvn tetsatanvhthv'i ale itsohiyuhvka ohstv khanohetv",
+      "emitted_text": "al hi'a nikawehske'i nhakwo alhiyloka ale unelhanvhi ukvwiyuhi kehsv ehskanhiyu tay'i titsineliyvn tetsatanvhthv'i ale itsohiyuhvka ohstv khanohetv",
       "words": [
         {
           "word": "ale",
@@ -4576,11 +4576,11 @@
         {
           "word": "nhakwo",
           "start": 202.66,
-          "end": 203.0,
-          "confidence": 0.091067,
+          "end": 203.12,
+          "confidence": 0.01388,
           "flagged": true,
-          "emitted_word": "nhakw",
-          "reconciled_word": "nhakw"
+          "emitted_word": "nhakwo",
+          "reconciled_word": "nhakwo"
         },
         {
           "word": "aliyiloka",
@@ -4727,12 +4727,12 @@
             "emitted_word": "nikawehske'i"
           },
           {
-            "word": "nhakw",
+            "word": "nhakwo",
             "start": 202.66,
-            "end": 203.0,
-            "confidence": 0.091067,
+            "end": 203.12,
+            "confidence": 0.01388,
             "flagged": true,
-            "emitted_word": "nhakw"
+            "emitted_word": "nhakwo"
           },
           {
             "word": "alhiyloka",
@@ -4866,12 +4866,12 @@
           "emitted_word": "nikawehske'i"
         },
         {
-          "word": "nhakw",
+          "word": "nhakwo",
           "start": 202.66,
-          "end": 203.0,
-          "confidence": 0.091067,
+          "end": 203.12,
+          "confidence": 0.01388,
           "flagged": true,
-          "emitted_word": "nhakw"
+          "emitted_word": "nhakwo"
         },
         {
           "word": "alhiyloka",
@@ -5716,7 +5716,7 @@
       "start": 249.75,
       "end": 268.9,
       "cer": -10.2012,
-      "emitted_text": "nanhnho wi'uwenv uhstikhitv tukohe tsimi tsekwit uwetsi tsaninho nhski tinatanhvlhi nahskinho nahskw untsa'e tsiyuhi tanotlvhihsihske tsunikayaluti",
+      "emitted_text": "nanhnho wi'uwenv uhstikhitv tukohe tsimi tsekwiti uwetsi tsaninho nhski tinatanhvlhi nahskinho nahskwo untsa'e tsiyuhi tanotlvhihsihske tsunikayaluti",
       "words": [
         {
           "word": "nanhano",
@@ -5766,11 +5766,11 @@
         {
           "word": "tsekwiti",
           "start": 256.1,
-          "end": 256.54,
-          "confidence": 0.940272,
-          "flagged": false,
-          "emitted_word": "tsekwit",
-          "reconciled_word": "tsekwit"
+          "end": 256.6,
+          "confidence": 0.292387,
+          "flagged": true,
+          "emitted_word": "tsekwiti",
+          "reconciled_word": "tsekwiti"
         },
         {
           "word": "uwetsi",
@@ -5820,18 +5820,18 @@
         {
           "word": "nahskwo",
           "start": 261.74,
-          "end": 262.06,
-          "confidence": 0.86391,
-          "flagged": false,
-          "emitted_word": "nahskw",
-          "reconciled_word": "nahskw"
+          "end": 262.16,
+          "confidence": 0.1507,
+          "flagged": true,
+          "emitted_word": "nahskwo",
+          "reconciled_word": "nahskwo"
         },
         {
           "word": "unatsa'e",
-          "start": 262.14,
+          "start": 262.36,
           "end": 264.1,
-          "confidence": 0.995807,
-          "flagged": false,
+          "confidence": 0.220489,
+          "flagged": true,
           "emitted_word": "untsa'e",
           "reconciled_word": "untsa'e"
         },
@@ -5906,12 +5906,12 @@
             "emitted_word": "tsimi"
           },
           {
-            "word": "tsekwit",
+            "word": "tsekwiti",
             "start": 256.1,
-            "end": 256.54,
-            "confidence": 0.940272,
-            "flagged": false,
-            "emitted_word": "tsekwit"
+            "end": 256.6,
+            "confidence": 0.292387,
+            "flagged": true,
+            "emitted_word": "tsekwiti"
           },
           {
             "word": "uwetsi",
@@ -5954,19 +5954,19 @@
             "emitted_word": "nahskinho"
           },
           {
-            "word": "nahskw",
+            "word": "nahskwo",
             "start": 261.74,
-            "end": 262.06,
-            "confidence": 0.86391,
-            "flagged": false,
-            "emitted_word": "nahskw"
+            "end": 262.16,
+            "confidence": 0.1507,
+            "flagged": true,
+            "emitted_word": "nahskwo"
           },
           {
             "word": "untsa'e",
-            "start": 262.14,
+            "start": 262.36,
             "end": 264.1,
-            "confidence": 0.995807,
-            "flagged": false,
+            "confidence": 0.220489,
+            "flagged": true,
             "emitted_word": "untsa'e"
           },
           {
@@ -6037,12 +6037,12 @@
           "emitted_word": "tsimi"
         },
         {
-          "word": "tsekwit",
+          "word": "tsekwiti",
           "start": 256.1,
-          "end": 256.54,
-          "confidence": 0.940272,
-          "flagged": false,
-          "emitted_word": "tsekwit"
+          "end": 256.6,
+          "confidence": 0.292387,
+          "flagged": true,
+          "emitted_word": "tsekwiti"
         },
         {
           "word": "uwetsi",
@@ -6085,19 +6085,19 @@
           "emitted_word": "nahskinho"
         },
         {
-          "word": "nahskw",
+          "word": "nahskwo",
           "start": 261.74,
-          "end": 262.06,
-          "confidence": 0.86391,
-          "flagged": false,
-          "emitted_word": "nahskw"
+          "end": 262.16,
+          "confidence": 0.1507,
+          "flagged": true,
+          "emitted_word": "nahskwo"
         },
         {
           "word": "untsa'e",
-          "start": 262.14,
+          "start": 262.36,
           "end": 264.1,
-          "confidence": 0.995807,
-          "flagged": false,
+          "confidence": 0.220489,
+          "flagged": true,
           "emitted_word": "untsa'e"
         },
         {
@@ -7967,7 +7967,7 @@
       "start": 351.27,
       "end": 358.52,
       "cer": -9.5028,
-      "emitted_text": "katahanho atant ulvtehsthanv ale ahstaya uwelhunhv unkotse'i",
+      "emitted_text": "katahanho atanto ulvtehsthanv ale ahstaya uwelhunhv unkotse'i",
       "words": [
         {
           "word": "katahano",
@@ -7981,17 +7981,17 @@
         {
           "word": "atanvto",
           "start": 352.44,
-          "end": 352.78,
-          "confidence": 0.874851,
+          "end": 352.84,
+          "confidence": 0.290274,
           "flagged": false,
-          "emitted_word": "atant",
-          "reconciled_word": "atant"
+          "emitted_word": "atanto",
+          "reconciled_word": "atanto"
         },
         {
           "word": "ulvtehsthanv",
-          "start": 352.8,
+          "start": 352.9,
           "end": 353.66,
-          "confidence": 0.449323,
+          "confidence": 0.442229,
           "flagged": true,
           "emitted_word": "ulvtehsthanv",
           "reconciled_word": "ulvtehsthanv"
@@ -8044,18 +8044,18 @@
             "emitted_word": "katahanho"
           },
           {
-            "word": "atant",
+            "word": "atanto",
             "start": 352.44,
-            "end": 352.78,
-            "confidence": 0.874851,
+            "end": 352.84,
+            "confidence": 0.290274,
             "flagged": false,
-            "emitted_word": "atant"
+            "emitted_word": "atanto"
           },
           {
             "word": "ulvtehsthanv",
-            "start": 352.8,
+            "start": 352.9,
             "end": 353.66,
-            "confidence": 0.449323,
+            "confidence": 0.442229,
             "flagged": true,
             "emitted_word": "ulvtehsthanv"
           },
@@ -8103,18 +8103,18 @@
           "emitted_word": "katahanho"
         },
         {
-          "word": "atant",
+          "word": "atanto",
           "start": 352.44,
-          "end": 352.78,
-          "confidence": 0.874851,
+          "end": 352.84,
+          "confidence": 0.290274,
           "flagged": false,
-          "emitted_word": "atant"
+          "emitted_word": "atanto"
         },
         {
           "word": "ulvtehsthanv",
-          "start": 352.8,
+          "start": 352.9,
           "end": 353.66,
-          "confidence": 0.449323,
+          "confidence": 0.442229,
           "flagged": true,
           "emitted_word": "ulvtehsthanv"
         },
@@ -8803,16 +8803,16 @@
       "start": 382.59,
       "end": 391.9,
       "cer": -9.4218,
-      "emitted_text": "khilakwn iyvt nhski tekanotsalhv tuyelihse kelili nanha kvwhathuwitv kehsv'i",
+      "emitted_text": "khilakwno iyvt nhski tekanotsalhv tuyelihse kelili nanha kvwhathuwitv kehsv'i",
       "words": [
         {
           "word": "kilakwono",
           "start": 383.18,
-          "end": 383.58,
-          "confidence": 0.860694,
+          "end": 383.64,
+          "confidence": 0.789425,
           "flagged": false,
-          "emitted_word": "khilakwn",
-          "reconciled_word": "khilakwn"
+          "emitted_word": "khilakwno",
+          "reconciled_word": "khilakwno"
         },
         {
           "word": "iyvtv",
@@ -8890,12 +8890,12 @@
       "additional_word_tiers": {
         "Reconciled Transcriptions": [
           {
-            "word": "khilakwn",
+            "word": "khilakwno",
             "start": 383.18,
-            "end": 383.58,
-            "confidence": 0.860694,
+            "end": 383.64,
+            "confidence": 0.789425,
             "flagged": false,
-            "emitted_word": "khilakwn"
+            "emitted_word": "khilakwno"
           },
           {
             "word": "iyvt",
@@ -8965,12 +8965,12 @@
       },
       "reconciled_words": [
         {
-          "word": "khilakwn",
+          "word": "khilakwno",
           "start": 383.18,
-          "end": 383.58,
-          "confidence": 0.860694,
+          "end": 383.64,
+          "confidence": 0.789425,
           "flagged": false,
-          "emitted_word": "khilakwn"
+          "emitted_word": "khilakwno"
         },
         {
           "word": "iyvt",
@@ -11406,9 +11406,9 @@
       "text": "",
       "english": "And he said unto them, Let us go into the next towns, that I may preach there also: for therefore came I forth.",
       "start": 493.9,
-      "end": 505.89,
+      "end": 506.58,
       "cer": -8.7521,
-      "emitted_text": "hi'an nituwehsele'i tihso'i totikatuhv witilohi nanha nahskwo kalitstonitolvha nhskiynho iyuhsti aki'luhthsil",
+      "emitted_text": "hi'an nituwehsele'i tihso'i totikatuhv witilohi nanha nahskwo kalitstonitolvha nhskiynho iyuhsti aki'luhthsilhv",
       "words": [
         {
           "word": "hi'ano",
@@ -11503,11 +11503,11 @@
         {
           "word": "akilutsilv",
           "start": 504.94,
-          "end": 505.86,
-          "confidence": 0.598446,
-          "flagged": false,
-          "emitted_word": "aki'luhthsil",
-          "reconciled_word": "aki'luhthsil"
+          "end": 505.94,
+          "confidence": 0.355483,
+          "flagged": true,
+          "emitted_word": "aki'luhthsilhv",
+          "reconciled_word": "aki'luhthsilhv"
         }
       ],
       "additional_word_tiers": {
@@ -11593,12 +11593,12 @@
             "emitted_word": "iyuhsti"
           },
           {
-            "word": "aki'luhthsil",
+            "word": "aki'luhthsilhv",
             "start": 504.94,
-            "end": 505.86,
-            "confidence": 0.598446,
-            "flagged": false,
-            "emitted_word": "aki'luhthsil"
+            "end": 505.94,
+            "confidence": 0.355483,
+            "flagged": true,
+            "emitted_word": "aki'luhthsilhv"
           }
         ]
       },
@@ -11684,12 +11684,12 @@
           "emitted_word": "iyuhsti"
         },
         {
-          "word": "aki'luhthsil",
+          "word": "aki'luhthsilhv",
           "start": 504.94,
-          "end": 505.86,
-          "confidence": 0.598446,
-          "flagged": false,
-          "emitted_word": "aki'luhthsil"
+          "end": 505.94,
+          "confidence": 0.355483,
+          "flagged": true,
+          "emitted_word": "aki'luhthsilhv"
         }
       ]
     },
@@ -11698,16 +11698,16 @@
       "cherokee_syllabary": "ᎠᎵᏥᏙᏂᏙᎮᏃ ᏧᏂᎳᏫᎢᏍᏗᏱ ᏂᎬᎾᏛ ᎨᎵᎵ, ᎠᎴ ᎠᏂᏍᎩᎾ ᏕᎦᏄᎪᏫᏍᎨᎢ.",
       "text": "",
       "english": "And he preached in their synagogues throughout all Galilee, and cast out devils.",
-      "start": 505.89,
+      "start": 506.58,
       "end": 516.44,
       "cer": -9.9066,
       "emitted_text": "alihtstonhitohenho tsunilawi'ihstiy nikvnathv kelili ale anihskina tekanukowhihske'i",
       "words": [
         {
           "word": "alitsitonitoheno",
-          "start": 505.92,
+          "start": 507.22,
           "end": 508.9,
-          "confidence": 0.753749,
+          "confidence": 0.75376,
           "flagged": false,
           "emitted_word": "alihtstonhitohenho",
           "reconciled_word": "alihtstonhitohenho"
@@ -11771,9 +11771,9 @@
         "Reconciled Transcriptions": [
           {
             "word": "alihtstonhitohenho",
-            "start": 505.92,
+            "start": 507.22,
             "end": 508.9,
-            "confidence": 0.753749,
+            "confidence": 0.75376,
             "flagged": false,
             "emitted_word": "alihtstonhitohenho"
           },
@@ -11830,9 +11830,9 @@
       "reconciled_words": [
         {
           "word": "alihtstonhitohenho",
-          "start": 505.92,
+          "start": 507.22,
           "end": 508.9,
-          "confidence": 0.753749,
+          "confidence": 0.75376,
           "flagged": false,
           "emitted_word": "alihtstonhitohenho"
         },
@@ -12555,7 +12555,7 @@
       "start": 543.38,
       "end": 553.15,
       "cer": -11.8667,
-      "emitted_text": "unhetskwnho khilakw iyvt atayehski utlvkv ulihthvhthane'i ale utanvkalvtv kehse'i",
+      "emitted_text": "unhetskwnho khilakwo iyvtv atayehski utlvkv ulihthvhthane'i ale utanvkalvtv kehse'i",
       "words": [
         {
           "word": "unetsvkwono",
@@ -12569,26 +12569,26 @@
         {
           "word": "kilakwo",
           "start": 545.28,
-          "end": 545.6,
-          "confidence": 0.989195,
-          "flagged": false,
-          "emitted_word": "khilakw",
-          "reconciled_word": "khilakw"
+          "end": 545.64,
+          "confidence": 0.224858,
+          "flagged": true,
+          "emitted_word": "khilakwo",
+          "reconciled_word": "khilakwo"
         },
         {
           "word": "iyvtv",
           "start": 545.76,
-          "end": 546.14,
-          "confidence": 0.966913,
-          "flagged": false,
-          "emitted_word": "iyvt",
-          "reconciled_word": "iyvt"
+          "end": 546.2,
+          "confidence": 0.140934,
+          "flagged": true,
+          "emitted_word": "iyvtv",
+          "reconciled_word": "iyvtv"
         },
         {
           "word": "atayehski",
-          "start": 546.18,
+          "start": 546.62,
           "end": 547.46,
-          "confidence": 0.998789,
+          "confidence": 0.997453,
           "flagged": false,
           "emitted_word": "atayehski",
           "reconciled_word": "atayehski"
@@ -12650,26 +12650,26 @@
             "emitted_word": "unhetskwnho"
           },
           {
-            "word": "khilakw",
+            "word": "khilakwo",
             "start": 545.28,
-            "end": 545.6,
-            "confidence": 0.989195,
-            "flagged": false,
-            "emitted_word": "khilakw"
+            "end": 545.64,
+            "confidence": 0.224858,
+            "flagged": true,
+            "emitted_word": "khilakwo"
           },
           {
-            "word": "iyvt",
+            "word": "iyvtv",
             "start": 545.76,
-            "end": 546.14,
-            "confidence": 0.966913,
-            "flagged": false,
-            "emitted_word": "iyvt"
+            "end": 546.2,
+            "confidence": 0.140934,
+            "flagged": true,
+            "emitted_word": "iyvtv"
           },
           {
             "word": "atayehski",
-            "start": 546.18,
+            "start": 546.62,
             "end": 547.46,
-            "confidence": 0.998789,
+            "confidence": 0.997453,
             "flagged": false,
             "emitted_word": "atayehski"
           },
@@ -12725,26 +12725,26 @@
           "emitted_word": "unhetskwnho"
         },
         {
-          "word": "khilakw",
+          "word": "khilakwo",
           "start": 545.28,
-          "end": 545.6,
-          "confidence": 0.989195,
-          "flagged": false,
-          "emitted_word": "khilakw"
+          "end": 545.64,
+          "confidence": 0.224858,
+          "flagged": true,
+          "emitted_word": "khilakwo"
         },
         {
-          "word": "iyvt",
+          "word": "iyvtv",
           "start": 545.76,
-          "end": 546.14,
-          "confidence": 0.966913,
-          "flagged": false,
-          "emitted_word": "iyvt"
+          "end": 546.2,
+          "confidence": 0.140934,
+          "flagged": true,
+          "emitted_word": "iyvtv"
         },
         {
           "word": "atayehski",
-          "start": 546.18,
+          "start": 546.62,
           "end": 547.46,
-          "confidence": 0.998789,
+          "confidence": 0.997453,
           "flagged": false,
           "emitted_word": "atayehski"
         },
@@ -12798,16 +12798,16 @@
       "start": 553.15,
       "end": 559.12,
       "cer": -9.1229,
-      "emitted_text": "ulhiniktn unhetshel khilakwo iyvt unhetsele utanvhstiyi",
+      "emitted_text": "ulhiniktnho unhetshel khilakwo iyvtv unhetsele utanvhstiyi",
       "words": [
         {
           "word": "ulinikitvno",
           "start": 553.6,
-          "end": 554.3,
-          "confidence": 0.462757,
+          "end": 554.4,
+          "confidence": 0.371882,
           "flagged": false,
-          "emitted_word": "ulhiniktn",
-          "reconciled_word": "ulhiniktn"
+          "emitted_word": "ulhiniktnho",
+          "reconciled_word": "ulhiniktnho"
         },
         {
           "word": "unetselv",
@@ -12830,11 +12830,11 @@
         {
           "word": "iyvtv",
           "start": 556.16,
-          "end": 556.48,
-          "confidence": 0.999207,
-          "flagged": false,
-          "emitted_word": "iyvt",
-          "reconciled_word": "iyvt"
+          "end": 556.52,
+          "confidence": 0.198902,
+          "flagged": true,
+          "emitted_word": "iyvtv",
+          "reconciled_word": "iyvtv"
         },
         {
           "word": "unetsele",
@@ -12858,12 +12858,12 @@
       "additional_word_tiers": {
         "Reconciled Transcriptions": [
           {
-            "word": "ulhiniktn",
+            "word": "ulhiniktnho",
             "start": 553.6,
-            "end": 554.3,
-            "confidence": 0.462757,
+            "end": 554.4,
+            "confidence": 0.371882,
             "flagged": false,
-            "emitted_word": "ulhiniktn"
+            "emitted_word": "ulhiniktnho"
           },
           {
             "word": "unhetshel",
@@ -12882,12 +12882,12 @@
             "emitted_word": "khilakwo"
           },
           {
-            "word": "iyvt",
+            "word": "iyvtv",
             "start": 556.16,
-            "end": 556.48,
-            "confidence": 0.999207,
-            "flagged": false,
-            "emitted_word": "iyvt"
+            "end": 556.52,
+            "confidence": 0.198902,
+            "flagged": true,
+            "emitted_word": "iyvtv"
           },
           {
             "word": "unhetsele",
@@ -12909,12 +12909,12 @@
       },
       "reconciled_words": [
         {
-          "word": "ulhiniktn",
+          "word": "ulhiniktnho",
           "start": 553.6,
-          "end": 554.3,
-          "confidence": 0.462757,
+          "end": 554.4,
+          "confidence": 0.371882,
           "flagged": false,
-          "emitted_word": "ulhiniktn"
+          "emitted_word": "ulhiniktnho"
         },
         {
           "word": "unhetshel",
@@ -12933,12 +12933,12 @@
           "emitted_word": "khilakwo"
         },
         {
-          "word": "iyvt",
+          "word": "iyvtv",
           "start": 556.16,
-          "end": 556.48,
-          "confidence": 0.999207,
-          "flagged": false,
-          "emitted_word": "iyvt"
+          "end": 556.52,
+          "confidence": 0.198902,
+          "flagged": true,
+          "emitted_word": "iyvtv"
         },
         {
           "word": "unhetsele",
@@ -12964,9 +12964,9 @@
       "text": "",
       "english": "And saith unto him, See thou say nothing to any man: but go thy way, shew thyself to the priest, and offer for thy cleansing those things which Moses commanded, for a testimony unto them.",
       "start": 559.12,
-      "end": 585.47,
+      "end": 585.98,
       "cer": -11.4835,
-      "emitted_text": "ale hi'a nwehsele'i heyhahthahehsti lhehsti khilo kohuhsti tsihinonheli henakwhskini khvnikehsv winiyatvnhihsi atsilkelhohi ale walhskolta tsatanvkalvhv ukvwalhi nahski mohsi unhetsv alhskolhvhtohtiyi nahski unatohiyunanhetiy",
+      "emitted_text": "ale hi'a nwehsele'i heyhahthahehsti lhehsti khilo kohuhsti tsihinonheli henakwhskini khvnikehsv winiyatvnhihsi atsilkelhohi ale walhskolta tsatanvkalvhv ukvwalhi nahski mohsi unhetsv alhskolhvhtohtiyi nahski unatohiyunanhetiyi",
       "words": [
         {
           "word": "ale",
@@ -13160,11 +13160,11 @@
         {
           "word": "unatohiyunanetiyi",
           "start": 583.86,
-          "end": 585.44,
-          "confidence": 0.973652,
+          "end": 585.52,
+          "confidence": 0.654258,
           "flagged": false,
-          "emitted_word": "unatohiyunanhetiy",
-          "reconciled_word": "unatohiyunanhetiy"
+          "emitted_word": "unatohiyunanhetiyi",
+          "reconciled_word": "unatohiyunanhetiyi"
         }
       ],
       "additional_word_tiers": {
@@ -13338,12 +13338,12 @@
             "emitted_word": "nahski"
           },
           {
-            "word": "unatohiyunanhetiy",
+            "word": "unatohiyunanhetiyi",
             "start": 583.86,
-            "end": 585.44,
-            "confidence": 0.973652,
+            "end": 585.52,
+            "confidence": 0.654258,
             "flagged": false,
-            "emitted_word": "unatohiyunanhetiy"
+            "emitted_word": "unatohiyunanhetiyi"
           }
         ]
       },
@@ -13517,12 +13517,12 @@
           "emitted_word": "nahski"
         },
         {
-          "word": "unatohiyunanhetiy",
+          "word": "unatohiyunanhetiyi",
           "start": 583.86,
-          "end": 585.44,
-          "confidence": 0.973652,
+          "end": 585.52,
+          "confidence": 0.654258,
           "flagged": false,
-          "emitted_word": "unatohiyunanhetiy"
+          "emitted_word": "unatohiyunanhetiyi"
         }
       ]
     },
@@ -13531,16 +13531,16 @@
       "cherokee_syllabary": "ᎠᏎᏃ ᎤᏄᎪᏨ, ᎤᎴᏅᎮ ᎤᏣᏘ ᏚᏰᎵᎯᏍᏔᏁᎢ, ᎠᎴ ᏚᏃᏣᎳᏁ ᎾᏍᎩ, ᎾᏍᎩᏃ ᎢᏳᏍᏗ ᏥᏌ ᎥᏝ ᎿᎭᏉ ᎬᏂᎨᏒ ᏫᎬᏩᏴᏍᏗ ᏱᎨᏎ ᎦᏚᎲᎢ, ᏙᏱᏗᏢᏉᏍᎩᏂ ᎢᎾᎨ ᏕᎨᏌᏗᏒ ᎡᏙᎮᎢ; ᏂᎬᎾᏛᏉᏃ ᏂᏙᏓᏳᏂᎶᏒᎯ ᎬᏩᎷᏤᎮᎢ.",
       "text": "",
       "english": "But he went out, and began to publish it much, and to blaze abroad the matter, insomuch that Jesus could no more openly enter into the city, but was without in desert places: and they came to him from every quarter.",
-      "start": 585.47,
-      "end": 615.74,
-      "cer": -11.5308,
-      "emitted_text": "ahsenho unkotsv ulenvhe utsathi tuyelihihsthane'i ale tunhothslne nahski nahskinho iyuhsti tsihsa vlha nhakw khvnikehsv wikvwayvhsti yikehse katuhv'i toyititlvkwohskini inake tekehsatihsv etohe'i nikvnathvkwnho nitotayunilohsvhi kvwaluhtshehe'i",
+      "start": 585.98,
+      "end": 603.06,
+      "cer": -15.9599,
+      "emitted_text": "ahsenho unkotsv ulenvhe utsathi tuyelihihsthane'i ale tnotslane nahsk nhsknho iyhst tshsa vl nhakw kvnkhs wikhv'wyhsti ykhs kathv'i toyhitilkwohskni inke tkhsathsv etohe'i nkvnatkwonho nttayunlhsvhi kvwaltshe'i",
       "words": [
         {
           "word": "ahseno",
-          "start": 585.5,
+          "start": 586.44,
           "end": 586.8,
-          "confidence": 0.376617,
+          "confidence": 0.994711,
           "flagged": false,
           "emitted_word": "ahsenho",
           "reconciled_word": "ahsenho"
@@ -13583,183 +13583,183 @@
         },
         {
           "word": "ale",
-          "start": 592.8,
-          "end": 592.96,
-          "confidence": 0.953392,
-          "flagged": false,
+          "start": 591.8,
+          "end": 591.86,
+          "confidence": 2e-06,
+          "flagged": true,
           "emitted_word": "ale",
           "reconciled_word": "ale"
         },
         {
           "word": "tunotsalane",
-          "start": 593.12,
-          "end": 593.9,
-          "confidence": 0.019002,
+          "start": 592.14,
+          "end": 592.96,
+          "confidence": 4.3e-05,
           "flagged": true,
-          "emitted_word": "tunhothslne",
-          "reconciled_word": "tunhothslne"
+          "emitted_word": "tnotslane",
+          "reconciled_word": "tnotslane"
         },
         {
           "word": "nahski",
-          "start": 594.22,
-          "end": 594.62,
-          "confidence": 0.136169,
+          "start": 593.04,
+          "end": 593.2,
+          "confidence": 6e-06,
           "flagged": true,
-          "emitted_word": "nahski",
-          "reconciled_word": "nahski"
+          "emitted_word": "nahsk",
+          "reconciled_word": "nahsk"
         },
         {
           "word": "nahskino",
-          "start": 595.84,
-          "end": 596.32,
-          "confidence": 0.913578,
-          "flagged": false,
-          "emitted_word": "nahskinho",
-          "reconciled_word": "nahskinho"
+          "start": 593.28,
+          "end": 593.58,
+          "confidence": 0.006464,
+          "flagged": true,
+          "emitted_word": "nhsknho",
+          "reconciled_word": "nhsknho"
         },
         {
           "word": "iyuhsti",
-          "start": 596.46,
-          "end": 596.9,
-          "confidence": 0.999202,
-          "flagged": false,
-          "emitted_word": "iyuhsti",
-          "reconciled_word": "iyuhsti"
+          "start": 593.62,
+          "end": 593.78,
+          "confidence": 1e-06,
+          "flagged": true,
+          "emitted_word": "iyhst",
+          "reconciled_word": "iyhst"
         },
         {
           "word": "tsihsa",
-          "start": 597.0,
-          "end": 597.34,
-          "confidence": 0.991326,
-          "flagged": false,
-          "emitted_word": "tsihsa",
-          "reconciled_word": "tsihsa"
+          "start": 593.78,
+          "end": 593.9,
+          "confidence": 4e-06,
+          "flagged": true,
+          "emitted_word": "tshsa",
+          "reconciled_word": "tshsa"
         },
         {
           "word": "vtla",
-          "start": 597.5,
-          "end": 597.94,
-          "confidence": 0.988805,
-          "flagged": false,
-          "emitted_word": "vlha",
-          "reconciled_word": "vlha"
+          "start": 594.0,
+          "end": 594.22,
+          "confidence": 0.000182,
+          "flagged": true,
+          "emitted_word": "vl",
+          "reconciled_word": "vl"
         },
         {
           "word": "nhakwo",
-          "start": 597.98,
-          "end": 598.26,
-          "confidence": 0.312123,
-          "flagged": false,
+          "start": 594.22,
+          "end": 594.54,
+          "confidence": 0.000192,
+          "flagged": true,
           "emitted_word": "nhakw",
           "reconciled_word": "nhakw"
         },
         {
           "word": "kvnikehsv",
-          "start": 598.84,
-          "end": 599.58,
-          "confidence": 0.997257,
-          "flagged": false,
-          "emitted_word": "khvnikehsv",
-          "reconciled_word": "khvnikehsv"
+          "start": 594.54,
+          "end": 596.04,
+          "confidence": 0.009148,
+          "flagged": true,
+          "emitted_word": "kvnkhs",
+          "reconciled_word": "kvnkhs"
         },
         {
           "word": "wikvwayvhsti",
-          "start": 599.9,
-          "end": 600.68,
-          "confidence": 0.556492,
-          "flagged": false,
-          "emitted_word": "wikvwayvhsti",
-          "reconciled_word": "wikvwayvhsti"
+          "start": 596.1,
+          "end": 596.9,
+          "confidence": 0.009129,
+          "flagged": true,
+          "emitted_word": "wikhv'wyhsti",
+          "reconciled_word": "wikhv'wyhsti"
         },
         {
           "word": "yikehse",
-          "start": 600.86,
-          "end": 601.42,
-          "confidence": 0.640859,
-          "flagged": false,
-          "emitted_word": "yikehse",
-          "reconciled_word": "yikehse"
+          "start": 597.0,
+          "end": 597.28,
+          "confidence": 0.00496,
+          "flagged": true,
+          "emitted_word": "ykhs",
+          "reconciled_word": "ykhs"
         },
         {
           "word": "katuhv'i",
-          "start": 602.28,
-          "end": 602.96,
-          "confidence": 0.990741,
-          "flagged": false,
-          "emitted_word": "katuhv'i",
-          "reconciled_word": "katuhv'i"
+          "start": 597.28,
+          "end": 597.72,
+          "confidence": 0.000257,
+          "flagged": true,
+          "emitted_word": "kathv'i",
+          "reconciled_word": "kathv'i"
         },
         {
           "word": "toyititlvkwohskini",
-          "start": 603.92,
-          "end": 605.16,
-          "confidence": 0.24473,
+          "start": 597.8,
+          "end": 599.08,
+          "confidence": 0.000674,
           "flagged": true,
-          "emitted_word": "toyititlvkwohskini",
-          "reconciled_word": "toyititlvkwohskini"
+          "emitted_word": "toyhitilkwohskni",
+          "reconciled_word": "toyhitilkwohskni"
         },
         {
           "word": "inake",
-          "start": 605.56,
-          "end": 605.96,
-          "confidence": 0.999915,
-          "flagged": false,
-          "emitted_word": "inake",
-          "reconciled_word": "inake"
+          "start": 599.1,
+          "end": 599.2,
+          "confidence": 0.001968,
+          "flagged": true,
+          "emitted_word": "inke",
+          "reconciled_word": "inke"
         },
         {
           "word": "tekehsatihsv",
-          "start": 606.94,
-          "end": 607.82,
-          "confidence": 0.99358,
-          "flagged": false,
-          "emitted_word": "tekehsatihsv",
-          "reconciled_word": "tekehsatihsv"
+          "start": 599.28,
+          "end": 599.58,
+          "confidence": 0.001185,
+          "flagged": true,
+          "emitted_word": "tkhsathsv",
+          "reconciled_word": "tkhsathsv"
         },
         {
           "word": "etohe'i",
-          "start": 607.96,
-          "end": 608.62,
-          "confidence": 0.999157,
-          "flagged": false,
+          "start": 599.72,
+          "end": 600.0,
+          "confidence": 4e-06,
+          "flagged": true,
           "emitted_word": "etohe'i",
           "reconciled_word": "etohe'i"
         },
         {
           "word": "nikvnatvkwono",
-          "start": 609.76,
-          "end": 610.92,
-          "confidence": 0.936939,
-          "flagged": false,
-          "emitted_word": "nikvnathvkwnho",
-          "reconciled_word": "nikvnathvkwnho"
+          "start": 600.04,
+          "end": 600.56,
+          "confidence": 0.000147,
+          "flagged": true,
+          "emitted_word": "nkvnatkwonho",
+          "reconciled_word": "nkvnatkwonho"
         },
         {
           "word": "nitotayunilohsvhi",
-          "start": 612.16,
-          "end": 613.72,
-          "confidence": 0.787299,
-          "flagged": false,
-          "emitted_word": "nitotayunilohsvhi",
-          "reconciled_word": "nitotayunilohsvhi"
+          "start": 600.58,
+          "end": 601.58,
+          "confidence": 0.000202,
+          "flagged": true,
+          "emitted_word": "nttayunlhsvhi",
+          "reconciled_word": "nttayunlhsvhi"
         },
         {
           "word": "kvwalutsehe'i",
-          "start": 614.44,
-          "end": 615.64,
-          "confidence": 0.894389,
-          "flagged": false,
-          "emitted_word": "kvwaluhtshehe'i",
-          "reconciled_word": "kvwaluhtshehe'i"
+          "start": 602.28,
+          "end": 602.96,
+          "confidence": 0.001742,
+          "flagged": true,
+          "emitted_word": "kvwaltshe'i",
+          "reconciled_word": "kvwaltshe'i"
         }
       ],
       "additional_word_tiers": {
         "Reconciled Transcriptions": [
           {
             "word": "ahsenho",
-            "start": 585.5,
+            "start": 586.44,
             "end": 586.8,
-            "confidence": 0.376617,
+            "confidence": 0.994711,
             "flagged": false,
             "emitted_word": "ahsenho"
           },
@@ -13797,164 +13797,164 @@
           },
           {
             "word": "ale",
-            "start": 592.8,
-            "end": 592.96,
-            "confidence": 0.953392,
-            "flagged": false,
+            "start": 591.8,
+            "end": 591.86,
+            "confidence": 2e-06,
+            "flagged": true,
             "emitted_word": "ale"
           },
           {
-            "word": "tunhothslne",
-            "start": 593.12,
+            "word": "tnotslane",
+            "start": 592.14,
+            "end": 592.96,
+            "confidence": 4.3e-05,
+            "flagged": true,
+            "emitted_word": "tnotslane"
+          },
+          {
+            "word": "nahsk",
+            "start": 593.04,
+            "end": 593.2,
+            "confidence": 6e-06,
+            "flagged": true,
+            "emitted_word": "nahsk"
+          },
+          {
+            "word": "nhsknho",
+            "start": 593.28,
+            "end": 593.58,
+            "confidence": 0.006464,
+            "flagged": true,
+            "emitted_word": "nhsknho"
+          },
+          {
+            "word": "iyhst",
+            "start": 593.62,
+            "end": 593.78,
+            "confidence": 1e-06,
+            "flagged": true,
+            "emitted_word": "iyhst"
+          },
+          {
+            "word": "tshsa",
+            "start": 593.78,
             "end": 593.9,
-            "confidence": 0.019002,
+            "confidence": 4e-06,
             "flagged": true,
-            "emitted_word": "tunhothslne"
+            "emitted_word": "tshsa"
           },
           {
-            "word": "nahski",
-            "start": 594.22,
-            "end": 594.62,
-            "confidence": 0.136169,
+            "word": "vl",
+            "start": 594.0,
+            "end": 594.22,
+            "confidence": 0.000182,
             "flagged": true,
-            "emitted_word": "nahski"
-          },
-          {
-            "word": "nahskinho",
-            "start": 595.84,
-            "end": 596.32,
-            "confidence": 0.913578,
-            "flagged": false,
-            "emitted_word": "nahskinho"
-          },
-          {
-            "word": "iyuhsti",
-            "start": 596.46,
-            "end": 596.9,
-            "confidence": 0.999202,
-            "flagged": false,
-            "emitted_word": "iyuhsti"
-          },
-          {
-            "word": "tsihsa",
-            "start": 597.0,
-            "end": 597.34,
-            "confidence": 0.991326,
-            "flagged": false,
-            "emitted_word": "tsihsa"
-          },
-          {
-            "word": "vlha",
-            "start": 597.5,
-            "end": 597.94,
-            "confidence": 0.988805,
-            "flagged": false,
-            "emitted_word": "vlha"
+            "emitted_word": "vl"
           },
           {
             "word": "nhakw",
-            "start": 597.98,
-            "end": 598.26,
-            "confidence": 0.312123,
-            "flagged": false,
+            "start": 594.22,
+            "end": 594.54,
+            "confidence": 0.000192,
+            "flagged": true,
             "emitted_word": "nhakw"
           },
           {
-            "word": "khvnikehsv",
-            "start": 598.84,
-            "end": 599.58,
-            "confidence": 0.997257,
-            "flagged": false,
-            "emitted_word": "khvnikehsv"
-          },
-          {
-            "word": "wikvwayvhsti",
-            "start": 599.9,
-            "end": 600.68,
-            "confidence": 0.556492,
-            "flagged": false,
-            "emitted_word": "wikvwayvhsti"
-          },
-          {
-            "word": "yikehse",
-            "start": 600.86,
-            "end": 601.42,
-            "confidence": 0.640859,
-            "flagged": false,
-            "emitted_word": "yikehse"
-          },
-          {
-            "word": "katuhv'i",
-            "start": 602.28,
-            "end": 602.96,
-            "confidence": 0.990741,
-            "flagged": false,
-            "emitted_word": "katuhv'i"
-          },
-          {
-            "word": "toyititlvkwohskini",
-            "start": 603.92,
-            "end": 605.16,
-            "confidence": 0.24473,
+            "word": "kvnkhs",
+            "start": 594.54,
+            "end": 596.04,
+            "confidence": 0.009148,
             "flagged": true,
-            "emitted_word": "toyititlvkwohskini"
+            "emitted_word": "kvnkhs"
           },
           {
-            "word": "inake",
-            "start": 605.56,
-            "end": 605.96,
-            "confidence": 0.999915,
-            "flagged": false,
-            "emitted_word": "inake"
+            "word": "wikhv'wyhsti",
+            "start": 596.1,
+            "end": 596.9,
+            "confidence": 0.009129,
+            "flagged": true,
+            "emitted_word": "wikhv'wyhsti"
           },
           {
-            "word": "tekehsatihsv",
-            "start": 606.94,
-            "end": 607.82,
-            "confidence": 0.99358,
-            "flagged": false,
-            "emitted_word": "tekehsatihsv"
+            "word": "ykhs",
+            "start": 597.0,
+            "end": 597.28,
+            "confidence": 0.00496,
+            "flagged": true,
+            "emitted_word": "ykhs"
+          },
+          {
+            "word": "kathv'i",
+            "start": 597.28,
+            "end": 597.72,
+            "confidence": 0.000257,
+            "flagged": true,
+            "emitted_word": "kathv'i"
+          },
+          {
+            "word": "toyhitilkwohskni",
+            "start": 597.8,
+            "end": 599.08,
+            "confidence": 0.000674,
+            "flagged": true,
+            "emitted_word": "toyhitilkwohskni"
+          },
+          {
+            "word": "inke",
+            "start": 599.1,
+            "end": 599.2,
+            "confidence": 0.001968,
+            "flagged": true,
+            "emitted_word": "inke"
+          },
+          {
+            "word": "tkhsathsv",
+            "start": 599.28,
+            "end": 599.58,
+            "confidence": 0.001185,
+            "flagged": true,
+            "emitted_word": "tkhsathsv"
           },
           {
             "word": "etohe'i",
-            "start": 607.96,
-            "end": 608.62,
-            "confidence": 0.999157,
-            "flagged": false,
+            "start": 599.72,
+            "end": 600.0,
+            "confidence": 4e-06,
+            "flagged": true,
             "emitted_word": "etohe'i"
           },
           {
-            "word": "nikvnathvkwnho",
-            "start": 609.76,
-            "end": 610.92,
-            "confidence": 0.936939,
-            "flagged": false,
-            "emitted_word": "nikvnathvkwnho"
+            "word": "nkvnatkwonho",
+            "start": 600.04,
+            "end": 600.56,
+            "confidence": 0.000147,
+            "flagged": true,
+            "emitted_word": "nkvnatkwonho"
           },
           {
-            "word": "nitotayunilohsvhi",
-            "start": 612.16,
-            "end": 613.72,
-            "confidence": 0.787299,
-            "flagged": false,
-            "emitted_word": "nitotayunilohsvhi"
+            "word": "nttayunlhsvhi",
+            "start": 600.58,
+            "end": 601.58,
+            "confidence": 0.000202,
+            "flagged": true,
+            "emitted_word": "nttayunlhsvhi"
           },
           {
-            "word": "kvwaluhtshehe'i",
-            "start": 614.44,
-            "end": 615.64,
-            "confidence": 0.894389,
-            "flagged": false,
-            "emitted_word": "kvwaluhtshehe'i"
+            "word": "kvwaltshe'i",
+            "start": 602.28,
+            "end": 602.96,
+            "confidence": 0.001742,
+            "flagged": true,
+            "emitted_word": "kvwaltshe'i"
           }
         ]
       },
       "reconciled_words": [
         {
           "word": "ahsenho",
-          "start": 585.5,
+          "start": 586.44,
           "end": 586.8,
-          "confidence": 0.376617,
+          "confidence": 0.994711,
           "flagged": false,
           "emitted_word": "ahsenho"
         },
@@ -13992,155 +13992,155 @@
         },
         {
           "word": "ale",
-          "start": 592.8,
-          "end": 592.96,
-          "confidence": 0.953392,
-          "flagged": false,
+          "start": 591.8,
+          "end": 591.86,
+          "confidence": 2e-06,
+          "flagged": true,
           "emitted_word": "ale"
         },
         {
-          "word": "tunhothslne",
-          "start": 593.12,
+          "word": "tnotslane",
+          "start": 592.14,
+          "end": 592.96,
+          "confidence": 4.3e-05,
+          "flagged": true,
+          "emitted_word": "tnotslane"
+        },
+        {
+          "word": "nahsk",
+          "start": 593.04,
+          "end": 593.2,
+          "confidence": 6e-06,
+          "flagged": true,
+          "emitted_word": "nahsk"
+        },
+        {
+          "word": "nhsknho",
+          "start": 593.28,
+          "end": 593.58,
+          "confidence": 0.006464,
+          "flagged": true,
+          "emitted_word": "nhsknho"
+        },
+        {
+          "word": "iyhst",
+          "start": 593.62,
+          "end": 593.78,
+          "confidence": 1e-06,
+          "flagged": true,
+          "emitted_word": "iyhst"
+        },
+        {
+          "word": "tshsa",
+          "start": 593.78,
           "end": 593.9,
-          "confidence": 0.019002,
+          "confidence": 4e-06,
           "flagged": true,
-          "emitted_word": "tunhothslne"
+          "emitted_word": "tshsa"
         },
         {
-          "word": "nahski",
-          "start": 594.22,
-          "end": 594.62,
-          "confidence": 0.136169,
+          "word": "vl",
+          "start": 594.0,
+          "end": 594.22,
+          "confidence": 0.000182,
           "flagged": true,
-          "emitted_word": "nahski"
-        },
-        {
-          "word": "nahskinho",
-          "start": 595.84,
-          "end": 596.32,
-          "confidence": 0.913578,
-          "flagged": false,
-          "emitted_word": "nahskinho"
-        },
-        {
-          "word": "iyuhsti",
-          "start": 596.46,
-          "end": 596.9,
-          "confidence": 0.999202,
-          "flagged": false,
-          "emitted_word": "iyuhsti"
-        },
-        {
-          "word": "tsihsa",
-          "start": 597.0,
-          "end": 597.34,
-          "confidence": 0.991326,
-          "flagged": false,
-          "emitted_word": "tsihsa"
-        },
-        {
-          "word": "vlha",
-          "start": 597.5,
-          "end": 597.94,
-          "confidence": 0.988805,
-          "flagged": false,
-          "emitted_word": "vlha"
+          "emitted_word": "vl"
         },
         {
           "word": "nhakw",
-          "start": 597.98,
-          "end": 598.26,
-          "confidence": 0.312123,
-          "flagged": false,
+          "start": 594.22,
+          "end": 594.54,
+          "confidence": 0.000192,
+          "flagged": true,
           "emitted_word": "nhakw"
         },
         {
-          "word": "khvnikehsv",
-          "start": 598.84,
-          "end": 599.58,
-          "confidence": 0.997257,
-          "flagged": false,
-          "emitted_word": "khvnikehsv"
-        },
-        {
-          "word": "wikvwayvhsti",
-          "start": 599.9,
-          "end": 600.68,
-          "confidence": 0.556492,
-          "flagged": false,
-          "emitted_word": "wikvwayvhsti"
-        },
-        {
-          "word": "yikehse",
-          "start": 600.86,
-          "end": 601.42,
-          "confidence": 0.640859,
-          "flagged": false,
-          "emitted_word": "yikehse"
-        },
-        {
-          "word": "katuhv'i",
-          "start": 602.28,
-          "end": 602.96,
-          "confidence": 0.990741,
-          "flagged": false,
-          "emitted_word": "katuhv'i"
-        },
-        {
-          "word": "toyititlvkwohskini",
-          "start": 603.92,
-          "end": 605.16,
-          "confidence": 0.24473,
+          "word": "kvnkhs",
+          "start": 594.54,
+          "end": 596.04,
+          "confidence": 0.009148,
           "flagged": true,
-          "emitted_word": "toyititlvkwohskini"
+          "emitted_word": "kvnkhs"
         },
         {
-          "word": "inake",
-          "start": 605.56,
-          "end": 605.96,
-          "confidence": 0.999915,
-          "flagged": false,
-          "emitted_word": "inake"
+          "word": "wikhv'wyhsti",
+          "start": 596.1,
+          "end": 596.9,
+          "confidence": 0.009129,
+          "flagged": true,
+          "emitted_word": "wikhv'wyhsti"
         },
         {
-          "word": "tekehsatihsv",
-          "start": 606.94,
-          "end": 607.82,
-          "confidence": 0.99358,
-          "flagged": false,
-          "emitted_word": "tekehsatihsv"
+          "word": "ykhs",
+          "start": 597.0,
+          "end": 597.28,
+          "confidence": 0.00496,
+          "flagged": true,
+          "emitted_word": "ykhs"
+        },
+        {
+          "word": "kathv'i",
+          "start": 597.28,
+          "end": 597.72,
+          "confidence": 0.000257,
+          "flagged": true,
+          "emitted_word": "kathv'i"
+        },
+        {
+          "word": "toyhitilkwohskni",
+          "start": 597.8,
+          "end": 599.08,
+          "confidence": 0.000674,
+          "flagged": true,
+          "emitted_word": "toyhitilkwohskni"
+        },
+        {
+          "word": "inke",
+          "start": 599.1,
+          "end": 599.2,
+          "confidence": 0.001968,
+          "flagged": true,
+          "emitted_word": "inke"
+        },
+        {
+          "word": "tkhsathsv",
+          "start": 599.28,
+          "end": 599.58,
+          "confidence": 0.001185,
+          "flagged": true,
+          "emitted_word": "tkhsathsv"
         },
         {
           "word": "etohe'i",
-          "start": 607.96,
-          "end": 608.62,
-          "confidence": 0.999157,
-          "flagged": false,
+          "start": 599.72,
+          "end": 600.0,
+          "confidence": 4e-06,
+          "flagged": true,
           "emitted_word": "etohe'i"
         },
         {
-          "word": "nikvnathvkwnho",
-          "start": 609.76,
-          "end": 610.92,
-          "confidence": 0.936939,
-          "flagged": false,
-          "emitted_word": "nikvnathvkwnho"
+          "word": "nkvnatkwonho",
+          "start": 600.04,
+          "end": 600.56,
+          "confidence": 0.000147,
+          "flagged": true,
+          "emitted_word": "nkvnatkwonho"
         },
         {
-          "word": "nitotayunilohsvhi",
-          "start": 612.16,
-          "end": 613.72,
-          "confidence": 0.787299,
-          "flagged": false,
-          "emitted_word": "nitotayunilohsvhi"
+          "word": "nttayunlhsvhi",
+          "start": 600.58,
+          "end": 601.58,
+          "confidence": 0.000202,
+          "flagged": true,
+          "emitted_word": "nttayunlhsvhi"
         },
         {
-          "word": "kvwaluhtshehe'i",
-          "start": 614.44,
-          "end": 615.64,
-          "confidence": 0.894389,
-          "flagged": false,
-          "emitted_word": "kvwaluhtshehe'i"
+          "word": "kvwaltshe'i",
+          "start": 602.28,
+          "end": 602.96,
+          "confidence": 0.001742,
+          "flagged": true,
+          "emitted_word": "kvwaltshe'i"
         }
       ]
     }
@@ -14316,12 +14316,12 @@
         "emitted_word": "tsalohihstiyi"
       },
       {
-        "word": "ikvyititl",
+        "word": "ikvyititlv",
         "start": 32.94,
-        "end": 33.7,
-        "confidence": 0.997533,
+        "end": 33.76,
+        "confidence": 0.478001,
         "flagged": false,
-        "emitted_word": "ikvyititl"
+        "emitted_word": "ikvyititlv"
       },
       {
         "word": "uwelhuhka",
@@ -14620,12 +14620,12 @@
         "emitted_word": "uweyv'i"
       },
       {
-        "word": "unihskanvts",
+        "word": "unihskanvtsv",
         "start": 78.46,
-        "end": 79.2,
-        "confidence": 0.938689,
+        "end": 79.3,
+        "confidence": 0.866192,
         "flagged": false,
-        "emitted_word": "unihskanvts"
+        "emitted_word": "unihskanvtsv"
       },
       {
         "word": "aninhohvhske'i",
@@ -14852,12 +14852,12 @@
         "emitted_word": "yiniko'i"
       },
       {
-        "word": "akwatihsattihstiy",
+        "word": "akwatihsattihstiyi",
         "start": 110.36,
-        "end": 111.7,
-        "confidence": 0.954184,
+        "end": 111.78,
+        "confidence": 0.802287,
         "flagged": false,
-        "emitted_word": "akwatihsattihstiy"
+        "emitted_word": "akwatihsattihstiyi"
       },
       {
         "word": "ale",
@@ -15268,12 +15268,12 @@
         "emitted_word": "kilakwono"
       },
       {
-        "word": "iyvt",
+        "word": "iyvtv",
         "start": 166.34,
-        "end": 166.72,
-        "confidence": 0.170643,
+        "end": 166.76,
+        "confidence": 0.066627,
         "flagged": false,
-        "emitted_word": "iyvt"
+        "emitted_word": "iyvtv"
       },
       {
         "word": "atanto",
@@ -15356,12 +15356,12 @@
         "emitted_word": "ukoliyehske'i"
       },
       {
-        "word": "al",
+        "word": "ale",
         "start": 178.4,
-        "end": 178.5,
-        "confidence": 0.117805,
-        "flagged": false,
-        "emitted_word": "al"
+        "end": 178.56,
+        "confidence": 0.009644,
+        "flagged": true,
+        "emitted_word": "ale"
       },
       {
         "word": "inake",
@@ -15476,12 +15476,12 @@
         "emitted_word": "ohstv"
       },
       {
-        "word": "khanohet",
+        "word": "khanohetv",
         "start": 195.76,
-        "end": 196.4,
-        "confidence": 0.895893,
+        "end": 196.46,
+        "confidence": 0.579943,
         "flagged": false,
-        "emitted_word": "khanohet"
+        "emitted_word": "khanohetv"
       },
       {
         "word": "unlanvhi",
@@ -15540,12 +15540,12 @@
         "emitted_word": "nikawehske'i"
       },
       {
-        "word": "nhakw",
+        "word": "nhakwo",
         "start": 202.66,
-        "end": 203.0,
-        "confidence": 0.091067,
+        "end": 203.12,
+        "confidence": 0.01388,
         "flagged": true,
-        "emitted_word": "nhakw"
+        "emitted_word": "nhakwo"
       },
       {
         "word": "alhiyloka",
@@ -15908,12 +15908,12 @@
         "emitted_word": "tsimi"
       },
       {
-        "word": "tsekwit",
+        "word": "tsekwiti",
         "start": 256.1,
-        "end": 256.54,
-        "confidence": 0.940272,
-        "flagged": false,
-        "emitted_word": "tsekwit"
+        "end": 256.6,
+        "confidence": 0.292387,
+        "flagged": true,
+        "emitted_word": "tsekwiti"
       },
       {
         "word": "uwetsi",
@@ -15956,19 +15956,19 @@
         "emitted_word": "nahskinho"
       },
       {
-        "word": "nahskw",
+        "word": "nahskwo",
         "start": 261.74,
-        "end": 262.06,
-        "confidence": 0.86391,
-        "flagged": false,
-        "emitted_word": "nahskw"
+        "end": 262.16,
+        "confidence": 0.1507,
+        "flagged": true,
+        "emitted_word": "nahskwo"
       },
       {
         "word": "untsa'e",
-        "start": 262.14,
+        "start": 262.36,
         "end": 264.1,
-        "confidence": 0.995807,
-        "flagged": false,
+        "confidence": 0.220489,
+        "flagged": true,
         "emitted_word": "untsa'e"
       },
       {
@@ -16556,18 +16556,18 @@
         "emitted_word": "katahanho"
       },
       {
-        "word": "atant",
+        "word": "atanto",
         "start": 352.44,
-        "end": 352.78,
-        "confidence": 0.874851,
+        "end": 352.84,
+        "confidence": 0.290274,
         "flagged": false,
-        "emitted_word": "atant"
+        "emitted_word": "atanto"
       },
       {
         "word": "ulvtehsthanv",
-        "start": 352.8,
+        "start": 352.9,
         "end": 353.66,
-        "confidence": 0.449323,
+        "confidence": 0.442229,
         "flagged": true,
         "emitted_word": "ulvtehsthanv"
       },
@@ -16804,12 +16804,12 @@
         "emitted_word": "kvwohiyuhvhsko'i"
       },
       {
-        "word": "khilakwn",
+        "word": "khilakwno",
         "start": 383.18,
-        "end": 383.58,
-        "confidence": 0.860694,
+        "end": 383.64,
+        "confidence": 0.789425,
         "flagged": false,
-        "emitted_word": "khilakwn"
+        "emitted_word": "khilakwno"
       },
       {
         "word": "iyvt",
@@ -17660,18 +17660,18 @@
         "emitted_word": "iyuhsti"
       },
       {
-        "word": "aki'luhthsil",
+        "word": "aki'luhthsilhv",
         "start": 504.94,
-        "end": 505.86,
-        "confidence": 0.598446,
-        "flagged": false,
-        "emitted_word": "aki'luhthsil"
+        "end": 505.94,
+        "confidence": 0.355483,
+        "flagged": true,
+        "emitted_word": "aki'luhthsilhv"
       },
       {
         "word": "alihtstonhitohenho",
-        "start": 505.92,
+        "start": 507.22,
         "end": 508.9,
-        "confidence": 0.753749,
+        "confidence": 0.75376,
         "flagged": false,
         "emitted_word": "alihtstonhitohenho"
       },
@@ -17932,26 +17932,26 @@
         "emitted_word": "unhetskwnho"
       },
       {
-        "word": "khilakw",
+        "word": "khilakwo",
         "start": 545.28,
-        "end": 545.6,
-        "confidence": 0.989195,
-        "flagged": false,
-        "emitted_word": "khilakw"
+        "end": 545.64,
+        "confidence": 0.224858,
+        "flagged": true,
+        "emitted_word": "khilakwo"
       },
       {
-        "word": "iyvt",
+        "word": "iyvtv",
         "start": 545.76,
-        "end": 546.14,
-        "confidence": 0.966913,
-        "flagged": false,
-        "emitted_word": "iyvt"
+        "end": 546.2,
+        "confidence": 0.140934,
+        "flagged": true,
+        "emitted_word": "iyvtv"
       },
       {
         "word": "atayehski",
-        "start": 546.18,
+        "start": 546.62,
         "end": 547.46,
-        "confidence": 0.998789,
+        "confidence": 0.997453,
         "flagged": false,
         "emitted_word": "atayehski"
       },
@@ -17996,12 +17996,12 @@
         "emitted_word": "kehse'i"
       },
       {
-        "word": "ulhiniktn",
+        "word": "ulhiniktnho",
         "start": 553.6,
-        "end": 554.3,
-        "confidence": 0.462757,
+        "end": 554.4,
+        "confidence": 0.371882,
         "flagged": false,
-        "emitted_word": "ulhiniktn"
+        "emitted_word": "ulhiniktnho"
       },
       {
         "word": "unhetshel",
@@ -18020,12 +18020,12 @@
         "emitted_word": "khilakwo"
       },
       {
-        "word": "iyvt",
+        "word": "iyvtv",
         "start": 556.16,
-        "end": 556.48,
-        "confidence": 0.999207,
-        "flagged": false,
-        "emitted_word": "iyvt"
+        "end": 556.52,
+        "confidence": 0.198902,
+        "flagged": true,
+        "emitted_word": "iyvtv"
       },
       {
         "word": "unhetsele",
@@ -18212,18 +18212,18 @@
         "emitted_word": "nahski"
       },
       {
-        "word": "unatohiyunanhetiy",
+        "word": "unatohiyunanhetiyi",
         "start": 583.86,
-        "end": 585.44,
-        "confidence": 0.973652,
+        "end": 585.52,
+        "confidence": 0.654258,
         "flagged": false,
-        "emitted_word": "unatohiyunanhetiy"
+        "emitted_word": "unatohiyunanhetiyi"
       },
       {
         "word": "ahsenho",
-        "start": 585.5,
+        "start": 586.44,
         "end": 586.8,
-        "confidence": 0.376617,
+        "confidence": 0.994711,
         "flagged": false,
         "emitted_word": "ahsenho"
       },
@@ -18261,155 +18261,155 @@
       },
       {
         "word": "ale",
-        "start": 592.8,
-        "end": 592.96,
-        "confidence": 0.953392,
-        "flagged": false,
+        "start": 591.8,
+        "end": 591.86,
+        "confidence": 2e-06,
+        "flagged": true,
         "emitted_word": "ale"
       },
       {
-        "word": "tunhothslne",
-        "start": 593.12,
+        "word": "tnotslane",
+        "start": 592.14,
+        "end": 592.96,
+        "confidence": 4.3e-05,
+        "flagged": true,
+        "emitted_word": "tnotslane"
+      },
+      {
+        "word": "nahsk",
+        "start": 593.04,
+        "end": 593.2,
+        "confidence": 6e-06,
+        "flagged": true,
+        "emitted_word": "nahsk"
+      },
+      {
+        "word": "nhsknho",
+        "start": 593.28,
+        "end": 593.58,
+        "confidence": 0.006464,
+        "flagged": true,
+        "emitted_word": "nhsknho"
+      },
+      {
+        "word": "iyhst",
+        "start": 593.62,
+        "end": 593.78,
+        "confidence": 1e-06,
+        "flagged": true,
+        "emitted_word": "iyhst"
+      },
+      {
+        "word": "tshsa",
+        "start": 593.78,
         "end": 593.9,
-        "confidence": 0.019002,
+        "confidence": 4e-06,
         "flagged": true,
-        "emitted_word": "tunhothslne"
+        "emitted_word": "tshsa"
       },
       {
-        "word": "nahski",
-        "start": 594.22,
-        "end": 594.62,
-        "confidence": 0.136169,
+        "word": "vl",
+        "start": 594.0,
+        "end": 594.22,
+        "confidence": 0.000182,
         "flagged": true,
-        "emitted_word": "nahski"
-      },
-      {
-        "word": "nahskinho",
-        "start": 595.84,
-        "end": 596.32,
-        "confidence": 0.913578,
-        "flagged": false,
-        "emitted_word": "nahskinho"
-      },
-      {
-        "word": "iyuhsti",
-        "start": 596.46,
-        "end": 596.9,
-        "confidence": 0.999202,
-        "flagged": false,
-        "emitted_word": "iyuhsti"
-      },
-      {
-        "word": "tsihsa",
-        "start": 597.0,
-        "end": 597.34,
-        "confidence": 0.991326,
-        "flagged": false,
-        "emitted_word": "tsihsa"
-      },
-      {
-        "word": "vlha",
-        "start": 597.5,
-        "end": 597.94,
-        "confidence": 0.988805,
-        "flagged": false,
-        "emitted_word": "vlha"
+        "emitted_word": "vl"
       },
       {
         "word": "nhakw",
-        "start": 597.98,
-        "end": 598.26,
-        "confidence": 0.312123,
-        "flagged": false,
+        "start": 594.22,
+        "end": 594.54,
+        "confidence": 0.000192,
+        "flagged": true,
         "emitted_word": "nhakw"
       },
       {
-        "word": "khvnikehsv",
-        "start": 598.84,
-        "end": 599.58,
-        "confidence": 0.997257,
-        "flagged": false,
-        "emitted_word": "khvnikehsv"
-      },
-      {
-        "word": "wikvwayvhsti",
-        "start": 599.9,
-        "end": 600.68,
-        "confidence": 0.556492,
-        "flagged": false,
-        "emitted_word": "wikvwayvhsti"
-      },
-      {
-        "word": "yikehse",
-        "start": 600.86,
-        "end": 601.42,
-        "confidence": 0.640859,
-        "flagged": false,
-        "emitted_word": "yikehse"
-      },
-      {
-        "word": "katuhv'i",
-        "start": 602.28,
-        "end": 602.96,
-        "confidence": 0.990741,
-        "flagged": false,
-        "emitted_word": "katuhv'i"
-      },
-      {
-        "word": "toyititlvkwohskini",
-        "start": 603.92,
-        "end": 605.16,
-        "confidence": 0.24473,
+        "word": "kvnkhs",
+        "start": 594.54,
+        "end": 596.04,
+        "confidence": 0.009148,
         "flagged": true,
-        "emitted_word": "toyititlvkwohskini"
+        "emitted_word": "kvnkhs"
       },
       {
-        "word": "inake",
-        "start": 605.56,
-        "end": 605.96,
-        "confidence": 0.999915,
-        "flagged": false,
-        "emitted_word": "inake"
+        "word": "wikhv'wyhsti",
+        "start": 596.1,
+        "end": 596.9,
+        "confidence": 0.009129,
+        "flagged": true,
+        "emitted_word": "wikhv'wyhsti"
       },
       {
-        "word": "tekehsatihsv",
-        "start": 606.94,
-        "end": 607.82,
-        "confidence": 0.99358,
-        "flagged": false,
-        "emitted_word": "tekehsatihsv"
+        "word": "ykhs",
+        "start": 597.0,
+        "end": 597.28,
+        "confidence": 0.00496,
+        "flagged": true,
+        "emitted_word": "ykhs"
+      },
+      {
+        "word": "kathv'i",
+        "start": 597.28,
+        "end": 597.72,
+        "confidence": 0.000257,
+        "flagged": true,
+        "emitted_word": "kathv'i"
+      },
+      {
+        "word": "toyhitilkwohskni",
+        "start": 597.8,
+        "end": 599.08,
+        "confidence": 0.000674,
+        "flagged": true,
+        "emitted_word": "toyhitilkwohskni"
+      },
+      {
+        "word": "inke",
+        "start": 599.1,
+        "end": 599.2,
+        "confidence": 0.001968,
+        "flagged": true,
+        "emitted_word": "inke"
+      },
+      {
+        "word": "tkhsathsv",
+        "start": 599.28,
+        "end": 599.58,
+        "confidence": 0.001185,
+        "flagged": true,
+        "emitted_word": "tkhsathsv"
       },
       {
         "word": "etohe'i",
-        "start": 607.96,
-        "end": 608.62,
-        "confidence": 0.999157,
-        "flagged": false,
+        "start": 599.72,
+        "end": 600.0,
+        "confidence": 4e-06,
+        "flagged": true,
         "emitted_word": "etohe'i"
       },
       {
-        "word": "nikvnathvkwnho",
-        "start": 609.76,
-        "end": 610.92,
-        "confidence": 0.936939,
-        "flagged": false,
-        "emitted_word": "nikvnathvkwnho"
+        "word": "nkvnatkwonho",
+        "start": 600.04,
+        "end": 600.56,
+        "confidence": 0.000147,
+        "flagged": true,
+        "emitted_word": "nkvnatkwonho"
       },
       {
-        "word": "nitotayunilohsvhi",
-        "start": 612.16,
-        "end": 613.72,
-        "confidence": 0.787299,
-        "flagged": false,
-        "emitted_word": "nitotayunilohsvhi"
+        "word": "nttayunlhsvhi",
+        "start": 600.58,
+        "end": 601.58,
+        "confidence": 0.000202,
+        "flagged": true,
+        "emitted_word": "nttayunlhsvhi"
       },
       {
-        "word": "kvwaluhtshehe'i",
-        "start": 614.44,
-        "end": 615.64,
-        "confidence": 0.894389,
-        "flagged": false,
-        "emitted_word": "kvwaluhtshehe'i"
+        "word": "kvwaltshe'i",
+        "start": 602.28,
+        "end": 602.96,
+        "confidence": 0.001742,
+        "flagged": true,
+        "emitted_word": "kvwaltshe'i"
       }
     ]
   },
@@ -18583,12 +18583,12 @@
       "emitted_word": "tsalohihstiyi"
     },
     {
-      "word": "ikvyititl",
+      "word": "ikvyititlv",
       "start": 32.94,
-      "end": 33.7,
-      "confidence": 0.997533,
+      "end": 33.76,
+      "confidence": 0.478001,
       "flagged": false,
-      "emitted_word": "ikvyititl"
+      "emitted_word": "ikvyititlv"
     },
     {
       "word": "uwelhuhka",
@@ -18887,12 +18887,12 @@
       "emitted_word": "uweyv'i"
     },
     {
-      "word": "unihskanvts",
+      "word": "unihskanvtsv",
       "start": 78.46,
-      "end": 79.2,
-      "confidence": 0.938689,
+      "end": 79.3,
+      "confidence": 0.866192,
       "flagged": false,
-      "emitted_word": "unihskanvts"
+      "emitted_word": "unihskanvtsv"
     },
     {
       "word": "aninhohvhske'i",
@@ -19119,12 +19119,12 @@
       "emitted_word": "yiniko'i"
     },
     {
-      "word": "akwatihsattihstiy",
+      "word": "akwatihsattihstiyi",
       "start": 110.36,
-      "end": 111.7,
-      "confidence": 0.954184,
+      "end": 111.78,
+      "confidence": 0.802287,
       "flagged": false,
-      "emitted_word": "akwatihsattihstiy"
+      "emitted_word": "akwatihsattihstiyi"
     },
     {
       "word": "ale",
@@ -19535,12 +19535,12 @@
       "emitted_word": "kilakwono"
     },
     {
-      "word": "iyvt",
+      "word": "iyvtv",
       "start": 166.34,
-      "end": 166.72,
-      "confidence": 0.170643,
+      "end": 166.76,
+      "confidence": 0.066627,
       "flagged": false,
-      "emitted_word": "iyvt"
+      "emitted_word": "iyvtv"
     },
     {
       "word": "atanto",
@@ -19623,12 +19623,12 @@
       "emitted_word": "ukoliyehske'i"
     },
     {
-      "word": "al",
+      "word": "ale",
       "start": 178.4,
-      "end": 178.5,
-      "confidence": 0.117805,
-      "flagged": false,
-      "emitted_word": "al"
+      "end": 178.56,
+      "confidence": 0.009644,
+      "flagged": true,
+      "emitted_word": "ale"
     },
     {
       "word": "inake",
@@ -19743,12 +19743,12 @@
       "emitted_word": "ohstv"
     },
     {
-      "word": "khanohet",
+      "word": "khanohetv",
       "start": 195.76,
-      "end": 196.4,
-      "confidence": 0.895893,
+      "end": 196.46,
+      "confidence": 0.579943,
       "flagged": false,
-      "emitted_word": "khanohet"
+      "emitted_word": "khanohetv"
     },
     {
       "word": "unlanvhi",
@@ -19807,12 +19807,12 @@
       "emitted_word": "nikawehske'i"
     },
     {
-      "word": "nhakw",
+      "word": "nhakwo",
       "start": 202.66,
-      "end": 203.0,
-      "confidence": 0.091067,
+      "end": 203.12,
+      "confidence": 0.01388,
       "flagged": true,
-      "emitted_word": "nhakw"
+      "emitted_word": "nhakwo"
     },
     {
       "word": "alhiyloka",
@@ -20175,12 +20175,12 @@
       "emitted_word": "tsimi"
     },
     {
-      "word": "tsekwit",
+      "word": "tsekwiti",
       "start": 256.1,
-      "end": 256.54,
-      "confidence": 0.940272,
-      "flagged": false,
-      "emitted_word": "tsekwit"
+      "end": 256.6,
+      "confidence": 0.292387,
+      "flagged": true,
+      "emitted_word": "tsekwiti"
     },
     {
       "word": "uwetsi",
@@ -20223,19 +20223,19 @@
       "emitted_word": "nahskinho"
     },
     {
-      "word": "nahskw",
+      "word": "nahskwo",
       "start": 261.74,
-      "end": 262.06,
-      "confidence": 0.86391,
-      "flagged": false,
-      "emitted_word": "nahskw"
+      "end": 262.16,
+      "confidence": 0.1507,
+      "flagged": true,
+      "emitted_word": "nahskwo"
     },
     {
       "word": "untsa'e",
-      "start": 262.14,
+      "start": 262.36,
       "end": 264.1,
-      "confidence": 0.995807,
-      "flagged": false,
+      "confidence": 0.220489,
+      "flagged": true,
       "emitted_word": "untsa'e"
     },
     {
@@ -20823,18 +20823,18 @@
       "emitted_word": "katahanho"
     },
     {
-      "word": "atant",
+      "word": "atanto",
       "start": 352.44,
-      "end": 352.78,
-      "confidence": 0.874851,
+      "end": 352.84,
+      "confidence": 0.290274,
       "flagged": false,
-      "emitted_word": "atant"
+      "emitted_word": "atanto"
     },
     {
       "word": "ulvtehsthanv",
-      "start": 352.8,
+      "start": 352.9,
       "end": 353.66,
-      "confidence": 0.449323,
+      "confidence": 0.442229,
       "flagged": true,
       "emitted_word": "ulvtehsthanv"
     },
@@ -21071,12 +21071,12 @@
       "emitted_word": "kvwohiyuhvhsko'i"
     },
     {
-      "word": "khilakwn",
+      "word": "khilakwno",
       "start": 383.18,
-      "end": 383.58,
-      "confidence": 0.860694,
+      "end": 383.64,
+      "confidence": 0.789425,
       "flagged": false,
-      "emitted_word": "khilakwn"
+      "emitted_word": "khilakwno"
     },
     {
       "word": "iyvt",
@@ -21927,18 +21927,18 @@
       "emitted_word": "iyuhsti"
     },
     {
-      "word": "aki'luhthsil",
+      "word": "aki'luhthsilhv",
       "start": 504.94,
-      "end": 505.86,
-      "confidence": 0.598446,
-      "flagged": false,
-      "emitted_word": "aki'luhthsil"
+      "end": 505.94,
+      "confidence": 0.355483,
+      "flagged": true,
+      "emitted_word": "aki'luhthsilhv"
     },
     {
       "word": "alihtstonhitohenho",
-      "start": 505.92,
+      "start": 507.22,
       "end": 508.9,
-      "confidence": 0.753749,
+      "confidence": 0.75376,
       "flagged": false,
       "emitted_word": "alihtstonhitohenho"
     },
@@ -22199,26 +22199,26 @@
       "emitted_word": "unhetskwnho"
     },
     {
-      "word": "khilakw",
+      "word": "khilakwo",
       "start": 545.28,
-      "end": 545.6,
-      "confidence": 0.989195,
-      "flagged": false,
-      "emitted_word": "khilakw"
+      "end": 545.64,
+      "confidence": 0.224858,
+      "flagged": true,
+      "emitted_word": "khilakwo"
     },
     {
-      "word": "iyvt",
+      "word": "iyvtv",
       "start": 545.76,
-      "end": 546.14,
-      "confidence": 0.966913,
-      "flagged": false,
-      "emitted_word": "iyvt"
+      "end": 546.2,
+      "confidence": 0.140934,
+      "flagged": true,
+      "emitted_word": "iyvtv"
     },
     {
       "word": "atayehski",
-      "start": 546.18,
+      "start": 546.62,
       "end": 547.46,
-      "confidence": 0.998789,
+      "confidence": 0.997453,
       "flagged": false,
       "emitted_word": "atayehski"
     },
@@ -22263,12 +22263,12 @@
       "emitted_word": "kehse'i"
     },
     {
-      "word": "ulhiniktn",
+      "word": "ulhiniktnho",
       "start": 553.6,
-      "end": 554.3,
-      "confidence": 0.462757,
+      "end": 554.4,
+      "confidence": 0.371882,
       "flagged": false,
-      "emitted_word": "ulhiniktn"
+      "emitted_word": "ulhiniktnho"
     },
     {
       "word": "unhetshel",
@@ -22287,12 +22287,12 @@
       "emitted_word": "khilakwo"
     },
     {
-      "word": "iyvt",
+      "word": "iyvtv",
       "start": 556.16,
-      "end": 556.48,
-      "confidence": 0.999207,
-      "flagged": false,
-      "emitted_word": "iyvt"
+      "end": 556.52,
+      "confidence": 0.198902,
+      "flagged": true,
+      "emitted_word": "iyvtv"
     },
     {
       "word": "unhetsele",
@@ -22479,18 +22479,18 @@
       "emitted_word": "nahski"
     },
     {
-      "word": "unatohiyunanhetiy",
+      "word": "unatohiyunanhetiyi",
       "start": 583.86,
-      "end": 585.44,
-      "confidence": 0.973652,
+      "end": 585.52,
+      "confidence": 0.654258,
       "flagged": false,
-      "emitted_word": "unatohiyunanhetiy"
+      "emitted_word": "unatohiyunanhetiyi"
     },
     {
       "word": "ahsenho",
-      "start": 585.5,
+      "start": 586.44,
       "end": 586.8,
-      "confidence": 0.376617,
+      "confidence": 0.994711,
       "flagged": false,
       "emitted_word": "ahsenho"
     },
@@ -22528,155 +22528,155 @@
     },
     {
       "word": "ale",
-      "start": 592.8,
-      "end": 592.96,
-      "confidence": 0.953392,
-      "flagged": false,
+      "start": 591.8,
+      "end": 591.86,
+      "confidence": 2e-06,
+      "flagged": true,
       "emitted_word": "ale"
     },
     {
-      "word": "tunhothslne",
-      "start": 593.12,
+      "word": "tnotslane",
+      "start": 592.14,
+      "end": 592.96,
+      "confidence": 4.3e-05,
+      "flagged": true,
+      "emitted_word": "tnotslane"
+    },
+    {
+      "word": "nahsk",
+      "start": 593.04,
+      "end": 593.2,
+      "confidence": 6e-06,
+      "flagged": true,
+      "emitted_word": "nahsk"
+    },
+    {
+      "word": "nhsknho",
+      "start": 593.28,
+      "end": 593.58,
+      "confidence": 0.006464,
+      "flagged": true,
+      "emitted_word": "nhsknho"
+    },
+    {
+      "word": "iyhst",
+      "start": 593.62,
+      "end": 593.78,
+      "confidence": 1e-06,
+      "flagged": true,
+      "emitted_word": "iyhst"
+    },
+    {
+      "word": "tshsa",
+      "start": 593.78,
       "end": 593.9,
-      "confidence": 0.019002,
+      "confidence": 4e-06,
       "flagged": true,
-      "emitted_word": "tunhothslne"
+      "emitted_word": "tshsa"
     },
     {
-      "word": "nahski",
-      "start": 594.22,
-      "end": 594.62,
-      "confidence": 0.136169,
+      "word": "vl",
+      "start": 594.0,
+      "end": 594.22,
+      "confidence": 0.000182,
       "flagged": true,
-      "emitted_word": "nahski"
-    },
-    {
-      "word": "nahskinho",
-      "start": 595.84,
-      "end": 596.32,
-      "confidence": 0.913578,
-      "flagged": false,
-      "emitted_word": "nahskinho"
-    },
-    {
-      "word": "iyuhsti",
-      "start": 596.46,
-      "end": 596.9,
-      "confidence": 0.999202,
-      "flagged": false,
-      "emitted_word": "iyuhsti"
-    },
-    {
-      "word": "tsihsa",
-      "start": 597.0,
-      "end": 597.34,
-      "confidence": 0.991326,
-      "flagged": false,
-      "emitted_word": "tsihsa"
-    },
-    {
-      "word": "vlha",
-      "start": 597.5,
-      "end": 597.94,
-      "confidence": 0.988805,
-      "flagged": false,
-      "emitted_word": "vlha"
+      "emitted_word": "vl"
     },
     {
       "word": "nhakw",
-      "start": 597.98,
-      "end": 598.26,
-      "confidence": 0.312123,
-      "flagged": false,
+      "start": 594.22,
+      "end": 594.54,
+      "confidence": 0.000192,
+      "flagged": true,
       "emitted_word": "nhakw"
     },
     {
-      "word": "khvnikehsv",
-      "start": 598.84,
-      "end": 599.58,
-      "confidence": 0.997257,
-      "flagged": false,
-      "emitted_word": "khvnikehsv"
-    },
-    {
-      "word": "wikvwayvhsti",
-      "start": 599.9,
-      "end": 600.68,
-      "confidence": 0.556492,
-      "flagged": false,
-      "emitted_word": "wikvwayvhsti"
-    },
-    {
-      "word": "yikehse",
-      "start": 600.86,
-      "end": 601.42,
-      "confidence": 0.640859,
-      "flagged": false,
-      "emitted_word": "yikehse"
-    },
-    {
-      "word": "katuhv'i",
-      "start": 602.28,
-      "end": 602.96,
-      "confidence": 0.990741,
-      "flagged": false,
-      "emitted_word": "katuhv'i"
-    },
-    {
-      "word": "toyititlvkwohskini",
-      "start": 603.92,
-      "end": 605.16,
-      "confidence": 0.24473,
+      "word": "kvnkhs",
+      "start": 594.54,
+      "end": 596.04,
+      "confidence": 0.009148,
       "flagged": true,
-      "emitted_word": "toyititlvkwohskini"
+      "emitted_word": "kvnkhs"
     },
     {
-      "word": "inake",
-      "start": 605.56,
-      "end": 605.96,
-      "confidence": 0.999915,
-      "flagged": false,
-      "emitted_word": "inake"
+      "word": "wikhv'wyhsti",
+      "start": 596.1,
+      "end": 596.9,
+      "confidence": 0.009129,
+      "flagged": true,
+      "emitted_word": "wikhv'wyhsti"
     },
     {
-      "word": "tekehsatihsv",
-      "start": 606.94,
-      "end": 607.82,
-      "confidence": 0.99358,
-      "flagged": false,
-      "emitted_word": "tekehsatihsv"
+      "word": "ykhs",
+      "start": 597.0,
+      "end": 597.28,
+      "confidence": 0.00496,
+      "flagged": true,
+      "emitted_word": "ykhs"
+    },
+    {
+      "word": "kathv'i",
+      "start": 597.28,
+      "end": 597.72,
+      "confidence": 0.000257,
+      "flagged": true,
+      "emitted_word": "kathv'i"
+    },
+    {
+      "word": "toyhitilkwohskni",
+      "start": 597.8,
+      "end": 599.08,
+      "confidence": 0.000674,
+      "flagged": true,
+      "emitted_word": "toyhitilkwohskni"
+    },
+    {
+      "word": "inke",
+      "start": 599.1,
+      "end": 599.2,
+      "confidence": 0.001968,
+      "flagged": true,
+      "emitted_word": "inke"
+    },
+    {
+      "word": "tkhsathsv",
+      "start": 599.28,
+      "end": 599.58,
+      "confidence": 0.001185,
+      "flagged": true,
+      "emitted_word": "tkhsathsv"
     },
     {
       "word": "etohe'i",
-      "start": 607.96,
-      "end": 608.62,
-      "confidence": 0.999157,
-      "flagged": false,
+      "start": 599.72,
+      "end": 600.0,
+      "confidence": 4e-06,
+      "flagged": true,
       "emitted_word": "etohe'i"
     },
     {
-      "word": "nikvnathvkwnho",
-      "start": 609.76,
-      "end": 610.92,
-      "confidence": 0.936939,
-      "flagged": false,
-      "emitted_word": "nikvnathvkwnho"
+      "word": "nkvnatkwonho",
+      "start": 600.04,
+      "end": 600.56,
+      "confidence": 0.000147,
+      "flagged": true,
+      "emitted_word": "nkvnatkwonho"
     },
     {
-      "word": "nitotayunilohsvhi",
-      "start": 612.16,
-      "end": 613.72,
-      "confidence": 0.787299,
-      "flagged": false,
-      "emitted_word": "nitotayunilohsvhi"
+      "word": "nttayunlhsvhi",
+      "start": 600.58,
+      "end": 601.58,
+      "confidence": 0.000202,
+      "flagged": true,
+      "emitted_word": "nttayunlhsvhi"
     },
     {
-      "word": "kvwaluhtshehe'i",
-      "start": 614.44,
-      "end": 615.64,
-      "confidence": 0.894389,
-      "flagged": false,
-      "emitted_word": "kvwaluhtshehe'i"
+      "word": "kvwaltshe'i",
+      "start": 602.28,
+      "end": 602.96,
+      "confidence": 0.001742,
+      "flagged": true,
+      "emitted_word": "kvwaltshe'i"
     }
   ]
 }

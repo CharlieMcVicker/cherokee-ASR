@@ -244,14 +244,11 @@ def run_rescoring(
     ]
     pad_id = getattr(model.processor.tokenizer, "pad_token_id", 0) or 0
 
-    valid_syncope = [t for t in aligner_config.syncope_tokens if t in char_list]
-    valid_intrusive = [t for t in aligner_config.intrusive_tokens if t in char_list]
-
     ctc_params = CtcSegmentationParameters(
         char_list=char_list,
         blank=pad_id,
-        syncope_tokens=valid_syncope,
-        intrusive_tokens=valid_intrusive,
+        syncope_tokens=aligner_config.syncope_tokens,
+        intrusive_tokens=aligner_config.intrusive_tokens,
         intrusive_max_stride=int(aligner_config.intrusive_max_stride),
         index_duration=float(aligner_config.index_duration),
         score_min_mean_over_L=2,

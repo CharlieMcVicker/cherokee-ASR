@@ -520,14 +520,11 @@ class CTCSegmentationAligner:
                 emitted_text="",
             )
 
-        valid_syncope = [t for t in self.syncope_tokens if t in char_list]
-        valid_intrusive = [t for t in self.intrusive_tokens if t in char_list]
-
         config = CtcSegmentationParameters(
             char_list=char_list,
             blank=pad_id,
-            syncope_tokens=valid_syncope,
-            intrusive_tokens=valid_intrusive,
+            syncope_tokens=self.syncope_tokens,
+            intrusive_tokens=self.intrusive_tokens,
             intrusive_max_stride=self.intrusive_max_stride,
             index_duration=self.index_duration,
             score_min_mean_over_L=2,
@@ -611,17 +608,14 @@ class CTCSegmentationAligner:
         )
         char_list, pad_id = self._get_char_list_and_blank(model)
 
-        valid_syncope = [t for t in self.syncope_tokens if t in char_list]
-        valid_intrusive = [t for t in self.intrusive_tokens if t in char_list]
-
         win_size = max(self.min_window_size, min(20000, int(lpz.shape[0])))
         max_win = max(self.max_window_size, win_size * 2)
 
         config = CtcSegmentationParameters(
             char_list=char_list,
             blank=pad_id,
-            syncope_tokens=valid_syncope,
-            intrusive_tokens=valid_intrusive,
+            syncope_tokens=self.syncope_tokens,
+            intrusive_tokens=self.intrusive_tokens,
             intrusive_max_stride=self.intrusive_max_stride,
             index_duration=self.index_duration,
             min_window_size=win_size,

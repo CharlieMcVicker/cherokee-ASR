@@ -55,6 +55,8 @@ class MockASRModel:
             "y": 12,
             "k": 13,
             "h": 14,
+            "t": 15,
+            "'": 16,
         }
         self.model_name = "mock_model"
         self.call_count = 0
@@ -62,7 +64,7 @@ class MockASRModel:
     def get_logits(self, samples: np.ndarray, sample_rate: int = 16000) -> torch.Tensor:
         self.call_count += 1
         n_frames = max(200, len(samples) // 320)
-        vocab_size = 15
+        vocab_size = len(self.processor.tokenizer.get_vocab.return_value)
         logits = torch.zeros((n_frames, vocab_size), dtype=torch.float32)
         logits[:, 1] = 2.0  # boost token 'a'
         return logits
