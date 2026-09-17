@@ -407,6 +407,9 @@ class CTCSegmentationAligner:
             if w_timings:
                 raw_w_start = min(w_timings)
                 raw_w_end = max(w_timings) + self.index_duration
+                if end_idx < len(timings) and timings[end_idx] > 0.0:
+                    raw_w_end = max(raw_w_end, float(timings[end_idx]))
+
                 w_start = max(
                     0.0, min(dur_sec, round(raw_w_start - lead_offset_sec, 3))
                 )

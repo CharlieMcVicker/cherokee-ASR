@@ -29,8 +29,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DEFAULT_CANDIDATE_JSONS = [
     BASE_DIR / "cherokee_new_testament" / "alignments" / "mark_alignment_records.json",
     BASE_DIR / "cherokee_new_testament" / "alignments" / "bible_alignment_records.json",
-    BASE_DIR / "runs" / "evaluation" / "ctc_segmentation_100_verses_comparison.json",
 ]
+
 
 HTML_TEMPLATE = r"""<!DOCTYPE html>
 <html lang="en">
@@ -486,6 +486,28 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       color: #d2a8ff;
     }
 
+    .clickable-word {
+      display: inline-block;
+      cursor: pointer;
+      padding: 1px 4px;
+      margin: 0 1px;
+      border-radius: 4px;
+      transition: background-color 0.12s ease, transform 0.1s ease, box-shadow 0.12s ease;
+    }
+
+    .clickable-word:hover {
+      background: rgba(88, 166, 255, 0.25);
+      box-shadow: 0 0 6px rgba(88, 166, 255, 0.35);
+      transform: translateY(-1px);
+    }
+
+    .clickable-word.active-playback {
+      background: rgba(88, 166, 255, 0.45);
+      color: #ffffff !important;
+      box-shadow: 0 0 10px rgba(88, 166, 255, 0.7);
+      font-weight: bold;
+    }
+
     .diff-highlight-box {
       background: rgba(0, 0, 0, 0.3);
       border: 1px dashed var(--surface-border);
@@ -745,31 +767,104 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
     const audioPlayers = new Map(); // verse_id -> Audio instance
     let activeSnippetTimeout = null;
 
-    // Simple LCS character diff between greedy and guided
-    function computeCharDiffHtml(s1, s2) {
+    // Helper to escape HTML characters
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    // Helper to render text with clickable word spans aligned with wordsList timestamps
+    function renderInteractiveText(text, verseId, audioPath, wordsList, verseOffset = 0) {
+      if (!text) return '';
+      const tokens = text.split(/(\s+)/);
+      let wordIdx = 0;
+      let html = '';
+
+      for (let i = 0; i < tokens.length; i++) {
+        const token = tokens[i];
+        if (!token) continue;
+        if (/^\s+$/.test(token)) {
+          html += token;
+          continue;
+        }
+
+        const cleanToken = token.replace(/^[^\w\u13A0-\u13FF\uAB70-\uABBF']+|[^\w\u13A0-\u13FF\uAB70-\uABBF']+$/g, '');
+        const wordData = (wordsList && wordIdx < wordsList.length) ? wordsList[wordIdx] : null;
+
+        if (wordData && wordData.start_sec !== undefined && wordData.end_sec !== undefined) {
+          const rawStart = wordData.start_sec;
+          const rawEnd = wordData.end_sec;
+          const start = Math.max(0, rawStart - verseOffset);
+          const end = Math.max(start + 0.05, rawEnd - verseOffset);
+          const escapedToken = escapeHtml(token);
+          const titleText = `${wordData.word || cleanToken} (${start.toFixed(2)}s – ${end.toFixed(2)}s) – click to play snippet`;
+          html += `<span class="clickable-word" data-verse="${verseId}" data-start="${start}" data-end="${end}" onclick="playWordSnippet('${verseId}', '${audioPath}', ${start}, ${end})" title="${titleText}">${escapedToken}</span>`;
+          wordIdx++;
+        } else {
+          html += `<span>${escapeHtml(token)}</span>`;
+        }
+      }
+
+      return html;
+    }
+
+    // Interactive LCS diff between greedy and guided with word-level audio snippets
+    function computeCharDiffHtml(s1, s2, verseId, audioPath, wordsList, verseOffset = 0) {
       if (!s1 || !s2) return '';
       if (s1 === s2) return `<span style="color: var(--text-muted);">(Greedy & Guided match exactly)</span>`;
 
       // Word level comparison
-      const w1 = s1.split(/\s+/);
-      const w2 = s2.split(/\s+/);
+      const w1 = s1.split(/\s+/).filter(Boolean);
+      const w2 = s2.split(/\s+/).filter(Boolean);
       
       let html = '<div style="display: flex; flex-direction: column; gap: 4px;">';
       html += '<div><strong>Greedy:</strong> ';
-      html += w1.map(word => {
-        if (!w2.includes(word)) {
-          return `<span class="diff-del">${word}</span>`;
+      html += w1.map((word, idx) => {
+        const wordData = (wordsList && idx < wordsList.length) ? wordsList[idx] : null;
+        let start = 0, end = 0;
+        if (wordData && wordData.start_sec !== undefined && wordData.end_sec !== undefined) {
+          start = Math.max(0, wordData.start_sec - verseOffset);
+          end = Math.max(start + 0.05, wordData.end_sec - verseOffset);
         }
-        return `<span>${word}</span>`;
+        const hasTime = wordData && wordData.start_sec !== undefined && verseId && audioPath;
+        const clickAttrs = hasTime
+          ? ` class="clickable-word diff-del" data-verse="${verseId}" data-start="${start}" data-end="${end}" onclick="playWordSnippet('${verseId}', '${audioPath}', ${start}, ${end})" title="${word} (${start.toFixed(2)}s – ${end.toFixed(2)}s)"`
+          : ` class="diff-del"`;
+        const cleanClickAttrs = hasTime
+          ? ` class="clickable-word" data-verse="${verseId}" data-start="${start}" data-end="${end}" onclick="playWordSnippet('${verseId}', '${audioPath}', ${start}, ${end})" title="${word} (${start.toFixed(2)}s – ${end.toFixed(2)}s)"`
+          : '';
+
+        if (!w2.includes(word)) {
+          return `<span${clickAttrs}>${escapeHtml(word)}</span>`;
+        }
+        return `<span${cleanClickAttrs}>${escapeHtml(word)}</span>`;
       }).join(' ');
       html += '</div>';
 
       html += '<div><strong>Guided:</strong> ';
-      html += w2.map(word => {
-        if (!w1.includes(word)) {
-          return `<span class="diff-ins">${word}</span>`;
+      html += w2.map((word, idx) => {
+        const wordData = (wordsList && idx < wordsList.length) ? wordsList[idx] : null;
+        let start = 0, end = 0;
+        if (wordData && wordData.start_sec !== undefined && wordData.end_sec !== undefined) {
+          start = Math.max(0, wordData.start_sec - verseOffset);
+          end = Math.max(start + 0.05, wordData.end_sec - verseOffset);
         }
-        return `<span>${word}</span>`;
+        const hasTime = wordData && wordData.start_sec !== undefined && verseId && audioPath;
+        const clickAttrs = hasTime
+          ? ` class="clickable-word diff-ins" data-verse="${verseId}" data-start="${start}" data-end="${end}" onclick="playWordSnippet('${verseId}', '${audioPath}', ${start}, ${end})" title="${word} (${start.toFixed(2)}s – ${end.toFixed(2)}s)"`
+          : ` class="diff-ins"`;
+        const cleanClickAttrs = hasTime
+          ? ` class="clickable-word" data-verse="${verseId}" data-start="${start}" data-end="${end}" onclick="playWordSnippet('${verseId}', '${audioPath}', ${start}, ${end})" title="${word} (${start.toFixed(2)}s – ${end.toFixed(2)}s)"`
+          : '';
+
+        if (!w1.includes(word)) {
+          return `<span${clickAttrs}>${escapeHtml(word)}</span>`;
+        }
+        return `<span${cleanClickAttrs}>${escapeHtml(word)}</span>`;
       }).join(' ');
       html += '</div></div>';
 
@@ -858,7 +953,7 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
         player.pause();
       });
       document.querySelectorAll('.play-btn').forEach(btn => btn.textContent = '▶');
-      document.querySelectorAll('.word-chip').forEach(chip => chip.classList.remove('active-playback'));
+      document.querySelectorAll('.word-chip, .clickable-word').forEach(el => el.classList.remove('active-playback'));
     }
 
     function getAudioPlayer(verseId, audioPath) {
@@ -877,15 +972,15 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
             timeEl.textContent = `${audio.currentTime.toFixed(2)}s / ${audio.duration.toFixed(2)}s`;
           }
 
-          // Highlight active word chips
-          const chips = document.querySelectorAll(`[data-verse="${verseId}"][data-start]`);
-          chips.forEach(chip => {
-            const start = parseFloat(chip.dataset.start);
-            const end = parseFloat(chip.dataset.end);
+          // Highlight active word chips and clickable text words
+          const words = document.querySelectorAll(`[data-verse="${verseId}"][data-start]`);
+          words.forEach(el => {
+            const start = parseFloat(el.dataset.start);
+            const end = parseFloat(el.dataset.end);
             if (audio.currentTime >= start && audio.currentTime <= end) {
-              chip.classList.add('active-playback');
+              el.classList.add('active-playback');
             } else {
-              chip.classList.remove('active-playback');
+              el.classList.remove('active-playback');
             }
           });
         });
@@ -893,8 +988,8 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
         audio.addEventListener('ended', () => {
           const btn = document.getElementById(`play-btn-${verseId}`);
           if (btn) btn.textContent = '▶';
-          const chips = document.querySelectorAll(`[data-verse="${verseId}"]`);
-          chips.forEach(c => c.classList.remove('active-playback'));
+          const words = document.querySelectorAll(`[data-verse="${verseId}"]`);
+          words.forEach(c => c.classList.remove('active-playback'));
         });
       }
       return audioPlayers.get(verseId);
@@ -913,7 +1008,7 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
         if (speedSelect) {
           audio.playbackRate = parseFloat(speedSelect.value);
         }
-        audio.play();
+        audio.play().catch(err => console.error("Error playing verse audio:", err));
         if (btn) btn.textContent = '⏸';
       }
     }
@@ -926,18 +1021,36 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
         audio.playbackRate = parseFloat(speedSelect.value);
       }
 
-      audio.currentTime = Math.max(0, startSec);
-      audio.play();
-
+      const targetStart = Math.max(0, startSec);
       const btn = document.getElementById(`play-btn-${verseId}`);
-      if (btn) btn.textContent = '⏸';
 
-      const durationMs = ((endSec - startSec) / audio.playbackRate) * 1000;
-      activeSnippetTimeout = setTimeout(() => {
-        audio.pause();
-        if (btn) btn.textContent = '▶';
-        document.querySelectorAll(`[data-verse="${verseId}"]`).forEach(c => c.classList.remove('active-playback'));
-      }, Math.max(80, durationMs));
+      const startPlayback = () => {
+        try {
+          audio.currentTime = targetStart;
+        } catch (e) {
+          console.warn("Could not immediately seek audio:", e);
+        }
+
+        const playPromise = audio.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(err => console.error("Word snippet audio play failed:", err));
+        }
+        if (btn) btn.textContent = '⏸';
+
+        const durationMs = ((endSec - targetStart) / (audio.playbackRate || 1.0)) * 1000;
+        activeSnippetTimeout = setTimeout(() => {
+          audio.pause();
+          if (btn) btn.textContent = '▶';
+          document.querySelectorAll(`[data-verse="${verseId}"]`).forEach(c => c.classList.remove('active-playback'));
+        }, Math.max(120, durationMs));
+      };
+
+      if (audio.readyState === 0) {
+        audio.addEventListener('canplay', startPlayback, { once: true });
+        audio.load();
+      } else {
+        startPlayback();
+      }
     }
 
     function seekVerse(event, verseId, audioPath) {
@@ -1024,7 +1137,14 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
         const syllabary = v.cherokee_syllabary || v.reference_syllabary || '';
         const greedyHyp = v.greedy_hypothesis || v.asr_hypothesis || '';
         const guidedHyp = v.guided_hypothesis || v.reconciled_phonetics || v.new_reconciled_phonetics || '';
-        const diffHtml = computeCharDiffHtml(greedyHyp, guidedHyp);
+
+        // Calculate if word timestamps are global chapter timestamps and need verse start_sec offset subtracted
+        const verseOffset = (v.start_sec && wordsList.length > 0 && wordsList[0].start_sec >= v.start_sec && v.duration_sec && wordsList[0].start_sec >= v.duration_sec) ? v.start_sec : 0;
+
+        const diffHtml = computeCharDiffHtml(greedyHyp, guidedHyp, v.verse_id, v.audio_path, wordsList, verseOffset);
+        const syllabaryHtml = renderInteractiveText(syllabary, v.verse_id, v.audio_path, wordsList, verseOffset);
+        const greedyHtml = renderInteractiveText(greedyHyp, v.verse_id, v.audio_path, wordsList, verseOffset) || '<span style="color: var(--text-muted);">(No greedy hypothesis recorded)</span>';
+        const guidedHtml = renderInteractiveText(guidedHyp, v.verse_id, v.audio_path, wordsList, verseOffset) || '<span style="color: var(--text-muted);">(No guided hypothesis recorded)</span>';
 
         return `
           <div class="verse-card ${hasAnomaly ? 'has-anomaly' : ''}" id="card-${v.verse_id}">
@@ -1064,9 +1184,9 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
               <div class="tier-card">
                 <div class="tier-header">
                   <span class="tier-label" style="color: #ffffff;"><span>📜</span> 1. Native Cherokee Syllabary</span>
-                  <span class="tier-badge syllabary">Ground Truth Syllabary</span>
+                  <span class="tier-badge syllabary">Ground Truth Syllabary (Click any word to hear snippet)</span>
                 </div>
-                <div class="syllabary-content">${syllabary}</div>
+                <div class="syllabary-content">${syllabaryHtml}</div>
               </div>
 
               <!-- Tier 2: Greedy Inference -->
@@ -1075,7 +1195,7 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
                   <span class="tier-label" style="color: var(--greedy-color);"><span>🎙️</span> 2. Greedy ASR Inference</span>
                   <span class="tier-badge greedy">Unconstrained Acoustic Emission ${v.greedy_confidence !== undefined ? `(${v.greedy_confidence})` : ''}</span>
                 </div>
-                <div class="phonetic-content greedy">${greedyHyp || '<span style="color: var(--text-muted);">(No greedy hypothesis recorded)</span>'}</div>
+                <div class="phonetic-content greedy">${greedyHtml}</div>
               </div>
 
               <!-- Tier 3: Guided Inference -->
@@ -1084,13 +1204,13 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
                   <span class="tier-label" style="color: var(--guided-color);"><span>✨</span> 3. Syllabary-Guided CTC Segmentation</span>
                   <span class="tier-badge guided">Trellis Reconciled Phonotactics ${v.cost !== undefined ? `(Cost: ${v.cost})` : ''}</span>
                 </div>
-                <div class="phonetic-content guided">${guidedHyp || '<span style="color: var(--text-muted);">(No guided hypothesis recorded)</span>'}</div>
+                <div class="phonetic-content guided">${guidedHtml}</div>
               </div>
 
               <!-- Comparative Diff Highlight -->
               <div class="diff-highlight-box">
                 <div style="font-size: 0.74rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; font-weight: 600;">
-                  🔍 Greedy vs Guided Word Diff Comparison:
+                  🔍 Greedy vs Guided Word Diff Comparison (Click words to listen):
                 </div>
                 ${diffHtml}
               </div>
@@ -1102,14 +1222,19 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
                   <span>🚨</span> Flagged Low-Confidence Words / Anomalies (${flaggedCount})
                 </div>
                 <div class="flagged-items-grid">
-                  ${flaggedWords.map(f => `
-                    <div class="flagged-item-row">
-                      <span>Target: <strong style="color: var(--text-primary);">${f.word}</strong></span>
-                      <span>→ Emitted: <strong style="color: #ff7b72;">${f.emitted_word || f.word}</strong></span>
-                      <span class="conf-badge conf-low">Confidence: ${(f.confidence || 0).toFixed(6)}</span>
-                      <span style="font-size: 0.76rem; color: var(--text-muted);">${(f.start_sec || 0).toFixed(2)}s – ${(f.end_sec || 0).toFixed(2)}s</span>
-                    </div>
-                  `).join('')}
+                  ${flaggedWords.map(f => {
+                    const fStart = Math.max(0, (f.start_sec || 0) - verseOffset);
+                    const fEnd = Math.max(fStart + 0.05, (f.end_sec || 0) - verseOffset);
+                    return `
+                      <div class="flagged-item-row" style="cursor: pointer;" onclick="playWordSnippet('${v.verse_id}', '${v.audio_path}', ${fStart}, ${fEnd})" title="Click to play ${fStart.toFixed(2)}s – ${fEnd.toFixed(2)}s">
+                        <span>Target: <strong style="color: var(--text-primary);">${escapeHtml(f.word)}</strong></span>
+                        <span>→ Emitted: <strong style="color: #ff7b72;">${escapeHtml(f.emitted_word || f.word)}</strong></span>
+                        <span class="conf-badge conf-low">Confidence: ${(f.confidence || 0).toFixed(6)}</span>
+                        <span style="font-size: 0.76rem; color: var(--text-muted);">${fStart.toFixed(2)}s – ${fEnd.toFixed(2)}s</span>
+                        <span style="font-size: 0.8rem; color: var(--accent);">▶</span>
+                      </div>
+                    `;
+                  }).join('')}
                 </div>
               </div>
             ` : ''}
@@ -1122,29 +1247,31 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
                 ${wordsList.map((w) => {
                   const isFlagged = w.flagged || (w.confidence !== undefined && w.confidence < 0.1);
                   const confCls = getConfidenceClass(w.confidence);
+                  const wStart = Math.max(0, (w.start_sec || 0) - verseOffset);
+                  const wEnd = Math.max(wStart + 0.05, (w.end_sec || 0) - verseOffset);
                   return `
                     <div 
                       class="word-chip ${isFlagged ? 'flagged' : ''}" 
                       data-verse="${v.verse_id}" 
-                      data-start="${w.start_sec}" 
-                      data-end="${w.end_sec}"
-                      onclick="playWordSnippet('${v.verse_id}', '${v.audio_path}', ${w.start_sec}, ${w.end_sec})"
-                      title="Click to play ${w.start_sec.toFixed(2)}s - ${w.end_sec.toFixed(2)}s"
+                      data-start="${wStart}" 
+                      data-end="${wEnd}"
+                      onclick="playWordSnippet('${v.verse_id}', '${v.audio_path}', ${wStart}, ${wEnd})"
+                      title="Click to play ${wStart.toFixed(2)}s - ${wEnd.toFixed(2)}s"
                     >
                       <div class="word-header">
-                        <span class="ref-word">${w.word}</span>
+                        <span class="ref-word">${escapeHtml(w.word)}</span>
                         <span class="play-snippet-icon">▶</span>
                       </div>
                       ${w.emitted_word && w.emitted_word !== w.word ? `
-                        <div class="emitted-word">${w.emitted_word}</div>
+                        <div class="emitted-word">${escapeHtml(w.emitted_word)}</div>
                       ` : `
-                        <div class="emitted-word" style="opacity: 0.5;">${w.word}</div>
+                        <div class="emitted-word" style="opacity: 0.5;">${escapeHtml(w.word)}</div>
                       `}
                       <div class="word-footer">
                         <span class="conf-badge ${confCls}">
                           ${w.confidence !== undefined ? (w.confidence >= 0.999 ? '1.000' : w.confidence.toFixed(3)) : '—'}
                         </span>
-                        <span class="time-badge">${w.start_sec.toFixed(2)}s</span>
+                        <span class="time-badge">${wStart.toFixed(2)}s</span>
                       </div>
                     </div>
                   `;
