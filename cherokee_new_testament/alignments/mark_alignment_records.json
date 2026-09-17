@@ -199,7 +199,7 @@
         "end_sec": 27.8,
         "confidence": 0.270495,
         "min_char_confidence": 0.00014,
-        "flagged": true,
+        "flagged": false,
         "emitted_word": "ikvyititlv"
       },
       {
@@ -241,7 +241,7 @@
     ],
     "phonetic": "Na-s-gi-ya hi-a tsi-ni-gv-nv tsi-go-we-la a-na-do-le-ho-s-gi-yi; Gv-ni-yu-quo, tsi-nv-li tsi-nv-si-da-s-di tsa-ka-dv i-gv-yi-di-tlv, na-s-gi da-tsa-dv-nv-i-s-da-ne-li tsa-lo-hi-s-di-yi i-gv-yi-di-tlv.",
     "english": "As it is written in the prophets, Behold, I send my messenger before thy face, which shall prepare thy way before thee.",
-    "has_anomalies": true
+    "has_anomalies": false
   },
   {
     "verse_id": "020103",
@@ -348,13 +348,13 @@
         "end_sec": 46.12,
         "confidence": 0.382076,
         "min_char_confidence": 0.000119,
-        "flagged": true,
+        "flagged": false,
         "emitted_word": "titsitshinohihsta"
       }
     ],
     "phonetic": "U-we-lu-ga gi-lo i-na-ge-i, hi-a ni-ga-we-ha; E-tsa-dv-nv-i-s-da-si Yi-ho-wa u-lo-hi-s-di-yi, du-nv-nv di-tsi-tsi-no-hi-s-da.",
     "english": "The voice of one crying in the wilderness, Prepare ye the way of the Lord, make his paths straight.",
-    "has_anomalies": true
+    "has_anomalies": false
   },
   {
     "verse_id": "020104",
@@ -416,7 +416,7 @@
         "end_sec": 52.44,
         "confidence": 0.41278,
         "min_char_confidence": 1.8e-05,
-        "flagged": true,
+        "flagged": false,
         "emitted_word": "alihtstohvhske"
       },
       {
@@ -452,7 +452,7 @@
         "end_sec": 58.04,
         "confidence": 0.539001,
         "min_char_confidence": 0.000161,
-        "flagged": true,
+        "flagged": false,
         "emitted_word": "kanetliyvhstiyi"
       },
       {
@@ -461,7 +461,7 @@
         "end_sec": 58.92,
         "confidence": 0.248288,
         "min_char_confidence": 4e-06,
-        "flagged": true,
+        "flagged": false,
         "emitted_word": "otanvhthv"
       },
       {
@@ -503,7 +503,7 @@
     ],
     "phonetic": "Tsa-ni da-da-wo-s-ge i-na-ge-i, a-le a-li-tsi-do-hv-s-ge ka-no-he-s-ge di-da-we-s-di ge-sv ga-ne-tli-yv-s-di-yi o-da-nv-dv u-gv-wa-li na-s-gi ga-yv-da-ti-ne-di-yi a-s-ga-nv-tsv-i.",
     "english": "John did baptize in the wilderness, and preach the baptism of repentance for the remission of sins.",
-    "has_anomalies": true
+    "has_anomalies": false
   },
   {
     "verse_id": "020105",
@@ -818,7 +818,7 @@
         "end_sec": 96.18,
         "confidence": 0.222282,
         "min_char_confidence": 2e-06,
-        "flagged": true,
+        "flagged": false,
         "emitted_word": "alhitsitohvhskenho"
       },
       {
@@ -854,7 +854,7 @@
         "end_sec": 100.28,
         "confidence": 0.316452,
         "min_char_confidence": 0.000189,
-        "flagged": true,
+        "flagged": false,
         "emitted_word": "ulhiniktiyu"
       },
       {
@@ -863,7 +863,7 @@
         "end_sec": 101.26,
         "confidence": 0.201169,
         "min_char_confidence": 3e-06,
-        "flagged": true,
+        "flagged": false,
         "emitted_word": "ehskakwo"
       },
       {
@@ -977,7 +977,7 @@
     ],
     "phonetic": "A-li-tsi-do-hv-s-ge-no hi-a ni-ga-we-s-ge-i; U-tli u-li-ni-gi-di-yu e-s-ga-quo a-yv o-ni da-ya-i, na-s-gi tsu-la-su-lo-gi-hi da-ka-ne-sa-dv v-tla ye-li yi-ni-go-i a-qua-di-sa-da-di-s-di-yi a-le di-gi-ka-ne-yv-di-yi.",
     "english": "And preached, saying, There cometh one mightier than I after me, the latchet of whose shoes I am not worthy to stoop down and unloose.",
-    "has_anomalies": true
+    "has_anomalies": false
   },
   {
     "verse_id": "020108",
@@ -1292,7 +1292,7 @@
         "end_sec": 144.92,
         "confidence": 0.204292,
         "min_char_confidence": 6e-06,
-        "flagged": true,
+        "flagged": false,
         "emitted_word": "kalvlo'i"
       },
       {
@@ -1355,7 +1355,7 @@
         "end_sec": 152.46,
         "confidence": 0.596998,
         "min_char_confidence": 0.000475,
-        "flagged": true,
+        "flagged": false,
         "emitted_word": "tsulo'ahsitihse"
       },
       {
@@ -1798,7 +1798,7 @@
         "end_sec": 195.0,
         "confidence": 0.240809,
         "min_char_confidence": 4e-06,
-        "flagged": true,
+        "flagged": false,
         "emitted_word": "alihtstohvhske"
       },
       {
@@ -1858,7 +1858,7 @@
     ],
     "phonetic": "Tsa-ni-no di-da-s-du-di-yi na-tsi-yv-ta-ne-i, Tsi-sa Ge-li-li u-lu-tse-i, a-li-tsi-do-hv-s-ge o-s-dv ka-no-he-dv U-ne-la-nv-hi u-gv-wi-yu-hi ge-sv u-gv-wa-li,",
     "english": "Now after that John was put in prison, Jesus came into Galilee, preaching the gospel of the kingdom of God,",
-    "has_anomalies": true
+    "has_anomalies": false
   },
   {
     "verse_id": "020115",
@@ -1920,7 +1920,7 @@
         "end_sec": 204.22,
         "confidence": 0.424133,
         "min_char_confidence": 0.000446,
-        "flagged": true,
+        "flagged": false,
         "emitted_word": "alhiyloka"
       },
       {
@@ -2078,7 +2078,7 @@
         "end_sec": 219.76,
         "confidence": 0.22462,
         "min_char_confidence": 0.000129,
-        "flagged": true,
+        "flagged": false,
         "emitted_word": "ulhoti"
       },
       {
@@ -2168,7 +2168,7 @@
         "end_sec": 232.02,
         "confidence": 0.503601,
         "min_char_confidence": 1e-06,
-        "flagged": true,
+        "flagged": false,
         "emitted_word": "anikayalu'vhskiyhenho"
       },
       {
@@ -2177,13 +2177,13 @@
         "end_sec": 233.24,
         "confidence": 0.084517,
         "min_char_confidence": 1e-05,
-        "flagged": true,
+        "flagged": false,
         "emitted_word": "kehse'i"
       }
     ],
     "phonetic": "Ge-li-li-no v-da-li u-lo-di a-i-sv-i, du-go-he Sa-wa-ni a-le E-ni-di na-s-gi di-na-da-nv-tli, v-da-li a-ni-ga-ya-lu-v-s-ge-i; a-ni-ga-ya-lu-v-s-gi-ye-no ge-se-i.",
     "english": "Now as he walked by the sea of Galilee, he saw Simon and Andrew his brother casting a net into the sea: for they were fishers.",
-    "has_anomalies": true
+    "has_anomalies": false
   },
   {
     "verse_id": "020117",
@@ -2227,7 +2227,7 @@
         "end_sec": 235.94,
         "confidence": 0.151312,
         "min_char_confidence": 3e-05,
-        "flagged": true,
+        "flagged": false,
         "emitted_word": "ntuwehsele'i"
       },
       {
@@ -2269,7 +2269,7 @@
     ],
     "phonetic": "Tsi-sa-no hi-a ni-du-we-se-le-i; S-gi-ni-s-da-wa-du-ga, yv-wi-no di-s-di-ga-ya-lu-v-s-gi nv-da-s-dv-yv-ne-li.",
     "english": "And Jesus said unto them, Come ye after me, and I will make you to become fishers of men.",
-    "has_anomalies": true
+    "has_anomalies": false
   },
   {
     "verse_id": "020118",
@@ -2381,7 +2381,7 @@
         "end_sec": 251.84,
         "confidence": 0.273512,
         "min_char_confidence": 6e-05,
-        "flagged": true,
+        "flagged": false,
         "emitted_word": "wi'uwenv"
       },
       {
@@ -2417,7 +2417,7 @@
         "end_sec": 256.6,
         "confidence": 0.292387,
         "min_char_confidence": 8.2e-05,
-        "flagged": true,
+        "flagged": false,
         "emitted_word": "tsekwiti"
       },
       {
@@ -2471,7 +2471,7 @@
         "end_sec": 262.16,
         "confidence": 0.1507,
         "min_char_confidence": 4e-06,
-        "flagged": true,
+        "flagged": false,
         "emitted_word": "nahskwo"
       },
       {
@@ -2480,7 +2480,7 @@
         "end_sec": 264.1,
         "confidence": 0.220489,
         "min_char_confidence": 2.6e-05,
-        "flagged": true,
+        "flagged": false,
         "emitted_word": "untsa'e"
       },
       {
@@ -2513,7 +2513,7 @@
     ],
     "phonetic": "Na-hna-no wi-u-we-nv u-s-di-gi-dv, du-go-he Tsi-mi, Tse-qui-di u-we-tsi, Tsa-ni-no na-s-gi di-na-da-nv-tli, na-s-gi-no na-s-quo u-na-tsa-e tsi-yu-hi da-no-tlv-hi-si-s-ge tsu-ni-ga-ya-lu-di.",
     "english": "And when he had gone a little further thence, he saw James the son of Zebedee, and John his brother, who also were in the ship mending their nets.",
-    "has_anomalies": true
+    "has_anomalies": false
   },
   {
     "verse_id": "020120",
@@ -2575,7 +2575,7 @@
         "end_sec": 273.74,
         "confidence": 0.158635,
         "min_char_confidence": 8e-06,
-        "flagged": true,
+        "flagged": false,
         "emitted_word": "unvhtetsvnho"
       },
       {
@@ -2653,7 +2653,7 @@
     ],
     "phonetic": "Gi-la-quo-no i-yv-dv na-s-gi wi-du-ya-nv-he-i; u-nv-de-tsv-no u-ni-do-da Tse-qui-di ge-ga-gu-yv-e-hi tsu-ni-nv-si-da-s-di i-tsu-la-ha tsi-yu-hi u-na-tsa-v-i, gv-wa-s-da-wa-dv-se-i.",
     "english": "And straightway he called them: and they left their father Zebedee in the ship with the hired servants, and went after him.",
-    "has_anomalies": true
+    "has_anomalies": false
   },
   {
     "verse_id": "020121",
@@ -2697,7 +2697,7 @@
         "end_sec": 289.52,
         "confidence": 0.316274,
         "min_char_confidence": 0.000468,
-        "flagged": true,
+        "flagged": false,
         "emitted_word": "kilakwonho"
       },
       {
@@ -2715,7 +2715,7 @@
         "end_sec": 291.72,
         "confidence": 0.393002,
         "min_char_confidence": 1e-06,
-        "flagged": true,
+        "flagged": false,
         "emitted_word": "tiklawi'ihstiyi"
       },
       {
@@ -2757,7 +2757,7 @@
     ],
     "phonetic": "Ge-qua-ni-no wu-ni-yv-le-i; gi-la-quo-no i-yv-dv di-ga-la-wi-i-s-di-yi wu-yv-lv du-de-yo-ne u-na-do-da-qua-s-gv i-ga.",
     "english": "And they went into Capernaum; and straightway on the sabbath day he entered into the synagogue, and taught.",
-    "has_anomalies": true
+    "has_anomalies": false
   },
   {
     "verse_id": "020122",
@@ -2837,7 +2837,7 @@
         "end_sec": 307.34,
         "confidence": 0.306404,
         "min_char_confidence": 8e-06,
-        "flagged": true,
+        "flagged": false,
         "emitted_word": "nahskiya'i"
       },
       {
@@ -2888,7 +2888,7 @@
     ],
     "phonetic": "U-ni-s-qua-ni-go-se-no nu-s-dv da-de-yo-hv-s-gv-i, du-de-yo-ne-ye-no u-li-ni-gi-dv tsu-ho na-s-gi-ya-i, v-tla-no di-no-we-li-s-gi da-na-de-yo-hv-s-gv na-s-gi-ya yi-ge-se-i.",
     "english": "And they were astonished at his doctrine: for he taught them as one that had authority, and not as the scribes.",
-    "has_anomalies": true
+    "has_anomalies": false
   },
   {
     "verse_id": "020123",
@@ -2914,7 +2914,7 @@
         "end_sec": 315.82,
         "confidence": 0.262957,
         "min_char_confidence": 6e-06,
-        "flagged": true,
+        "flagged": false,
         "emitted_word": "tsunilaw'ihstiynho"
       },
       {
@@ -2923,7 +2923,7 @@
         "end_sec": 316.92,
         "confidence": 0.105589,
         "min_char_confidence": 2.9e-05,
-        "flagged": true,
+        "flagged": false,
         "emitted_word": "aya'e"
       },
       {
@@ -2950,7 +2950,7 @@
         "end_sec": 319.42,
         "confidence": 0.231363,
         "min_char_confidence": 2e-06,
-        "flagged": true,
+        "flagged": false,
         "emitted_word": "atanhvhto"
       },
       {
@@ -2959,7 +2959,7 @@
         "end_sec": 320.02,
         "confidence": 0.114031,
         "min_char_confidence": 1.9e-05,
-        "flagged": true,
+        "flagged": false,
         "emitted_word": "uya'i"
       },
       {
@@ -2983,7 +2983,7 @@
     ],
     "phonetic": "Tsu-ni-la-wi-i-s-di-yi-no a-ya-e a-s-ga-ya ga-da-ha a-da-nv-do u-ya-i, a-le u-we-lu-ne,",
     "english": "And there was in their synagogue a man with an unclean spirit; and he cried out,",
-    "has_anomalies": true
+    "has_anomalies": false
   },
   {
     "verse_id": "020124",
@@ -3009,7 +3009,7 @@
         "end_sec": 323.6,
         "confidence": 0.072665,
         "min_char_confidence": 2.9e-05,
-        "flagged": true,
+        "flagged": false,
         "emitted_word": "hi'a"
       },
       {
@@ -3081,7 +3081,7 @@
         "end_sec": 333.46,
         "confidence": 0.11443,
         "min_char_confidence": 2.2e-05,
-        "flagged": true,
+        "flagged": false,
         "emitted_word": "hehi'"
       },
       {
@@ -3099,7 +3099,7 @@
         "end_sec": 336.5,
         "confidence": 0.508319,
         "min_char_confidence": 1.3e-05,
-        "flagged": true,
+        "flagged": false,
         "emitted_word": "hskithvhthanilhv'"
       },
       {
@@ -3316,7 +3316,7 @@
         "end_sec": 353.66,
         "confidence": 0.442229,
         "min_char_confidence": 8.5e-05,
-        "flagged": true,
+        "flagged": false,
         "emitted_word": "ulvtehsthanv"
       },
       {
@@ -3358,7 +3358,7 @@
     ],
     "phonetic": "Ga-da-ha-no a-da-nv-do u-lv-de-s-ta-nv, a-le a-s-da-ya u-we-lu-nv, u-nu-go-tse-i.",
     "english": "And when the unclean spirit had torn him, and cried with a loud voice, he came out of him.",
-    "has_anomalies": true
+    "has_anomalies": false
   },
   {
     "verse_id": "020127",
@@ -3474,7 +3474,7 @@
         "end_sec": 367.92,
         "confidence": 0.094804,
         "min_char_confidence": 8e-06,
-        "flagged": true,
+        "flagged": false,
         "emitted_word": "hi'a'"
       },
       {
@@ -3528,7 +3528,7 @@
         "end_sec": 371.6,
         "confidence": 0.102715,
         "min_char_confidence": 1.4e-05,
-        "flagged": true,
+        "flagged": false,
         "emitted_word": "kehsv'i'"
       },
       {
@@ -3537,7 +3537,7 @@
         "end_sec": 373.7,
         "confidence": 0.40713,
         "min_char_confidence": 4.2e-05,
-        "flagged": true,
+        "flagged": false,
         "emitted_word": "ulhinikitvyhenho"
       },
       {
@@ -3606,7 +3606,7 @@
     ],
     "phonetic": "Ni-ga-dv-no u-ni-s-qua-ni-go-se-i; a-le u-nv-sv ge-sv du-na-da-dv-dv-ne-i, hi-a na-ni-we-s-ge-i; Ga-do u-ye-lv-di hi-a?  Ga-do u-s-di hi-a i-tse di-de-yo-di ge-sv-i?  U-li-ni-gi-dv-ye-no u-hv gv-di de-ka-ne-tse-ho a-ni-ga-da-ha di-da-nv-do, a-le gv-wo-hi-yu-hv-s-go-i.",
     "english": "And they were all amazed, insomuch that they questioned among themselves, saying, What thing is this? what new doctrine is this? for with authority commandeth he even the unclean spirits, and they do obey him.",
-    "has_anomalies": true
+    "has_anomalies": false
   },
   {
     "verse_id": "020128",
@@ -3903,7 +3903,7 @@
         "end_sec": 409.26,
         "confidence": 0.188162,
         "min_char_confidence": 4e-06,
-        "flagged": true,
+        "flagged": false,
         "emitted_word": "kanhvhke"
       },
       {
@@ -3930,7 +3930,7 @@
         "end_sec": 413.08,
         "confidence": 0.322031,
         "min_char_confidence": 9.6e-05,
-        "flagged": true,
+        "flagged": false,
         "emitted_word": "khilkwono"
       },
       {
@@ -3954,7 +3954,7 @@
     ],
     "phonetic": "Sa-wa-ni-no u-da-li-i u-tsi ga-nv-ge u-tlv-ge u-di-le-hv-s-ge-i; gi-la-quo-no i-yv-dv gv-wa-no-ne-le-i.",
     "english": "But Simon's wife's mother lay sick of a fever, and anon they tell him of her.",
-    "has_anomalies": true
+    "has_anomalies": false
   },
   {
     "verse_id": "020131",
@@ -4025,7 +4025,7 @@
         "end_sec": 422.18,
         "confidence": 0.214645,
         "min_char_confidence": 5e-06,
-        "flagged": true,
+        "flagged": false,
         "emitted_word": "khilakwo"
       },
       {
@@ -4067,7 +4067,7 @@
     ],
     "phonetic": "U-lu-tsv-no a-le u-wo-ya-ne-sv, du-le-ta-ne-i; u-di-le-hv-s-gv-no gi-la-quo i-yv-dv u-di-wa-se-i, a-le du-s-de-lv-hi-do-le-i.",
     "english": "And he came and took her by the hand, and lifted her up; and immediately the fever left her, and she ministered unto them.",
-    "has_anomalies": true
+    "has_anomalies": false
   },
   {
     "verse_id": "020132",
@@ -4111,7 +4111,7 @@
         "end_sec": 429.38,
         "confidence": 0.079378,
         "min_char_confidence": 4.1e-05,
-        "flagged": true,
+        "flagged": false,
         "emitted_word": "nvto"
       },
       {
@@ -4180,7 +4180,7 @@
     ],
     "phonetic": "U-sv-no hna-quo nv-do wu-de-li-tsv, de-gv-wa-ti-no-he-le ni-ga-dv tsu-ni-tlv-gi, a-le a-ni-s-gi-na di-gv-wa-ni-ya-i;",
     "english": "And at even, when the sun did set, they brought unto him all that were diseased, and them that were possessed with devils.",
-    "has_anomalies": true
+    "has_anomalies": false
   },
   {
     "verse_id": "020133",
@@ -4233,7 +4233,7 @@
         "end_sec": 440.08,
         "confidence": 0.300169,
         "min_char_confidence": 2e-06,
-        "flagged": true,
+        "flagged": false,
         "emitted_word": "unatalhihshe"
       },
       {
@@ -4248,7 +4248,7 @@
     ],
     "phonetic": "Ni-ga-dv-no ga-du-hv a-ne-hi u-na-da-tli-sa-he ga-lo-hi-s-di-yi.",
     "english": "And all the city was gathered together at the door.",
-    "has_anomalies": true
+    "has_anomalies": false
   },
   {
     "verse_id": "020134",
@@ -4418,13 +4418,13 @@
         "end_sec": 463.96,
         "confidence": 0.379996,
         "min_char_confidence": 1.2e-05,
-        "flagged": true,
+        "flagged": false,
         "emitted_word": "kvwolhihkv'i"
       }
     ],
     "phonetic": "U-ni-tsa-ti-no de-u-nv-wa-ne tsu-ni-tlv-gi tsu-da-le-nv-dv v-yu-gi u-ne-hi; a-le u-ni-tsa-ti a-ni-s-gi-na du-nu-go-wi-se-i; a-le v-tla wa-ni-ne-gi yi-de-li-se-he a-ni-s-gi-na, u-di-ga-li-s-do-di-s-ge gv-wo-li-gv-i.",
     "english": "And he healed many that were sick of divers diseases, and cast out many devils; and suffered not the devils to speak, because they knew him.",
-    "has_anomalies": true
+    "has_anomalies": false
   },
   {
     "verse_id": "020135",
@@ -4450,7 +4450,7 @@
         "end_sec": 465.74,
         "confidence": 0.404364,
         "min_char_confidence": 0.000299,
-        "flagged": true,
+        "flagged": false,
         "emitted_word": "sunalenho"
       },
       {
@@ -4564,7 +4564,7 @@
     ],
     "phonetic": "Su-na-le-no, a-si go-hi-di-yu gv-wa-gi-tsv-di ge-sv u-di-dv-he u-nu-go-tse-i, a-le i-na-ge wu-lo-se-i, a-le na-hna u-da-do-li-s-ta-ne-i.",
     "english": "And in the morning, rising up a great while before day, he went out, and departed into a solitary place, and there prayed.",
-    "has_anomalies": true
+    "has_anomalies": false
   },
   {
     "verse_id": "020136",
@@ -4703,13 +4703,13 @@
         "end_sec": 493.54,
         "confidence": 0.227588,
         "min_char_confidence": 1e-06,
-        "flagged": true,
+        "flagged": false,
         "emitted_word": "ketsayhohs"
       }
     ],
     "phonetic": "Wi-gv-wa-wa-dv-hv-no, hi-a ni-gv-wa-we-se-le-i, ni-ga-dv-quo yv-wi ge-tsa-yo-se.",
     "english": "And when they had found him, they said unto him, All men seek for thee.",
-    "has_anomalies": true
+    "has_anomalies": false
   },
   {
     "verse_id": "020138",
@@ -4789,7 +4789,7 @@
         "end_sec": 500.76,
         "confidence": 0.134865,
         "min_char_confidence": 4e-06,
-        "flagged": true,
+        "flagged": false,
         "emitted_word": "nahskwo"
       },
       {
@@ -4825,13 +4825,13 @@
         "end_sec": 505.94,
         "confidence": 0.355483,
         "min_char_confidence": 0.000245,
-        "flagged": true,
+        "flagged": false,
         "emitted_word": "aki'luhthsilhv"
       }
     ],
     "phonetic": "Hi-a-no ni-du-we-se-le-i, Di-so-i do-di-ga-du-hv wi-di-lo-hi, na-hna na-s-quo ga-li-tsi-do-ni-do-lv-ha; na-s-gi-ye-no i-yu-s-di a-gi-lu-tsi-lv.",
     "english": "And he said unto them, Let us go into the next towns, that I may preach there also: for therefore came I forth.",
-    "has_anomalies": true
+    "has_anomalies": false
   },
   {
     "verse_id": "020139",
@@ -4979,7 +4979,7 @@
         "end_sec": 523.48,
         "confidence": 0.55001,
         "min_char_confidence": 0.00012,
-        "flagged": true,
+        "flagged": false,
         "emitted_word": "tulhinikwanvnele'i"
       },
       {
@@ -5042,7 +5042,7 @@
         "end_sec": 529.7,
         "confidence": 0.182996,
         "min_char_confidence": 7e-06,
-        "flagged": true,
+        "flagged": false,
         "emitted_word": "yelikwo"
       },
       {
@@ -5051,13 +5051,13 @@
         "end_sec": 530.76,
         "confidence": 0.235361,
         "min_char_confidence": 1e-06,
-        "flagged": true,
+        "flagged": false,
         "emitted_word": "yihskinvkalv"
       }
     ],
     "phonetic": "A-da-ye-s-gi-no u-tlv-gi u-lu-tse-le-i, u-da-do-li-s-da-ne-le du-li-ni-qua-nv-ne-le-i, a-le hi-a nu-we-se-le-i, I-yu-no o-si-yu yi-tsa-ye-lv-nv, ye-li-quo yi-s-gi-nv-ga-lv.",
     "english": "And there came a leper to him, beseeching him, and kneeling down to him, and saying unto him, If thou wilt, thou canst make me clean.",
-    "has_anomalies": true
+    "has_anomalies": false
   },
   {
     "verse_id": "020141",
@@ -5164,7 +5164,7 @@
         "end_sec": 540.88,
         "confidence": 0.378543,
         "min_char_confidence": 0.000167,
-        "flagged": true,
+        "flagged": false,
         "emitted_word": "tsiyelvnv"
       },
       {
@@ -5188,7 +5188,7 @@
     ],
     "phonetic": "Tsi-sa-no, ga-do-li-gv u-do-ya-nv-hi-de-i, a-le u-sv-ni-le-i, a-le hi-a nu-we-se-le-i, O-si-yu tsi-ye-lv-nv; tsa-da-nv-ga-lv-dv ge-se-s-di.",
     "english": "And Jesus, moved with compassion, put forth his hand, and touched him, and saith unto him, I will; be thou clean.",
-    "has_anomalies": true
+    "has_anomalies": false
   },
   {
     "verse_id": "020142",
@@ -5214,7 +5214,7 @@
         "end_sec": 545.08,
         "confidence": 0.263911,
         "min_char_confidence": 8e-06,
-        "flagged": true,
+        "flagged": false,
         "emitted_word": "unhetskwnho"
       },
       {
@@ -5223,7 +5223,7 @@
         "end_sec": 545.64,
         "confidence": 0.224858,
         "min_char_confidence": 7e-06,
-        "flagged": true,
+        "flagged": false,
         "emitted_word": "khilakwo"
       },
       {
@@ -5232,7 +5232,7 @@
         "end_sec": 546.2,
         "confidence": 0.140934,
         "min_char_confidence": 6.4e-05,
-        "flagged": true,
+        "flagged": false,
         "emitted_word": "iyvtv"
       },
       {
@@ -5277,7 +5277,7 @@
         "end_sec": 551.88,
         "confidence": 0.406996,
         "min_char_confidence": 6.4e-05,
-        "flagged": true,
+        "flagged": false,
         "emitted_word": "utanvkalvtv"
       },
       {
@@ -5292,7 +5292,7 @@
     ],
     "phonetic": "U-ne-tsv-quo-no gi-la-quo i-yv-dv a-da-ye-s-gi u-tlv-gv u-li-dv-ta-ne-i, a-le u-da-nv-ga-lv-dv ge-se-i.",
     "english": "And as soon as he had spoken, immediately the leprosy departed from him, and he was cleansed.",
-    "has_anomalies": true
+    "has_anomalies": false
   },
   {
     "verse_id": "020143",
@@ -5336,7 +5336,7 @@
         "end_sec": 556.04,
         "confidence": 0.212315,
         "min_char_confidence": 4e-06,
-        "flagged": true,
+        "flagged": false,
         "emitted_word": "khilakwo"
       },
       {
@@ -5345,7 +5345,7 @@
         "end_sec": 556.52,
         "confidence": 0.198902,
         "min_char_confidence": 0.000312,
-        "flagged": true,
+        "flagged": false,
         "emitted_word": "iyvtv"
       },
       {
@@ -5369,7 +5369,7 @@
     ],
     "phonetic": "U-li-ni-gi-dv-no u-ne-tse-lv, gi-la-quo i-yv-dv u-ne-tse-le u-da-nv-s-di-yi;",
     "english": "And he straitly charged him, and forthwith sent him away;",
-    "has_anomalies": true
+    "has_anomalies": false
   },
   {
     "verse_id": "020144",
@@ -5422,7 +5422,7 @@
         "end_sec": 562.84,
         "confidence": 0.413146,
         "min_char_confidence": 2e-06,
-        "flagged": true,
+        "flagged": false,
         "emitted_word": "heyhahthahehsti"
       },
       {
@@ -5476,7 +5476,7 @@
         "end_sec": 569.66,
         "confidence": 0.405621,
         "min_char_confidence": 0.000157,
-        "flagged": true,
+        "flagged": false,
         "emitted_word": "khvnikehsv"
       },
       {
@@ -5485,7 +5485,7 @@
         "end_sec": 570.74,
         "confidence": 0.482648,
         "min_char_confidence": 8.6e-05,
-        "flagged": true,
+        "flagged": false,
         "emitted_word": "winiyatvnhihsi"
       },
       {
@@ -5590,7 +5590,7 @@
     ],
     "phonetic": "A-le hi-a nu-we-se-le-i, He-ya-ta-he-s-di tle-s-di gi-lo go-hu-s-di tsi-hi-no-ne-li; he-na-quo-s-gi-ni, gv-ni-ge-sv wi-ni-ya-dv-ni-si a-tsi-lv-ge-lo-hi, a-le wa-li-s-go-lv-da tsa-da-nv-ga-lv-hv u-gv-wa-li, na-s-gi Mo-si u-ne-tsv a-li-s-go-lv-do-di-yi, na-s-gi u-na-do-hi-yu-na-ne-di-yi.",
     "english": "And saith unto him, See thou say nothing to any man: but go thy way, shew thyself to the priest, and offer for thy cleansing those things which Moses commanded, for a testimony unto them.",
-    "has_anomalies": true
+    "has_anomalies": false
   },
   {
     "verse_id": "020145",
@@ -5634,7 +5634,7 @@
         "end_sec": 589.16,
         "confidence": 0.177861,
         "min_char_confidence": 9e-06,
-        "flagged": true,
+        "flagged": false,
         "emitted_word": "ulenvhe"
       },
       {
@@ -5652,7 +5652,7 @@
         "end_sec": 591.76,
         "confidence": 0.411045,
         "min_char_confidence": 4e-06,
-        "flagged": true,
+        "flagged": false,
         "emitted_word": "tuyelihihsthane'i"
       },
       {
@@ -5785,7 +5785,7 @@
         "word": "tekehsatihsv",
         "start_sec": 599.28,
         "end_sec": 599.6,
-        "confidence": 0.001185,
+        "confidence": 0.000601,
         "min_char_confidence": 2e-06,
         "flagged": true,
         "emitted_word": "tkhsathsv"
@@ -5801,9 +5801,9 @@
       },
       {
         "word": "nikvnatvkwono",
-        "start_sec": 600.04,
+        "start_sec": 600.02,
         "end_sec": 600.56,
-        "confidence": 0.000147,
+        "confidence": 0.000104,
         "min_char_confidence": 0.0,
         "flagged": true,
         "emitted_word": "nkvnatkwonho"
