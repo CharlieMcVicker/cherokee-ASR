@@ -226,8 +226,225 @@ def prepare_alignment_input(
     raise ValueError("Either bible_metadata or chunk_list must be provided.")
 
 
+def load_syllabary_transcript(
+    source: Union[str, Path, List[str], List[Dict[str, Any]], Dict[str, Any]],
+    normalizer: Callable[[str], str] = normalize_syllabary_for_alignment,
+) -> Tuple[List[TextChunk], Dict[str, Dict[str, Any]]]:
+    """
+    Ingests Cherokee Syllabary transcripts (or mixed Cherokee/English code-switched text)
+    from raw strings, text files, JSON files, or chunk lists into normalized TextChunks
+    and a source lookup dictionary.
+
+    Args:
+        source: Raw multiline text string, path to .txt/.json file, list of text lines/chunks,
+                or dictionary of chunks.
+        normalizer: Function to convert syllabary text into canonical TTH phonetics.
+                    Defaults to normalize_syllabary_for_alignment.
+
+    Returns:
+        A tuple of (chunks, source_lookup) where:
+            chunks: List[TextChunk] with chunk_id and normalized TTH phonetic text.
+            source_lookup: Dict[str, Dict[str, Any]] mapping chunk_id to metadata dictionaries
+                           with keys 'syllabary', 'text', 'phonetic', etc.
+    """
+    chunks: List[TextChunk] = []
+    source_lookup: Dict[str, Dict[str, Any]] = {}
+
+    if isinstance(source, (str, Path)):
+        s_str = str(source).strip()
+        if os.path.exists(s_str) and os.path.isfile(s_str):
+            if s_str.endswith(".json"):
+                with open(s_str, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                return load_syllabary_transcript(data, normalizer=normalizer)
+            else:
+                with open(s_str, "r", encoding="utf-8") as f:
+                    content = f.read()
+                lines = [line.strip() for line in content.splitlines() if line.strip()]
+                for idx, line in enumerate(lines, 1):
+                    cid = f"chunk_{idx:03d}"
+                    norm = normalizer(line)
+                    chunks.append(TextChunk(chunk_id=cid, text=norm))
+                    source_lookup[cid] = {
+                        "syllabary": line,
+                        "text": line,
+                        "phonetic": norm,
+                    }
+                return chunks, source_lookup
+        elif s_str.startswith("{") or s_str.startswith("["):
+            try:
+                data = json.loads(s_str)
+                return load_syllabary_transcript(data, normalizer=normalizer)
+            except Exception:
+                pass
+
+        lines = [line.strip() for line in s_str.splitlines() if line.strip()]
+        for idx, line in enumerate(lines, 1):
+            cid = f"chunk_{idx:03d}"
+            norm = normalizer(line)
+            chunks.append(TextChunk(chunk_id=cid, text=norm))
+            source_lookup[cid] = {
+                "syllabary": line,
+                "text": line,
+                "phonetic": norm,
+            }
+        return chunks, source_lookup
+
+    elif isinstance(source, list):
+        for idx, item in enumerate(source, 1):
+            if isinstance(item, dict):
+                cid = str(
+                    item.get(
+                        "chunk_id",
+                        item.get("line_id", item.get("id", f"chunk_{idx:03d}")),
+                    )
+                )
+                raw_syll = str(
+                    item.get(
+                        "syllabary",
+                        item.get(
+                            "cherokee",
+                            item.get("text", item.get("raw_text", "")),
+                        ),
+                    )
+                ).strip()
+                norm = normalizer(raw_syll)
+                chunks.append(TextChunk(chunk_id=cid, text=norm))
+                meta = dict(item)
+                meta["syllabary"] = raw_syll
+                meta["text"] = raw_syll
+                meta["phonetic"] = norm
+                source_lookup[cid] = meta
+            else:
+                line_str = str(item).strip()
+                cid = f"chunk_{idx:03d}"
+                norm = normalizer(line_str)
+                chunks.append(TextChunk(chunk_id=cid, text=norm))
+                source_lookup[cid] = {
+                    "syllabary": line_str,
+                    "text": line_str,
+                    "phonetic": norm,
+                }
+        return chunks, source_lookup
+
+    elif isinstance(source, dict):
+        for idx, (cid, item) in enumerate(source.items(), 1):
+            cid_str = str(cid)
+            if isinstance(item, dict):
+                raw_syll = str(
+                    item.get(
+                        "syllabary",
+                        item.get(
+                            "cherokee",
+                            item.get("text", item.get("raw_text", "")),
+                        ),
+                    )
+                ).strip()
+                norm = normalizer(raw_syll)
+                chunks.append(TextChunk(chunk_id=cid_str, text=norm))
+                meta = dict(item)
+                meta["syllabary"] = raw_syll
+                meta["text"] = raw_syll
+                meta["phonetic"] = norm
+                source_lookup[cid_str] = meta
+            else:
+                raw_syll = str(item).strip()
+                norm = normalizer(raw_syll)
+                chunks.append(TextChunk(chunk_id=cid_str, text=norm))
+                source_lookup[cid_str] = {
+                    "syllabary": raw_syll,
+                    "text": raw_syll,
+                    "phonetic": norm,
+                }
+        return chunks, source_lookup
+
+    raise ValueError(f"Unsupported transcript source type: {type(source)}")
+
+
+def load_interview_transcript(
+    source: Union[str, Path, List[str]],
+    normalizer: Callable[[str], str] = normalize_syllabary_for_alignment,
+) -> Tuple[List[TextChunk], Dict[str, Dict[str, Any]]]:
+    """
+    Ingests dialogue and interview transcripts formatted as 'Speaker: Spoken text',
+    handling Cherokee Syllabary, English code-switching, speaker labels, and multiline turns.
+
+    Extracts spoken dialogue into normalized TextChunks (stripping speaker prefixes so they
+    do not pollute acoustic alignment) while recording speaker identity in source metadata.
+
+    Args:
+        source: File path to transcript (.txt), raw multiline string, or list of line strings.
+        normalizer: Function to convert syllabary text into canonical TTH phonetics.
+                    Defaults to normalize_syllabary_for_alignment.
+
+    Returns:
+        A tuple of (chunks, source_lookup) where:
+            chunks: List[TextChunk] with turn IDs ('turn_001', 'turn_002', ...) and normalized phonetic text.
+            source_lookup: Dict[str, Dict[str, Any]] mapping turn ID to metadata dictionary with keys:
+                           'speaker', 'syllabary', 'text', 'phonetic', 'raw_line', and 'line_number'.
+    """
+    if isinstance(source, (str, Path)):
+        s_str = str(source).strip()
+        if os.path.exists(s_str) and os.path.isfile(s_str):
+            with open(s_str, "r", encoding="utf-8") as f:
+                content = f.read()
+            raw_lines = content.splitlines()
+        else:
+            raw_lines = s_str.splitlines()
+    elif isinstance(source, list):
+        raw_lines = [str(item) for item in source]
+    else:
+        raise ValueError(
+            f"Unsupported interview transcript source type: {type(source)}"
+        )
+
+    chunks: List[TextChunk] = []
+    source_lookup: Dict[str, Dict[str, Any]] = {}
+
+    current_speaker = "Speaker"
+    chunk_idx = 1
+
+    for line_num, line in enumerate(raw_lines, 1):
+        stripped = line.strip()
+        if not stripped:
+            continue
+
+        if ":" in stripped:
+            parts = stripped.split(":", 1)
+            speaker_candidate = parts[0].strip()
+            spoken_text = parts[1].strip()
+            if len(speaker_candidate) <= 40 and spoken_text:
+                current_speaker = speaker_candidate
+                text_to_process = spoken_text
+            else:
+                text_to_process = stripped
+        else:
+            text_to_process = stripped
+
+        if not text_to_process:
+            continue
+
+        cid = f"turn_{chunk_idx:03d}"
+        chunk_idx += 1
+        norm_phonetic = normalizer(text_to_process)
+
+        chunks.append(TextChunk(chunk_id=cid, text=norm_phonetic))
+        source_lookup[cid] = {
+            "speaker": current_speaker,
+            "syllabary": text_to_process,
+            "text": text_to_process,
+            "phonetic": norm_phonetic,
+            "raw_line": stripped,
+            "line_number": line_num,
+        }
+
+    return chunks, source_lookup
+
+
 __all__ = [
     "load_bible_chunks",
     "load_generic_chunks",
+    "load_interview_transcript",
+    "load_syllabary_transcript",
     "prepare_alignment_input",
 ]

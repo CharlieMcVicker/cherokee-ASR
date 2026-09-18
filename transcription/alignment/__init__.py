@@ -41,7 +41,13 @@ from transcription.alignment.extractors import (
 from transcription.alignment.ingestion import (
     load_bible_chunks,
     load_generic_chunks,
+    load_interview_transcript,
+    load_syllabary_transcript,
     prepare_alignment_input,
+)
+from transcription.alignment.pipeline import (
+    align_syllabary_ctc,
+    align_syllabary_greedy,
 )
 from transcription.alignment.models import (
     AlignedChunk,
@@ -95,6 +101,8 @@ __all__ = [
     # Ingestion & Normalizers
     "load_bible_chunks",
     "load_generic_chunks",
+    "load_interview_transcript",
+    "load_syllabary_transcript",
     "prepare_alignment_input",
     "normalize_syllabary_for_alignment",
     "normalize_phonetics_for_alignment",
@@ -115,11 +123,13 @@ __all__ = [
     "LevenshteinDistanceMetric",
     "CustomCallableDistanceMetric",
     "calculate_cer",
-    # Aligners
+    # Aligners & Runners
     "NeedlemanWunschWordAligner",
     "SlidingWindowDTWAligner",
     "CTCSegmentationAligner",
     "get_logits_cached",
+    "align_syllabary_greedy",
+    "align_syllabary_ctc",
     # Reconciliation
     "reconcile_word_intervals",
     "reconcile_alignment_words",

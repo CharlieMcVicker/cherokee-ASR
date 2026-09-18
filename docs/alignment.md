@@ -824,7 +824,42 @@ align-cherokee \
 
 ## 10. Programmatic Python API
 
-The `transcription.alignment` package supports both high-level one-line execution and fine-grained modular pipelines.
+The `transcription.alignment` package supports turnkey syllabary interview alignment functions as well as fine-grained modular pipelines.
+
+### Syllabary Interview Alignment (`align_syllabary_greedy` vs `align_syllabary_ctc`)
+
+To align an interview transcript in Cherokee syllabary (with potential English code-switching) and export multi-tier Praat TextGrids and JSON manifests:
+
+```python
+from transcription.alignment import align_syllabary_greedy, align_syllabary_ctc
+
+# 1. Pipeline 1: Greedy ASR + DTW + Syllabary Reconciliation
+output_greedy = align_syllabary_greedy(
+    audio="path/to/interview.wav",
+    transcript="ᎣᏍᏓ ᏂᎦᎵᏍᏗᎭ\nᎭᏩ ᎰᏩ",  # Raw syllabary, .txt path, or chunk list
+    output_dir="output/interview_greedy",
+    export_praat=True,     # Generates greedy_alignment.TextGrid
+    export_manifest=True,  # Generates alignment_manifest.json
+)
+
+# 2. Pipeline 2: Guided CTC Segmentation
+output_ctc = align_syllabary_ctc(
+    audio="path/to/interview.wav",
+    transcript="ᎣᏍᏓ ᏂᎦᎵᏍᏗᎭ\nᎭᏩ ᎰᏩ",
+    output_dir="output/interview_ctc",
+    cache=True,            # Caches acoustic log-probabilities on disk
+    export_praat=True,     # Generates ctc_alignment.TextGrid
+    export_manifest=True,  # Generates alignment_manifest.json
+)
+```
+
+Both runners automatically generate multi-tier Praat TextGrids containing:
+- **`Chunks`**: Sentence / Turn chunk intervals.
+- **`Words` / `Syllabary Words`**: Aligned Cherokee Syllabary words.
+- **`Padded Words`**: Padded word intervals.
+- **`Reconciled Words`**: Reconciled phonetic representations combining Syllabary rules and ASR acoustic observations.
+
+---
 
 ### High-Level Execution (`run_alignment_pipeline`)
 
