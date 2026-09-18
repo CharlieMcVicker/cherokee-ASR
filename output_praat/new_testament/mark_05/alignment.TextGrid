@@ -2,7 +2,7 @@ File type = "ooTextFile"
 Object class = "TextGrid"
 
 xmin = 0
-xmax = 599.640
+xmax = 595.980
 tiers? <exists>
 size = 4
 item []:
@@ -10,7 +10,7 @@ item []:
         class = "IntervalTier"
         name = "Chunks"
         xmin = 0
-        xmax = 599.640
+        xmax = 595.980
         intervals: size = 44
         intervals [1]:
             xmin = 0.000
@@ -18,10 +18,10 @@ item []:
             text = ""
         intervals [2]:
             xmin = 3.540
-            xmax = 10.840
+            xmax = 10.850
             text = "020501"
         intervals [3]:
-            xmin = 10.840
+            xmin = 10.850
             xmax = 22.610
             text = "020502"
         intervals [4]:
@@ -30,10 +30,10 @@ item []:
             text = "020503"
         intervals [5]:
             xmin = 33.180
-            xmax = 56.050
+            xmax = 56.060
             text = "020504"
         intervals [6]:
-            xmin = 56.050
+            xmin = 56.060
             xmax = 68.630
             text = "020505"
         intervals [7]:
@@ -46,10 +46,10 @@ item []:
             text = "020507"
         intervals [9]:
             xmin = 99.860
-            xmax = 110.490
+            xmax = 110.500
             text = "020508"
         intervals [10]:
-            xmin = 110.490
+            xmin = 110.500
             xmax = 123.290
             text = "020509"
         intervals [11]:
@@ -66,10 +66,10 @@ item []:
             text = "020512"
         intervals [14]:
             xmin = 153.170
-            xmax = 180.390
+            xmax = 180.400
             text = "020513"
         intervals [15]:
-            xmin = 180.390
+            xmin = 180.400
             xmax = 194.850
             text = "020514"
         intervals [16]:
@@ -82,26 +82,26 @@ item []:
             text = "020516"
         intervals [18]:
             xmin = 227.610
-            xmax = 234.550
+            xmax = 234.560
             text = "020517"
         intervals [19]:
-            xmin = 234.550
+            xmin = 234.560
             xmax = 246.620
             text = "020518"
         intervals [20]:
             xmin = 246.620
-            xmax = 266.920
+            xmax = 266.930
             text = "020519"
         intervals [21]:
-            xmin = 266.920
+            xmin = 266.930
             xmax = 283.400
             text = "020520"
         intervals [22]:
             xmin = 283.400
-            xmax = 297.260
+            xmax = 297.270
             text = "020521"
         intervals [23]:
-            xmin = 297.260
+            xmin = 297.270
             xmax = 309.930
             text = "020522"
         intervals [24]:
@@ -150,10 +150,10 @@ item []:
             text = "020533"
         intervals [35]:
             xmin = 456.060
-            xmax = 469.760
+            xmax = 469.770
             text = "020534"
         intervals [36]:
-            xmin = 469.760
+            xmin = 469.770
             xmax = 488.540
             text = "020535"
         intervals [37]:
@@ -166,10 +166,10 @@ item []:
             text = "020537"
         intervals [39]:
             xmin = 514.000
-            xmax = 528.070
+            xmax = 528.080
             text = "020538"
         intervals [40]:
-            xmin = 528.070
+            xmin = 528.080
             xmax = 541.850
             text = "020539"
         intervals [41]:
@@ -186,13 +186,13 @@ item []:
             text = "020542"
         intervals [44]:
             xmin = 586.080
-            xmax = 599.640
+            xmax = 595.980
             text = "020543"
     item [2]:
         class = "IntervalTier"
         name = "Words"
         xmin = 0
-        xmax = 599.640
+        xmax = 595.980
         intervals: size = 1029
         intervals [1]:
             xmin = 0.000
@@ -232,10 +232,10 @@ item []:
             text = ""
         intervals [10]:
             xmin = 9.300
-            xmax = 10.260
+            xmax = 10.280
             text = "unatselikohi"
         intervals [11]:
-            xmin = 10.260
+            xmin = 10.280
             xmax = 11.420
             text = ""
         intervals [12]:
@@ -256,14 +256,14 @@ item []:
             text = ""
         intervals [16]:
             xmin = 13.620
-            xmax = 13.960
+            xmax = 14.020
             text = "kilakwo"
         intervals [17]:
-            xmin = 13.960
-            xmax = 14.000
+            xmin = 14.020
+            xmax = 14.080
             text = ""
         intervals [18]:
-            xmin = 14.000
+            xmin = 14.080
             xmax = 14.480
             text = "iyvtv"
         intervals [19]:
@@ -272,10 +272,10 @@ item []:
             text = ""
         intervals [20]:
             xmin = 15.220
-            xmax = 15.840
+            xmax = 15.860
             text = "tutlohse"
         intervals [21]:
-            xmin = 15.840
+            xmin = 15.860
             xmax = 16.000
             text = ""
         intervals [22]:
@@ -288,10 +288,10 @@ item []:
             text = ""
         intervals [24]:
             xmin = 17.100
-            xmax = 18.100
+            xmax = 18.120
             text = "tatanihsahv"
         intervals [25]:
-            xmin = 18.100
+            xmin = 18.120
             xmax = 18.460
             text = ""
         intervals [26]:
@@ -304,18 +304,18 @@ item []:
             text = ""
         intervals [28]:
             xmin = 20.360
-            xmax = 20.900
+            xmax = 20.920
             text = "kataha"
         intervals [29]:
-            xmin = 20.900
+            xmin = 20.920
             xmax = 21.080
             text = ""
         intervals [30]:
             xmin = 21.080
-            xmax = 21.640
+            xmax = 21.660
             text = "atanvto"
         intervals [31]:
-            xmin = 21.640
+            xmin = 21.660
             xmax = 21.840
             text = ""
         intervals [32]:
@@ -416,10 +416,10 @@ item []:
             text = ""
         intervals [56]:
             xmin = 33.600
-            xmax = 34.640
+            xmax = 34.660
             text = "yanokiyuyeno"
         intervals [57]:
-            xmin = 34.640
+            xmin = 34.660
             xmax = 35.240
             text = ""
         intervals [58]:
@@ -456,26 +456,26 @@ item []:
             text = ""
         intervals [66]:
             xmin = 41.920
-            xmax = 42.940
+            xmax = 42.960
             text = "tsakalvhsthanvhi"
         intervals [67]:
-            xmin = 42.940
+            xmin = 42.960
             xmax = 43.400
             text = ""
         intervals [68]:
             xmin = 43.400
-            xmax = 43.880
+            xmax = 43.900
             text = "kehse'i"
         intervals [69]:
-            xmin = 43.880
+            xmin = 43.900
             xmax = 45.100
             text = ""
         intervals [70]:
             xmin = 45.100
-            xmax = 46.180
+            xmax = 46.200
             text = "tsutatehsvtvno"
         intervals [71]:
-            xmin = 46.180
+            xmin = 46.200
             xmax = 46.440
             text = ""
         intervals [72]:
@@ -488,18 +488,18 @@ item []:
             text = ""
         intervals [74]:
             xmin = 47.960
-            xmax = 48.100
+            xmax = 48.120
             text = "ale"
         intervals [75]:
-            xmin = 48.100
+            xmin = 48.120
             xmax = 48.240
             text = ""
         intervals [76]:
             xmin = 48.240
-            xmax = 49.080
+            xmax = 49.100
             text = "tikanvtlohsti"
         intervals [77]:
-            xmin = 49.080
+            xmin = 49.100
             xmax = 49.700
             text = ""
         intervals [78]:
@@ -536,18 +536,18 @@ item []:
             text = ""
         intervals [86]:
             xmin = 53.060
-            xmax = 54.500
+            xmax = 54.520
             text = "kvwatanvthihsoti"
         intervals [87]:
-            xmin = 54.500
+            xmin = 54.520
             xmax = 54.760
             text = ""
         intervals [88]:
             xmin = 54.760
-            xmax = 55.460
+            xmax = 55.480
             text = "yikehse'i"
         intervals [89]:
-            xmin = 55.460
+            xmin = 55.480
             xmax = 56.640
             text = ""
         intervals [90]:
@@ -616,18 +616,18 @@ item []:
             text = ""
         intervals [106]:
             xmin = 63.700
-            xmax = 64.620
+            xmax = 64.640
             text = "uweluke'i"
         intervals [107]:
-            xmin = 64.620
+            xmin = 64.640
             xmax = 65.420
             text = ""
         intervals [108]:
             xmin = 65.420
-            xmax = 65.600
+            xmax = 65.620
             text = "ale"
         intervals [109]:
-            xmin = 65.600
+            xmin = 65.620
             xmax = 66.080
             text = ""
         intervals [110]:
@@ -832,10 +832,10 @@ item []:
             text = ""
         intervals [160]:
             xmin = 91.120
-            xmax = 92.120
+            xmax = 92.140
             text = "unelanvhi"
         intervals [161]:
-            xmin = 92.120
+            xmin = 92.140
             xmax = 93.200
             text = ""
         intervals [162]:
@@ -936,18 +936,18 @@ item []:
             text = ""
         intervals [186]:
             xmin = 109.180
-            xmax = 109.840
+            xmax = 109.860
             text = "atanvto"
         intervals [187]:
-            xmin = 109.840
+            xmin = 109.860
             xmax = 111.140
             text = ""
         intervals [188]:
             xmin = 111.140
-            xmax = 112.120
+            xmax = 112.140
             text = "utvtvneno"
         intervals [189]:
-            xmin = 112.120
+            xmin = 112.140
             xmax = 113.200
             text = ""
         intervals [190]:
@@ -984,10 +984,10 @@ item []:
             text = ""
         intervals [198]:
             xmin = 117.860
-            xmax = 118.600
+            xmax = 118.620
             text = "nuwehsele'i"
         intervals [199]:
-            xmin = 118.600
+            xmin = 118.620
             xmax = 119.220
             text = ""
         intervals [200]:
@@ -1096,18 +1096,18 @@ item []:
             text = ""
         intervals [226]:
             xmin = 135.360
-            xmax = 136.060
+            xmax = 136.080
             text = "unitsathi"
         intervals [227]:
-            xmin = 136.060
+            xmin = 136.080
             xmax = 136.920
             text = ""
         intervals [228]:
             xmin = 136.920
-            xmax = 137.600
+            xmax = 137.620
             text = "hsunatatluki"
         intervals [229]:
-            xmin = 137.600
+            xmin = 137.620
             xmax = 137.980
             text = ""
         intervals [230]:
@@ -1128,10 +1128,10 @@ item []:
             text = ""
         intervals [234]:
             xmin = 141.060
-            xmax = 141.700
+            xmax = 141.720
             text = "nikatvno"
         intervals [235]:
-            xmin = 141.700
+            xmin = 141.720
             xmax = 142.020
             text = ""
         intervals [236]:
@@ -1176,10 +1176,10 @@ item []:
             text = ""
         intervals [246]:
             xmin = 147.960
-            xmax = 148.340
+            xmax = 148.360
             text = "hsikwa"
         intervals [247]:
-            xmin = 148.340
+            xmin = 148.360
             xmax = 148.420
             text = ""
         intervals [248]:
@@ -1240,18 +1240,18 @@ item []:
             text = ""
         intervals [262]:
             xmin = 155.260
-            xmax = 156.780
+            xmax = 156.800
             text = "tulihskolvtanele'i"
         intervals [263]:
-            xmin = 156.780
+            xmin = 156.800
             xmax = 157.700
             text = ""
         intervals [264]:
             xmin = 157.700
-            xmax = 158.640
+            xmax = 158.720
             text = "tikatahano"
         intervals [265]:
-            xmin = 158.640
+            xmin = 158.720
             xmax = 158.760
             text = ""
         intervals [266]:
@@ -1296,18 +1296,18 @@ item []:
             text = ""
         intervals [276]:
             xmin = 164.820
-            xmax = 166.700
+            xmax = 166.720
             text = "unanelukihse"
         intervals [277]:
-            xmin = 166.700
+            xmin = 166.720
             xmax = 167.380
             text = ""
         intervals [278]:
             xmin = 167.380
-            xmax = 168.460
+            xmax = 168.480
             text = "unikahso'ahse"
         intervals [279]:
-            xmin = 168.460
+            xmin = 168.480
             xmax = 168.760
             text = ""
         intervals [280]:
@@ -1336,10 +1336,10 @@ item []:
             text = ""
         intervals [286]:
             xmin = 171.120
-            xmax = 172.760
+            xmax = 172.780
             text = "wunalithatinvhse'i"
         intervals [287]:
-            xmin = 172.760
+            xmin = 172.780
             xmax = 173.260
             text = ""
         intervals [288]:
@@ -1392,10 +1392,10 @@ item []:
             text = ""
         intervals [300]:
             xmin = 178.820
-            xmax = 179.840
+            xmax = 179.860
             text = "tunikvtse'i"
         intervals [301]:
-            xmin = 179.840
+            xmin = 179.860
             xmax = 180.940
             text = ""
         intervals [302]:
@@ -1464,10 +1464,10 @@ item []:
             text = ""
         intervals [318]:
             xmin = 189.700
-            xmax = 190.860
+            xmax = 190.880
             text = "uninukotseno"
         intervals [319]:
-            xmin = 190.860
+            xmin = 190.880
             xmax = 191.320
             text = ""
         intervals [320]:
@@ -1512,26 +1512,26 @@ item []:
             text = ""
         intervals [330]:
             xmin = 197.640
-            xmax = 197.840
+            xmax = 197.860
             text = "ale"
         intervals [331]:
-            xmin = 197.840
+            xmin = 197.860
             xmax = 198.900
             text = ""
         intervals [332]:
             xmin = 198.900
-            xmax = 199.660
+            xmax = 199.680
             text = "kvwakohe"
         intervals [333]:
-            xmin = 199.660
+            xmin = 199.680
             xmax = 199.900
             text = ""
         intervals [334]:
             xmin = 199.900
-            xmax = 200.280
+            xmax = 200.300
             text = "nahski"
         intervals [335]:
-            xmin = 200.280
+            xmin = 200.300
             xmax = 201.180
             text = ""
         intervals [336]:
@@ -1560,10 +1560,10 @@ item []:
             text = ""
         intervals [342]:
             xmin = 204.060
-            xmax = 204.900
+            xmax = 204.920
             text = "hsunatatluki"
         intervals [343]:
-            xmin = 204.900
+            xmin = 204.920
             xmax = 205.240
             text = ""
         intervals [344]:
@@ -1584,10 +1584,10 @@ item []:
             text = ""
         intervals [348]:
             xmin = 207.840
-            xmax = 208.040
+            xmax = 208.060
             text = "ale"
         intervals [349]:
-            xmin = 208.040
+            xmin = 208.060
             xmax = 208.360
             text = ""
         intervals [350]:
@@ -1664,10 +1664,10 @@ item []:
             text = ""
         intervals [368]:
             xmin = 220.420
-            xmax = 221.220
+            xmax = 221.240
             text = "nulihstanelv"
         intervals [369]:
-            xmin = 221.220
+            xmin = 221.240
             xmax = 221.940
             text = ""
         intervals [370]:
@@ -1752,10 +1752,10 @@ item []:
             text = ""
         intervals [390]:
             xmin = 232.960
-            xmax = 233.940
+            xmax = 233.960
             text = "unatselikohi"
         intervals [391]:
-            xmin = 233.940
+            xmin = 233.960
             xmax = 235.160
             text = ""
         intervals [392]:
@@ -1776,10 +1776,10 @@ item []:
             text = ""
         intervals [396]:
             xmin = 237.100
-            xmax = 237.460
+            xmax = 237.480
             text = "nahski"
         intervals [397]:
-            xmin = 237.460
+            xmin = 237.480
             xmax = 238.400
             text = ""
         intervals [398]:
@@ -1808,10 +1808,10 @@ item []:
             text = ""
         intervals [404]:
             xmin = 242.260
-            xmax = 242.820
+            xmax = 242.840
             text = "unelaki"
         intervals [405]:
-            xmin = 242.820
+            xmin = 242.840
             xmax = 243.000
             text = ""
         intervals [406]:
@@ -1848,10 +1848,10 @@ item []:
             text = ""
         intervals [414]:
             xmin = 248.120
-            xmax = 249.260
+            xmax = 249.280
             text = "yulihskolvtanele'i"
         intervals [415]:
-            xmin = 249.260
+            xmin = 249.280
             xmax = 249.460
             text = ""
         intervals [416]:
@@ -1896,10 +1896,10 @@ item []:
             text = ""
         intervals [426]:
             xmin = 255.060
-            xmax = 255.680
+            xmax = 255.700
             text = "kohuhsti"
         intervals [427]:
-            xmin = 255.680
+            xmin = 255.700
             xmax = 255.920
             text = ""
         intervals [428]:
@@ -1912,18 +1912,18 @@ item []:
             text = ""
         intervals [430]:
             xmin = 256.480
-            xmax = 257.180
+            xmax = 257.200
             text = "tinehv'i"
         intervals [431]:
-            xmin = 257.180
+            xmin = 257.200
             xmax = 258.360
             text = ""
         intervals [432]:
             xmin = 258.360
-            xmax = 258.540
+            xmax = 258.560
             text = "ale"
         intervals [433]:
-            xmin = 258.540
+            xmin = 258.560
             xmax = 258.740
             text = ""
         intervals [434]:
@@ -1968,34 +1968,34 @@ item []:
             text = ""
         intervals [444]:
             xmin = 264.600
-            xmax = 264.760
+            xmax = 264.780
             text = "ale"
         intervals [445]:
-            xmin = 264.760
+            xmin = 264.780
             xmax = 265.180
             text = ""
         intervals [446]:
             xmin = 265.180
-            xmax = 266.360
+            xmax = 266.380
             text = "tsatolitsv'i"
         intervals [447]:
-            xmin = 266.360
+            xmin = 266.380
             xmax = 267.480
             text = ""
         intervals [448]:
             xmin = 267.480
-            xmax = 268.440
+            xmax = 268.460
             text = "unikihseno"
         intervals [449]:
-            xmin = 268.440
+            xmin = 268.460
             xmax = 268.600
             text = ""
         intervals [450]:
             xmin = 268.600
-            xmax = 268.800
+            xmax = 268.820
             text = "ale"
         intervals [451]:
-            xmin = 268.800
+            xmin = 268.820
             xmax = 269.200
             text = ""
         intervals [452]:
@@ -2048,10 +2048,10 @@ item []:
             text = ""
         intervals [464]:
             xmin = 278.200
-            xmax = 279.100
+            xmax = 279.120
             text = "nutvnelv'i"
         intervals [465]:
-            xmin = 279.100
+            xmin = 279.120
             xmax = 279.280
             text = ""
         intervals [466]:
@@ -2168,10 +2168,10 @@ item []:
             text = ""
         intervals [494]:
             xmin = 294.980
-            xmax = 295.300
+            xmax = 295.380
             text = "vtali"
         intervals [495]:
-            xmin = 295.300
+            xmin = 295.380
             xmax = 295.520
             text = ""
         intervals [496]:
@@ -2184,10 +2184,10 @@ item []:
             text = ""
         intervals [498]:
             xmin = 296.100
-            xmax = 296.740
+            xmax = 296.760
             text = "etohe'i"
         intervals [499]:
-            xmin = 296.740
+            xmin = 296.760
             xmax = 297.780
             text = ""
         intervals [500]:
@@ -2200,26 +2200,26 @@ item []:
             text = ""
         intervals [502]:
             xmin = 297.980
-            xmax = 298.560
+            xmax = 298.600
             text = "kvniyukwo"
         intervals [503]:
-            xmin = 298.560
-            xmax = 298.580
+            xmin = 298.600
+            xmax = 298.720
             text = ""
         intervals [504]:
-            xmin = 298.580
-            xmax = 299.380
+            xmin = 298.720
+            xmax = 299.400
             text = "ulutse"
         intervals [505]:
-            xmin = 299.380
+            xmin = 299.400
             xmax = 299.640
             text = ""
         intervals [506]:
             xmin = 299.640
-            xmax = 299.780
+            xmax = 299.860
             text = "kilo"
         intervals [507]:
-            xmin = 299.780
+            xmin = 299.860
             xmax = 299.980
             text = ""
         intervals [508]:
@@ -2248,10 +2248,10 @@ item []:
             text = ""
         intervals [514]:
             xmin = 304.340
-            xmax = 304.780
+            xmax = 304.800
             text = "tsela"
         intervals [515]:
-            xmin = 304.780
+            xmin = 304.800
             xmax = 305.000
             text = ""
         intervals [516]:
@@ -2280,10 +2280,10 @@ item []:
             text = ""
         intervals [522]:
             xmin = 307.900
-            xmax = 308.460
+            xmax = 308.480
             text = "tulahskv"
         intervals [523]:
-            xmin = 308.460
+            xmin = 308.480
             xmax = 308.620
             text = ""
         intervals [524]:
@@ -2296,10 +2296,10 @@ item []:
             text = ""
         intervals [526]:
             xmin = 310.460
-            xmax = 310.640
+            xmax = 310.660
             text = "ale"
         intervals [527]:
-            xmin = 310.640
+            xmin = 310.660
             xmax = 310.860
             text = ""
         intervals [528]:
@@ -2328,10 +2328,10 @@ item []:
             text = ""
         intervals [534]:
             xmin = 313.260
-            xmax = 313.880
+            xmax = 313.900
             text = "nuwehse'i"
         intervals [535]:
-            xmin = 313.880
+            xmin = 313.900
             xmax = 314.660
             text = ""
         intervals [536]:
@@ -2352,10 +2352,10 @@ item []:
             text = ""
         intervals [540]:
             xmin = 316.380
-            xmax = 316.660
+            xmax = 316.720
             text = "nhakwo"
         intervals [541]:
-            xmin = 316.660
+            xmin = 316.720
             xmax = 316.840
             text = ""
         intervals [542]:
@@ -2384,10 +2384,10 @@ item []:
             text = ""
         intervals [548]:
             xmin = 320.380
-            xmax = 321.360
+            xmax = 321.380
             text = "hiyahsithatvha"
         intervals [549]:
-            xmin = 321.360
+            xmin = 321.380
             xmax = 322.660
             text = ""
         intervals [550]:
@@ -2416,10 +2416,10 @@ item []:
             text = ""
         intervals [556]:
             xmin = 326.980
-            xmax = 327.920
+            xmax = 327.940
             text = "unenvhseno"
         intervals [557]:
-            xmin = 327.920
+            xmin = 327.940
             xmax = 328.360
             text = ""
         intervals [558]:
@@ -2544,18 +2544,18 @@ item []:
             text = ""
         intervals [588]:
             xmin = 346.120
-            xmax = 346.940
+            xmax = 346.960
             text = "anikotiyu"
         intervals [589]:
-            xmin = 346.940
+            xmin = 346.960
             xmax = 347.120
             text = ""
         intervals [590]:
             xmin = 347.120
-            xmax = 348.220
+            xmax = 348.240
             text = "anikanakathi"
         intervals [591]:
-            xmin = 348.220
+            xmin = 348.240
             xmax = 348.560
             text = ""
         intervals [592]:
@@ -2568,18 +2568,18 @@ item []:
             text = ""
         intervals [594]:
             xmin = 350.000
-            xmax = 351.080
+            xmax = 351.160
             text = "kvwakilvnvhi"
         intervals [595]:
-            xmin = 351.080
+            xmin = 351.160
             xmax = 351.220
             text = ""
         intervals [596]:
             xmin = 351.220
-            xmax = 351.740
+            xmax = 351.760
             text = "kehse'i"
         intervals [597]:
-            xmin = 351.740
+            xmin = 351.760
             xmax = 352.660
             text = ""
         intervals [598]:
@@ -2616,10 +2616,10 @@ item []:
             text = ""
         intervals [606]:
             xmin = 355.000
-            xmax = 355.800
+            xmax = 355.820
             text = "uhsvnvhi"
         intervals [607]:
-            xmin = 355.800
+            xmin = 355.820
             xmax = 355.860
             text = ""
         intervals [608]:
@@ -2632,10 +2632,10 @@ item []:
             text = ""
         intervals [610]:
             xmin = 356.900
-            xmax = 357.840
+            xmax = 357.860
             text = "akuyihskv'i"
         intervals [611]:
-            xmin = 357.840
+            xmin = 357.860
             xmax = 358.720
             text = ""
         intervals [612]:
@@ -2736,18 +2736,18 @@ item []:
             text = ""
         intervals [636]:
             xmin = 373.060
-            xmax = 373.820
+            xmax = 373.840
             text = "nunatvnv"
         intervals [637]:
-            xmin = 373.820
+            xmin = 373.840
             xmax = 374.060
             text = ""
         intervals [638]:
             xmin = 374.060
-            xmax = 375.180
+            xmax = 375.200
             text = "uluhihsthane"
         intervals [639]:
-            xmin = 375.180
+            xmin = 375.200
             xmax = 375.420
             text = ""
         intervals [640]:
@@ -2760,10 +2760,10 @@ item []:
             text = ""
         intervals [642]:
             xmin = 376.180
-            xmax = 376.880
+            xmax = 376.900
             text = "uhsvnile"
         intervals [643]:
-            xmin = 376.880
+            xmin = 376.900
             xmax = 377.860
             text = ""
         intervals [644]:
@@ -2864,10 +2864,10 @@ item []:
             text = ""
         intervals [668]:
             xmin = 391.780
-            xmax = 393.000
+            xmax = 393.020
             text = "utolehohseno"
         intervals [669]:
-            xmin = 393.000
+            xmin = 393.020
             xmax = 393.420
             text = ""
         intervals [670]:
@@ -2880,10 +2880,10 @@ item []:
             text = ""
         intervals [672]:
             xmin = 394.620
-            xmax = 395.300
+            xmax = 395.320
             text = "utiwahsv"
         intervals [673]:
-            xmin = 395.300
+            xmin = 395.320
             xmax = 396.040
             text = ""
         intervals [674]:
@@ -2904,22 +2904,22 @@ item []:
             text = ""
         intervals [678]:
             xmin = 398.240
-            xmax = 398.680
+            xmax = 398.800
             text = "tsihsano"
         intervals [679]:
-            xmin = 398.680
+            xmin = 398.800
             xmax = 399.180
             text = ""
         intervals [680]:
             xmin = 399.180
-            xmax = 399.500
+            xmax = 399.560
             text = "kilakwo"
         intervals [681]:
-            xmin = 399.500
-            xmax = 399.540
+            xmin = 399.560
+            xmax = 399.640
             text = ""
         intervals [682]:
-            xmin = 399.540
+            xmin = 399.640
             xmax = 399.980
             text = "iyvtv"
         intervals [683]:
@@ -2992,14 +2992,14 @@ item []:
             text = ""
         intervals [700]:
             xmin = 409.160
-            xmax = 409.720
+            xmax = 409.780
             text = "unvthitv"
         intervals [701]:
-            xmin = 409.720
-            xmax = 409.760
+            xmin = 409.780
+            xmax = 409.940
             text = ""
         intervals [702]:
-            xmin = 409.760
+            xmin = 409.940
             xmax = 410.920
             text = "anitona'v'i"
         intervals [703]:
@@ -3160,10 +3160,10 @@ item []:
             text = ""
         intervals [742]:
             xmin = 435.480
-            xmax = 435.840
+            xmax = 435.860
             text = "nahski"
         intervals [743]:
-            xmin = 435.840
+            xmin = 435.860
             xmax = 436.060
             text = ""
         intervals [744]:
@@ -3192,18 +3192,18 @@ item []:
             text = ""
         intervals [750]:
             xmin = 439.580
-            xmax = 439.940
+            xmax = 440.100
             text = "akeyv"
         intervals [751]:
-            xmin = 439.940
-            xmax = 440.080
+            xmin = 440.100
+            xmax = 440.340
             text = ""
         intervals [752]:
-            xmin = 440.080
-            xmax = 441.160
+            xmin = 440.340
+            xmax = 441.180
             text = "ahska'ihe"
         intervals [753]:
-            xmin = 441.160
+            xmin = 441.180
             xmax = 441.360
             text = ""
         intervals [754]:
@@ -3216,18 +3216,18 @@ item []:
             text = ""
         intervals [756]:
             xmin = 441.860
-            xmax = 443.360
+            xmax = 443.380
             text = "uwenawihske'i"
         intervals [757]:
-            xmin = 443.360
+            xmin = 443.380
             xmax = 444.260
             text = ""
         intervals [758]:
             xmin = 444.260
-            xmax = 444.900
+            xmax = 444.920
             text = "akathahe"
         intervals [759]:
-            xmin = 444.900
+            xmin = 444.920
             xmax = 445.400
             text = ""
         intervals [760]:
@@ -3256,10 +3256,10 @@ item []:
             text = ""
         intervals [766]:
             xmin = 449.120
-            xmax = 449.520
+            xmax = 449.540
             text = "elati"
         intervals [767]:
-            xmin = 449.520
+            xmin = 449.540
             xmax = 450.500
             text = ""
         intervals [768]:
@@ -3288,10 +3288,10 @@ item []:
             text = ""
         intervals [774]:
             xmin = 454.160
-            xmax = 454.840
+            xmax = 454.860
             text = "tuyukotv"
         intervals [775]:
-            xmin = 454.840
+            xmin = 454.860
             xmax = 455.040
             text = ""
         intervals [776]:
@@ -3320,10 +3320,10 @@ item []:
             text = ""
         intervals [782]:
             xmin = 458.640
-            xmax = 459.220
+            xmax = 459.240
             text = "akwetsi"
         intervals [783]:
-            xmin = 459.220
+            xmin = 459.240
             xmax = 459.980
             text = ""
         intervals [784]:
@@ -3360,18 +3360,18 @@ item []:
             text = ""
         intervals [792]:
             xmin = 465.700
-            xmax = 465.860
+            xmax = 465.880
             text = "ale"
         intervals [793]:
-            xmin = 465.860
+            xmin = 465.880
             xmax = 466.180
             text = ""
         intervals [794]:
             xmin = 466.180
-            xmax = 466.920
+            xmax = 466.940
             text = "tsatiwahsvhi"
         intervals [795]:
-            xmin = 466.920
+            xmin = 466.940
             xmax = 467.300
             text = ""
         intervals [796]:
@@ -3384,10 +3384,10 @@ item []:
             text = ""
         intervals [798]:
             xmin = 468.600
-            xmax = 469.400
+            xmax = 469.420
             text = "tsatlvkv'i"
         intervals [799]:
-            xmin = 469.400
+            xmin = 469.420
             xmax = 470.120
             text = ""
         intervals [800]:
@@ -3400,10 +3400,10 @@ item []:
             text = ""
         intervals [802]:
             xmin = 470.980
-            xmax = 471.680
+            xmax = 471.700
             text = "khaneke'i"
         intervals [803]:
-            xmin = 471.680
+            xmin = 471.700
             xmax = 472.280
             text = ""
         intervals [804]:
@@ -3472,10 +3472,10 @@ item []:
             text = ""
         intervals [820]:
             xmin = 483.000
-            xmax = 483.360
+            xmax = 483.380
             text = "tsetsi"
         intervals [821]:
-            xmin = 483.360
+            xmin = 483.380
             xmax = 483.860
             text = ""
         intervals [822]:
@@ -3664,10 +3664,10 @@ item []:
             text = ""
         intervals [868]:
             xmin = 510.040
-            xmax = 510.200
+            xmax = 510.220
             text = "ale"
         intervals [869]:
-            xmin = 510.200
+            xmin = 510.220
             xmax = 510.440
             text = ""
         intervals [870]:
@@ -3800,10 +3800,10 @@ item []:
             text = ""
         intervals [902]:
             xmin = 526.960
-            xmax = 527.820
+            xmax = 527.840
             text = "taniyvkv'i"
         intervals [903]:
-            xmin = 527.820
+            xmin = 527.840
             xmax = 528.320
             text = ""
         intervals [904]:
@@ -3876,10 +3876,10 @@ item []:
             text = ""
         intervals [921]:
             xmin = 538.860
-            xmax = 539.520
+            xmax = 539.540
             text = "akeyutsa"
         intervals [922]:
-            xmin = 539.520
+            xmin = 539.540
             xmax = 540.300
             text = ""
         intervals [923]:
@@ -3912,10 +3912,10 @@ item []:
             text = ""
         intervals [930]:
             xmin = 547.680
-            xmax = 547.860
+            xmax = 547.880
             text = "hi'a"
         intervals [931]:
-            xmin = 547.860
+            xmin = 547.880
             xmax = 547.940
             text = ""
         intervals [932]:
@@ -3984,10 +3984,10 @@ item []:
             text = ""
         intervals [948]:
             xmin = 553.200
-            xmax = 553.960
+            xmax = 553.980
             text = "tuthinvhse"
         intervals [949]:
-            xmin = 553.960
+            xmin = 553.980
             xmax = 554.860
             text = ""
         intervals [950]:
@@ -4016,10 +4016,10 @@ item []:
             text = ""
         intervals [956]:
             xmin = 556.320
-            xmax = 556.980
+            xmax = 557.000
             text = "akeyutsa"
         intervals [957]:
-            xmin = 556.980
+            xmin = 557.000
             xmax = 557.300
             text = ""
         intervals [958]:
@@ -4064,10 +4064,10 @@ item []:
             text = ""
         intervals [968]:
             xmin = 562.640
-            xmax = 563.180
+            xmax = 563.200
             text = "thalita"
         intervals [969]:
-            xmin = 563.180
+            xmin = 563.200
             xmax = 563.600
             text = ""
         intervals [970]:
@@ -4088,10 +4088,10 @@ item []:
             text = ""
         intervals [974]:
             xmin = 565.000
-            xmax = 566.020
+            xmax = 566.040
             text = "anetlvthanvhi"
         intervals [975]:
-            xmin = 566.020
+            xmin = 566.040
             xmax = 566.160
             text = ""
         intervals [976]:
@@ -4152,10 +4152,10 @@ item []:
             text = ""
         intervals [990]:
             xmin = 573.320
-            xmax = 573.700
+            xmax = 573.760
             text = "iyvtv"
         intervals [991]:
-            xmin = 573.700
+            xmin = 573.760
             xmax = 574.140
             text = ""
         intervals [992]:
@@ -4176,18 +4176,18 @@ item []:
             text = ""
         intervals [996]:
             xmin = 576.620
-            xmax = 576.820
+            xmax = 576.840
             text = "ale"
         intervals [997]:
-            xmin = 576.820
+            xmin = 576.840
             xmax = 577.000
             text = ""
         intervals [998]:
             xmin = 577.000
-            xmax = 577.740
+            xmax = 577.760
             text = "uwetole'i"
         intervals [999]:
-            xmin = 577.740
+            xmin = 577.760
             xmax = 578.580
             text = ""
         intervals [1000]:
@@ -4208,10 +4208,10 @@ item []:
             text = ""
         intervals [1004]:
             xmin = 581.280
-            xmax = 581.880
+            xmax = 581.900
             text = "kehse'i"
         intervals [1005]:
-            xmin = 581.880
+            xmin = 581.900
             xmax = 582.780
             text = ""
         intervals [1006]:
@@ -4268,54 +4268,54 @@ item []:
             text = "utolehohihstiyi"
         intervals [1019]:
             xmin = 592.980
-            xmax = 593.700
+            xmax = 593.080
             text = ""
         intervals [1020]:
-            xmin = 593.700
-            xmax = 594.120
+            xmin = 593.080
+            xmax = 593.560
             text = "nahski"
         intervals [1021]:
-            xmin = 594.120
-            xmax = 594.960
+            xmin = 593.560
+            xmax = 593.600
             text = ""
         intervals [1022]:
-            xmin = 594.960
-            xmax = 595.140
+            xmin = 593.600
+            xmax = 593.660
             text = "ale"
         intervals [1023]:
-            xmin = 595.140
-            xmax = 595.400
+            xmin = 593.660
+            xmax = 593.680
             text = ""
         intervals [1024]:
-            xmin = 595.400
-            xmax = 596.800
+            xmin = 593.680
+            xmax = 594.120
             text = "unetsekohuhsti"
         intervals [1025]:
-            xmin = 596.800
-            xmax = 597.320
+            xmin = 594.120
+            xmax = 594.180
             text = ""
         intervals [1026]:
-            xmin = 597.320
-            xmax = 597.960
+            xmin = 594.180
+            xmax = 595.280
             text = "ulihstayvti"
         intervals [1027]:
-            xmin = 597.960
-            xmax = 598.560
+            xmin = 595.280
+            xmax = 595.400
             text = ""
         intervals [1028]:
-            xmin = 598.560
-            xmax = 599.540
+            xmin = 595.400
+            xmax = 595.880
             text = "uninetiyi"
         intervals [1029]:
-            xmin = 599.540
-            xmax = 599.640
+            xmin = 595.880
+            xmax = 595.980
             text = ""
     item [3]:
         class = "IntervalTier"
         name = "Padded Words"
         xmin = 0
-        xmax = 599.640
-        intervals: size = 893
+        xmax = 595.980
+        intervals: size = 886
         intervals [1]:
             xmin = 0.000
             xmax = 3.640
@@ -4354,10 +4354,10 @@ item []:
             text = ""
         intervals [10]:
             xmin = 9.300
-            xmax = 10.360
+            xmax = 10.380
             text = "unatselikohi"
         intervals [11]:
-            xmin = 10.360
+            xmin = 10.380
             xmax = 11.420
             text = ""
         intervals [12]:
@@ -4386,10 +4386,10 @@ item []:
             text = ""
         intervals [18]:
             xmin = 15.220
-            xmax = 15.940
+            xmax = 15.960
             text = "tutlohse"
         intervals [19]:
-            xmin = 15.940
+            xmin = 15.960
             xmax = 16.000
             text = ""
         intervals [20]:
@@ -4402,10 +4402,10 @@ item []:
             text = ""
         intervals [22]:
             xmin = 17.100
-            xmax = 18.200
+            xmax = 18.220
             text = "tatanihsahv"
         intervals [23]:
-            xmin = 18.200
+            xmin = 18.220
             xmax = 18.460
             text = ""
         intervals [24]:
@@ -4418,18 +4418,18 @@ item []:
             text = ""
         intervals [26]:
             xmin = 20.360
-            xmax = 21.000
+            xmax = 21.020
             text = "kataha"
         intervals [27]:
-            xmin = 21.000
+            xmin = 21.020
             xmax = 21.080
             text = ""
         intervals [28]:
             xmin = 21.080
-            xmax = 21.740
+            xmax = 21.760
             text = "atanvto"
         intervals [29]:
-            xmin = 21.740
+            xmin = 21.760
             xmax = 21.840
             text = ""
         intervals [30]:
@@ -4514,10 +4514,10 @@ item []:
             text = ""
         intervals [50]:
             xmin = 33.600
-            xmax = 34.740
+            xmax = 34.760
             text = "yanokiyuyeno"
         intervals [51]:
-            xmin = 34.740
+            xmin = 34.760
             xmax = 35.240
             text = ""
         intervals [52]:
@@ -4554,26 +4554,26 @@ item []:
             text = ""
         intervals [60]:
             xmin = 41.920
-            xmax = 43.040
+            xmax = 43.060
             text = "tsakalvhsthanvhi"
         intervals [61]:
-            xmin = 43.040
+            xmin = 43.060
             xmax = 43.400
             text = ""
         intervals [62]:
             xmin = 43.400
-            xmax = 43.980
+            xmax = 44.000
             text = "kehse'i"
         intervals [63]:
-            xmin = 43.980
+            xmin = 44.000
             xmax = 45.100
             text = ""
         intervals [64]:
             xmin = 45.100
-            xmax = 46.280
+            xmax = 46.300
             text = "tsutatehsvtvno"
         intervals [65]:
-            xmin = 46.280
+            xmin = 46.300
             xmax = 46.440
             text = ""
         intervals [66]:
@@ -4586,18 +4586,18 @@ item []:
             text = ""
         intervals [68]:
             xmin = 47.960
-            xmax = 48.200
+            xmax = 48.220
             text = "ale"
         intervals [69]:
-            xmin = 48.200
+            xmin = 48.220
             xmax = 48.240
             text = ""
         intervals [70]:
             xmin = 48.240
-            xmax = 49.180
+            xmax = 49.200
             text = "tikanvtlohsti"
         intervals [71]:
-            xmin = 49.180
+            xmin = 49.200
             xmax = 49.700
             text = ""
         intervals [72]:
@@ -4622,18 +4622,18 @@ item []:
             text = ""
         intervals [77]:
             xmin = 53.060
-            xmax = 54.600
+            xmax = 54.620
             text = "kvwatanvthihsoti"
         intervals [78]:
-            xmin = 54.600
+            xmin = 54.620
             xmax = 54.760
             text = ""
         intervals [79]:
             xmin = 54.760
-            xmax = 55.560
+            xmax = 55.580
             text = "yikehse'i"
         intervals [80]:
-            xmin = 55.560
+            xmin = 55.580
             xmax = 56.640
             text = ""
         intervals [81]:
@@ -4698,18 +4698,18 @@ item []:
             text = ""
         intervals [96]:
             xmin = 63.700
-            xmax = 64.720
+            xmax = 64.740
             text = "uweluke'i"
         intervals [97]:
-            xmin = 64.720
+            xmin = 64.740
             xmax = 65.420
             text = ""
         intervals [98]:
             xmin = 65.420
-            xmax = 65.700
+            xmax = 65.720
             text = "ale"
         intervals [99]:
-            xmin = 65.700
+            xmin = 65.720
             xmax = 66.080
             text = ""
         intervals [100]:
@@ -4906,10 +4906,10 @@ item []:
             text = ""
         intervals [148]:
             xmin = 91.120
-            xmax = 92.220
+            xmax = 92.240
             text = "unelanvhi"
         intervals [149]:
-            xmin = 92.220
+            xmin = 92.240
             xmax = 93.200
             text = ""
         intervals [150]:
@@ -4994,18 +4994,18 @@ item []:
             text = ""
         intervals [170]:
             xmin = 109.180
-            xmax = 109.940
+            xmax = 109.960
             text = "atanvto"
         intervals [171]:
-            xmin = 109.940
+            xmin = 109.960
             xmax = 111.140
             text = ""
         intervals [172]:
             xmin = 111.140
-            xmax = 112.220
+            xmax = 112.240
             text = "utvtvneno"
         intervals [173]:
-            xmin = 112.220
+            xmin = 112.240
             xmax = 113.200
             text = ""
         intervals [174]:
@@ -5026,10 +5026,10 @@ item []:
             text = ""
         intervals [178]:
             xmin = 115.820
-            xmax = 118.700
+            xmax = 118.720
             text = "uwohsele'i hi'ano nuwehsele'i"
         intervals [179]:
-            xmin = 118.700
+            xmin = 118.720
             xmax = 119.220
             text = ""
         intervals [180]:
@@ -5138,18 +5138,18 @@ item []:
             text = ""
         intervals [206]:
             xmin = 135.360
-            xmax = 136.160
+            xmax = 136.180
             text = "unitsathi"
         intervals [207]:
-            xmin = 136.160
+            xmin = 136.180
             xmax = 136.920
             text = ""
         intervals [208]:
             xmin = 136.920
-            xmax = 137.700
+            xmax = 137.720
             text = "hsunatatluki"
         intervals [209]:
-            xmin = 137.700
+            xmin = 137.720
             xmax = 137.980
             text = ""
         intervals [210]:
@@ -5170,10 +5170,10 @@ item []:
             text = ""
         intervals [214]:
             xmin = 141.060
-            xmax = 141.800
+            xmax = 141.820
             text = "nikatvno"
         intervals [215]:
-            xmin = 141.800
+            xmin = 141.820
             xmax = 142.020
             text = ""
         intervals [216]:
@@ -5258,874 +5258,874 @@ item []:
             text = ""
         intervals [236]:
             xmin = 155.260
-            xmax = 156.880
+            xmax = 156.900
             text = "tulihskolvtanele'i"
         intervals [237]:
-            xmin = 156.880
+            xmin = 156.900
             xmax = 157.700
             text = ""
         intervals [238]:
             xmin = 157.700
-            xmax = 158.740
-            text = "tikatahano"
-        intervals [239]:
-            xmin = 158.740
-            xmax = 158.760
-            text = ""
-        intervals [240]:
-            xmin = 158.760
             xmax = 159.500
-            text = "titanvto"
-        intervals [241]:
+            text = "tikatahano titanvto"
+        intervals [239]:
             xmin = 159.500
             xmax = 159.580
             text = ""
-        intervals [242]:
+        intervals [240]:
             xmin = 159.580
             xmax = 160.620
             text = "uninukotsv"
-        intervals [243]:
+        intervals [241]:
             xmin = 160.620
             xmax = 161.080
             text = ""
-        intervals [244]:
+        intervals [242]:
             xmin = 161.080
             xmax = 161.640
             text = "hsikwa"
-        intervals [245]:
+        intervals [243]:
             xmin = 161.640
             xmax = 161.660
             text = ""
-        intervals [246]:
+        intervals [244]:
             xmin = 161.660
             xmax = 163.200
             text = "wituniyvhsele'i"
-        intervals [247]:
+        intervals [245]:
             xmin = 163.200
             xmax = 163.480
             text = ""
-        intervals [248]:
+        intervals [246]:
             xmin = 163.480
             xmax = 164.740
             text = "hsunatatlukino"
-        intervals [249]:
+        intervals [247]:
             xmin = 164.740
             xmax = 164.820
             text = ""
-        intervals [250]:
+        intervals [248]:
             xmin = 164.820
-            xmax = 166.800
+            xmax = 166.820
             text = "unanelukihse"
-        intervals [251]:
-            xmin = 166.800
+        intervals [249]:
+            xmin = 166.820
             xmax = 167.380
             text = ""
-        intervals [252]:
+        intervals [250]:
             xmin = 167.380
-            xmax = 168.560
+            xmax = 168.580
             text = "unikahso'ahse"
-        intervals [253]:
-            xmin = 168.560
+        intervals [251]:
+            xmin = 168.580
             xmax = 168.760
             text = ""
-        intervals [254]:
+        intervals [252]:
             xmin = 168.760
             xmax = 169.740
             text = "kanetluki"
-        intervals [255]:
+        intervals [253]:
             xmin = 169.740
             xmax = 170.020
             text = ""
-        intervals [256]:
+        intervals [254]:
             xmin = 170.020
             xmax = 170.460
             text = "kehsv"
-        intervals [257]:
+        intervals [255]:
             xmin = 170.460
             xmax = 170.560
             text = ""
-        intervals [258]:
+        intervals [256]:
             xmin = 170.560
-            xmax = 172.860
+            xmax = 172.880
             text = "vtali wunalithatinvhse'i"
-        intervals [259]:
-            xmin = 172.860
+        intervals [257]:
+            xmin = 172.880
             xmax = 173.260
             text = ""
-        intervals [260]:
+        intervals [258]:
             xmin = 173.260
             xmax = 173.680
             text = "thali"
-        intervals [261]:
+        intervals [259]:
             xmin = 173.680
             xmax = 174.240
             text = ""
-        intervals [262]:
+        intervals [260]:
             xmin = 174.240
             xmax = 175.020
             text = "iyakayvli"
-        intervals [263]:
+        intervals [261]:
             xmin = 175.020
             xmax = 175.340
             text = ""
-        intervals [264]:
+        intervals [262]:
             xmin = 175.340
             xmax = 175.820
             text = "iyvtv"
-        intervals [265]:
+        intervals [263]:
             xmin = 175.820
             xmax = 176.260
             text = ""
-        intervals [266]:
+        intervals [264]:
             xmin = 176.260
             xmax = 177.080
             text = "nani'e'i"
-        intervals [267]:
+        intervals [265]:
             xmin = 177.080
             xmax = 177.760
             text = ""
-        intervals [268]:
+        intervals [266]:
             xmin = 177.760
             xmax = 178.060
             text = "ale"
-        intervals [269]:
+        intervals [267]:
             xmin = 178.060
             xmax = 178.100
             text = ""
-        intervals [270]:
+        intervals [268]:
             xmin = 178.100
             xmax = 178.620
             text = "vtali"
-        intervals [271]:
+        intervals [269]:
             xmin = 178.620
             xmax = 178.820
             text = ""
-        intervals [272]:
+        intervals [270]:
             xmin = 178.820
-            xmax = 179.940
+            xmax = 179.960
             text = "tunikvtse'i"
-        intervals [273]:
-            xmin = 179.940
+        intervals [271]:
+            xmin = 179.960
             xmax = 180.940
             text = ""
-        intervals [274]:
+        intervals [272]:
             xmin = 180.940
             xmax = 182.020
             text = "tinikathiyano"
-        intervals [275]:
+        intervals [273]:
             xmin = 182.020
             xmax = 182.580
             text = ""
-        intervals [276]:
+        intervals [274]:
             xmin = 182.580
             xmax = 183.520
             text = "unalihse'i"
-        intervals [277]:
+        intervals [275]:
             xmin = 183.520
             xmax = 184.440
             text = ""
-        intervals [278]:
+        intervals [276]:
             xmin = 184.440
             xmax = 185.400
             text = "ale katuhv"
-        intervals [279]:
+        intervals [277]:
             xmin = 185.400
             xmax = 185.520
             text = ""
-        intervals [280]:
+        intervals [278]:
             xmin = 185.520
             xmax = 186.540
             text = "wuninone'i"
-        intervals [281]:
+        intervals [279]:
             xmin = 186.540
             xmax = 187.040
             text = ""
-        intervals [282]:
+        intervals [280]:
             xmin = 187.040
             xmax = 187.320
             text = "ale"
-        intervals [283]:
+        intervals [281]:
             xmin = 187.320
             xmax = 187.340
             text = ""
-        intervals [284]:
+        intervals [282]:
             xmin = 187.340
             xmax = 187.860
             text = "iyvtv"
-        intervals [285]:
+        intervals [283]:
             xmin = 187.860
             xmax = 187.920
             text = ""
-        intervals [286]:
+        intervals [284]:
             xmin = 187.920
             xmax = 189.060
             text = "tanewatihsv'i"
-        intervals [287]:
+        intervals [285]:
             xmin = 189.060
             xmax = 189.700
             text = ""
-        intervals [288]:
+        intervals [286]:
             xmin = 189.700
-            xmax = 190.960
+            xmax = 190.980
             text = "uninukotseno"
-        intervals [289]:
-            xmin = 190.960
+        intervals [287]:
+            xmin = 190.980
             xmax = 191.320
             text = ""
-        intervals [290]:
+        intervals [288]:
             xmin = 191.320
             xmax = 192.520
             text = "unakathanvhse"
-        intervals [291]:
+        intervals [289]:
             xmin = 192.520
             xmax = 192.700
             text = ""
-        intervals [292]:
+        intervals [290]:
             xmin = 192.700
             xmax = 193.220
             text = "nahski"
-        intervals [293]:
+        intervals [291]:
             xmin = 193.220
             xmax = 193.380
             text = ""
-        intervals [294]:
+        intervals [292]:
             xmin = 193.380
             xmax = 194.280
             text = "nulihsthanv'i"
-        intervals [295]:
+        intervals [293]:
             xmin = 194.280
             xmax = 195.520
             text = ""
-        intervals [296]:
+        intervals [294]:
             xmin = 195.520
             xmax = 196.100
             text = "tsihsano"
-        intervals [297]:
+        intervals [295]:
             xmin = 196.100
             xmax = 196.120
             text = ""
-        intervals [298]:
+        intervals [296]:
             xmin = 196.120
             xmax = 197.340
             text = "kvwalutsele'i"
-        intervals [299]:
+        intervals [297]:
             xmin = 197.340
             xmax = 197.640
             text = ""
-        intervals [300]:
+        intervals [298]:
             xmin = 197.640
-            xmax = 197.940
+            xmax = 197.960
             text = "ale"
-        intervals [301]:
-            xmin = 197.940
+        intervals [299]:
+            xmin = 197.960
             xmax = 198.900
             text = ""
-        intervals [302]:
+        intervals [300]:
             xmin = 198.900
-            xmax = 199.760
+            xmax = 199.780
             text = "kvwakohe"
-        intervals [303]:
-            xmin = 199.760
+        intervals [301]:
+            xmin = 199.780
             xmax = 199.900
             text = ""
-        intervals [304]:
+        intervals [302]:
             xmin = 199.900
-            xmax = 200.380
+            xmax = 200.400
             text = "nahski"
-        intervals [305]:
-            xmin = 200.380
+        intervals [303]:
+            xmin = 200.400
             xmax = 201.180
             text = ""
-        intervals [306]:
+        intervals [304]:
             xmin = 201.180
             xmax = 201.820
             text = "anihskina"
-        intervals [307]:
+        intervals [305]:
             xmin = 201.820
             xmax = 202.160
             text = ""
-        intervals [308]:
+        intervals [306]:
             xmin = 202.160
             xmax = 203.120
             text = "kvwayvlvhi"
-        intervals [309]:
+        intervals [307]:
             xmin = 203.120
             xmax = 203.680
             text = ""
-        intervals [310]:
+        intervals [308]:
             xmin = 203.680
-            xmax = 205.000
+            xmax = 205.020
             text = "nahski hsunatatluki"
-        intervals [311]:
-            xmin = 205.000
+        intervals [309]:
+            xmin = 205.020
             xmax = 205.240
             text = ""
-        intervals [312]:
+        intervals [310]:
             xmin = 205.240
             xmax = 206.200
             text = "kvwayvlvhi"
-        intervals [313]:
+        intervals [311]:
             xmin = 206.200
             xmax = 207.100
             text = ""
-        intervals [314]:
+        intervals [312]:
             xmin = 207.100
-            xmax = 208.140
+            xmax = 208.160
             text = "uwole'i ale"
-        intervals [315]:
-            xmin = 208.140
+        intervals [313]:
+            xmin = 208.160
             xmax = 208.360
             text = ""
-        intervals [316]:
+        intervals [314]:
             xmin = 208.360
             xmax = 209.220
             text = "tunuwe'i"
-        intervals [317]:
+        intervals [315]:
             xmin = 209.220
             xmax = 210.060
             text = ""
-        intervals [318]:
+        intervals [316]:
             xmin = 210.060
             xmax = 210.300
             text = "ale"
-        intervals [319]:
+        intervals [317]:
             xmin = 210.300
             xmax = 210.360
             text = ""
-        intervals [320]:
+        intervals [318]:
             xmin = 210.360
             xmax = 210.760
             text = "tohi"
-        intervals [321]:
+        intervals [319]:
             xmin = 210.760
             xmax = 210.920
             text = ""
-        intervals [322]:
+        intervals [320]:
             xmin = 210.920
             xmax = 211.920
             text = "utanvthe'i"
-        intervals [323]:
+        intervals [321]:
             xmin = 211.920
             xmax = 212.720
             text = ""
-        intervals [324]:
+        intervals [322]:
             xmin = 212.720
             xmax = 213.000
             text = "ale"
-        intervals [325]:
+        intervals [323]:
             xmin = 213.000
             xmax = 213.560
             text = ""
-        intervals [326]:
+        intervals [324]:
             xmin = 213.560
             xmax = 214.740
             text = "anihska'ihe'i"
-        intervals [327]:
+        intervals [325]:
             xmin = 214.740
             xmax = 215.760
             text = ""
-        intervals [328]:
+        intervals [326]:
             xmin = 215.760
             xmax = 216.400
             text = "nahskino"
-        intervals [329]:
+        intervals [327]:
             xmin = 216.400
             xmax = 216.500
             text = ""
-        intervals [330]:
+        intervals [328]:
             xmin = 216.500
             xmax = 217.860
             text = "unikohvhi"
-        intervals [331]:
+        intervals [329]:
             xmin = 217.860
             xmax = 218.800
             text = ""
-        intervals [332]:
+        intervals [330]:
             xmin = 218.800
             xmax = 219.880
             text = "kvwaninonele"
-        intervals [333]:
+        intervals [331]:
             xmin = 219.880
             xmax = 220.420
             text = ""
-        intervals [334]:
+        intervals [332]:
             xmin = 220.420
-            xmax = 221.320
+            xmax = 221.340
             text = "nulihstanelv"
-        intervals [335]:
-            xmin = 221.320
+        intervals [333]:
+            xmin = 221.340
             xmax = 221.940
             text = ""
-        intervals [336]:
+        intervals [334]:
             xmin = 221.940
             xmax = 222.860
             text = "anihskina"
-        intervals [337]:
+        intervals [335]:
             xmin = 222.860
             xmax = 223.000
             text = ""
-        intervals [338]:
+        intervals [336]:
             xmin = 223.000
             xmax = 223.800
             text = "kvwayvlvhi"
-        intervals [339]:
+        intervals [337]:
             xmin = 223.800
             xmax = 224.560
             text = ""
-        intervals [340]:
+        intervals [338]:
             xmin = 224.560
             xmax = 225.140
             text = "ale nahskwo"
-        intervals [341]:
+        intervals [339]:
             xmin = 225.140
             xmax = 225.640
             text = "hsikwa"
-        intervals [342]:
+        intervals [340]:
             xmin = 225.640
             xmax = 225.760
             text = ""
-        intervals [343]:
+        intervals [341]:
             xmin = 225.760
             xmax = 226.960
             text = "nunalihstanelv'i"
-        intervals [344]:
+        intervals [342]:
             xmin = 226.960
             xmax = 228.360
             text = ""
-        intervals [345]:
+        intervals [343]:
             xmin = 228.360
             xmax = 228.640
             text = "ale"
-        intervals [346]:
+        intervals [344]:
             xmin = 228.640
             xmax = 228.700
             text = ""
-        intervals [347]:
+        intervals [345]:
             xmin = 228.700
             xmax = 229.580
             text = "unalenvhe"
-        intervals [348]:
+        intervals [346]:
             xmin = 229.580
             xmax = 229.700
             text = ""
-        intervals [349]:
+        intervals [347]:
             xmin = 229.700
             xmax = 230.900
             text = "kvwathayohsele"
-        intervals [350]:
+        intervals [348]:
             xmin = 230.900
             xmax = 231.540
             text = ""
-        intervals [351]:
+        intervals [349]:
             xmin = 231.540
             xmax = 232.520
             text = "utanvhstiyi"
-        intervals [352]:
+        intervals [350]:
             xmin = 232.520
             xmax = 232.960
             text = ""
-        intervals [353]:
+        intervals [351]:
             xmin = 232.960
-            xmax = 234.040
+            xmax = 234.060
             text = "unatselikohi"
-        intervals [354]:
-            xmin = 234.040
+        intervals [352]:
+            xmin = 234.060
             xmax = 235.160
             text = ""
-        intervals [355]:
+        intervals [353]:
             xmin = 235.160
             xmax = 236.120
             text = "tsiyuhino"
-        intervals [356]:
+        intervals [354]:
             xmin = 236.120
             xmax = 236.220
             text = ""
-        intervals [357]:
+        intervals [355]:
             xmin = 236.220
             xmax = 236.900
             text = "utsanv"
-        intervals [358]:
+        intervals [356]:
             xmin = 236.900
             xmax = 237.100
             text = ""
-        intervals [359]:
+        intervals [357]:
             xmin = 237.100
-            xmax = 237.560
+            xmax = 237.580
             text = "nahski"
-        intervals [360]:
-            xmin = 237.560
+        intervals [358]:
+            xmin = 237.580
             xmax = 238.400
             text = ""
-        intervals [361]:
+        intervals [359]:
             xmin = 238.400
             xmax = 239.240
             text = "anihskina"
-        intervals [362]:
+        intervals [360]:
             xmin = 239.240
             xmax = 239.260
             text = ""
-        intervals [363]:
+        intervals [361]:
             xmin = 239.260
             xmax = 240.320
             text = "kvwayvlvhi"
-        intervals [364]:
+        intervals [362]:
             xmin = 240.320
             xmax = 241.200
             text = ""
-        intervals [365]:
+        intervals [363]:
             xmin = 241.200
             xmax = 242.160
             text = "uthayohsele"
-        intervals [366]:
+        intervals [364]:
             xmin = 242.160
             xmax = 242.260
             text = ""
-        intervals [367]:
+        intervals [365]:
             xmin = 242.260
-            xmax = 242.920
+            xmax = 242.940
             text = "unelaki"
-        intervals [368]:
-            xmin = 242.920
+        intervals [366]:
+            xmin = 242.940
             xmax = 243.000
             text = ""
-        intervals [369]:
+        intervals [367]:
             xmin = 243.000
             xmax = 244.140
             text = "uwelihsetiyi"
-        intervals [370]:
+        intervals [368]:
             xmin = 244.140
             xmax = 244.840
             text = ""
-        intervals [371]:
+        intervals [369]:
             xmin = 244.840
             xmax = 246.260
             text = "uhstawatitahstiyi"
-        intervals [372]:
+        intervals [370]:
             xmin = 246.260
             xmax = 247.080
             text = ""
-        intervals [373]:
+        intervals [371]:
             xmin = 247.080
             xmax = 247.560
             text = "ahseno"
-        intervals [374]:
+        intervals [372]:
             xmin = 247.560
             xmax = 247.580
             text = ""
-        intervals [375]:
+        intervals [373]:
             xmin = 247.580
             xmax = 247.980
             text = "vtla"
-        intervals [376]:
+        intervals [374]:
             xmin = 247.980
             xmax = 248.120
             text = ""
-        intervals [377]:
+        intervals [375]:
             xmin = 248.120
-            xmax = 249.360
+            xmax = 249.380
             text = "yulihskolvtanele'i"
-        intervals [378]:
-            xmin = 249.360
+        intervals [376]:
+            xmin = 249.380
             xmax = 249.460
             text = ""
-        intervals [379]:
+        intervals [377]:
             xmin = 249.460
             xmax = 249.900
             text = "tsihsa"
-        intervals [380]:
+        intervals [378]:
             xmin = 249.900
             xmax = 251.340
             text = "hi'akwohskini"
-        intervals [381]:
+        intervals [379]:
             xmin = 251.340
             xmax = 251.380
             text = ""
-        intervals [382]:
+        intervals [380]:
             xmin = 251.380
             xmax = 252.300
             text = "nuwehsele'i"
-        intervals [383]:
+        intervals [381]:
             xmin = 252.300
             xmax = 253.200
             text = ""
-        intervals [384]:
+        intervals [382]:
             xmin = 253.200
             xmax = 254.720
             text = "tsihena titsenvhsv"
-        intervals [385]:
+        intervals [383]:
             xmin = 254.720
             xmax = 255.060
             text = ""
-        intervals [386]:
+        intervals [384]:
             xmin = 255.060
-            xmax = 255.780
+            xmax = 255.800
             text = "kohuhsti"
-        intervals [387]:
-            xmin = 255.780
+        intervals [385]:
+            xmin = 255.800
             xmax = 255.920
             text = ""
-        intervals [388]:
+        intervals [386]:
             xmin = 255.920
-            xmax = 257.280
+            xmax = 257.300
             text = "titsvna tinehv'i"
-        intervals [389]:
-            xmin = 257.280
+        intervals [387]:
+            xmin = 257.300
             xmax = 258.360
             text = ""
-        intervals [390]:
+        intervals [388]:
             xmin = 258.360
-            xmax = 258.640
+            xmax = 258.660
             text = "ale"
-        intervals [391]:
-            xmin = 258.640
+        intervals [389]:
+            xmin = 258.660
             xmax = 258.740
             text = ""
-        intervals [392]:
+        intervals [390]:
             xmin = 258.740
             xmax = 260.360
             text = "witinohvhsi nika'v"
-        intervals [393]:
+        intervals [391]:
             xmin = 260.360
             xmax = 260.560
             text = ""
-        intervals [394]:
+        intervals [392]:
             xmin = 260.560
             xmax = 261.360
             text = "uhskwanikoti"
-        intervals [395]:
+        intervals [393]:
             xmin = 261.360
             xmax = 261.420
             text = ""
-        intervals [396]:
+        intervals [394]:
             xmin = 261.420
             xmax = 262.180
             text = "ukvwiyuhi"
-        intervals [397]:
+        intervals [395]:
             xmin = 262.180
             xmax = 262.660
             text = ""
-        intervals [398]:
+        intervals [396]:
             xmin = 262.660
             xmax = 263.780
             text = "nitsatvnelv'i"
-        intervals [399]:
+        intervals [397]:
             xmin = 263.780
             xmax = 264.600
             text = ""
-        intervals [400]:
+        intervals [398]:
             xmin = 264.600
-            xmax = 264.860
+            xmax = 264.880
             text = "ale"
-        intervals [401]:
-            xmin = 264.860
+        intervals [399]:
+            xmin = 264.880
             xmax = 265.180
             text = ""
-        intervals [402]:
+        intervals [400]:
             xmin = 265.180
-            xmax = 266.460
+            xmax = 266.480
             text = "tsatolitsv'i"
-        intervals [403]:
-            xmin = 266.460
+        intervals [401]:
+            xmin = 266.480
             xmax = 267.480
             text = ""
-        intervals [404]:
+        intervals [402]:
             xmin = 267.480
-            xmax = 268.540
+            xmax = 268.560
             text = "unikihseno"
-        intervals [405]:
-            xmin = 268.540
+        intervals [403]:
+            xmin = 268.560
             xmax = 268.600
             text = ""
-        intervals [406]:
+        intervals [404]:
             xmin = 268.600
-            xmax = 268.900
+            xmax = 268.920
             text = "ale"
-        intervals [407]:
-            xmin = 268.900
+        intervals [405]:
+            xmin = 268.920
             xmax = 269.200
             text = ""
-        intervals [408]:
+        intervals [406]:
             xmin = 269.200
             xmax = 270.140
             text = "ulenvhe"
-        intervals [409]:
+        intervals [407]:
             xmin = 270.140
             xmax = 270.860
             text = ""
-        intervals [410]:
+        intervals [408]:
             xmin = 270.860
             xmax = 271.800
             text = "tunotsalane"
-        intervals [411]:
+        intervals [409]:
             xmin = 271.800
             xmax = 272.800
             text = ""
-        intervals [412]:
+        intervals [410]:
             xmin = 272.800
             xmax = 275.240
             text = "ahskohi'ikatukiyi"
-        intervals [413]:
+        intervals [411]:
             xmin = 275.240
             xmax = 276.220
             text = ""
-        intervals [414]:
+        intervals [412]:
             xmin = 276.220
             xmax = 276.820
             text = "nika'v"
-        intervals [415]:
+        intervals [413]:
             xmin = 276.820
             xmax = 276.980
             text = ""
-        intervals [416]:
+        intervals [414]:
             xmin = 276.980
-            xmax = 279.200
+            xmax = 279.220
             text = "uhskwanikoti tsihsa nutvnelv'i"
-        intervals [417]:
-            xmin = 279.200
+        intervals [415]:
+            xmin = 279.220
             xmax = 279.280
             text = ""
-        intervals [418]:
+        intervals [416]:
             xmin = 279.280
             xmax = 279.580
             text = "ale"
-        intervals [419]:
+        intervals [417]:
             xmin = 279.580
             xmax = 280.060
             text = ""
-        intervals [420]:
+        intervals [418]:
             xmin = 280.060
             xmax = 280.700
             text = "nikatv"
-        intervals [421]:
+        intervals [419]:
             xmin = 280.700
             xmax = 280.860
             text = ""
-        intervals [422]:
+        intervals [420]:
             xmin = 280.860
             xmax = 281.320
             text = "yvwi"
-        intervals [423]:
+        intervals [421]:
             xmin = 281.320
             xmax = 281.460
             text = ""
-        intervals [424]:
+        intervals [422]:
             xmin = 281.460
             xmax = 282.780
             text = "unihskwanikohse'i"
-        intervals [425]:
+        intervals [423]:
             xmin = 282.780
             xmax = 284.120
             text = ""
-        intervals [426]:
+        intervals [424]:
             xmin = 284.120
             xmax = 284.720
             text = "tsihsano"
-        intervals [427]:
+        intervals [425]:
             xmin = 284.720
             xmax = 284.820
             text = ""
-        intervals [428]:
+        intervals [426]:
             xmin = 284.820
             xmax = 285.340
             text = "thaline"
-        intervals [429]:
+        intervals [427]:
             xmin = 285.340
             xmax = 285.360
             text = ""
-        intervals [430]:
+        intervals [428]:
             xmin = 285.360
             xmax = 286.120
             text = "tsiyuhi"
-        intervals [431]:
+        intervals [429]:
             xmin = 286.120
             xmax = 286.840
             text = ""
-        intervals [432]:
+        intervals [430]:
             xmin = 286.840
             xmax = 287.840
             text = "to'uwehsotsv"
-        intervals [433]:
+        intervals [431]:
             xmin = 287.840
             xmax = 288.480
             text = ""
-        intervals [434]:
+        intervals [432]:
             xmin = 288.480
             xmax = 289.300
             text = "ihskona"
-        intervals [435]:
+        intervals [433]:
             xmin = 289.300
             xmax = 289.660
             text = ""
-        intervals [436]:
+        intervals [434]:
             xmin = 289.660
             xmax = 290.420
             text = "wi'ulutsv"
-        intervals [437]:
+        intervals [435]:
             xmin = 290.420
             xmax = 291.180
             text = ""
-        intervals [438]:
+        intervals [436]:
             xmin = 291.180
             xmax = 292.400
             text = "unitsathi yvwi"
-        intervals [439]:
+        intervals [437]:
             xmin = 292.400
             xmax = 292.600
             text = ""
-        intervals [440]:
+        intervals [438]:
             xmin = 292.600
             xmax = 293.980
             text = "kvwatatluwihsthane'i"
-        intervals [441]:
+        intervals [439]:
             xmin = 293.980
             xmax = 294.680
             text = ""
-        intervals [442]:
+        intervals [440]:
             xmin = 294.680
             xmax = 294.940
             text = "ale"
-        intervals [443]:
+        intervals [441]:
             xmin = 294.940
             xmax = 294.980
             text = ""
-        intervals [444]:
+        intervals [442]:
             xmin = 294.980
-            xmax = 295.400
+            xmax = 295.480
             text = "vtali"
-        intervals [445]:
-            xmin = 295.400
+        intervals [443]:
+            xmin = 295.480
             xmax = 295.520
             text = ""
-        intervals [446]:
+        intervals [444]:
             xmin = 295.520
             xmax = 295.980
             text = "uloti"
-        intervals [447]:
+        intervals [445]:
             xmin = 295.980
             xmax = 296.100
             text = ""
-        intervals [448]:
+        intervals [446]:
             xmin = 296.100
-            xmax = 296.840
+            xmax = 296.860
             text = "etohe'i"
-        intervals [449]:
-            xmin = 296.840
+        intervals [447]:
+            xmin = 296.860
             xmax = 297.780
             text = ""
-        intervals [450]:
+        intervals [448]:
             xmin = 297.780
-            xmax = 299.480
-            text = "ale kvniyukwo ulutse"
+            xmax = 298.700
+            text = "ale kvniyukwo"
+        intervals [449]:
+            xmin = 298.700
+            xmax = 298.720
+            text = ""
+        intervals [450]:
+            xmin = 298.720
+            xmax = 299.500
+            text = "ulutse"
         intervals [451]:
-            xmin = 299.480
+            xmin = 299.500
             xmax = 299.640
             text = ""
         intervals [452]:
             xmin = 299.640
-            xmax = 299.880
+            xmax = 299.960
             text = "kilo"
         intervals [453]:
-            xmin = 299.880
+            xmin = 299.960
             xmax = 299.980
             text = ""
         intervals [454]:
@@ -6154,10 +6154,10 @@ item []:
             text = ""
         intervals [460]:
             xmin = 304.340
-            xmax = 304.880
+            xmax = 304.900
             text = "tsela"
         intervals [461]:
-            xmin = 304.880
+            xmin = 304.900
             xmax = 305.000
             text = ""
         intervals [462]:
@@ -6178,10 +6178,10 @@ item []:
             text = ""
         intervals [466]:
             xmin = 307.900
-            xmax = 308.560
+            xmax = 308.580
             text = "tulahskv"
         intervals [467]:
-            xmin = 308.560
+            xmin = 308.580
             xmax = 308.620
             text = ""
         intervals [468]:
@@ -6194,10 +6194,10 @@ item []:
             text = ""
         intervals [470]:
             xmin = 310.460
-            xmax = 310.740
+            xmax = 310.760
             text = "ale"
         intervals [471]:
-            xmin = 310.740
+            xmin = 310.760
             xmax = 310.860
             text = ""
         intervals [472]:
@@ -6218,10 +6218,10 @@ item []:
             text = ""
         intervals [476]:
             xmin = 313.000
-            xmax = 313.980
+            xmax = 314.000
             text = "hi'a nuwehse'i"
         intervals [477]:
-            xmin = 313.980
+            xmin = 314.000
             xmax = 314.660
             text = ""
         intervals [478]:
@@ -6242,10 +6242,10 @@ item []:
             text = ""
         intervals [482]:
             xmin = 316.380
-            xmax = 316.760
+            xmax = 316.820
             text = "nhakwo"
         intervals [483]:
-            xmin = 316.760
+            xmin = 316.820
             xmax = 316.840
             text = ""
         intervals [484]:
@@ -6274,10 +6274,10 @@ item []:
             text = ""
         intervals [490]:
             xmin = 320.380
-            xmax = 321.460
+            xmax = 321.480
             text = "hiyahsithatvha"
         intervals [491]:
-            xmin = 321.460
+            xmin = 321.480
             xmax = 322.660
             text = ""
         intervals [492]:
@@ -6306,10 +6306,10 @@ item []:
             text = ""
         intervals [498]:
             xmin = 326.980
-            xmax = 328.020
+            xmax = 328.040
             text = "unenvhseno"
         intervals [499]:
-            xmin = 328.020
+            xmin = 328.040
             xmax = 328.360
             text = ""
         intervals [500]:
@@ -6426,18 +6426,18 @@ item []:
             text = ""
         intervals [528]:
             xmin = 346.120
-            xmax = 347.040
+            xmax = 347.060
             text = "anikotiyu"
         intervals [529]:
-            xmin = 347.040
+            xmin = 347.060
             xmax = 347.120
             text = ""
         intervals [530]:
             xmin = 347.120
-            xmax = 348.320
+            xmax = 348.340
             text = "anikanakathi"
         intervals [531]:
-            xmin = 348.320
+            xmin = 348.340
             xmax = 348.560
             text = ""
         intervals [532]:
@@ -6450,356 +6450,356 @@ item []:
             text = ""
         intervals [534]:
             xmin = 350.000
-            xmax = 351.180
-            text = "kvwakilvnvhi"
+            xmax = 351.860
+            text = "kvwakilvnvhi kehse'i"
         intervals [535]:
-            xmin = 351.180
-            xmax = 351.220
-            text = ""
-        intervals [536]:
-            xmin = 351.220
-            xmax = 351.840
-            text = "kehse'i"
-        intervals [537]:
-            xmin = 351.840
+            xmin = 351.860
             xmax = 352.660
             text = ""
-        intervals [538]:
+        intervals [536]:
             xmin = 352.660
             xmax = 352.920
             text = "ale"
-        intervals [539]:
+        intervals [537]:
             xmin = 352.920
             xmax = 352.980
             text = ""
-        intervals [540]:
+        intervals [538]:
             xmin = 352.980
             xmax = 353.700
             text = "kohuhsti"
-        intervals [541]:
+        intervals [539]:
             xmin = 353.700
             xmax = 353.720
             text = ""
-        intervals [542]:
+        intervals [540]:
             xmin = 353.720
             xmax = 354.160
             text = "uhv"
-        intervals [543]:
+        intervals [541]:
             xmin = 354.160
             xmax = 354.800
             text = "nikatv"
-        intervals [544]:
+        intervals [542]:
             xmin = 354.800
             xmax = 355.000
             text = ""
-        intervals [545]:
+        intervals [543]:
             xmin = 355.000
             xmax = 356.340
             text = "uhsvnvhi kehse"
-        intervals [546]:
+        intervals [544]:
             xmin = 356.340
             xmax = 356.900
             text = ""
-        intervals [547]:
+        intervals [545]:
             xmin = 356.900
-            xmax = 357.940
+            xmax = 357.960
             text = "akuyihskv'i"
-        intervals [548]:
-            xmin = 357.940
+        intervals [546]:
+            xmin = 357.960
             xmax = 358.720
             text = ""
-        intervals [549]:
+        intervals [547]:
             xmin = 358.720
             xmax = 359.240
             text = "ahseno"
-        intervals [550]:
+        intervals [548]:
             xmin = 359.240
             xmax = 359.340
             text = ""
-        intervals [551]:
+        intervals [549]:
             xmin = 359.340
             xmax = 359.780
             text = "vtla"
-        intervals [552]:
+        intervals [550]:
             xmin = 359.780
             xmax = 359.820
             text = ""
-        intervals [553]:
+        intervals [551]:
             xmin = 359.820
             xmax = 360.500
             text = "ohsiyu"
-        intervals [554]:
+        intervals [552]:
             xmin = 360.500
             xmax = 360.960
             text = ""
-        intervals [555]:
+        intervals [553]:
             xmin = 360.960
             xmax = 364.840
             text = "yinulihstanehe'i khanekwokekwohskini"
-        intervals [556]:
+        intervals [554]:
             xmin = 364.840
             xmax = 364.860
             text = ""
-        intervals [557]:
+        intervals [555]:
             xmin = 364.860
             xmax = 365.780
             text = "utlvkv'i"
-        intervals [558]:
+        intervals [556]:
             xmin = 365.780
             xmax = 367.160
             text = ""
-        intervals [559]:
+        intervals [557]:
             xmin = 367.160
             xmax = 367.620
             text = "nahski"
-        intervals [560]:
+        intervals [558]:
             xmin = 367.620
             xmax = 367.660
             text = ""
-        intervals [561]:
+        intervals [559]:
             xmin = 367.660
             xmax = 369.100
             text = "utvkanv tsihsa"
-        intervals [562]:
+        intervals [560]:
             xmin = 369.100
             xmax = 369.160
             text = ""
-        intervals [563]:
+        intervals [561]:
             xmin = 369.160
             xmax = 370.460
             text = "atsinohehskv'i"
-        intervals [564]:
+        intervals [562]:
             xmin = 370.460
             xmax = 371.240
             text = ""
-        intervals [565]:
+        intervals [563]:
             xmin = 371.240
             xmax = 372.000
             text = "onititlv"
-        intervals [566]:
+        intervals [564]:
             xmin = 372.000
             xmax = 372.200
             text = ""
-        intervals [567]:
+        intervals [565]:
             xmin = 372.200
             xmax = 372.980
             text = "unvthitv"
-        intervals [568]:
+        intervals [566]:
             xmin = 372.980
             xmax = 373.060
             text = ""
-        intervals [569]:
+        intervals [567]:
             xmin = 373.060
-            xmax = 373.920
+            xmax = 373.940
             text = "nunatvnv"
-        intervals [570]:
-            xmin = 373.920
+        intervals [568]:
+            xmin = 373.940
             xmax = 374.060
             text = ""
-        intervals [571]:
+        intervals [569]:
             xmin = 374.060
-            xmax = 375.280
+            xmax = 375.300
             text = "uluhihsthane"
-        intervals [572]:
-            xmin = 375.280
+        intervals [570]:
+            xmin = 375.300
             xmax = 375.420
             text = ""
-        intervals [573]:
+        intervals [571]:
             xmin = 375.420
             xmax = 375.740
             text = "ale"
-        intervals [574]:
+        intervals [572]:
             xmin = 375.740
             xmax = 376.180
             text = ""
-        intervals [575]:
+        intervals [573]:
             xmin = 376.180
-            xmax = 376.980
+            xmax = 377.000
             text = "uhsvnile"
-        intervals [576]:
-            xmin = 376.980
+        intervals [574]:
+            xmin = 377.000
             xmax = 377.860
             text = ""
-        intervals [577]:
+        intervals [575]:
             xmin = 377.860
             xmax = 380.740
             text = "unuwv'i hi'ayeno nuwehse'i"
-        intervals [578]:
+        intervals [576]:
             xmin = 380.740
             xmax = 380.940
             text = ""
-        intervals [579]:
+        intervals [577]:
             xmin = 380.940
             xmax = 381.800
             text = "tsunuwokwo"
-        intervals [580]:
+        intervals [578]:
             xmin = 381.800
             xmax = 381.860
             text = ""
-        intervals [581]:
+        intervals [579]:
             xmin = 381.860
             xmax = 382.300
             text = "nahskwo"
-        intervals [582]:
+        intervals [580]:
             xmin = 382.300
             xmax = 383.120
             text = ""
-        intervals [583]:
+        intervals [581]:
             xmin = 383.120
             xmax = 384.100
             text = "yitakwahsvnilv"
-        intervals [584]:
+        intervals [582]:
             xmin = 384.100
             xmax = 384.740
             text = ""
-        intervals [585]:
+        intervals [583]:
             xmin = 384.740
             xmax = 385.680
             text = "yakwatiwi"
-        intervals [586]:
+        intervals [584]:
             xmin = 385.680
             xmax = 386.320
             text = ""
-        intervals [587]:
+        intervals [585]:
             xmin = 386.320
             xmax = 386.880
             text = "kilakwono"
-        intervals [588]:
+        intervals [586]:
             xmin = 386.880
             xmax = 386.900
             text = ""
-        intervals [589]:
+        intervals [587]:
             xmin = 386.900
             xmax = 387.420
             text = "iyvtv"
-        intervals [590]:
+        intervals [588]:
             xmin = 387.420
             xmax = 387.720
             text = ""
-        intervals [591]:
+        intervals [589]:
             xmin = 387.720
             xmax = 388.140
             text = "kikv"
-        intervals [592]:
+        intervals [590]:
             xmin = 388.140
             xmax = 388.200
             text = ""
-        intervals [593]:
+        intervals [591]:
             xmin = 388.200
             xmax = 389.340
             text = "uwenv'ehv"
-        intervals [594]:
+        intervals [592]:
             xmin = 389.340
             xmax = 389.980
             text = ""
-        intervals [595]:
+        intervals [593]:
             xmin = 389.980
             xmax = 391.020
             text = "uyohihsthane'i"
-        intervals [596]:
+        intervals [594]:
             xmin = 391.020
             xmax = 391.780
             text = ""
-        intervals [597]:
+        intervals [595]:
             xmin = 391.780
-            xmax = 393.100
+            xmax = 393.120
             text = "utolehohseno"
-        intervals [598]:
-            xmin = 393.100
+        intervals [596]:
+            xmin = 393.120
             xmax = 393.420
             text = ""
-        intervals [599]:
+        intervals [597]:
             xmin = 393.420
             xmax = 394.060
             text = "ayelv"
-        intervals [600]:
+        intervals [598]:
             xmin = 394.060
             xmax = 394.620
             text = ""
-        intervals [601]:
+        intervals [599]:
             xmin = 394.620
-            xmax = 395.400
+            xmax = 395.420
             text = "utiwahsv"
-        intervals [602]:
-            xmin = 395.400
+        intervals [600]:
+            xmin = 395.420
             xmax = 396.040
             text = ""
-        intervals [603]:
+        intervals [601]:
             xmin = 396.040
             xmax = 397.200
             text = "nahski utlvkv'i"
-        intervals [604]:
+        intervals [602]:
             xmin = 397.200
             xmax = 398.240
             text = ""
-        intervals [605]:
+        intervals [603]:
             xmin = 398.240
-            xmax = 398.780
+            xmax = 398.900
             text = "tsihsano"
-        intervals [606]:
-            xmin = 398.780
+        intervals [604]:
+            xmin = 398.900
             xmax = 399.180
             text = ""
-        intervals [607]:
+        intervals [605]:
             xmin = 399.180
             xmax = 400.080
             text = "kilakwo iyvtv"
-        intervals [608]:
+        intervals [606]:
             xmin = 400.080
             xmax = 400.140
             text = ""
-        intervals [609]:
+        intervals [607]:
             xmin = 400.140
             xmax = 401.400
             text = "utolehohsv"
-        intervals [610]:
+        intervals [608]:
             xmin = 401.400
             xmax = 401.600
             text = ""
-        intervals [611]:
+        intervals [609]:
             xmin = 401.600
             xmax = 402.260
             text = "uwahsv"
-        intervals [612]:
+        intervals [610]:
             xmin = 402.260
             xmax = 402.720
             text = ""
-        intervals [613]:
+        intervals [611]:
             xmin = 402.720
             xmax = 403.220
             text = "kehsv"
-        intervals [614]:
+        intervals [612]:
             xmin = 403.220
             xmax = 403.460
             text = ""
-        intervals [615]:
+        intervals [613]:
             xmin = 403.460
             xmax = 405.560
             text = "utanvwoti kehsv unukotsv'i"
-        intervals [616]:
+        intervals [614]:
             xmin = 405.560
             xmax = 406.200
             text = ""
-        intervals [617]:
+        intervals [615]:
             xmin = 406.200
             xmax = 407.180
             text = "ukathahvhse"
-        intervals [618]:
+        intervals [616]:
             xmin = 407.180
             xmax = 407.840
             text = ""
-        intervals [619]:
+        intervals [617]:
             xmin = 407.840
             xmax = 408.240
             text = "nanha"
-        intervals [620]:
+        intervals [618]:
             xmin = 408.240
             xmax = 409.160
             text = ""
-        intervals [621]:
+        intervals [619]:
             xmin = 409.160
+            xmax = 409.880
+            text = "unvthitv"
+        intervals [620]:
+            xmin = 409.880
+            xmax = 409.940
+            text = ""
+        intervals [621]:
+            xmin = 409.940
             xmax = 411.020
-            text = "unvthitv anitona'v'i"
+            text = "anitona'v'i"
         intervals [622]:
             xmin = 411.020
             xmax = 412.300
@@ -6930,10 +6930,10 @@ item []:
             text = ""
         intervals [654]:
             xmin = 434.340
-            xmax = 435.940
+            xmax = 435.960
             text = "ukowatvtiyi nahski"
         intervals [655]:
-            xmin = 435.940
+            xmin = 435.960
             xmax = 436.060
             text = ""
         intervals [656]:
@@ -6962,18 +6962,18 @@ item []:
             text = ""
         intervals [662]:
             xmin = 439.580
-            xmax = 440.040
+            xmax = 440.200
             text = "akeyv"
         intervals [663]:
-            xmin = 440.040
-            xmax = 440.080
+            xmin = 440.200
+            xmax = 440.340
             text = ""
         intervals [664]:
-            xmin = 440.080
-            xmax = 441.260
+            xmin = 440.340
+            xmax = 441.280
             text = "ahska'ihe"
         intervals [665]:
-            xmin = 441.260
+            xmin = 441.280
             xmax = 441.360
             text = ""
         intervals [666]:
@@ -6986,18 +6986,18 @@ item []:
             text = ""
         intervals [668]:
             xmin = 441.860
-            xmax = 443.460
+            xmax = 443.480
             text = "uwenawihske'i"
         intervals [669]:
-            xmin = 443.460
+            xmin = 443.480
             xmax = 444.260
             text = ""
         intervals [670]:
             xmin = 444.260
-            xmax = 445.000
+            xmax = 445.020
             text = "akathahe"
         intervals [671]:
-            xmin = 445.000
+            xmin = 445.020
             xmax = 445.400
             text = ""
         intervals [672]:
@@ -7026,10 +7026,10 @@ item []:
             text = ""
         intervals [678]:
             xmin = 449.120
-            xmax = 449.620
+            xmax = 449.640
             text = "elati"
         intervals [679]:
-            xmin = 449.620
+            xmin = 449.640
             xmax = 450.500
             text = ""
         intervals [680]:
@@ -7058,10 +7058,10 @@ item []:
             text = ""
         intervals [686]:
             xmin = 454.160
-            xmax = 454.940
+            xmax = 454.960
             text = "tuyukotv"
         intervals [687]:
-            xmin = 454.940
+            xmin = 454.960
             xmax = 455.040
             text = ""
         intervals [688]:
@@ -7074,10 +7074,10 @@ item []:
             text = ""
         intervals [690]:
             xmin = 458.640
-            xmax = 459.320
+            xmax = 459.340
             text = "akwetsi"
         intervals [691]:
-            xmin = 459.320
+            xmin = 459.340
             xmax = 459.980
             text = ""
         intervals [692]:
@@ -7114,18 +7114,18 @@ item []:
             text = ""
         intervals [700]:
             xmin = 465.700
-            xmax = 465.960
+            xmax = 465.980
             text = "ale"
         intervals [701]:
-            xmin = 465.960
+            xmin = 465.980
             xmax = 466.180
             text = ""
         intervals [702]:
             xmin = 466.180
-            xmax = 467.020
+            xmax = 467.040
             text = "tsatiwahsvhi"
         intervals [703]:
-            xmin = 467.020
+            xmin = 467.040
             xmax = 467.300
             text = ""
         intervals [704]:
@@ -7138,10 +7138,10 @@ item []:
             text = ""
         intervals [706]:
             xmin = 468.600
-            xmax = 469.500
+            xmax = 469.520
             text = "tsatlvkv'i"
         intervals [707]:
-            xmin = 469.500
+            xmin = 469.520
             xmax = 470.120
             text = ""
         intervals [708]:
@@ -7154,10 +7154,10 @@ item []:
             text = ""
         intervals [710]:
             xmin = 470.980
-            xmax = 471.780
+            xmax = 471.800
             text = "khaneke'i"
         intervals [711]:
-            xmin = 471.780
+            xmin = 471.800
             xmax = 472.280
             text = ""
         intervals [712]:
@@ -7218,10 +7218,10 @@ item []:
             text = ""
         intervals [726]:
             xmin = 483.000
-            xmax = 483.460
+            xmax = 483.480
             text = "tsetsi"
         intervals [727]:
-            xmin = 483.460
+            xmin = 483.480
             xmax = 483.860
             text = ""
         intervals [728]:
@@ -7358,10 +7358,10 @@ item []:
             text = ""
         intervals [761]:
             xmin = 510.040
-            xmax = 510.300
+            xmax = 510.320
             text = "ale"
         intervals [762]:
-            xmin = 510.300
+            xmin = 510.320
             xmax = 510.440
             text = ""
         intervals [763]:
@@ -7478,10 +7478,10 @@ item []:
             text = ""
         intervals [791]:
             xmin = 526.720
-            xmax = 527.920
+            xmax = 527.940
             text = "ale taniyvkv'i"
         intervals [792]:
-            xmin = 527.920
+            xmin = 527.940
             xmax = 528.320
             text = ""
         intervals [793]:
@@ -7542,10 +7542,10 @@ item []:
             text = ""
         intervals [807]:
             xmin = 538.860
-            xmax = 539.620
+            xmax = 539.640
             text = "akeyutsa"
         intervals [808]:
-            xmin = 539.620
+            xmin = 539.640
             xmax = 540.300
             text = ""
         intervals [809]:
@@ -7614,10 +7614,10 @@ item []:
             text = ""
         intervals [825]:
             xmin = 553.200
-            xmax = 554.060
+            xmax = 554.080
             text = "tuthinvhse"
         intervals [826]:
-            xmin = 554.060
+            xmin = 554.080
             xmax = 554.860
             text = ""
         intervals [827]:
@@ -7646,10 +7646,10 @@ item []:
             text = ""
         intervals [833]:
             xmin = 556.320
-            xmax = 557.080
+            xmax = 557.100
             text = "akeyutsa"
         intervals [834]:
-            xmin = 557.080
+            xmin = 557.100
             xmax = 557.300
             text = ""
         intervals [835]:
@@ -7682,10 +7682,10 @@ item []:
             text = ""
         intervals [842]:
             xmin = 562.640
-            xmax = 563.280
+            xmax = 563.300
             text = "thalita"
         intervals [843]:
-            xmin = 563.280
+            xmin = 563.300
             xmax = 563.600
             text = ""
         intervals [844]:
@@ -7698,10 +7698,10 @@ item []:
             text = ""
         intervals [846]:
             xmin = 564.620
-            xmax = 566.120
+            xmax = 566.140
             text = "nahski anetlvthanvhi"
         intervals [847]:
-            xmin = 566.120
+            xmin = 566.140
             xmax = 566.160
             text = ""
         intervals [848]:
@@ -7746,10 +7746,10 @@ item []:
             text = ""
         intervals [858]:
             xmin = 573.320
-            xmax = 573.800
+            xmax = 573.860
             text = "iyvtv"
         intervals [859]:
-            xmin = 573.800
+            xmin = 573.860
             xmax = 574.140
             text = ""
         intervals [860]:
@@ -7770,18 +7770,18 @@ item []:
             text = ""
         intervals [864]:
             xmin = 576.620
-            xmax = 576.920
+            xmax = 576.940
             text = "ale"
         intervals [865]:
-            xmin = 576.920
+            xmin = 576.940
             xmax = 577.000
             text = ""
         intervals [866]:
             xmin = 577.000
-            xmax = 577.840
+            xmax = 577.860
             text = "uwetole'i"
         intervals [867]:
-            xmin = 577.840
+            xmin = 577.860
             xmax = 578.580
             text = ""
         intervals [868]:
@@ -7798,10 +7798,10 @@ item []:
             text = ""
         intervals [871]:
             xmin = 581.280
-            xmax = 581.980
+            xmax = 582.000
             text = "kehse'i"
         intervals [872]:
-            xmin = 581.980
+            xmin = 582.000
             xmax = 582.780
             text = ""
         intervals [873]:
@@ -7850,49 +7850,21 @@ item []:
             text = "utolehohihstiyi"
         intervals [884]:
             xmin = 593.080
-            xmax = 593.700
-            text = ""
+            xmax = 595.380
+            text = "nahski ale unetsekohuhsti ulihstayvti"
         intervals [885]:
-            xmin = 593.700
-            xmax = 594.220
-            text = "nahski"
-        intervals [886]:
-            xmin = 594.220
-            xmax = 594.960
-            text = ""
-        intervals [887]:
-            xmin = 594.960
-            xmax = 595.240
-            text = "ale"
-        intervals [888]:
-            xmin = 595.240
+            xmin = 595.380
             xmax = 595.400
             text = ""
-        intervals [889]:
+        intervals [886]:
             xmin = 595.400
-            xmax = 596.900
-            text = "unetsekohuhsti"
-        intervals [890]:
-            xmin = 596.900
-            xmax = 597.320
-            text = ""
-        intervals [891]:
-            xmin = 597.320
-            xmax = 598.060
-            text = "ulihstayvti"
-        intervals [892]:
-            xmin = 598.060
-            xmax = 598.560
-            text = ""
-        intervals [893]:
-            xmin = 598.560
-            xmax = 599.640
+            xmax = 595.980
             text = "uninetiyi"
     item [4]:
         class = "IntervalTier"
         name = "Reconciled Transcriptions"
         xmin = 0
-        xmax = 599.640
+        xmax = 595.980
         intervals: size = 1029
         intervals [1]:
             xmin = 0.000
@@ -7932,10 +7904,10 @@ item []:
             text = ""
         intervals [10]:
             xmin = 9.300
-            xmax = 10.260
+            xmax = 10.280
             text = "unatselikohi"
         intervals [11]:
-            xmin = 10.260
+            xmin = 10.280
             xmax = 11.420
             text = ""
         intervals [12]:
@@ -7956,14 +7928,14 @@ item []:
             text = ""
         intervals [16]:
             xmin = 13.620
-            xmax = 13.960
-            text = "khilakw"
+            xmax = 14.020
+            text = "khilakwo"
         intervals [17]:
-            xmin = 13.960
-            xmax = 14.000
+            xmin = 14.020
+            xmax = 14.080
             text = ""
         intervals [18]:
-            xmin = 14.000
+            xmin = 14.080
             xmax = 14.480
             text = "iyvtv"
         intervals [19]:
@@ -7972,10 +7944,10 @@ item []:
             text = ""
         intervals [20]:
             xmin = 15.220
-            xmax = 15.840
+            xmax = 15.860
             text = "tutlohse"
         intervals [21]:
-            xmin = 15.840
+            xmin = 15.860
             xmax = 16.000
             text = ""
         intervals [22]:
@@ -7988,10 +7960,10 @@ item []:
             text = ""
         intervals [24]:
             xmin = 17.100
-            xmax = 18.100
+            xmax = 18.120
             text = "tatanihshv"
         intervals [25]:
-            xmin = 18.100
+            xmin = 18.120
             xmax = 18.460
             text = ""
         intervals [26]:
@@ -8004,18 +7976,18 @@ item []:
             text = ""
         intervals [28]:
             xmin = 20.360
-            xmax = 20.900
+            xmax = 20.920
             text = "kataha"
         intervals [29]:
-            xmin = 20.900
+            xmin = 20.920
             xmax = 21.080
             text = ""
         intervals [30]:
             xmin = 21.080
-            xmax = 21.640
+            xmax = 21.660
             text = "atantho"
         intervals [31]:
-            xmin = 21.640
+            xmin = 21.660
             xmax = 21.840
             text = ""
         intervals [32]:
@@ -8116,10 +8088,10 @@ item []:
             text = ""
         intervals [56]:
             xmin = 33.600
-            xmax = 34.640
+            xmax = 34.660
             text = "yanokiyuyhenho"
         intervals [57]:
-            xmin = 34.640
+            xmin = 34.660
             xmax = 35.240
             text = ""
         intervals [58]:
@@ -8156,26 +8128,26 @@ item []:
             text = ""
         intervals [66]:
             xmin = 41.920
-            xmax = 42.940
+            xmax = 42.960
             text = "tsakalhvhsthanvhi"
         intervals [67]:
-            xmin = 42.940
+            xmin = 42.960
             xmax = 43.400
             text = ""
         intervals [68]:
             xmin = 43.400
-            xmax = 43.880
+            xmax = 43.900
             text = "kehse'i"
         intervals [69]:
-            xmin = 43.880
+            xmin = 43.900
             xmax = 45.100
             text = ""
         intervals [70]:
             xmin = 45.100
-            xmax = 46.180
+            xmax = 46.200
             text = "tsutatehsvtno"
         intervals [71]:
-            xmin = 46.180
+            xmin = 46.200
             xmax = 46.440
             text = ""
         intervals [72]:
@@ -8188,18 +8160,18 @@ item []:
             text = ""
         intervals [74]:
             xmin = 47.960
-            xmax = 48.100
+            xmax = 48.120
             text = "ale"
         intervals [75]:
-            xmin = 48.100
+            xmin = 48.120
             xmax = 48.240
             text = ""
         intervals [76]:
             xmin = 48.240
-            xmax = 49.080
+            xmax = 49.100
             text = "tikanvtlhohsti"
         intervals [77]:
-            xmin = 49.080
+            xmin = 49.100
             xmax = 49.700
             text = ""
         intervals [78]:
@@ -8236,18 +8208,18 @@ item []:
             text = ""
         intervals [86]:
             xmin = 53.060
-            xmax = 54.500
+            xmax = 54.520
             text = "kvwatanvthihsohti"
         intervals [87]:
-            xmin = 54.500
+            xmin = 54.520
             xmax = 54.760
             text = ""
         intervals [88]:
             xmin = 54.760
-            xmax = 55.460
+            xmax = 55.480
             text = "yikehse'i"
         intervals [89]:
-            xmin = 55.460
+            xmin = 55.480
             xmax = 56.640
             text = ""
         intervals [90]:
@@ -8316,18 +8288,18 @@ item []:
             text = ""
         intervals [106]:
             xmin = 63.700
-            xmax = 64.620
+            xmax = 64.640
             text = "uwelhuhke'i"
         intervals [107]:
-            xmin = 64.620
+            xmin = 64.640
             xmax = 65.420
             text = ""
         intervals [108]:
             xmin = 65.420
-            xmax = 65.600
+            xmax = 65.620
             text = "ale"
         intervals [109]:
-            xmin = 65.600
+            xmin = 65.620
             xmax = 66.080
             text = ""
         intervals [110]:
@@ -8532,10 +8504,10 @@ item []:
             text = ""
         intervals [160]:
             xmin = 91.120
-            xmax = 92.120
+            xmax = 92.140
             text = "unelhanvhi"
         intervals [161]:
-            xmin = 92.120
+            xmin = 92.140
             xmax = 93.200
             text = ""
         intervals [162]:
@@ -8636,18 +8608,18 @@ item []:
             text = ""
         intervals [186]:
             xmin = 109.180
-            xmax = 109.840
+            xmax = 109.860
             text = "atanhvhto"
         intervals [187]:
-            xmin = 109.840
+            xmin = 109.860
             xmax = 111.140
             text = ""
         intervals [188]:
             xmin = 111.140
-            xmax = 112.120
+            xmax = 112.140
             text = "uthvtvnhenho"
         intervals [189]:
-            xmin = 112.120
+            xmin = 112.140
             xmax = 113.200
             text = ""
         intervals [190]:
@@ -8684,10 +8656,10 @@ item []:
             text = ""
         intervals [198]:
             xmin = 117.860
-            xmax = 118.600
+            xmax = 118.620
             text = "nuwehsel'i"
         intervals [199]:
-            xmin = 118.600
+            xmin = 118.620
             xmax = 119.220
             text = ""
         intervals [200]:
@@ -8796,18 +8768,18 @@ item []:
             text = ""
         intervals [226]:
             xmin = 135.360
-            xmax = 136.060
+            xmax = 136.080
             text = "unitsathi"
         intervals [227]:
-            xmin = 136.060
+            xmin = 136.080
             xmax = 136.920
             text = ""
         intervals [228]:
             xmin = 136.920
-            xmax = 137.600
+            xmax = 137.620
             text = "hsunatalki"
         intervals [229]:
-            xmin = 137.600
+            xmin = 137.620
             xmax = 137.980
             text = ""
         intervals [230]:
@@ -8828,10 +8800,10 @@ item []:
             text = ""
         intervals [234]:
             xmin = 141.060
-            xmax = 141.700
+            xmax = 141.720
             text = "nikatvnho"
         intervals [235]:
-            xmin = 141.700
+            xmin = 141.720
             xmax = 142.020
             text = ""
         intervals [236]:
@@ -8876,10 +8848,10 @@ item []:
             text = ""
         intervals [246]:
             xmin = 147.960
-            xmax = 148.340
+            xmax = 148.360
             text = "hsihkwa"
         intervals [247]:
-            xmin = 148.340
+            xmin = 148.360
             xmax = 148.420
             text = ""
         intervals [248]:
@@ -8940,18 +8912,18 @@ item []:
             text = ""
         intervals [262]:
             xmin = 155.260
-            xmax = 156.780
+            xmax = 156.800
             text = "tulhskoltanele'i"
         intervals [263]:
-            xmin = 156.780
+            xmin = 156.800
             xmax = 157.700
             text = ""
         intervals [264]:
             xmin = 157.700
-            xmax = 158.640
+            xmax = 158.720
             text = "tikatahanho"
         intervals [265]:
-            xmin = 158.640
+            xmin = 158.720
             xmax = 158.760
             text = ""
         intervals [266]:
@@ -8996,18 +8968,18 @@ item []:
             text = ""
         intervals [276]:
             xmin = 164.820
-            xmax = 166.700
+            xmax = 166.720
             text = "unanelukihse"
         intervals [277]:
-            xmin = 166.700
+            xmin = 166.720
             xmax = 167.380
             text = ""
         intervals [278]:
             xmin = 167.380
-            xmax = 168.460
+            xmax = 168.480
             text = "unikhso'ahse"
         intervals [279]:
-            xmin = 168.460
+            xmin = 168.480
             xmax = 168.760
             text = ""
         intervals [280]:
@@ -9036,10 +9008,10 @@ item []:
             text = ""
         intervals [286]:
             xmin = 171.120
-            xmax = 172.760
+            xmax = 172.780
             text = "wunalthatinvhse'i"
         intervals [287]:
-            xmin = 172.760
+            xmin = 172.780
             xmax = 173.260
             text = ""
         intervals [288]:
@@ -9092,10 +9064,10 @@ item []:
             text = ""
         intervals [300]:
             xmin = 178.820
-            xmax = 179.840
+            xmax = 179.860
             text = "tunikvtse'i"
         intervals [301]:
-            xmin = 179.840
+            xmin = 179.860
             xmax = 180.940
             text = ""
         intervals [302]:
@@ -9164,10 +9136,10 @@ item []:
             text = ""
         intervals [318]:
             xmin = 189.700
-            xmax = 190.860
+            xmax = 190.880
             text = "uninukotsenho"
         intervals [319]:
-            xmin = 190.860
+            xmin = 190.880
             xmax = 191.320
             text = ""
         intervals [320]:
@@ -9212,26 +9184,26 @@ item []:
             text = ""
         intervals [330]:
             xmin = 197.640
-            xmax = 197.840
+            xmax = 197.860
             text = "ale"
         intervals [331]:
-            xmin = 197.840
+            xmin = 197.860
             xmax = 198.900
             text = ""
         intervals [332]:
             xmin = 198.900
-            xmax = 199.660
+            xmax = 199.680
             text = "kvwakohe"
         intervals [333]:
-            xmin = 199.660
+            xmin = 199.680
             xmax = 199.900
             text = ""
         intervals [334]:
             xmin = 199.900
-            xmax = 200.280
+            xmax = 200.300
             text = "nhski"
         intervals [335]:
-            xmin = 200.280
+            xmin = 200.300
             xmax = 201.180
             text = ""
         intervals [336]:
@@ -9260,10 +9232,10 @@ item []:
             text = ""
         intervals [342]:
             xmin = 204.060
-            xmax = 204.900
+            xmax = 204.920
             text = "hsunatalki"
         intervals [343]:
-            xmin = 204.900
+            xmin = 204.920
             xmax = 205.240
             text = ""
         intervals [344]:
@@ -9284,10 +9256,10 @@ item []:
             text = ""
         intervals [348]:
             xmin = 207.840
-            xmax = 208.040
+            xmax = 208.060
             text = "ale"
         intervals [349]:
-            xmin = 208.040
+            xmin = 208.060
             xmax = 208.360
             text = ""
         intervals [350]:
@@ -9364,10 +9336,10 @@ item []:
             text = ""
         intervals [368]:
             xmin = 220.420
-            xmax = 221.220
+            xmax = 221.240
             text = "nulhstanhelv"
         intervals [369]:
-            xmin = 221.220
+            xmin = 221.240
             xmax = 221.940
             text = ""
         intervals [370]:
@@ -9452,10 +9424,10 @@ item []:
             text = ""
         intervals [390]:
             xmin = 232.960
-            xmax = 233.940
+            xmax = 233.960
             text = "unatselikohi"
         intervals [391]:
-            xmin = 233.940
+            xmin = 233.960
             xmax = 235.160
             text = ""
         intervals [392]:
@@ -9476,10 +9448,10 @@ item []:
             text = ""
         intervals [396]:
             xmin = 237.100
-            xmax = 237.460
+            xmax = 237.480
             text = "nhski"
         intervals [397]:
-            xmin = 237.460
+            xmin = 237.480
             xmax = 238.400
             text = ""
         intervals [398]:
@@ -9508,10 +9480,10 @@ item []:
             text = ""
         intervals [404]:
             xmin = 242.260
-            xmax = 242.820
+            xmax = 242.840
             text = "unelaki"
         intervals [405]:
-            xmin = 242.820
+            xmin = 242.840
             xmax = 243.000
             text = ""
         intervals [406]:
@@ -9548,10 +9520,10 @@ item []:
             text = ""
         intervals [414]:
             xmin = 248.120
-            xmax = 249.260
+            xmax = 249.280
             text = "yulhskoltanele'i"
         intervals [415]:
-            xmin = 249.260
+            xmin = 249.280
             xmax = 249.460
             text = ""
         intervals [416]:
@@ -9596,10 +9568,10 @@ item []:
             text = ""
         intervals [426]:
             xmin = 255.060
-            xmax = 255.680
+            xmax = 255.700
             text = "kohuhsti"
         intervals [427]:
-            xmin = 255.680
+            xmin = 255.700
             xmax = 255.920
             text = ""
         intervals [428]:
@@ -9612,18 +9584,18 @@ item []:
             text = ""
         intervals [430]:
             xmin = 256.480
-            xmax = 257.180
+            xmax = 257.200
             text = "tinehv'i"
         intervals [431]:
-            xmin = 257.180
+            xmin = 257.200
             xmax = 258.360
             text = ""
         intervals [432]:
             xmin = 258.360
-            xmax = 258.540
+            xmax = 258.560
             text = "ale"
         intervals [433]:
-            xmin = 258.540
+            xmin = 258.560
             xmax = 258.740
             text = ""
         intervals [434]:
@@ -9668,34 +9640,34 @@ item []:
             text = ""
         intervals [444]:
             xmin = 264.600
-            xmax = 264.760
+            xmax = 264.780
             text = "ale"
         intervals [445]:
-            xmin = 264.760
+            xmin = 264.780
             xmax = 265.180
             text = ""
         intervals [446]:
             xmin = 265.180
-            xmax = 266.360
+            xmax = 266.380
             text = "tsatolitsv'i"
         intervals [447]:
-            xmin = 266.360
+            xmin = 266.380
             xmax = 267.480
             text = ""
         intervals [448]:
             xmin = 267.480
-            xmax = 268.440
+            xmax = 268.460
             text = "unhikihsenho"
         intervals [449]:
-            xmin = 268.440
+            xmin = 268.460
             xmax = 268.600
             text = ""
         intervals [450]:
             xmin = 268.600
-            xmax = 268.800
+            xmax = 268.820
             text = "ale"
         intervals [451]:
-            xmin = 268.800
+            xmin = 268.820
             xmax = 269.200
             text = ""
         intervals [452]:
@@ -9748,10 +9720,10 @@ item []:
             text = ""
         intervals [464]:
             xmin = 278.200
-            xmax = 279.100
+            xmax = 279.120
             text = "nutvnhelv'i"
         intervals [465]:
-            xmin = 279.100
+            xmin = 279.120
             xmax = 279.280
             text = ""
         intervals [466]:
@@ -9868,10 +9840,10 @@ item []:
             text = ""
         intervals [494]:
             xmin = 294.980
-            xmax = 295.300
-            text = "vtal"
+            xmax = 295.380
+            text = "vtali"
         intervals [495]:
-            xmin = 295.300
+            xmin = 295.380
             xmax = 295.520
             text = ""
         intervals [496]:
@@ -9884,10 +9856,10 @@ item []:
             text = ""
         intervals [498]:
             xmin = 296.100
-            xmax = 296.740
+            xmax = 296.760
             text = "etohe'i"
         intervals [499]:
-            xmin = 296.740
+            xmin = 296.760
             xmax = 297.780
             text = ""
         intervals [500]:
@@ -9900,26 +9872,26 @@ item []:
             text = ""
         intervals [502]:
             xmin = 297.980
-            xmax = 298.560
-            text = "kvnhiyukw"
+            xmax = 298.600
+            text = "kvnhiyukwo"
         intervals [503]:
-            xmin = 298.560
-            xmax = 298.580
+            xmin = 298.600
+            xmax = 298.720
             text = ""
         intervals [504]:
-            xmin = 298.580
-            xmax = 299.380
+            xmin = 298.720
+            xmax = 299.400
             text = "ulutse"
         intervals [505]:
-            xmin = 299.380
+            xmin = 299.400
             xmax = 299.640
             text = ""
         intervals [506]:
             xmin = 299.640
-            xmax = 299.780
-            text = "khil"
+            xmax = 299.860
+            text = "khilo"
         intervals [507]:
-            xmin = 299.780
+            xmin = 299.860
             xmax = 299.980
             text = ""
         intervals [508]:
@@ -9948,10 +9920,10 @@ item []:
             text = ""
         intervals [514]:
             xmin = 304.340
-            xmax = 304.780
+            xmax = 304.800
             text = "tsela"
         intervals [515]:
-            xmin = 304.780
+            xmin = 304.800
             xmax = 305.000
             text = ""
         intervals [516]:
@@ -9980,10 +9952,10 @@ item []:
             text = ""
         intervals [522]:
             xmin = 307.900
-            xmax = 308.460
+            xmax = 308.480
             text = "tulahskv"
         intervals [523]:
-            xmin = 308.460
+            xmin = 308.480
             xmax = 308.620
             text = ""
         intervals [524]:
@@ -9996,10 +9968,10 @@ item []:
             text = ""
         intervals [526]:
             xmin = 310.460
-            xmax = 310.640
+            xmax = 310.660
             text = "ale"
         intervals [527]:
-            xmin = 310.640
+            xmin = 310.660
             xmax = 310.860
             text = ""
         intervals [528]:
@@ -10028,10 +10000,10 @@ item []:
             text = ""
         intervals [534]:
             xmin = 313.260
-            xmax = 313.880
+            xmax = 313.900
             text = "nuwehse'i"
         intervals [535]:
-            xmin = 313.880
+            xmin = 313.900
             xmax = 314.660
             text = ""
         intervals [536]:
@@ -10052,10 +10024,10 @@ item []:
             text = ""
         intervals [540]:
             xmin = 316.380
-            xmax = 316.660
-            text = "nhakw"
+            xmax = 316.720
+            text = "nhakwo"
         intervals [541]:
-            xmin = 316.660
+            xmin = 316.720
             xmax = 316.840
             text = ""
         intervals [542]:
@@ -10084,10 +10056,10 @@ item []:
             text = ""
         intervals [548]:
             xmin = 320.380
-            xmax = 321.360
+            xmax = 321.380
             text = "hiyahsihthatvha"
         intervals [549]:
-            xmin = 321.360
+            xmin = 321.380
             xmax = 322.660
             text = ""
         intervals [550]:
@@ -10116,10 +10088,10 @@ item []:
             text = ""
         intervals [556]:
             xmin = 326.980
-            xmax = 327.920
+            xmax = 327.940
             text = "unenvhsenho"
         intervals [557]:
-            xmin = 327.920
+            xmin = 327.940
             xmax = 328.360
             text = ""
         intervals [558]:
@@ -10244,18 +10216,18 @@ item []:
             text = ""
         intervals [588]:
             xmin = 346.120
-            xmax = 346.940
+            xmax = 346.960
             text = "anikotiyu"
         intervals [589]:
-            xmin = 346.940
+            xmin = 346.960
             xmax = 347.120
             text = ""
         intervals [590]:
             xmin = 347.120
-            xmax = 348.220
+            xmax = 348.240
             text = "anikanakthi"
         intervals [591]:
-            xmin = 348.220
+            xmin = 348.240
             xmax = 348.560
             text = ""
         intervals [592]:
@@ -10268,18 +10240,18 @@ item []:
             text = ""
         intervals [594]:
             xmin = 350.000
-            xmax = 351.080
+            xmax = 351.160
             text = "kvwakilhvnhvhi"
         intervals [595]:
-            xmin = 351.080
+            xmin = 351.160
             xmax = 351.220
             text = ""
         intervals [596]:
             xmin = 351.220
-            xmax = 351.740
+            xmax = 351.760
             text = "kehse'i"
         intervals [597]:
-            xmin = 351.740
+            xmin = 351.760
             xmax = 352.660
             text = ""
         intervals [598]:
@@ -10316,10 +10288,10 @@ item []:
             text = ""
         intervals [606]:
             xmin = 355.000
-            xmax = 355.800
+            xmax = 355.820
             text = "uhsvnhvhi"
         intervals [607]:
-            xmin = 355.800
+            xmin = 355.820
             xmax = 355.860
             text = ""
         intervals [608]:
@@ -10332,10 +10304,10 @@ item []:
             text = ""
         intervals [610]:
             xmin = 356.900
-            xmax = 357.840
+            xmax = 357.860
             text = "akhuyihskv'i"
         intervals [611]:
-            xmin = 357.840
+            xmin = 357.860
             xmax = 358.720
             text = ""
         intervals [612]:
@@ -10436,18 +10408,18 @@ item []:
             text = ""
         intervals [636]:
             xmin = 373.060
-            xmax = 373.820
+            xmax = 373.840
             text = "nunatvnhv"
         intervals [637]:
-            xmin = 373.820
+            xmin = 373.840
             xmax = 374.060
             text = ""
         intervals [638]:
             xmin = 374.060
-            xmax = 375.180
+            xmax = 375.200
             text = "uluhihsthane"
         intervals [639]:
-            xmin = 375.180
+            xmin = 375.200
             xmax = 375.420
             text = ""
         intervals [640]:
@@ -10460,10 +10432,10 @@ item []:
             text = ""
         intervals [642]:
             xmin = 376.180
-            xmax = 376.880
+            xmax = 376.900
             text = "uhsvnhile"
         intervals [643]:
-            xmin = 376.880
+            xmin = 376.900
             xmax = 377.860
             text = ""
         intervals [644]:
@@ -10564,10 +10536,10 @@ item []:
             text = ""
         intervals [668]:
             xmin = 391.780
-            xmax = 393.000
+            xmax = 393.020
             text = "utlehohsenho"
         intervals [669]:
-            xmin = 393.000
+            xmin = 393.020
             xmax = 393.420
             text = ""
         intervals [670]:
@@ -10580,10 +10552,10 @@ item []:
             text = ""
         intervals [672]:
             xmin = 394.620
-            xmax = 395.300
+            xmax = 395.320
             text = "utiwhsv"
         intervals [673]:
-            xmin = 395.300
+            xmin = 395.320
             xmax = 396.040
             text = ""
         intervals [674]:
@@ -10604,22 +10576,22 @@ item []:
             text = ""
         intervals [678]:
             xmin = 398.240
-            xmax = 398.680
+            xmax = 398.800
             text = "tsihsanho"
         intervals [679]:
-            xmin = 398.680
+            xmin = 398.800
             xmax = 399.180
             text = ""
         intervals [680]:
             xmin = 399.180
-            xmax = 399.500
-            text = "kilakw"
+            xmax = 399.560
+            text = "kilakwo"
         intervals [681]:
-            xmin = 399.500
-            xmax = 399.540
+            xmin = 399.560
+            xmax = 399.640
             text = ""
         intervals [682]:
-            xmin = 399.540
+            xmin = 399.640
             xmax = 399.980
             text = "iyvtv"
         intervals [683]:
@@ -10645,7 +10617,7 @@ item []:
         intervals [688]:
             xmin = 402.720
             xmax = 403.120
-            text = "kehs"
+            text = "kehsv"
         intervals [689]:
             xmin = 403.120
             xmax = 403.460
@@ -10692,14 +10664,14 @@ item []:
             text = ""
         intervals [700]:
             xmin = 409.160
-            xmax = 409.720
-            text = "unvthit"
+            xmax = 409.780
+            text = "unvthitv"
         intervals [701]:
-            xmin = 409.720
-            xmax = 409.760
+            xmin = 409.780
+            xmax = 409.940
             text = ""
         intervals [702]:
-            xmin = 409.760
+            xmin = 409.940
             xmax = 410.920
             text = "anitona'v'i"
         intervals [703]:
@@ -10860,10 +10832,10 @@ item []:
             text = ""
         intervals [742]:
             xmin = 435.480
-            xmax = 435.840
+            xmax = 435.860
             text = "nhski"
         intervals [743]:
-            xmin = 435.840
+            xmin = 435.860
             xmax = 436.060
             text = ""
         intervals [744]:
@@ -10892,18 +10864,18 @@ item []:
             text = ""
         intervals [750]:
             xmin = 439.580
-            xmax = 439.940
-            text = "akey"
+            xmax = 440.100
+            text = "akeyv"
         intervals [751]:
-            xmin = 439.940
-            xmax = 440.080
+            xmin = 440.100
+            xmax = 440.340
             text = ""
         intervals [752]:
-            xmin = 440.080
-            xmax = 441.160
+            xmin = 440.340
+            xmax = 441.180
             text = "ahska'ihe"
         intervals [753]:
-            xmin = 441.160
+            xmin = 441.180
             xmax = 441.360
             text = ""
         intervals [754]:
@@ -10916,18 +10888,18 @@ item []:
             text = ""
         intervals [756]:
             xmin = 441.860
-            xmax = 443.360
+            xmax = 443.380
             text = "uwenawihske'i"
         intervals [757]:
-            xmin = 443.360
+            xmin = 443.380
             xmax = 444.260
             text = ""
         intervals [758]:
             xmin = 444.260
-            xmax = 444.900
+            xmax = 444.920
             text = "akhahthahe"
         intervals [759]:
-            xmin = 444.900
+            xmin = 444.920
             xmax = 445.400
             text = ""
         intervals [760]:
@@ -10956,10 +10928,10 @@ item []:
             text = ""
         intervals [766]:
             xmin = 449.120
-            xmax = 449.520
+            xmax = 449.540
             text = "elati"
         intervals [767]:
-            xmin = 449.520
+            xmin = 449.540
             xmax = 450.500
             text = ""
         intervals [768]:
@@ -10988,10 +10960,10 @@ item []:
             text = ""
         intervals [774]:
             xmin = 454.160
-            xmax = 454.840
+            xmax = 454.860
             text = "tuyukohtv"
         intervals [775]:
-            xmin = 454.840
+            xmin = 454.860
             xmax = 455.040
             text = ""
         intervals [776]:
@@ -11020,10 +10992,10 @@ item []:
             text = ""
         intervals [782]:
             xmin = 458.640
-            xmax = 459.220
+            xmax = 459.240
             text = "akwetsi"
         intervals [783]:
-            xmin = 459.220
+            xmin = 459.240
             xmax = 459.980
             text = ""
         intervals [784]:
@@ -11060,18 +11032,18 @@ item []:
             text = ""
         intervals [792]:
             xmin = 465.700
-            xmax = 465.860
+            xmax = 465.880
             text = "ale"
         intervals [793]:
-            xmin = 465.860
+            xmin = 465.880
             xmax = 466.180
             text = ""
         intervals [794]:
             xmin = 466.180
-            xmax = 466.920
+            xmax = 466.940
             text = "tsatiwhsvhi"
         intervals [795]:
-            xmin = 466.920
+            xmin = 466.940
             xmax = 467.300
             text = ""
         intervals [796]:
@@ -11084,10 +11056,10 @@ item []:
             text = ""
         intervals [798]:
             xmin = 468.600
-            xmax = 469.400
+            xmax = 469.420
             text = "tstlvkv'i"
         intervals [799]:
-            xmin = 469.400
+            xmin = 469.420
             xmax = 470.120
             text = ""
         intervals [800]:
@@ -11100,10 +11072,10 @@ item []:
             text = ""
         intervals [802]:
             xmin = 470.980
-            xmax = 471.680
+            xmax = 471.700
             text = "khaneke'i"
         intervals [803]:
-            xmin = 471.680
+            xmin = 471.700
             xmax = 472.280
             text = ""
         intervals [804]:
@@ -11172,10 +11144,10 @@ item []:
             text = ""
         intervals [820]:
             xmin = 483.000
-            xmax = 483.360
+            xmax = 483.380
             text = "tsetsi"
         intervals [821]:
-            xmin = 483.360
+            xmin = 483.380
             xmax = 483.860
             text = ""
         intervals [822]:
@@ -11364,10 +11336,10 @@ item []:
             text = ""
         intervals [868]:
             xmin = 510.040
-            xmax = 510.200
+            xmax = 510.220
             text = "ale"
         intervals [869]:
-            xmin = 510.200
+            xmin = 510.220
             xmax = 510.440
             text = ""
         intervals [870]:
@@ -11500,10 +11472,10 @@ item []:
             text = ""
         intervals [902]:
             xmin = 526.960
-            xmax = 527.820
+            xmax = 527.840
             text = "taniyvhkv'i"
         intervals [903]:
-            xmin = 527.820
+            xmin = 527.840
             xmax = 528.320
             text = ""
         intervals [904]:
@@ -11576,10 +11548,10 @@ item []:
             text = ""
         intervals [921]:
             xmin = 538.860
-            xmax = 539.520
+            xmax = 539.540
             text = "akeyhutsa"
         intervals [922]:
-            xmin = 539.520
+            xmin = 539.540
             xmax = 540.300
             text = ""
         intervals [923]:
@@ -11612,10 +11584,10 @@ item []:
             text = ""
         intervals [930]:
             xmin = 547.680
-            xmax = 547.860
+            xmax = 547.880
             text = "hi'a"
         intervals [931]:
-            xmin = 547.860
+            xmin = 547.880
             xmax = 547.940
             text = ""
         intervals [932]:
@@ -11684,10 +11656,10 @@ item []:
             text = ""
         intervals [948]:
             xmin = 553.200
-            xmax = 553.960
+            xmax = 553.980
             text = "tuthinhvhse"
         intervals [949]:
-            xmin = 553.960
+            xmin = 553.980
             xmax = 554.860
             text = ""
         intervals [950]:
@@ -11716,10 +11688,10 @@ item []:
             text = ""
         intervals [956]:
             xmin = 556.320
-            xmax = 556.980
+            xmax = 557.000
             text = "akeyhutsa"
         intervals [957]:
-            xmin = 556.980
+            xmin = 557.000
             xmax = 557.300
             text = ""
         intervals [958]:
@@ -11764,10 +11736,10 @@ item []:
             text = ""
         intervals [968]:
             xmin = 562.640
-            xmax = 563.180
+            xmax = 563.200
             text = "thalita"
         intervals [969]:
-            xmin = 563.180
+            xmin = 563.200
             xmax = 563.600
             text = ""
         intervals [970]:
@@ -11788,10 +11760,10 @@ item []:
             text = ""
         intervals [974]:
             xmin = 565.000
-            xmax = 566.020
+            xmax = 566.040
             text = "anhelvhthanvhi"
         intervals [975]:
-            xmin = 566.020
+            xmin = 566.040
             xmax = 566.160
             text = ""
         intervals [976]:
@@ -11852,10 +11824,10 @@ item []:
             text = ""
         intervals [990]:
             xmin = 573.320
-            xmax = 573.700
-            text = "iyvt"
+            xmax = 573.760
+            text = "iyvtv"
         intervals [991]:
-            xmin = 573.700
+            xmin = 573.760
             xmax = 574.140
             text = ""
         intervals [992]:
@@ -11876,18 +11848,18 @@ item []:
             text = ""
         intervals [996]:
             xmin = 576.620
-            xmax = 576.820
+            xmax = 576.840
             text = "ale"
         intervals [997]:
-            xmin = 576.820
+            xmin = 576.840
             xmax = 577.000
             text = ""
         intervals [998]:
             xmin = 577.000
-            xmax = 577.740
+            xmax = 577.760
             text = "uwetole'i"
         intervals [999]:
-            xmin = 577.740
+            xmin = 577.760
             xmax = 578.580
             text = ""
         intervals [1000]:
@@ -11908,10 +11880,10 @@ item []:
             text = ""
         intervals [1004]:
             xmin = 581.280
-            xmax = 581.880
+            xmax = 581.900
             text = "kehse'i"
         intervals [1005]:
-            xmin = 581.880
+            xmin = 581.900
             xmax = 582.780
             text = ""
         intervals [1006]:
@@ -11968,45 +11940,45 @@ item []:
             text = "utolehohihstiyi"
         intervals [1019]:
             xmin = 592.980
-            xmax = 593.700
+            xmax = 593.080
             text = ""
         intervals [1020]:
-            xmin = 593.700
-            xmax = 594.120
+            xmin = 593.080
+            xmax = 593.560
             text = "nhski"
         intervals [1021]:
-            xmin = 594.120
-            xmax = 594.960
+            xmin = 593.560
+            xmax = 593.600
             text = ""
         intervals [1022]:
-            xmin = 594.960
-            xmax = 595.140
+            xmin = 593.600
+            xmax = 593.660
             text = "ale"
         intervals [1023]:
-            xmin = 595.140
-            xmax = 595.400
+            xmin = 593.660
+            xmax = 593.680
             text = ""
         intervals [1024]:
-            xmin = 595.400
-            xmax = 596.800
-            text = "unhetsekohuhsti"
+            xmin = 593.680
+            xmax = 594.120
+            text = "unetsekhuhsti"
         intervals [1025]:
-            xmin = 596.800
-            xmax = 597.320
+            xmin = 594.120
+            xmax = 594.180
             text = ""
         intervals [1026]:
-            xmin = 597.320
-            xmax = 597.960
-            text = "ulhstayvhti"
+            xmin = 594.180
+            xmax = 595.280
+            text = "ulhstayvti"
         intervals [1027]:
-            xmin = 597.960
-            xmax = 598.560
+            xmin = 595.280
+            xmax = 595.400
             text = ""
         intervals [1028]:
-            xmin = 598.560
-            xmax = 599.540
-            text = "uninehtiyi"
+            xmin = 595.400
+            xmax = 595.880
+            text = "unnhetyi"
         intervals [1029]:
-            xmin = 599.540
-            xmax = 599.640
+            xmin = 595.880
+            xmax = 595.980
             text = ""
