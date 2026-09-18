@@ -333,7 +333,11 @@ def test_realign_book_single_chapter(tmp_path: Path, monkeypatch):
     assert "has_anomalies" in records[0]
     assert (alignments_dir / "mark_alignment_records.json").exists()
     assert (train_csvs_dir / "mark.csv").exists()
-    assert (split_dir / "mark_01_01.wav").exists()
+    # Deferred slicing only exports WAV if verse is clean (TASK-348.3)
+    if records[0]["has_anomalies"]:
+        assert not (split_dir / "mark_01_01.wav").exists()
+    else:
+        assert (split_dir / "mark_01_01.wav").exists()
 
 
 def test_realign_book_flags_and_excludes_anomaly_verse_from_train_csv(
@@ -342,7 +346,7 @@ def test_realign_book_flags_and_excludes_anomaly_verse_from_train_csv(
     """
     Test that when an aligned chunk has flagged words (e.g. transcript typo/low confidence),
     the verse is marked with has_anomalies: True in alignment records and is NOT added
-    to the generated training CSV (mark.csv).
+    to the generated training CSV (mark.csv), and audio slicing is deferred/skipped.
     """
     import csv
     import scripts.realign_bible as rb
@@ -493,13 +497,17 @@ def test_realign_book_flags_and_excludes_anomaly_verse_from_train_csv(
     assert any("mark_01_02.wav" in r["path"] for r in rows_on_disk)
     assert not any("mark_01_01.wav" in r["path"] for r in rows_on_disk)
 
+    # Sliced audio: anomalous verse 020101 is NOT exported to disk, clean verse 020102 IS exported
+    assert not (split_dir / "mark_01_01.wav").exists()
+    assert (split_dir / "mark_01_02.wav").exists()
+
 
 def test_realign_book_excludes_verse_with_missing_emitted_text_from_train_csv(
     tmp_path: Path, monkeypatch
 ):
     """
     Test that when an aligned chunk has no emitted_text (empty or whitespace),
-    it is excluded from training CSV export with no fallback to phonetic text.
+    it is excluded from training CSV export and audio slicing with no fallback to phonetic text.
     """
     import csv
     import scripts.realign_bible as rb
@@ -620,6 +628,10 @@ def test_realign_book_excludes_verse_with_missing_emitted_text_from_train_csv(
     assert len(rows_on_disk) == 1
     assert any("mark_01_02.wav" in r["path"] for r in rows_on_disk)
     assert not any("mark_01_01.wav" in r["path"] for r in rows_on_disk)
+
+    # Sliced audio: missing emission verse 020101 is NOT exported to disk, valid emission verse 020102 IS exported
+    assert not (split_dir / "mark_01_01.wav").exists()
+    assert (split_dir / "mark_01_02.wav").exists()
 
 
 def test_align_chapter_forwards_intrusive_and_phonotactic_parameters(

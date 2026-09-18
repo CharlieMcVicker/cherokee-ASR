@@ -923,3 +923,51 @@ def test_syncope_class_prevents_kwo_vowel_clipping():
     nahskwo_class = next(w for w in res_class if w.word == "nahskwo")
     # Class syncope pooling retains 'o' on canonical path
     assert nahskwo_class.emitted_word == "nahskwo"
+
+
+def test_extract_word_intervals_vectorized_confidence():
+    """Verify vectorized _extract_word_intervals correctly computes peaks, confidence, and min_char_prob."""
+    aligner = CTCSegmentationAligner(
+        config=CTCAlignerConfig(flag_min_confidence=0.5, flag_min_char_confidence=0.4)
+    )
+    words = ["test", "word"]
+    # timings: for word 0, char_start_idx:end_idx = 1:5; for word 1, 6:10
+    timings = np.array([0.0, 0.1, 0.2, 0.3, 0.4, 0.0, 0.6, 0.7, 0.8, 0.9])
+    utt_indices = [0, 5, 10]
+    # state_list has 50 frames
+    state_list = ["ε"] * 50
+    # word 0 occupies frames 5 to 20 (0.1s to 0.4s + 0.02s => frames 5 to 21)
+    state_list[7] = "t"
+    state_list[12] = "e"
+    state_list[16] = "s"
+    state_list[19] = "t"
+
+    # log-probabilities: np.log([0.9, 0.8, 0.7, 0.6])
+    char_probs = np.full(50, -2.0, dtype=np.float32)
+    # peaks for t, e, s, t:
+    char_probs[7] = float(np.log(0.9))
+    char_probs[12] = float(np.log(0.8))
+    char_probs[16] = float(np.log(0.7))
+    char_probs[19] = float(np.log(0.6))
+
+    intervals = aligner._extract_word_intervals(
+        words=words,
+        timings=timings,
+        char_probs=char_probs,
+        state_list=state_list,
+        utt_indices=utt_indices,
+        start_word_idx=0,
+        dur_sec=2.0,
+    )
+
+    assert len(intervals) == 2
+    w0 = intervals[0]
+    assert w0.word == "test"
+    assert w0.emitted_word == "test"
+    assert w0.flagged is False
+    expected_peaks = [np.log(0.9), np.log(0.8), np.log(0.7), np.log(0.6)]
+    expected_word_conf = float(np.exp(np.mean(expected_peaks)))
+    expected_min_char = 0.6
+    assert np.isclose(w0.confidence, expected_word_conf, atol=1e-4)
+    assert w0.min_char_confidence is not None
+    assert np.isclose(w0.min_char_confidence, expected_min_char, atol=1e-4)

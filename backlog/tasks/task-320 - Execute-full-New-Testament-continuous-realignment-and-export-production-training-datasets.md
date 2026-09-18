@@ -3,11 +3,11 @@ id: TASK-320
 title: >-
   Execute full New Testament continuous realignment and export production
   training datasets
-status: In Progress
+status: Done
 assignee:
   - '@myself'
 created_date: '2026-09-14 13:09'
-updated_date: '2026-09-16 17:22'
+updated_date: '2026-09-18 13:26'
 labels: []
 dependencies: []
 ordinal: 336000

@@ -159,6 +159,7 @@ def realign_book(
             aligner_config=aligner_config,
         )
 
+        ch_lpz, _, _ = ctc_aligner.get_logits_cached(audio_path)
         audio_seg = (
             AudioSegment.from_file(str(audio_path))
             .set_frame_rate(16000)
@@ -187,20 +188,24 @@ def realign_book(
 
             split_out_path = SPLIT_AUDIO_DIR / split_filename
 
-            # Slicing unclipped verse audio using natural inter-verse boundary partition points
-            start_ms = int(start_sec * 1000)
-            end_ms = int(end_sec * 1000)
-            if end_ms <= start_ms:
+            # Greedy decoding from cached chapter lpz matrix without forward passes
+            start_f = max(0, int(round(start_sec / ctc_aligner.index_duration)))
+            end_f = min(
+                ch_lpz.shape[0],
+                max(start_f + 1, int(round(end_sec / ctc_aligner.index_duration))),
+            )
+            if end_f <= start_f or start_sec >= end_sec:
                 print(
-                    f"    [Warning] Skipping zero or negative duration audio slice for {verse_id}: [{start_sec}s - {end_sec}s]"
+                    f"    [Warning] Skipping zero or negative duration verse for {verse_id}: [{start_sec}s - {end_sec}s]"
                 )
                 greedy_sentence = ""
                 greedy_conf = 0.0
             else:
-                verse_audio = audio_seg[start_ms:end_ms]
-                verse_audio.export(str(split_out_path), format="wav")
+                verse_lpz = ch_lpz[start_f:end_f]
                 try:
-                    greedy_res = ctc_aligner.model.transcribe(str(split_out_path))
+                    greedy_res = ctc_aligner.model.decode(
+                        verse_lpz, compute_word_confidences=False
+                    )
                     greedy_sentence = clean_punctuation_and_whitespace(
                         strip_tones_and_colons(greedy_res.text)
                     )
@@ -264,15 +269,20 @@ def realign_book(
             }
             records.append(record)
 
-            # Only export non-anomalous verses with valid emitted text to the training dataset.
+            # Only export audio slice and training CSV row for non-anomalous verses with valid emitted text.
             # Strict quality control: no fallback to phonetic text. If emitted_text is missing or anomalous, do not export.
             if not chunk.has_anomalies and emitted_sentence:
-                csv_rows.append(
-                    {
-                        "path": f"cherokee_new_testament/split_audio/{split_filename}",
-                        "sentence": emitted_sentence,
-                    }
-                )
+                start_ms = int(start_sec * 1000)
+                end_ms = int(end_sec * 1000)
+                if end_ms > start_ms:
+                    verse_audio = audio_seg[start_ms:end_ms]
+                    verse_audio.export(str(split_out_path), format="wav")
+                    csv_rows.append(
+                        {
+                            "path": f"cherokee_new_testament/split_audio/{split_filename}",
+                            "sentence": emitted_sentence,
+                        }
+                    )
             elif not emitted_sentence:
                 print(
                     f"    [Missing Emission Filtered] Excluded verse {verse_id} from training CSV due to missing emitted text."

@@ -7,6 +7,7 @@ segmentation with workshop-transcription alignment domain models and pipelines.
 """
 
 import hashlib
+import itertools
 import logging
 import os
 from pathlib import Path
@@ -381,6 +382,8 @@ class CTCSegmentationAligner:
         """
         word_intervals: List[WordInterval] = []
         prev_end = initial_prev_end
+        char_probs_flat = np.asarray(char_probs).ravel()
+        timings_arr = np.asarray(timings)
 
         for local_w_i, raw_w in enumerate(words):
             global_w_i = start_word_idx + local_w_i
@@ -388,27 +391,24 @@ class CTCSegmentationAligner:
             end_idx = utt_indices[global_w_i + 1]
             char_start_idx = min(start_idx + 1, end_idx)
 
-            # ctc_segmentation initializes unvisited trellis character slots to 0.0.
-            # Valid character alignments have t > 0.0, except possibly the very first
-            # character of the first word at frame 0 if aligned to non-blank acoustic state.
-            w_timings = [
-                t
-                for idx, t in enumerate(timings[char_start_idx:end_idx])
-                if t > 0.0
-                or (
+            sub_timings = timings_arr[char_start_idx:end_idx]
+            if len(sub_timings) > 0:
+                mask = sub_timings > 0.0
+                if (
                     global_w_i == 0
-                    and idx == 0
-                    and t == 0.0
                     and len(state_list) > 0
                     and state_list[0] not in ("", "ε", "[PAD]")
-                )
-            ]
+                ):
+                    mask[0] = True
+                w_timings = sub_timings[mask]
+            else:
+                w_timings = np.array([], dtype=timings_arr.dtype)
 
-            if w_timings:
-                raw_w_start = min(w_timings)
-                raw_w_end = max(w_timings) + self.index_duration
-                if end_idx < len(timings) and timings[end_idx] > 0.0:
-                    raw_w_end = max(raw_w_end, float(timings[end_idx]))
+            if len(w_timings) > 0:
+                raw_w_start = float(np.min(w_timings))
+                raw_w_end = float(np.max(w_timings)) + self.index_duration
+                if end_idx < len(timings_arr) and timings_arr[end_idx] > 0.0:
+                    raw_w_end = max(raw_w_end, float(timings_arr[end_idx]))
 
                 w_start = max(
                     0.0, min(dur_sec, round(raw_w_start - lead_offset_sec, 3))
@@ -418,34 +418,33 @@ class CTCSegmentationAligner:
                 )
                 start_f = int(round(raw_w_start / self.index_duration))
                 end_f = int(round(raw_w_end / self.index_duration))
-                emitted_chars = [
-                    s
-                    for s in state_list[start_f : max(start_f + 1, end_f)]
-                    if s and s != "ε" and s != "[PAD]"
-                ]
+                f_stop = min(len(state_list), max(start_f + 1, end_f))
+                sub_states = (
+                    state_list[start_f:f_stop] if start_f < len(state_list) else []
+                )
+                sub_probs = (
+                    char_probs_flat[start_f:f_stop]
+                    if start_f < len(char_probs_flat)
+                    else np.array([])
+                )
+
+                emitted_chars = [s for s in sub_states if s and s not in ("ε", "[PAD]")]
                 emitted_w = "".join(emitted_chars) or raw_w
 
                 char_peaks: List[float] = []
-                current_char: Optional[str] = None
-                current_lps: List[float] = []
-
-                for f in range(start_f, max(start_f + 1, end_f)):
-                    s = state_list[f] if f < len(state_list) else ""
-                    if s and s not in ("ε", "[PAD]"):
-                        if s == current_char:
-                            current_lps.append(float(char_probs[f]))
-                        else:
-                            if current_char is not None and current_lps:
-                                char_peaks.append(max(current_lps))
-                            current_char = s
-                            current_lps = [float(char_probs[f])]
-                    else:
-                        if current_char is not None and current_lps:
-                            char_peaks.append(max(current_lps))
-                            current_char = None
-                            current_lps = []
-                if current_char is not None and current_lps:
-                    char_peaks.append(max(current_lps))
+                offset = 0
+                for s, group in itertools.groupby(sub_states):
+                    group_len = sum(1 for _ in group)
+                    if s and s not in ("ε", "[PAD]") and offset < len(sub_probs):
+                        peak = float(
+                            np.max(
+                                sub_probs[
+                                    offset : min(offset + group_len, len(sub_probs))
+                                ]
+                            )
+                        )
+                        char_peaks.append(peak)
+                    offset += group_len
 
                 if char_peaks:
                     mean_logprob = float(np.mean(char_peaks))
