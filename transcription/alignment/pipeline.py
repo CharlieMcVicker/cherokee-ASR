@@ -29,6 +29,7 @@ from transcription.alignment.extractors import (
     ASREmissionsExtractor,
     CherokeeASRExtractor,
 )
+from transcription.alignment.arpabet import SyntheticTargetProjectorProtocol
 from transcription.alignment.ingestion import (
     load_syllabary_transcript,
     prepare_alignment_input,
@@ -54,8 +55,16 @@ def _build_syllabary_word_tier(
     for chunk in alignment.aligned_chunks:
         syll_chunk_str = syllabary_lookup.get(chunk.chunk_id, "")
         s_words = syll_chunk_str.split()
-        for w_idx, w in enumerate(chunk.words):
-            syll_w = s_words[w_idx] if w_idx < len(s_words) else w.word
+        syll_idx = 0
+        for w in chunk.words:
+            k = max(1, len(w.word.split())) if w.word else 1
+            if s_words and syll_idx < len(s_words):
+                syll_w = " ".join(s_words[syll_idx : syll_idx + k])
+                syll_idx += k
+            elif s_words and syll_idx >= len(s_words):
+                syll_w = s_words[-1]
+            else:
+                syll_w = w.word
             syllabary_words.append(
                 WordInterval(
                     word=syll_w,
@@ -67,6 +76,43 @@ def _build_syllabary_word_tier(
                 )
             )
     return syllabary_words
+
+
+def _build_english_word_tier(
+    alignment: AlignmentOutput,
+    source_lookup: Dict[str, Dict[str, Any]],
+) -> List[WordInterval]:
+    """
+    Builds a list of WordIntervals containing English words/names from code-switched tokens
+    mapped to aligned word timestamps. Non-English intervals contain empty strings.
+    """
+    english_words: List[WordInterval] = []
+    for chunk in alignment.aligned_chunks:
+        meta = source_lookup.get(chunk.chunk_id, {})
+        cs_meta = meta.get("code_switched")
+        tokens = cs_meta.get("tokens", []) if isinstance(cs_meta, dict) else []
+        tok_idx = 0
+        for w in chunk.words:
+            k = max(1, len(w.word.split())) if w.word else 1
+            eng_parts = []
+            if tokens and tok_idx < len(tokens):
+                for t in tokens[tok_idx : tok_idx + k]:
+                    stem = t.get("english_stem")
+                    if stem:
+                        eng_parts.append(stem)
+                tok_idx += k
+            eng_w = " ".join(eng_parts) if eng_parts else ""
+            english_words.append(
+                WordInterval(
+                    word=eng_w,
+                    start_sec=w.start_sec,
+                    end_sec=w.end_sec,
+                    confidence=w.confidence,
+                    flagged=w.flagged,
+                    emitted_word=w.emitted_word,
+                )
+            )
+    return english_words
 
 
 def align_syllabary_greedy(
@@ -83,6 +129,8 @@ def align_syllabary_greedy(
     textgrid_filename: str = "greedy_alignment.TextGrid",
     manifest_filename: str = "alignment_manifest.json",
     emissions_extractor: Optional[ASREmissionsExtractor] = None,
+    projector: Optional[SyntheticTargetProjectorProtocol] = None,
+    code_switched: bool = False,
 ) -> AlignmentOutput:
     """
     Aligns Cherokee audio against a syllabary transcript using the established
@@ -104,11 +152,15 @@ def align_syllabary_greedy(
         textgrid_filename: Name of the generated TextGrid file (default: greedy_alignment.TextGrid).
         manifest_filename: Name of the generated JSON manifest (default: alignment_manifest.json).
         emissions_extractor: Optional custom ASREmissionsExtractor.
+        projector: Optional SyntheticTargetProjectorProtocol instance.
+        code_switched: Whether to enable code-switched English projection (defaults to False).
 
     Returns:
         AlignmentOutput object with aligned chunks, word intervals, metrics, and tiers.
     """
-    chunks, source_lookup = load_syllabary_transcript(transcript)
+    chunks, source_lookup = load_syllabary_transcript(
+        transcript, projector=projector, code_switched=code_switched
+    )
 
     if emissions_extractor is not None:
         extractor = emissions_extractor
@@ -143,6 +195,10 @@ def align_syllabary_greedy(
     additional_word_tiers: Dict[str, Sequence[WordInterval]] = {
         "Syllabary Words": syllabary_words_tier,
     }
+
+    if code_switched:
+        english_words_tier = _build_english_word_tier(alignment, source_lookup)
+        additional_word_tiers["English Words"] = english_words_tier
 
     if reconcile:
         reconciled_words = reconcile_alignment_words(alignment, syllabary_lookup)
@@ -186,6 +242,8 @@ def align_syllabary_ctc(
     export_manifest: bool = True,
     textgrid_filename: str = "ctc_alignment.TextGrid",
     manifest_filename: str = "alignment_manifest.json",
+    projector: Optional[SyntheticTargetProjectorProtocol] = None,
+    code_switched: bool = False,
 ) -> AlignmentOutput:
     """
     Aligns Cherokee audio against a syllabary transcript using the syncope-
@@ -205,11 +263,15 @@ def align_syllabary_ctc(
         export_manifest: Whether to export alignment_manifest.json when output_dir is provided.
         textgrid_filename: Name of the generated TextGrid file (default: ctc_alignment.TextGrid).
         manifest_filename: Name of the generated JSON manifest (default: alignment_manifest.json).
+        projector: Optional SyntheticTargetProjectorProtocol instance.
+        code_switched: Whether to enable code-switched English projection (defaults to False).
 
     Returns:
         AlignmentOutput object with CTC-segmented aligned chunks, word intervals, and tiers.
     """
-    chunks, source_lookup = load_syllabary_transcript(transcript)
+    chunks, source_lookup = load_syllabary_transcript(
+        transcript, projector=projector, code_switched=code_switched
+    )
 
     asr_model = model
     if asr_model is None:
@@ -240,6 +302,10 @@ def align_syllabary_ctc(
     additional_word_tiers: Dict[str, Sequence[WordInterval]] = {
         "Syllabary Words": syllabary_words_tier,
     }
+
+    if code_switched:
+        english_words_tier = _build_english_word_tier(alignment, source_lookup)
+        additional_word_tiers["English Words"] = english_words_tier
 
     if reconcile:
         reconciled_words = reconcile_alignment_words(alignment, syllabary_lookup)

@@ -148,10 +148,46 @@ def test_cli_main_argument_parsing(tmp_path):
                 audio_path="audio.wav",
                 bible_metadata_path=None,
                 chunk_list_path=str(chunks_path),
+                transcript_path=None,
                 output_dir=out_dir,
                 export_praat=True,
                 model_path=None,
                 skip_vad=True,
                 debug_export=True,
                 reconcile=True,
+                code_switched=False,
+            )
+
+
+def test_cli_main_code_switched(tmp_path):
+    transcript_path = tmp_path / "transcript.txt"
+    transcript_path.write_text("ᎯᎠ coffee ᎠᎩᏚᎵ")
+    out_dir = str(tmp_path / "out_cs")
+
+    test_args = [
+        "align_cli",
+        "--audio",
+        "audio.wav",
+        "--transcript",
+        str(transcript_path),
+        "--code-switched",
+        "--output-dir",
+        out_dir,
+    ]
+
+    with patch.object(sys, "argv", test_args):
+        with patch("transcription.alignment.cli.run_alignment_pipeline") as mock_run:
+            main()
+            mock_run.assert_called_once_with(
+                audio_path="audio.wav",
+                bible_metadata_path=None,
+                chunk_list_path=None,
+                transcript_path=str(transcript_path),
+                output_dir=out_dir,
+                export_praat=True,
+                model_path=None,
+                skip_vad=False,
+                debug_export=False,
+                reconcile=False,
+                code_switched=True,
             )

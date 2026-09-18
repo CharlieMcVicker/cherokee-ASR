@@ -73,7 +73,8 @@ flowchart TD
 | Extractors | [`extractors.py`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/extractors.py) | `ASREmissionsExtractor` protocol, `CherokeeASRExtractor`, `CallbackEmissionsExtractor`, `PrecomputedEmissionsExtractor`, `prepare_audio_chunks`. |
 | Metrics | [`distance_metrics.py`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/distance_metrics.py) | `DistanceMetric` protocol, `DefaultCERDistanceMetric`, `LevenshteinDistanceMetric`, `CustomCallableDistanceMetric`, `calculate_cer`. |
 | Normalizers | [`normalizers.py`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/normalizers.py) | `normalize_syllabary_for_alignment` (aspiration stripped), `normalize_phonetics_for_alignment` (aspiration preserved), and `normalize_text_for_alignment` (compat alias). |
-| Ingestion | [`ingestion.py`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/ingestion.py) | `prepare_alignment_input` (sum-type dispatcher & normalizer resolver), `load_bible_chunks`, and `load_generic_chunks`. |
+| Ingestion | [`ingestion.py`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/ingestion.py) | `prepare_alignment_input` (sum-type dispatcher & normalizer resolver), `load_bible_chunks`, `load_generic_chunks`, `load_syllabary_transcript`, and `load_interview_transcript`. |
+| Code-Switching | [`arpabet/projector.py`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/arpabet/projector.py) | `SyntheticTargetProjector`, `get_default_projector`, O(1) static dictionary lookup (`english_loanwords_tth.json`), dynamic G2P + confusion matrix argmax mapping, and `normalize_code_switched_text`. |
 | Reconciliation | [`reconciliation.py`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/reconciliation.py) | `reconcile_word_intervals`, `reconcile_alignment_words`, `reconcile_alignment_by_chunk`. |
 | Exporters | [`exporters.py`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/exporters.py) | `export_manifest`, `export_textgrid` (multi-tier Praat), `export_debug_json`. |
 | Thresholding | [`threshold_finder.py`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/threshold_finder.py) | `AlignmentThresholdFinder`, interactive binary search CLI, and threshold metrics exporter. |
@@ -554,6 +555,105 @@ chunks, source_lookup = load_bible_chunks(
 
 ---
 
+### `load_syllabary_transcript`
+
+Ingests Cherokee Syllabary transcripts (or mixed Cherokee/English code-switched text) from plain text strings, `.txt` files, JSON files, or chunk lists into normalized [`TextChunk`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/models.py#L21-L27) lists:
+
+```python
+from transcription.alignment.ingestion import load_syllabary_transcript
+
+chunks, source_lookup = load_syllabary_transcript(
+    source="data/transcripts/elders_meeting.txt",
+    code_switched=True,  # Projects English words into synthetic TTH phonetics
+)
+```
+
+- **Cherokee Syllabary Words**: Converted to canonical Cherokee TTH (`Orthography.TTH`) via `normalize_syllabary_for_alignment`.
+- **English Code-Switched Words**: Projected into synthetic Cherokee TTH phonetics via `SyntheticTargetProjector`.
+
+---
+
+### `load_interview_transcript`
+
+Ingests dialogue and interview transcripts formatted as `'Speaker: Spoken text'`, preserving speaker identity in metadata while extracting cleaned speech turns:
+
+```python
+from transcription.alignment.ingestion import load_interview_transcript
+
+chunks, source_lookup = load_interview_transcript(
+    source="Speaker 1: ᎯᎠ coffee ᎠᎩᏚᎵ\nSpeaker 2: ᎥᎥ, hospital ᏫᏥᎦ",
+    code_switched=True,
+)
+```
+
+---
+
+### Code-Switched Ingestion & Synthetic Target Projection (`transcription.alignment.arpabet.projector`)
+
+When Cherokee speakers code-switch or use English loanwords (e.g., *coffee*, *hospital*, *doctor*, *car*), standard ASR and alignment pipelines fail because Latin English spellings do not match the Cherokee acoustic model's emission vocabulary.
+
+The projector module translates English text -> ARPAbet -> synthetic Cherokee TTH targets using:
+1. **O(1) Static Memoized Dictionary**: Precomputed mappings for 3,662+ high-frequency English words and loanwords serialized at `data/arpabet_alignment/dictionaries/english_loanwords_tth.json`.
+2. **Fallback Dynamic G2P**: Converts OOV English words to standardized 39-phoneme ARPAbet via `g2p_en`.
+3. **Calibrated Confusion Matrix Argmax Projection**: Maps each ARPAbet phoneme to the highest-probability Cherokee phone using an empirical `AcousticConfusionMatrix` trained via iterative Expectation-Maximization (EM).
+4. **Strict Cherokee Phonetic Invariance**: Completely eliminates non-Cherokee consonants (`d`, `g`, `ch`, `j`), enforces pre-aspiration `hs`, and formats outputs in canonical `T/TH` acoustic phonetics.
+
+#### Programmatic Example
+
+```python
+from transcription.alignment.arpabet import (
+    get_default_projector,
+    normalize_code_switched_text,
+    project_english_text,
+    project_english_word,
+)
+
+# 1. Project single English word
+target = project_english_word("coffee")
+print(target.projected_tth)     # "khasi"
+print(target.syllabary)         # "ᎧᏏ"
+print(target.confidence_score)   # 0.789
+
+# 2. Project full English sentence
+synth_tth = project_english_text("the hospital")
+print(synth_tth)  # "ta hahsthitaw"
+
+# 3. Normalize mixed Cherokee/English code-switched string
+mixed = "ᎯᎠ coffee ᎠᎩᏚᎵ"
+norm_tth = normalize_code_switched_text(mixed)
+print(norm_tth)  # "hi'a khasi akituli"
+```
+
+### Code-Switching Ground Truth Preparer (`transcription.alignment.arpabet.codeswitched_preparer`)
+
+For dialogue transcripts with mixed Syllabary, English loanwords, speaker prefixes, and compound clitics (e.g. *JayᎢ* -> English 'Jay' + Syllabary 'Ꭲ'), `create_groundtruth_for_code_switched_syllabary` performs script-level token discrimination with zero double conversion.
+
+```python
+from transcription.alignment.arpabet import (
+    create_groundtruth_for_code_switched_syllabary,
+    split_compound_clitic,
+    TokenType,
+)
+
+# 1. Segment compound tokens with English stems and Syllabary clitics
+stem, clitic = split_compound_clitic("JayᎢ")
+print(stem, clitic)  # ("Jay", "Ꭲ")
+
+# 2. Prepare code-switched line with speaker prefix stripping and zero double conversion
+line = "Guy: ᎯᎠ Guy Soldier ᏓᏩᏙ JayᎢ ᏂᏛᎩᎶᏒ"
+res = create_groundtruth_for_code_switched_syllabary(line, strip_speaker=True)
+
+print(res.speaker)      # "Guy"
+print(res.unified_tth)  # "hi'a ka hsowtsa tawato tsei nitvkilohsv"
+
+# 3. Access multi-tier word metadata
+print(res.syllabary_tier_tokens)   # ("ᎯᎠ", "ᏓᏩᏙ", "JayᎢ", "ᏂᏛᎩᎶᏒ")
+print(res.english_tier_tokens)     # ("Guy", "Soldier", "Jay")
+print(res.reconciled_tier_tokens)  # ("hi'a", "ka", "hsowtsa", "tawato", "tsei", "nitvkilohsv")
+```
+
+---
+
 ## 7. Syllabary Phonetic Reconciliation (`transcription.alignment.reconciliation`)
 
 Spoken Cherokee frequently undergoes phonological processes (vowel syncopation, pre-aspiration, post-vocalic aspiration) that cause acoustic pronunciations to diverge from base transliterations.
@@ -772,6 +872,8 @@ The `align-cherokee` command is registered in `pyproject.toml` and points to [`t
 | Audio File | `--audio` | `str` (required) | Path to input audio file (`.wav`, `.mp3`). |
 | Chunk List | `--chunk-list` | `str` (mutually exclusive) | Path to generic chunk list JSON (e.g. story chunks). |
 | Bible Metadata | `--bible-metadata` / `--metadata` | `str` (mutually exclusive) | Path to Bible metadata JSON dictionary. |
+| Transcript | `--transcript` | `str` (mutually exclusive) | Path to Cherokee Syllabary or code-switched transcript file (`.txt`, `.json`). |
+| Code-Switching | `--code-switched` | `flag` (default: `False`) | Enable code-switched English-to-Cherokee synthetic target projection. |
 | Output Directory | `--output-dir` | `str` (required) | Directory where artifacts will be saved. |
 | Praat Export | `--export-praat` | `flag` (default: `True`) | Export Praat `.TextGrid` file. |
 | Custom Model | `--model-path` | `str` (optional) | Custom Wav2Vec2 checkpoint path or Hugging Face repo ID. |
@@ -818,6 +920,16 @@ align-cherokee \
   --chunk-list "data/processed/chunks.json" \
   --output-dir "output/custom_run" \
   --model-path "output_w2v2/checkpoint-800"
+```
+
+#### 5. Align Code-Switched Transcript (`--code-switched`)
+```bash
+align-cherokee \
+  --audio "data/raw/interview_recording.wav" \
+  --transcript "data/transcripts/elders_meeting.txt" \
+  --code-switched \
+  --output-dir "output/code_switched" \
+  --reconcile
 ```
 
 ---

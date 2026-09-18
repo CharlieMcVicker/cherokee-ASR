@@ -7,6 +7,13 @@ import os
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
+from transcription.alignment.arpabet import (
+    CodeSwitchedLineResult,
+    SyntheticTargetProjectorProtocol,
+    create_groundtruth_for_code_switched_syllabary,
+    get_default_projector,
+    normalize_code_switched_text,
+)
 from transcription.alignment.models import TextChunk
 from transcription.alignment.normalizers import (
     normalize_phonetics_for_alignment,
@@ -174,6 +181,11 @@ def load_generic_chunks(
 def prepare_alignment_input(
     bible_metadata: Optional[Union[str, Dict[str, Any], List[Dict[str, Any]]]] = None,
     chunk_list: Optional[Union[str, List[Dict[str, Any]], Dict[str, Any]]] = None,
+    transcript: Optional[
+        Union[str, Path, List[str], List[Dict[str, Any]], Dict[str, Any]]
+    ] = None,
+    projector: Optional[SyntheticTargetProjectorProtocol] = None,
+    code_switched: bool = False,
 ) -> Tuple[
     List[TextChunk],
     Dict[str, Dict[str, Any]],
@@ -181,12 +193,19 @@ def prepare_alignment_input(
     Callable[[str], str],
 ]:
     """
-    Ingests alignment input from either Bible verse metadata or generic chunk list sources,
-    resolving the appropriate representation-aware text normalizers for chunks and emissions.
+    Ingests alignment input from either Bible verse metadata, generic chunk list sources,
+    or plain/code-switched syllabary transcripts, resolving the appropriate representation-aware
+    text normalizers for chunks and emissions.
+
+    When code_switched=True or a projector is provided, English words in the transcript
+    are projected into synthetic Cherokee TTH phonetics using the projector.
 
     Args:
         bible_metadata: Path to Bible metadata JSON, or dictionary/list of Bible verse metadata items.
         chunk_list: Path to generic chunk list JSON, or list/dictionary of chunk items.
+        transcript: Path or in-memory Cherokee Syllabary / code-switched transcript.
+        projector: Optional SyntheticTargetProjectorProtocol instance.
+        code_switched: Whether to enable code-switched English projection (defaults to False).
 
     Returns:
         A tuple of (chunks, source_lookup, chunk_normalizer, emissions_normalizer):
@@ -196,30 +215,92 @@ def prepare_alignment_input(
             emissions_normalizer: Callable[[str], str] normalizer strategy for ASR token emissions.
 
     Raises:
-        ValueError: If neither or both input sources are provided.
+        ValueError: If neither or multiple input sources are provided.
     """
-    if bible_metadata is not None and chunk_list is not None:
-        raise ValueError("Cannot provide both bible_metadata and chunk_list.")
+    sources_count = sum(x is not None for x in (bible_metadata, chunk_list, transcript))
+    if sources_count == 0:
+        raise ValueError("Either bible_metadata or chunk_list must be provided.")
+    if sources_count > 1:
+        if bible_metadata is not None and chunk_list is not None:
+            raise ValueError("Cannot provide both bible_metadata and chunk_list.")
+        raise ValueError(
+            "Cannot provide multiple input sources to prepare_alignment_input."
+        )
 
-    if bible_metadata is not None:
-        chunks, source_lookup = load_bible_chunks(
-            bible_metadata, normalizer=normalize_phonetics_for_alignment
+    active_projector: Optional[SyntheticTargetProjectorProtocol] = projector
+    if code_switched and active_projector is None:
+        active_projector = get_default_projector()
+
+    if transcript is not None:
+        chunks, source_lookup = load_syllabary_transcript(
+            transcript,
+            normalizer=normalize_syllabary_for_alignment,
+            projector=active_projector,
+            code_switched=code_switched,
+        )
+        chunk_norm: Callable[[str], str] = (
+            (
+                lambda t: create_groundtruth_for_code_switched_syllabary(
+                    t, projector=active_projector
+                ).unified_tth
+            )
+            if code_switched and active_projector is not None
+            else (
+                (
+                    lambda t: normalize_code_switched_text(
+                        t,
+                        normalizer=normalize_syllabary_for_alignment,
+                        projector=active_projector,
+                    )
+                )
+                if active_projector is not None
+                else normalize_syllabary_for_alignment
+            )
         )
         return (
             chunks,
             source_lookup,
+            chunk_norm,
             normalize_phonetics_for_alignment,
+        )
+
+    if bible_metadata is not None:
+        chunk_norm = (
+            (
+                lambda t: normalize_code_switched_text(
+                    t,
+                    normalizer=normalize_phonetics_for_alignment,
+                    projector=active_projector,
+                )
+            )
+            if active_projector is not None
+            else normalize_phonetics_for_alignment
+        )
+        chunks, source_lookup = load_bible_chunks(bible_metadata, normalizer=chunk_norm)
+        return (
+            chunks,
+            source_lookup,
+            chunk_norm,
             normalize_phonetics_for_alignment,
         )
 
     if chunk_list is not None:
-        chunks, source_lookup = load_generic_chunks(
-            chunk_list, normalizer=normalize_phonetics_for_alignment
+        chunk_norm = (
+            (
+                lambda t: normalize_code_switched_text(
+                    t,
+                    normalizer=normalize_phonetics_for_alignment,
+                    projector=active_projector,
+                )
+            )
+            if active_projector is not None
+            else normalize_phonetics_for_alignment
         )
+        chunks, source_lookup = load_generic_chunks(chunk_list, normalizer=chunk_norm)
         return (
             chunks,
             source_lookup,
-            normalize_phonetics_for_alignment,
+            chunk_norm,
             normalize_phonetics_for_alignment,
         )
 
@@ -229,6 +310,8 @@ def prepare_alignment_input(
 def load_syllabary_transcript(
     source: Union[str, Path, List[str], List[Dict[str, Any]], Dict[str, Any]],
     normalizer: Callable[[str], str] = normalize_syllabary_for_alignment,
+    projector: Optional[SyntheticTargetProjectorProtocol] = None,
+    code_switched: bool = False,
 ) -> Tuple[List[TextChunk], Dict[str, Dict[str, Any]]]:
     """
     Ingests Cherokee Syllabary transcripts (or mixed Cherokee/English code-switched text)
@@ -240,6 +323,8 @@ def load_syllabary_transcript(
                 or dictionary of chunks.
         normalizer: Function to convert syllabary text into canonical TTH phonetics.
                     Defaults to normalize_syllabary_for_alignment.
+        projector: Optional SyntheticTargetProjectorProtocol instance.
+        code_switched: Whether to enable code-switched English projection (defaults to False).
 
     Returns:
         A tuple of (chunks, source_lookup) where:
@@ -247,6 +332,35 @@ def load_syllabary_transcript(
             source_lookup: Dict[str, Dict[str, Any]] mapping chunk_id to metadata dictionaries
                            with keys 'syllabary', 'text', 'phonetic', etc.
     """
+    active_projector = projector
+    if code_switched and active_projector is None:
+        active_projector = get_default_projector()
+
+    if code_switched and active_projector is not None:
+        effective_norm: Callable[[str], str] = (
+            lambda s: create_groundtruth_for_code_switched_syllabary(
+                s, projector=active_projector
+            ).unified_tth
+        )
+    elif active_projector is not None:
+        effective_norm: Callable[[str], str] = lambda s: normalize_code_switched_text(
+            s, normalizer=normalizer, projector=active_projector
+        )
+    else:
+        effective_norm = normalizer
+
+    def _build_metadata(text_val: str, norm_val: str) -> Dict[str, Any]:
+        meta: Dict[str, Any] = {
+            "syllabary": text_val,
+            "text": text_val,
+            "phonetic": norm_val,
+        }
+        if code_switched and active_projector is not None:
+            meta["code_switched"] = create_groundtruth_for_code_switched_syllabary(
+                text_val, projector=active_projector
+            ).to_dict()
+        return meta
+
     chunks: List[TextChunk] = []
     source_lookup: Dict[str, Dict[str, Any]] = {}
 
@@ -256,38 +370,40 @@ def load_syllabary_transcript(
             if s_str.endswith(".json"):
                 with open(s_str, "r", encoding="utf-8") as f:
                     data = json.load(f)
-                return load_syllabary_transcript(data, normalizer=normalizer)
+                return load_syllabary_transcript(
+                    data,
+                    normalizer=normalizer,
+                    projector=active_projector,
+                    code_switched=code_switched,
+                )
             else:
                 with open(s_str, "r", encoding="utf-8") as f:
                     content = f.read()
                 lines = [line.strip() for line in content.splitlines() if line.strip()]
                 for idx, line in enumerate(lines, 1):
                     cid = f"chunk_{idx:03d}"
-                    norm = normalizer(line)
+                    norm = effective_norm(line)
                     chunks.append(TextChunk(chunk_id=cid, text=norm))
-                    source_lookup[cid] = {
-                        "syllabary": line,
-                        "text": line,
-                        "phonetic": norm,
-                    }
+                    source_lookup[cid] = _build_metadata(line, norm)
                 return chunks, source_lookup
         elif s_str.startswith("{") or s_str.startswith("["):
             try:
                 data = json.loads(s_str)
-                return load_syllabary_transcript(data, normalizer=normalizer)
+                return load_syllabary_transcript(
+                    data,
+                    normalizer=normalizer,
+                    projector=active_projector,
+                    code_switched=code_switched,
+                )
             except Exception:
                 pass
 
         lines = [line.strip() for line in s_str.splitlines() if line.strip()]
         for idx, line in enumerate(lines, 1):
             cid = f"chunk_{idx:03d}"
-            norm = normalizer(line)
+            norm = effective_norm(line)
             chunks.append(TextChunk(chunk_id=cid, text=norm))
-            source_lookup[cid] = {
-                "syllabary": line,
-                "text": line,
-                "phonetic": norm,
-            }
+            source_lookup[cid] = _build_metadata(line, norm)
         return chunks, source_lookup
 
     elif isinstance(source, list):
@@ -308,23 +424,25 @@ def load_syllabary_transcript(
                         ),
                     )
                 ).strip()
-                norm = normalizer(raw_syll)
+                norm = effective_norm(raw_syll)
                 chunks.append(TextChunk(chunk_id=cid, text=norm))
                 meta = dict(item)
                 meta["syllabary"] = raw_syll
                 meta["text"] = raw_syll
                 meta["phonetic"] = norm
+                if code_switched and active_projector is not None:
+                    meta["code_switched"] = (
+                        create_groundtruth_for_code_switched_syllabary(
+                            raw_syll, projector=active_projector
+                        ).to_dict()
+                    )
                 source_lookup[cid] = meta
             else:
                 line_str = str(item).strip()
                 cid = f"chunk_{idx:03d}"
-                norm = normalizer(line_str)
+                norm = effective_norm(line_str)
                 chunks.append(TextChunk(chunk_id=cid, text=norm))
-                source_lookup[cid] = {
-                    "syllabary": line_str,
-                    "text": line_str,
-                    "phonetic": norm,
-                }
+                source_lookup[cid] = _build_metadata(line_str, norm)
         return chunks, source_lookup
 
     elif isinstance(source, dict):
@@ -340,22 +458,24 @@ def load_syllabary_transcript(
                         ),
                     )
                 ).strip()
-                norm = normalizer(raw_syll)
+                norm = effective_norm(raw_syll)
                 chunks.append(TextChunk(chunk_id=cid_str, text=norm))
                 meta = dict(item)
                 meta["syllabary"] = raw_syll
                 meta["text"] = raw_syll
                 meta["phonetic"] = norm
+                if code_switched and active_projector is not None:
+                    meta["code_switched"] = (
+                        create_groundtruth_for_code_switched_syllabary(
+                            raw_syll, projector=active_projector
+                        ).to_dict()
+                    )
                 source_lookup[cid_str] = meta
             else:
                 raw_syll = str(item).strip()
-                norm = normalizer(raw_syll)
+                norm = effective_norm(raw_syll)
                 chunks.append(TextChunk(chunk_id=cid_str, text=norm))
-                source_lookup[cid_str] = {
-                    "syllabary": raw_syll,
-                    "text": raw_syll,
-                    "phonetic": norm,
-                }
+                source_lookup[cid_str] = _build_metadata(raw_syll, norm)
         return chunks, source_lookup
 
     raise ValueError(f"Unsupported transcript source type: {type(source)}")
@@ -364,6 +484,8 @@ def load_syllabary_transcript(
 def load_interview_transcript(
     source: Union[str, Path, List[str]],
     normalizer: Callable[[str], str] = normalize_syllabary_for_alignment,
+    projector: Optional[SyntheticTargetProjectorProtocol] = None,
+    code_switched: bool = False,
 ) -> Tuple[List[TextChunk], Dict[str, Dict[str, Any]]]:
     """
     Ingests dialogue and interview transcripts formatted as 'Speaker: Spoken text',
@@ -376,6 +498,8 @@ def load_interview_transcript(
         source: File path to transcript (.txt), raw multiline string, or list of line strings.
         normalizer: Function to convert syllabary text into canonical TTH phonetics.
                     Defaults to normalize_syllabary_for_alignment.
+        projector: Optional SyntheticTargetProjectorProtocol instance.
+        code_switched: Whether to enable code-switched English projection (defaults to False).
 
     Returns:
         A tuple of (chunks, source_lookup) where:
@@ -383,6 +507,23 @@ def load_interview_transcript(
             source_lookup: Dict[str, Dict[str, Any]] mapping turn ID to metadata dictionary with keys:
                            'speaker', 'syllabary', 'text', 'phonetic', 'raw_line', and 'line_number'.
     """
+    active_projector = projector
+    if code_switched and active_projector is None:
+        active_projector = get_default_projector()
+
+    if code_switched and active_projector is not None:
+        effective_norm: Callable[[str], str] = (
+            lambda s: create_groundtruth_for_code_switched_syllabary(
+                s, projector=active_projector
+            ).unified_tth
+        )
+    elif active_projector is not None:
+        effective_norm: Callable[[str], str] = lambda s: normalize_code_switched_text(
+            s, normalizer=normalizer, projector=active_projector
+        )
+    else:
+        effective_norm = normalizer
+
     if isinstance(source, (str, Path)):
         s_str = str(source).strip()
         if os.path.exists(s_str) and os.path.isfile(s_str):
@@ -426,10 +567,10 @@ def load_interview_transcript(
 
         cid = f"turn_{chunk_idx:03d}"
         chunk_idx += 1
-        norm_phonetic = normalizer(text_to_process)
+        norm_phonetic = effective_norm(text_to_process)
 
         chunks.append(TextChunk(chunk_id=cid, text=norm_phonetic))
-        source_lookup[cid] = {
+        turn_meta: Dict[str, Any] = {
             "speaker": current_speaker,
             "syllabary": text_to_process,
             "text": text_to_process,
@@ -437,6 +578,11 @@ def load_interview_transcript(
             "raw_line": stripped,
             "line_number": line_num,
         }
+        if code_switched and active_projector is not None:
+            turn_meta["code_switched"] = create_groundtruth_for_code_switched_syllabary(
+                text_to_process, projector=active_projector
+            ).to_dict()
+        source_lookup[cid] = turn_meta
 
     return chunks, source_lookup
 

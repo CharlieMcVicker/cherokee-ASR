@@ -1,0 +1,921 @@
+# -*- coding: utf-8 -*-
+"""
+transcription.alignment.arpabet.matrix module.
+
+Articulatory phonetic seed initialization, Numba-accelerated Wagner-Fischer
+dynamic programming alignment, and iterative Expectation-Maximization (EM)
+statistical matrix estimation for ARPAbet-to-Cherokee phonetic mapping.
+
+Follows Types and Maps architectural principles:
+- Deterministic articulatory distance mappings based on place and manner of articulation.
+- Numba JIT-compiled dynamic programming kernel for microsecond-scale word alignment.
+- Confidence-weighted iterative EM frequency accumulation converging P(Cherokee | ARPAbet),
+  epenthetic insertion costs, and coda deletion costs in 3-5 cycles.
+- Transition probability pruning (< 5%) with normalized negative log-cost serialization.
+"""
+
+from __future__ import annotations
+
+import argparse
+from datetime import datetime, timezone
+import logging
+import math
+from pathlib import Path
+from typing import (
+    Any,
+    Dict,
+    Iterable,
+    List,
+    Optional,
+    Sequence,
+    Set,
+    Tuple,
+    Union,
+)
+
+import numba
+import numpy as np
+
+from transcription.alignment.arpabet.dataset import load_words_manifest
+from transcription.alignment.arpabet.inference import sanitize_model_id
+from transcription.alignment.arpabet.types import (
+    CANONICAL_CHEROKEE_CONSONANTS,
+    CANONICAL_CHEROKEE_PHONEMES,
+    CANONICAL_CHEROKEE_VOWELS,
+    STANDARD_ARPABET_CONSONANTS,
+    STANDARD_ARPABET_PHONEMES,
+    STANDARD_ARPABET_VOWELS,
+    AcousticConfusionMatrix,
+    AlignedTokenPair,
+    ArpabetToken,
+    CherokeeToken,
+    InferenceCacheManifest,
+    TracebackAlignerProtocol,
+    TracebackAlignmentResult,
+    WordInferenceCacheEntry,
+    WordManifestEntry,
+)
+
+logger = logging.getLogger(__name__)
+
+
+# ============================================================================
+# 1. Articulatory Phonetic Distance Tables
+# ============================================================================
+
+# Explicit place and manner distances between ARPAbet and Cherokee phonemes.
+# Close matches: 0.2 - 0.5. Distant same-category matches: 1.0 - 1.8. Cross-category: 2.4.
+ARTICULATORY_FEATURE_DISTANCES: Dict[str, Dict[str, float]] = {
+    # ------------------------------------------------------------------------
+    # ARPAbet Vowels (15)
+    # ------------------------------------------------------------------------
+    "AA": {"a": 0.2, "o": 0.5, "v": 0.7, "e": 1.2, "u": 1.4, "i": 1.6},
+    "AE": {"a": 0.2, "e": 0.4, "v": 0.7, "i": 1.0, "o": 1.5, "u": 1.7},
+    "AH": {"a": 0.2, "v": 0.3, "o": 0.5, "e": 0.6, "u": 1.0, "i": 1.2},
+    "AO": {"o": 0.2, "a": 0.4, "u": 0.5, "v": 0.7, "e": 1.4, "i": 1.6},
+    "AW": {"a": 0.3, "u": 0.4, "o": 0.5, "w": 0.6, "v": 0.7, "e": 1.4, "i": 1.5},
+    "AY": {"a": 0.3, "i": 0.4, "e": 0.4, "y": 0.6, "v": 0.8, "o": 1.4, "u": 1.6},
+    "EH": {"e": 0.2, "a": 0.4, "i": 0.6, "v": 0.8, "o": 1.4, "u": 1.6},
+    "ER": {"v": 0.3, "e": 0.4, "a": 0.5, "l": 0.8, "o": 1.0, "u": 1.2, "i": 1.2},
+    "EY": {"e": 0.2, "i": 0.4, "a": 0.6, "v": 0.9, "o": 1.5, "u": 1.7},
+    "IH": {"i": 0.2, "e": 0.4, "a": 0.8, "v": 0.9, "u": 1.2, "o": 1.5},
+    "IY": {"i": 0.2, "e": 0.5, "y": 0.6, "a": 1.2, "v": 1.4, "u": 1.5, "o": 1.8},
+    "OW": {"o": 0.2, "u": 0.4, "w": 0.6, "a": 0.8, "v": 0.9, "e": 1.5, "i": 1.8},
+    "OY": {"o": 0.3, "i": 0.4, "e": 0.5, "u": 0.7, "a": 0.8, "y": 0.6},
+    "UH": {"u": 0.2, "o": 0.4, "v": 0.6, "a": 0.9, "e": 1.4, "i": 1.5},
+    "UW": {"u": 0.2, "o": 0.4, "w": 0.5, "v": 0.7, "a": 1.2, "e": 1.5, "i": 1.8},
+    # ------------------------------------------------------------------------
+    # ARPAbet Stops (Voiced & Voiceless) (6)
+    # ------------------------------------------------------------------------
+    "B": {"w": 0.3, "wh": 0.4, "t": 0.5, "k": 0.5, "th": 0.6, "kh": 0.6, "m": 0.6},
+    "D": {"t": 0.2, "th": 0.4, "ts": 0.5, "tsh": 0.6, "k": 0.8, "kh": 0.9},
+    "G": {"k": 0.2, "kw": 0.3, "kh": 0.4, "kwh": 0.5, "t": 0.8, "th": 0.9},
+    "P": {
+        "th": 0.3,
+        "t": 0.4,
+        "wh": 0.4,
+        "kh": 0.4,
+        "k": 0.5,
+        "w": 0.5,
+        "kwh": 0.5,
+        "kw": 0.6,
+    },
+    "T": {
+        "th": 0.2,
+        "t": 0.3,
+        "ts": 0.5,
+        "tsh": 0.5,
+        "s": 0.6,
+        "hs": 0.6,
+        "kh": 0.8,
+        "k": 0.9,
+    },
+    "K": {
+        "kh": 0.2,
+        "k": 0.3,
+        "kwh": 0.4,
+        "kw": 0.4,
+        "th": 0.8,
+        "t": 0.9,
+    },
+    # ------------------------------------------------------------------------
+    # ARPAbet Sibilants, Fricatives & Affricates (6)
+    # ------------------------------------------------------------------------
+    "CH": {"tsh": 0.2, "ts": 0.3, "s": 0.5, "hs": 0.5, "th": 0.7},
+    "JH": {"ts": 0.2, "tsh": 0.4, "s": 0.5, "hs": 0.5, "t": 0.7},
+    "S": {"s": 0.2, "hs": 0.3, "ts": 0.5, "tsh": 0.6, "th": 0.8},
+    "Z": {"s": 0.2, "hs": 0.3, "ts": 0.4, "tsh": 0.5},
+    "SH": {"s": 0.2, "hs": 0.3, "ts": 0.4, "tsh": 0.4},
+    "ZH": {"s": 0.3, "hs": 0.4, "ts": 0.3, "tsh": 0.4},
+    # ------------------------------------------------------------------------
+    # Dental & Labiodental Fricatives (4)
+    # ------------------------------------------------------------------------
+    "TH": {"th": 0.2, "t": 0.3, "s": 0.4, "hs": 0.4, "tsh": 0.6},
+    "DH": {"t": 0.2, "th": 0.3, "s": 0.4, "hs": 0.4, "ts": 0.5},
+    "F": {
+        "wh": 0.3,
+        "w": 0.4,
+        "h": 0.4,
+        "hs": 0.5,
+        "th": 0.5,
+        "s": 0.6,
+        "kh": 0.6,
+    },
+    "V": {"w": 0.3, "wh": 0.4, "t": 0.6, "k": 0.6, "m": 0.6},
+    # ------------------------------------------------------------------------
+    # Nasals (3)
+    # ------------------------------------------------------------------------
+    "M": {"m": 0.2, "n": 0.5, "nh": 0.6, "w": 0.7},
+    "N": {"n": 0.2, "nh": 0.4, "m": 0.5, "l": 0.7},
+    "NG": {"n": 0.3, "nh": 0.4, "k": 0.5, "kh": 0.6, "m": 0.6},
+    # ------------------------------------------------------------------------
+    # Liquids (2)
+    # ------------------------------------------------------------------------
+    "L": {"l": 0.2, "lh": 0.3, "tl": 0.4, "tlh": 0.5, "w": 0.7},
+    "R": {"l": 0.3, "lh": 0.4, "w": 0.4, "wh": 0.5, "tl": 0.6, "tlh": 0.7},
+    # ------------------------------------------------------------------------
+    # Glides & Laryngeals (3)
+    # ------------------------------------------------------------------------
+    "W": {"w": 0.2, "wh": 0.3, "kw": 0.4, "kwh": 0.5, "m": 0.7},
+    "Y": {"y": 0.2, "yh": 0.3, "ts": 0.6, "i": 0.8},
+    "HH": {"h": 0.2, "hs": 0.3, "'": 0.4, "wh": 0.5, "yh": 0.5},
+}
+
+
+def get_articulatory_distance(
+    arpabet_phone: str,
+    cherokee_phone: str,
+) -> float:
+    """
+    Computes articulatory distance between an ARPAbet phoneme and a Cherokee token.
+
+    Returns:
+        float distance value in [0.2, 2.4].
+    """
+    a = arpabet_phone.upper()
+    c = cherokee_phone.lower()
+
+    # Check explicit mapped distances
+    if a in ARTICULATORY_FEATURE_DISTANCES:
+        if c in ARTICULATORY_FEATURE_DISTANCES[a]:
+            return ARTICULATORY_FEATURE_DISTANCES[a][c]
+
+    is_a_vowel = a in STANDARD_ARPABET_VOWELS
+    is_c_vowel = c in CANONICAL_CHEROKEE_VOWELS
+
+    # Cross-category penalty
+    if is_a_vowel != is_c_vowel:
+        return 2.4
+
+    # Unmapped same-category defaults
+    return 1.5 if is_a_vowel else 1.8
+
+
+# ============================================================================
+# 2. Articulatory Seed Matrix Builder
+# ============================================================================
+
+
+def build_articulatory_seed_matrix(
+    arpabet_phonemes: Optional[Sequence[str]] = None,
+    cherokee_phonemes: Optional[Sequence[str]] = None,
+    model_id: str = "articulatory_seed",
+    temperature: float = 0.5,
+) -> AcousticConfusionMatrix:
+    """
+    Builds an initial AcousticConfusionMatrix using articulatory phonetic feature similarity.
+
+    Maps place and manner of articulation into normalized conditional probabilities
+    P(Cherokee | ARPAbet) to guarantee immediate EM convergence without degenerate vowel collapse.
+
+    Args:
+        arpabet_phonemes: Optional sequence of ARPAbet phoneme symbols (defaults to STANDARD_ARPABET_PHONEMES).
+        cherokee_phonemes: Optional sequence of Cherokee phoneme symbols (defaults to CANONICAL_CHEROKEE_PHONEMES).
+        model_id: Model identifier string.
+        temperature: Softmax scaling temperature for distance-to-probability mapping (default 0.5).
+
+    Returns:
+        Initialized AcousticConfusionMatrix instance with precomputed log costs.
+    """
+    arp_vocab: Tuple[str, ...] = (
+        tuple(arpabet_phonemes)
+        if arpabet_phonemes is not None
+        else STANDARD_ARPABET_PHONEMES
+    )
+    chr_vocab: Tuple[str, ...] = (
+        tuple(cherokee_phonemes)
+        if cherokee_phonemes is not None
+        else CANONICAL_CHEROKEE_PHONEMES
+    )
+
+    # 1. Compute substitution conditional probabilities P(Cherokee | ARPAbet)
+    probabilities: Dict[str, Dict[str, float]] = {}
+    for a in arp_vocab:
+        weights: Dict[str, float] = {}
+        for c in chr_vocab:
+            dist = get_articulatory_distance(a, c)
+            weights[c] = math.exp(-dist / max(temperature, 1e-4))
+
+        sum_w = sum(weights.values())
+        probabilities[a] = {c: w / sum_w for c, w in weights.items()}
+
+    # 2. Compute epenthetic insertion probabilities P(Cherokee | <eps>)
+    # Cherokee has strong CV phonotactics; epenthetic vowels (i, a, u, v, e, o)
+    # and laryngeals (h, hs, ') are common insertion sites.
+    ins_weights: Dict[str, float] = {}
+    for c in chr_vocab:
+        if c == "i":
+            ins_weights[c] = 4.0
+        elif c == "a":
+            ins_weights[c] = 3.5
+        elif c in ("u", "v"):
+            ins_weights[c] = 2.5
+        elif c in ("e", "o"):
+            ins_weights[c] = 1.5
+        elif c in ("h", "hs", "'"):
+            ins_weights[c] = 1.0
+        else:
+            ins_weights[c] = 0.1
+
+    sum_ins = sum(ins_weights.values())
+    insertion_probabilities: Dict[str, float] = {
+        c: w / sum_ins for c, w in ins_weights.items()
+    }
+
+    # 3. Compute coda deletion probabilities P(<eps> | ARPAbet)
+    # English coda consonants (stops, fricatives, nasals, liquids) often drop in Cherokee acoustics.
+    deletion_probabilities: Dict[str, float] = {}
+    coda_frequent = {
+        "T",
+        "D",
+        "P",
+        "K",
+        "B",
+        "G",
+        "S",
+        "Z",
+        "SH",
+        "ZH",
+        "L",
+        "R",
+        "N",
+        "M",
+    }
+    weak_vowels = {"AH", "ER", "IH"}
+
+    for a in arp_vocab:
+        if a in coda_frequent:
+            deletion_probabilities[a] = 0.25
+        elif a in STANDARD_ARPABET_CONSONANTS:
+            deletion_probabilities[a] = 0.18
+        elif a in weak_vowels:
+            deletion_probabilities[a] = 0.10
+        else:
+            deletion_probabilities[a] = 0.05
+
+    return AcousticConfusionMatrix.create(
+        model_id=model_id,
+        probabilities=probabilities,
+        insertion_probabilities=insertion_probabilities,
+        deletion_probabilities=deletion_probabilities,
+        arpabet_vocab=arp_vocab,
+        cherokee_vocab=chr_vocab,
+        prune_threshold=0.05,
+        iteration=0,
+        metadata={"source": "articulatory_feature_seed", "temperature": temperature},
+    )
+
+
+# ============================================================================
+# 3. Numba-Accelerated Wagner-Fischer Kernel
+# ============================================================================
+
+
+@numba.njit
+def _wagner_fischer_kernel(
+    sub_costs: np.ndarray,
+    ins_costs: np.ndarray,
+    del_costs: np.ndarray,
+) -> Tuple[np.ndarray, np.ndarray]:
+    """
+    Numba JIT-compiled dynamic programming kernel for Wagner-Fischer traceback alignment.
+
+    Args:
+        sub_costs: 2D array of substitution costs of shape (N, M).
+        ins_costs: 1D array of insertion costs of shape (M,).
+        del_costs: 1D array of deletion costs of shape (N,).
+
+    Returns:
+        Tuple of:
+            - dp: 2D float64 array of shape (N + 1, M + 1) with minimum cumulative costs.
+            - backpointers: 2D int8 array of shape (N + 1, M + 1) where:
+                0 = start/boundary
+                1 = substitution (diagonal: i-1, j-1)
+                2 = deletion (up: i-1, j)
+                3 = insertion (left: i, j-1)
+    """
+    N, M = sub_costs.shape
+    dp = np.zeros((N + 1, M + 1), dtype=np.float64)
+    backpointers = np.zeros((N + 1, M + 1), dtype=np.int8)
+
+    for i in range(1, N + 1):
+        dp[i, 0] = dp[i - 1, 0] + del_costs[i - 1]
+        backpointers[i, 0] = 2  # del
+
+    for j in range(1, M + 1):
+        dp[0, j] = dp[0, j - 1] + ins_costs[j - 1]
+        backpointers[0, j] = 3  # ins
+
+    for i in range(1, N + 1):
+        for j in range(1, M + 1):
+            cost_sub = dp[i - 1, j - 1] + sub_costs[i - 1, j - 1]
+            cost_del = dp[i - 1, j] + del_costs[i - 1]
+            cost_ins = dp[i, j - 1] + ins_costs[j - 1]
+
+            best_cost = cost_sub
+            bp = 1  # sub
+            if cost_del < best_cost:
+                best_cost = cost_del
+                bp = 2  # del
+            if cost_ins < best_cost:
+                best_cost = cost_ins
+                bp = 3  # ins
+
+            dp[i, j] = best_cost
+            backpointers[i, j] = bp
+
+    return dp, backpointers
+
+
+# ============================================================================
+# 4. Confidence-Weighted DP Traceback Aligner
+# ============================================================================
+
+
+def align_word_pair(
+    arpabet_tokens: Sequence[Union[str, ArpabetToken]],
+    cherokee_tokens: Sequence[Union[str, CherokeeToken]],
+    matrix: AcousticConfusionMatrix,
+    token_confidences: Optional[Sequence[float]] = None,
+) -> TracebackAlignmentResult:
+    """
+    Performs dynamic programming (Wagner-Fischer) alignment between an ARPAbet phoneme sequence
+    and emitted Cherokee tokens using negative log-costs from AcousticConfusionMatrix.
+
+    Confidence weighting:
+    - Attaches token confidence to each AlignedTokenPair for subsequent weighted EM accumulation.
+    - Accurately recovers substitutions, epenthetic Cherokee insertions, and dropped English deletions.
+
+    Args:
+        arpabet_tokens: Sequence of input ARPAbet phonemes (strings or ArpabetToken).
+        cherokee_tokens: Sequence of emitted Cherokee phonemes (strings or CherokeeToken).
+        matrix: Calibrated or seeded AcousticConfusionMatrix.
+        token_confidences: Optional per-Cherokee-token confidence scores in [0.0, 1.0].
+
+    Returns:
+        TracebackAlignmentResult with aligned token pairs, total cost, and normalized cost.
+    """
+    # Normalize input tokens
+    arp_objs: List[ArpabetToken] = [
+        t if isinstance(t, ArpabetToken) else ArpabetToken(t)
+        for t in arpabet_tokens
+        if (t.phone if isinstance(t, ArpabetToken) else t)
+        not in ("", "<eps>", "<EPS>", "eps", "EPS")
+    ]
+    chr_objs: List[CherokeeToken] = [
+        t if isinstance(t, CherokeeToken) else CherokeeToken(t)
+        for t in cherokee_tokens
+        if (t.phone if isinstance(t, CherokeeToken) else t)
+        not in ("", "<eps>", "<EPS>", "eps", "EPS")
+    ]
+
+    N = len(arp_objs)
+    M = len(chr_objs)
+
+    # Normalize confidences for Cherokee emissions
+    confs: List[float] = (
+        list(token_confidences) if token_confidences is not None else []
+    )
+    if len(confs) < M:
+        confs.extend([1.0] * (M - len(confs)))
+
+    # Handle boundary conditions
+    if N == 0 and M == 0:
+        return TracebackAlignmentResult(
+            pairs=(),
+            total_cost=0.0,
+            normalized_cost=0.0,
+        )
+
+    if N == 0:
+        ins_pairs: List[AlignedTokenPair] = [
+            AlignedTokenPair(
+                arpabet=None,
+                cherokee=chr_objs[j],
+                cost=matrix.get_insertion_cost(chr_objs[j]),
+                confidence=confs[j],
+            )
+            for j in range(M)
+        ]
+        total_cost = sum(p.cost for p in ins_pairs)
+        return TracebackAlignmentResult(
+            pairs=tuple(ins_pairs),
+            total_cost=total_cost,
+            normalized_cost=total_cost / max(1, len(ins_pairs)),
+        )
+
+    if M == 0:
+        del_pairs: List[AlignedTokenPair] = [
+            AlignedTokenPair(
+                arpabet=arp_objs[i],
+                cherokee=None,
+                cost=matrix.get_deletion_cost(arp_objs[i]),
+                confidence=1.0,
+            )
+            for i in range(N)
+        ]
+        total_cost = sum(p.cost for p in del_pairs)
+        return TracebackAlignmentResult(
+            pairs=tuple(del_pairs),
+            total_cost=total_cost,
+            normalized_cost=total_cost / max(1, len(del_pairs)),
+        )
+
+    # Build cost arrays for Numba kernel
+    sub_costs = np.zeros((N, M), dtype=np.float64)
+    for i in range(N):
+        for j in range(M):
+            sub_costs[i, j] = matrix.get_substitution_cost(arp_objs[i], chr_objs[j])
+
+    del_costs = np.array(
+        [matrix.get_deletion_cost(arp_objs[i]) for i in range(N)],
+        dtype=np.float64,
+    )
+    ins_costs = np.array(
+        [matrix.get_insertion_cost(chr_objs[j]) for j in range(M)],
+        dtype=np.float64,
+    )
+
+    dp, backpointers = _wagner_fischer_kernel(sub_costs, ins_costs, del_costs)
+
+    # Traceback from (N, M) to (0, 0)
+    pairs: List[AlignedTokenPair] = []
+    i, j = N, M
+    while i > 0 or j > 0:
+        bp = backpointers[i, j]
+        if bp == 1:  # Substitution
+            pairs.append(
+                AlignedTokenPair(
+                    arpabet=arp_objs[i - 1],
+                    cherokee=chr_objs[j - 1],
+                    cost=float(sub_costs[i - 1, j - 1]),
+                    confidence=confs[j - 1],
+                )
+            )
+            i -= 1
+            j -= 1
+        elif bp == 2:  # Deletion
+            pairs.append(
+                AlignedTokenPair(
+                    arpabet=arp_objs[i - 1],
+                    cherokee=None,
+                    cost=float(del_costs[i - 1]),
+                    confidence=1.0,
+                )
+            )
+            i -= 1
+        elif bp == 3:  # Insertion
+            pairs.append(
+                AlignedTokenPair(
+                    arpabet=None,
+                    cherokee=chr_objs[j - 1],
+                    cost=float(ins_costs[j - 1]),
+                    confidence=confs[j - 1],
+                )
+            )
+            j -= 1
+        else:
+            break
+
+    pairs.reverse()
+    total_cost = float(dp[N, M])
+    normalized_cost = total_cost / max(1, len(pairs))
+
+    return TracebackAlignmentResult(
+        pairs=tuple(pairs),
+        total_cost=total_cost,
+        normalized_cost=normalized_cost,
+    )
+
+
+class WagnerFischerAligner:
+    """
+    Pure functional alignment service implementing TracebackAlignerProtocol.
+    """
+
+    def align(
+        self,
+        arpabet_tokens: Sequence[Union[str, ArpabetToken]],
+        cherokee_tokens: Sequence[Union[str, CherokeeToken]],
+        matrix: AcousticConfusionMatrix,
+        token_confidences: Optional[Sequence[float]] = None,
+    ) -> TracebackAlignmentResult:
+        """Aligns ARPAbet and Cherokee token sequences via Wagner-Fischer DP."""
+        return align_word_pair(
+            arpabet_tokens=arpabet_tokens,
+            cherokee_tokens=cherokee_tokens,
+            matrix=matrix,
+            token_confidences=token_confidences,
+        )
+
+
+# ============================================================================
+# 5. Iterative Expectation-Maximization (EM) Matrix Estimator
+# ============================================================================
+
+
+def train_acoustic_confusion_matrix(
+    manifest_entries: Union[
+        Sequence[WordManifestEntry], Path, str, List[Dict[str, Any]]
+    ],
+    emissions_manifest: Union[InferenceCacheManifest, Path, str, List[Dict[str, Any]]],
+    num_iterations: int = 4,
+    prune_threshold: float = 0.05,
+    seed_matrix: Optional[AcousticConfusionMatrix] = None,
+    model_id: Optional[str] = None,
+    alpha_prior: float = 0.05,
+) -> AcousticConfusionMatrix:
+    """
+    Trains an AcousticConfusionMatrix using iterative Expectation-Maximization (EM).
+
+    Algorithm:
+    1. Initialize from articulatory feature seed matrix (seed_matrix).
+    2. E-step: Aligns all dataset word pairs using current DP costs.
+       Accumulates confidence-weighted transition counts Count(Cherokee | ARPAbet),
+       epenthetic insertion counts Count(Cherokee | <eps>), and coda deletion counts Count(<eps> | ARPAbet).
+    3. M-step: Normalizes frequency counts into conditional probability distributions
+       P(Cherokee | ARPAbet), P(Cherokee | <eps>), and P(<eps> | ARPAbet).
+    4. Repeats for num_iterations cycles.
+    5. Pruning: Prunes transitions below prune_threshold (< 5%), re-normalizes surviving
+       distributions, and converts to negative log-costs.
+
+    Args:
+        manifest_entries: WordManifestEntry sequence, list of dicts, or path to words_manifest.json.
+        emissions_manifest: InferenceCacheManifest, list of dicts, or path to emissions cache JSON.
+        num_iterations: Number of EM cycles to run (default 4, typical 3-5).
+        prune_threshold: Minimum transition probability threshold to retain (default 0.05).
+        seed_matrix: Optional pre-initialized seed matrix. If None, builds articulatory seed.
+        model_id: Model identifier for metadata and serialization.
+        alpha_prior: Dirichlet prior smoothing weight to maintain stability for rare tokens (default 0.05).
+
+    Returns:
+        Finalized, pruned, and normalized AcousticConfusionMatrix.
+    """
+    # 1. Ingest Word Manifest
+    if isinstance(manifest_entries, (str, Path)):
+        word_entries = load_words_manifest(manifest_entries)
+    elif isinstance(manifest_entries, Sequence):
+        word_entries = [
+            e if isinstance(e, WordManifestEntry) else WordManifestEntry.from_dict(e)
+            for e in manifest_entries
+        ]
+    else:
+        raise TypeError(f"Unsupported manifest_entries type: {type(manifest_entries)}")
+
+    manifest_by_id: Dict[str, WordManifestEntry] = {e.clip_id: e for e in word_entries}
+
+    # 2. Ingest Emissions Cache Manifest
+    if isinstance(emissions_manifest, (str, Path)):
+        cache = InferenceCacheManifest.load(emissions_manifest)
+    elif isinstance(emissions_manifest, InferenceCacheManifest):
+        cache = emissions_manifest
+    elif isinstance(emissions_manifest, (list, tuple)):
+        entries = [
+            (
+                e
+                if isinstance(e, WordInferenceCacheEntry)
+                else WordInferenceCacheEntry.from_dict(e)
+            )
+            for e in emissions_manifest
+        ]
+        cache = InferenceCacheManifest(
+            model_id=model_id or "unknown_model",
+            created_at=datetime.now(timezone.utc).isoformat(),
+            entries=tuple(entries),
+        )
+    else:
+        raise TypeError(
+            f"Unsupported emissions_manifest type: {type(emissions_manifest)}"
+        )
+
+    emissions_by_id: Dict[str, WordInferenceCacheEntry] = cache.by_clip_id
+
+    effective_model_id = model_id or cache.model_id or "charliemcvicker_cherokee_asr"
+
+    # 3. Match paired data
+    paired_data: List[Tuple[Tuple[str, ...], Tuple[str, ...], Tuple[float, ...]]] = []
+    for clip_id, man_entry in manifest_by_id.items():
+        if clip_id in emissions_by_id:
+            em_entry = emissions_by_id[clip_id]
+            arp_phones = tuple(
+                tok.phone for tok in man_entry.arpabet if not tok.is_epsilon
+            )
+            chr_phones = tuple(
+                tok.phone for tok in em_entry.greedy_tokens if not tok.is_epsilon
+            )
+            confs = tuple(float(c) for c in em_entry.token_confidences)
+            if arp_phones or chr_phones:
+                paired_data.append((arp_phones, chr_phones, confs))
+
+    logger.info(
+        f"Initialized EM training with {len(paired_data)} word pairs for model '{effective_model_id}'."
+    )
+
+    # 4. Initialize current matrix from articulatory seed
+    current_matrix: AcousticConfusionMatrix = (
+        seed_matrix
+        if seed_matrix is not None
+        else build_articulatory_seed_matrix(model_id=effective_model_id)
+    )
+
+    arp_vocab: Tuple[str, ...] = current_matrix.arpabet_vocab
+    chr_vocab: Tuple[str, ...] = current_matrix.cherokee_vocab
+
+    last_delta: float = 0.0
+    mean_cost: float = 0.0
+
+    # 5. Run EM iterations
+    for iteration in range(1, num_iterations + 1):
+        # --------------------------------------------------------------------
+        # E-Step: Accumulate alignment counts
+        # --------------------------------------------------------------------
+        sub_counts: Dict[str, Dict[str, float]] = {
+            a: {c: 0.0 for c in chr_vocab} for a in arp_vocab
+        }
+        ins_counts: Dict[str, float] = {c: 0.0 for c in chr_vocab}
+        del_counts: Dict[str, float] = {a: 0.0 for a in arp_vocab}
+
+        total_cost_sum = 0.0
+        total_alignments = len(paired_data)
+
+        for arp_seq, chr_seq, confs in paired_data:
+            align_res = align_word_pair(
+                arp_seq, chr_seq, current_matrix, token_confidences=confs
+            )
+            total_cost_sum += align_res.total_cost
+
+            for pair in align_res.pairs:
+                if pair.is_substitution:
+                    assert pair.arpabet is not None and pair.cherokee is not None
+                    a_ph = pair.arpabet.phone
+                    c_ph = pair.cherokee.phone
+                    w = pair.confidence
+                    if a_ph in sub_counts and c_ph in sub_counts[a_ph]:
+                        sub_counts[a_ph][c_ph] += w
+                elif pair.is_insertion:
+                    assert pair.cherokee is not None
+                    c_ph = pair.cherokee.phone
+                    w = pair.confidence
+                    if c_ph in ins_counts:
+                        ins_counts[c_ph] += w
+                elif pair.is_deletion:
+                    assert pair.arpabet is not None
+                    a_ph = pair.arpabet.phone
+                    if a_ph in del_counts:
+                        del_counts[a_ph] += 1.0
+
+        mean_cost = total_cost_sum / max(1, total_alignments)
+
+        # --------------------------------------------------------------------
+        # M-Step: Re-estimate conditional probabilities
+        # --------------------------------------------------------------------
+        new_probabilities: Dict[str, Dict[str, float]] = {}
+        max_delta = 0.0
+
+        for a in arp_vocab:
+            new_probabilities[a] = {}
+            prior_map = current_matrix.probabilities.get(a, {})
+            # Effective counts with prior smoothing
+            effective_counts: Dict[str, float] = {
+                c: sub_counts[a][c]
+                + alpha_prior * prior_map.get(c, 1.0 / len(chr_vocab))
+                for c in chr_vocab
+            }
+            total_a = sum(effective_counts.values())
+            for c in chr_vocab:
+                p_new = effective_counts[c] / total_a
+                new_probabilities[a][c] = p_new
+                old_p = current_matrix.probabilities.get(a, {}).get(c, 0.0)
+                max_delta = max(max_delta, abs(p_new - old_p))
+
+        # Re-estimate insertion probabilities P(c | <eps>)
+        new_ins_probs: Dict[str, float] = {}
+        prior_ins = current_matrix.insertion_probabilities
+        eff_ins = {
+            c: ins_counts[c] + alpha_prior * prior_ins.get(c, 1.0 / len(chr_vocab))
+            for c in chr_vocab
+        }
+        tot_ins = sum(eff_ins.values())
+        for c in chr_vocab:
+            new_ins_probs[c] = eff_ins[c] / tot_ins
+
+        # Re-estimate deletion probabilities P(<eps> | a)
+        new_del_probs: Dict[str, float] = {}
+        prior_del = current_matrix.deletion_probabilities
+        for a in arp_vocab:
+            tot_sub_a = sum(sub_counts[a].values())
+            tot_a = tot_sub_a + del_counts[a]
+            if tot_a > 0:
+                new_del_probs[a] = (
+                    del_counts[a] + alpha_prior * prior_del.get(a, 0.1)
+                ) / (tot_a + alpha_prior)
+            else:
+                new_del_probs[a] = prior_del.get(a, 0.1)
+
+        last_delta = max_delta
+        logger.info(
+            f"EM Iteration {iteration}/{num_iterations}: delta={max_delta:.5f}, mean_cost={mean_cost:.3f}"
+        )
+
+        # Update matrix for next iteration
+        current_matrix = AcousticConfusionMatrix.create(
+            model_id=effective_model_id,
+            probabilities=new_probabilities,
+            insertion_probabilities=new_ins_probs,
+            deletion_probabilities=new_del_probs,
+            arpabet_vocab=arp_vocab,
+            cherokee_vocab=chr_vocab,
+            prune_threshold=prune_threshold,
+            iteration=iteration,
+            metadata={
+                "iteration": iteration,
+                "delta": max_delta,
+                "mean_cost": mean_cost,
+            },
+        )
+
+    # ------------------------------------------------------------------------
+    # Pruning & Normalization Step
+    # ------------------------------------------------------------------------
+    pruned_probabilities: Dict[str, Dict[str, float]] = {}
+    for a in arp_vocab:
+        raw_map = current_matrix.probabilities.get(a, {})
+        # Filter transitions above threshold
+        filtered = {c: p for c, p in raw_map.items() if p >= prune_threshold}
+        if not filtered:
+            # Fallback to argmax if everything was pruned
+            best_c, best_p = max(raw_map.items(), key=lambda kv: kv[1])
+            filtered = {best_c: best_p}
+
+        sum_f = sum(filtered.values())
+        pruned_probabilities[a] = {c: p / sum_f for c, p in filtered.items()}
+
+    # Prune insertion probabilities
+    raw_ins = current_matrix.insertion_probabilities
+    filtered_ins = {c: p for c, p in raw_ins.items() if p >= prune_threshold}
+    if not filtered_ins:
+        best_c, best_p = max(raw_ins.items(), key=lambda kv: kv[1])
+        filtered_ins = {best_c: best_p}
+    sum_ins_f = sum(filtered_ins.values())
+    pruned_insertion = {c: p / sum_ins_f for c, p in filtered_ins.items()}
+
+    # Clip deletion probabilities to valid probability range
+    pruned_deletion = {
+        a: max(0.01, min(0.99, p))
+        for a, p in current_matrix.deletion_probabilities.items()
+    }
+
+    final_matrix = AcousticConfusionMatrix.create(
+        model_id=effective_model_id,
+        probabilities=pruned_probabilities,
+        insertion_probabilities=pruned_insertion,
+        deletion_probabilities=pruned_deletion,
+        arpabet_vocab=arp_vocab,
+        cherokee_vocab=chr_vocab,
+        prune_threshold=prune_threshold,
+        iteration=num_iterations,
+        metadata={
+            "trained_on_pairs": len(paired_data),
+            "num_iterations": num_iterations,
+            "prune_threshold": prune_threshold,
+            "final_delta": last_delta,
+            "mean_cost": mean_cost,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+        },
+    )
+
+    return final_matrix
+
+
+# ============================================================================
+# 6. CLI Runner
+# ============================================================================
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Train and serialize ARPAbet-to-Cherokee empirical acoustic confusion matrix."
+    )
+    parser.add_argument(
+        "--manifest-path",
+        type=str,
+        default="data/arpabet_alignment/words_manifest.json",
+        help="Path to LibriSpeech words manifest JSON.",
+    )
+    parser.add_argument(
+        "--emissions-path",
+        type=str,
+        default="data/arpabet_alignment/cache/charliemcvicker_length-only-20260704-155307-asr-cherokee-colon_76e62140955f4738abdab345ea34068b02d8d2a2_emissions.json",
+        help="Path to cached ASR emissions manifest JSON.",
+    )
+    parser.add_argument(
+        "--output-dir",
+        type=str,
+        default="data/arpabet_alignment/matrices",
+        help="Directory to save the trained confusion matrix.",
+    )
+    parser.add_argument(
+        "--output-path",
+        type=str,
+        default=None,
+        help="Explicit output path for the serialized confusion matrix JSON.",
+    )
+    parser.add_argument(
+        "--num-iterations",
+        type=int,
+        default=4,
+        help="Number of Expectation-Maximization iterations (default: 4).",
+    )
+    parser.add_argument(
+        "--prune-threshold",
+        type=float,
+        default=0.05,
+        help="Probability threshold below which transitions are pruned (default: 0.05).",
+    )
+    return parser.parse_args()
+
+
+def main() -> None:
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+    )
+    args = parse_args()
+
+    manifest_p = Path(args.manifest_path)
+    emissions_p = Path(args.emissions_path)
+
+    if not manifest_p.exists():
+        raise FileNotFoundError(f"Words manifest not found: {manifest_p}")
+    if not emissions_p.exists():
+        raise FileNotFoundError(f"Emissions manifest not found: {emissions_p}")
+
+    logger.info(f"Loading emissions from {emissions_p}...")
+    cache = InferenceCacheManifest.load(emissions_p)
+    sanitized_id = sanitize_model_id(cache.model_id)
+
+    if args.output_path:
+        out_path = Path(args.output_path)
+    else:
+        out_dir = Path(args.output_dir)
+        out_dir.mkdir(parents=True, exist_ok=True)
+        out_path = out_dir / f"{sanitized_id}_confusion_matrix.json"
+
+    logger.info(f"Training acoustic confusion matrix for '{cache.model_id}'...")
+    matrix = train_acoustic_confusion_matrix(
+        manifest_entries=manifest_p,
+        emissions_manifest=cache,
+        num_iterations=args.num_iterations,
+        prune_threshold=args.prune_threshold,
+        model_id=cache.model_id,
+    )
+
+    logger.info(f"Saving confusion matrix to {out_path}...")
+    matrix.save(out_path)
+    logger.info(
+        f"Done! Trained matrix serialized successfully ({len(matrix.probabilities)} ARPAbet phonemes)."
+    )
+
+
+if __name__ == "__main__":
+    main()

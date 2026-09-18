@@ -194,6 +194,7 @@ def export_textgrid(
             tier_raw = [
                 {"start_sec": w.start_sec, "end_sec": w.end_sec, "text": w.word}
                 for w in word_seq
+                if w.word and w.word.strip()
             ]
             tier_intervals = _build_contiguous_intervals(tier_raw, total_end)
             extra_tiers_formatted.append((tier_name, tier_intervals))

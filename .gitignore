@@ -133,3 +133,7 @@ transcriber_dist
 # Large streaming evaluation cache & experiment runs
 *.jsonl
 runs/
+
+# Alignment datasets and local inference caches
+data/librispeech/
+data/arpabet_alignment/cache/
