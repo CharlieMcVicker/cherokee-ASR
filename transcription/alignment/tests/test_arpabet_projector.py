@@ -253,3 +253,32 @@ def test_prepare_alignment_input_code_switched(default_projector):
     assert len(chunks_c) == 2
     assert chunks_c[0].text == "hi'a khasi akituli"
     assert chunks_c[1].text == "hahsthitaw"
+
+
+def test_project_arpabet_multigram_viterbi():
+    """Verify 1,2-gram Viterbi projection selects multi-phone cluster targets."""
+    from transcription.alignment.arpabet.types import (
+        AcousticConfusionMatrix,
+        ArpabetToken,
+    )
+
+    # Matrix with 1-gram and 2-gram transitions
+    probs = {
+        "S": {"s": 0.8, "hs": 0.2},
+        "T": {"th": 0.7, "t": 0.3},
+        "AY": {"ai": 0.8, "a": 0.2},
+        "S T": {"hst": 0.9, "st": 0.1},
+    }
+    matrix = AcousticConfusionMatrix.create(
+        model_id="test_multigram",
+        probabilities=probs,
+    )
+    proj = SyntheticTargetProjector(matrix=matrix, dictionary={})
+
+    # Test diphthong 1->2 mapping
+    res_ay = proj.project_arpabet([ArpabetToken("AY")], matrix=matrix)
+    assert res_ay.projected_tth == "ai"
+
+    # Test 2-gram cluster S T -> hst
+    res_st = proj.project_arpabet([ArpabetToken("S"), ArpabetToken("T")], matrix=matrix)
+    assert res_st.projected_tth == "hst"

@@ -539,10 +539,47 @@ class InferenceCacheManifest:
 # ============================================================================
 
 
+def _normalize_arpabet_key(
+    arpabet: Union[str, ArpabetToken, Sequence[Union[str, ArpabetToken]]],
+) -> str:
+    """Normalizes an ARPAbet phoneme or sequence of phonemes into a lookup key."""
+    if isinstance(arpabet, str):
+        return arpabet.strip()
+    elif isinstance(arpabet, ArpabetToken):
+        return arpabet.phone
+    elif isinstance(arpabet, (list, tuple)):
+        return " ".join(
+            t.phone if isinstance(t, ArpabetToken) else str(t).strip()
+            for t in arpabet
+            if (t.phone if isinstance(t, ArpabetToken) else str(t).strip())
+            not in ("", "<eps>", "<EPS>", "eps", "EPS", EPSILON_TOKEN)
+        )
+    return str(arpabet)
+
+
+def _normalize_cherokee_key(
+    cherokee: Union[str, CherokeeToken, Sequence[Union[str, CherokeeToken]]],
+) -> str:
+    """Normalizes a Cherokee phoneme or sequence of phonemes into a target key."""
+    if isinstance(cherokee, str):
+        return cherokee.strip()
+    elif isinstance(cherokee, CherokeeToken):
+        return cherokee.phone
+    elif isinstance(cherokee, (list, tuple)):
+        return "".join(
+            t.phone if isinstance(t, CherokeeToken) else str(t).strip()
+            for t in cherokee
+            if (t.phone if isinstance(t, CherokeeToken) else str(t).strip())
+            not in ("", "<eps>", "<EPS>", "eps", "EPS", EPSILON_TOKEN)
+        )
+    return str(cherokee)
+
+
 @dataclass(frozen=True)
 class AcousticConfusionMatrix:
     """
     Empirical statistical mapping between ARPAbet tokens and Cherokee phonemes.
+    Supports both 1-gram and multi-gram (e.g. 1-to-2, 2-to-1, 2-to-2) transitions.
 
     Stores:
     - Conditional substitution probabilities: P(cherokee | arpabet)
@@ -649,66 +686,105 @@ class AcousticConfusionMatrix:
 
     def get_substitution_cost(
         self,
-        arpabet: Union[str, ArpabetToken],
-        cherokee: Union[str, CherokeeToken],
+        arpabet: Union[str, ArpabetToken, Sequence[Union[str, ArpabetToken]]],
+        cherokee: Union[str, CherokeeToken, Sequence[Union[str, CherokeeToken]]],
     ) -> float:
         """Returns substitution cost -log P(cherokee | arpabet)."""
-        a = arpabet.phone if isinstance(arpabet, ArpabetToken) else arpabet
-        c = cherokee.phone if isinstance(cherokee, CherokeeToken) else cherokee
+        a = _normalize_arpabet_key(arpabet)
+        c = _normalize_cherokee_key(cherokee)
         if a in self.log_costs and c in self.log_costs[a]:
             return self.log_costs[a][c]
+        # Fallback for unobserved 2-gram decomposition if present
+        tokens = a.split()
+        if len(tokens) == 2 and len(c) >= 2:
+            c1, c2 = c[:1], c[1:]
+            if tokens[0] in self.log_costs and tokens[1] in self.log_costs:
+                return self.get_substitution_cost(
+                    tokens[0], c1
+                ) + self.get_substitution_cost(tokens[1], c2)
         return self.default_substitution_cost
 
     def get_probability(
         self,
-        arpabet: Union[str, ArpabetToken],
-        cherokee: Union[str, CherokeeToken],
+        arpabet: Union[str, ArpabetToken, Sequence[Union[str, ArpabetToken]]],
+        cherokee: Union[str, CherokeeToken, Sequence[Union[str, CherokeeToken]]],
     ) -> float:
         """Returns conditional probability P(cherokee | arpabet)."""
-        a = arpabet.phone if isinstance(arpabet, ArpabetToken) else arpabet
-        c = cherokee.phone if isinstance(cherokee, CherokeeToken) else cherokee
+        a = _normalize_arpabet_key(arpabet)
+        c = _normalize_cherokee_key(cherokee)
         if a in self.probabilities and c in self.probabilities[a]:
             return self.probabilities[a][c]
         return 0.0
 
-    def get_insertion_cost(self, cherokee: Union[str, CherokeeToken]) -> float:
+    def has_transition(
+        self,
+        arpabet: Union[str, ArpabetToken, Sequence[Union[str, ArpabetToken]]],
+    ) -> bool:
+        """Returns True if the matrix contains transitions for the given phone or multi-gram key."""
+        a = _normalize_arpabet_key(arpabet)
+        return a in self.probabilities and len(self.probabilities[a]) > 0
+
+    def get_insertion_cost(
+        self,
+        cherokee: Union[str, CherokeeToken, Sequence[Union[str, CherokeeToken]]],
+    ) -> float:
         """Returns insertion cost -log P(cherokee | eps)."""
-        c = cherokee.phone if isinstance(cherokee, CherokeeToken) else cherokee
+        c = _normalize_cherokee_key(cherokee)
         return self.insertion_costs.get(c, self.default_insertion_cost)
 
-    def get_insertion_probability(self, cherokee: Union[str, CherokeeToken]) -> float:
+    def get_insertion_probability(
+        self,
+        cherokee: Union[str, CherokeeToken, Sequence[Union[str, CherokeeToken]]],
+    ) -> float:
         """Returns insertion probability P(cherokee | eps)."""
-        c = cherokee.phone if isinstance(cherokee, CherokeeToken) else cherokee
+        c = _normalize_cherokee_key(cherokee)
         return self.insertion_probabilities.get(c, 0.0)
 
-    def get_deletion_cost(self, arpabet: Union[str, ArpabetToken]) -> float:
+    def get_deletion_cost(
+        self,
+        arpabet: Union[str, ArpabetToken, Sequence[Union[str, ArpabetToken]]],
+    ) -> float:
         """Returns deletion cost -log P(eps | arpabet)."""
-        a = arpabet.phone if isinstance(arpabet, ArpabetToken) else arpabet
+        a = _normalize_arpabet_key(arpabet)
         return self.deletion_costs.get(a, self.default_deletion_cost)
 
-    def get_deletion_probability(self, arpabet: Union[str, ArpabetToken]) -> float:
+    def get_deletion_probability(
+        self,
+        arpabet: Union[str, ArpabetToken, Sequence[Union[str, ArpabetToken]]],
+    ) -> float:
         """Returns deletion probability P(eps | arpabet)."""
-        a = arpabet.phone if isinstance(arpabet, ArpabetToken) else arpabet
+        a = _normalize_arpabet_key(arpabet)
         return self.deletion_probabilities.get(a, 0.0)
 
-    def best_cherokee_for(self, arpabet: Union[str, ArpabetToken]) -> Tuple[str, float]:
+    def best_cherokee_for(
+        self,
+        arpabet: Union[str, ArpabetToken, Sequence[Union[str, ArpabetToken]]],
+    ) -> Tuple[str, float]:
         """
-        Returns the argmax Cherokee token and its probability for the given ARPAbet phoneme.
+        Returns the argmax Cherokee token sequence and its probability for the given ARPAbet phoneme(s).
         """
-        a = arpabet.phone if isinstance(arpabet, ArpabetToken) else arpabet
+        a = _normalize_arpabet_key(arpabet)
         targets = self.probabilities.get(a, {})
-        if not targets:
-            return ("", 0.0)
-        best_c, best_p = max(targets.items(), key=lambda kv: kv[1])
-        return (best_c, best_p)
+        if targets:
+            best_c, best_p = max(targets.items(), key=lambda kv: kv[1])
+            return (best_c, best_p)
+        tokens = a.split()
+        if len(tokens) > 1:
+            parts = [self.best_cherokee_for(t) for t in tokens]
+            best_c = "".join(p[0] for p in parts)
+            prob = float(math.prod([p[1] for p in parts])) if parts else 0.0
+            return (best_c, prob)
+        return ("", 0.0)
 
     def top_cherokee_candidates(
-        self, arpabet: Union[str, ArpabetToken], top_k: int = 3
+        self,
+        arpabet: Union[str, ArpabetToken, Sequence[Union[str, ArpabetToken]]],
+        top_k: int = 3,
     ) -> List[Tuple[str, float]]:
         """
         Returns top-k candidate Cherokee tokens and probabilities, sorted descending.
         """
-        a = arpabet.phone if isinstance(arpabet, ArpabetToken) else arpabet
+        a = _normalize_arpabet_key(arpabet)
         targets = self.probabilities.get(a, {})
         sorted_items = sorted(targets.items(), key=lambda kv: kv[1], reverse=True)
         return sorted_items[:top_k]
@@ -873,45 +949,108 @@ class SyntheticCherokeeTarget:
 @dataclass(frozen=True)
 class AlignedTokenPair:
     """
-    A single alignment step in DP traceback (substitution, insertion, or deletion).
+    A single alignment step in DP traceback (substitution, insertion, deletion,
+    or multi-gram joint transition).
     """
 
     arpabet: Optional[ArpabetToken] = None
     cherokee: Optional[CherokeeToken] = None
+    arpabet_tokens: Tuple[ArpabetToken, ...] = field(default_factory=tuple)
+    cherokee_tokens: Tuple[CherokeeToken, ...] = field(default_factory=tuple)
     cost: float = 0.0
     confidence: float = 1.0
 
+    def __post_init__(self) -> None:
+        if not self.arpabet_tokens and self.arpabet is not None:
+            object.__setattr__(self, "arpabet_tokens", (self.arpabet,))
+        elif self.arpabet_tokens and self.arpabet is None:
+            if len(self.arpabet_tokens) == 1:
+                object.__setattr__(self, "arpabet", self.arpabet_tokens[0])
+            else:
+                object.__setattr__(
+                    self,
+                    "arpabet",
+                    ArpabetToken(" ".join(t.phone for t in self.arpabet_tokens)),
+                )
+
+        if not self.cherokee_tokens and self.cherokee is not None:
+            object.__setattr__(self, "cherokee_tokens", (self.cherokee,))
+        elif self.cherokee_tokens and self.cherokee is None:
+            if len(self.cherokee_tokens) == 1:
+                object.__setattr__(self, "cherokee", self.cherokee_tokens[0])
+            else:
+                object.__setattr__(
+                    self,
+                    "cherokee",
+                    CherokeeToken("".join(t.phone for t in self.cherokee_tokens)),
+                )
+
     @property
     def is_substitution(self) -> bool:
-        return self.arpabet is not None and self.cherokee is not None
+        return len(self.arpabet_tokens) > 0 and len(self.cherokee_tokens) > 0
 
     @property
     def is_insertion(self) -> bool:
         """Epenthetic Cherokee token emitted with no corresponding ARPAbet token."""
-        return self.arpabet is None and self.cherokee is not None
+        return len(self.arpabet_tokens) == 0 and len(self.cherokee_tokens) > 0
 
     @property
     def is_deletion(self) -> bool:
         """Dropped ARPAbet phoneme with no corresponding Cherokee emission."""
-        return self.arpabet is not None and self.cherokee is None
+        return len(self.arpabet_tokens) > 0 and len(self.cherokee_tokens) == 0
+
+    @property
+    def arpabet_key(self) -> str:
+        return " ".join(t.phone for t in self.arpabet_tokens)
+
+    @property
+    def cherokee_key(self) -> str:
+        return "".join(t.phone for t in self.cherokee_tokens)
 
     def to_dict(self) -> Dict[str, Any]:
-        return {
+        d: Dict[str, Any] = {
             "arpabet": self.arpabet.to_dict() if self.arpabet is not None else None,
             "cherokee": self.cherokee.to_dict() if self.cherokee is not None else None,
             "cost": self.cost,
             "confidence": self.confidence,
         }
+        if len(self.arpabet_tokens) > 1:
+            d["arpabet_tokens"] = [t.to_dict() for t in self.arpabet_tokens]
+        if len(self.cherokee_tokens) > 1:
+            d["cherokee_tokens"] = [t.to_dict() for t in self.cherokee_tokens]
+        return d
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> AlignedTokenPair:
-        raw_arp = data.get("arpabet")
-        arp = ArpabetToken.from_dict(raw_arp) if raw_arp is not None else None
-        raw_chr = data.get("cherokee")
-        chr_tok = CherokeeToken.from_dict(raw_chr) if raw_chr is not None else None
+        raw_arps = data.get("arpabet_tokens")
+        if raw_arps:
+            arp_tokens = tuple(
+                t if isinstance(t, ArpabetToken) else ArpabetToken.from_dict(t)
+                for t in raw_arps
+            )
+            arp = None
+        else:
+            raw_arp = data.get("arpabet")
+            arp = ArpabetToken.from_dict(raw_arp) if raw_arp is not None else None
+            arp_tokens = (arp,) if arp is not None else ()
+
+        raw_chrs = data.get("cherokee_tokens")
+        if raw_chrs:
+            chr_tokens = tuple(
+                t if isinstance(t, CherokeeToken) else CherokeeToken.from_dict(t)
+                for t in raw_chrs
+            )
+            chr_tok = None
+        else:
+            raw_chr = data.get("cherokee")
+            chr_tok = CherokeeToken.from_dict(raw_chr) if raw_chr is not None else None
+            chr_tokens = (chr_tok,) if chr_tok is not None else ()
+
         return cls(
             arpabet=arp,
             cherokee=chr_tok,
+            arpabet_tokens=arp_tokens,
+            cherokee_tokens=chr_tokens,
             cost=float(data.get("cost", 0.0)),
             confidence=float(data.get("confidence", 1.0)),
         )

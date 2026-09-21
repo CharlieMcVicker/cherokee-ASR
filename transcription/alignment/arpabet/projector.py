@@ -224,19 +224,36 @@ class SyntheticTargetProjector:
     ) -> SyntheticCherokeeTarget:
         """
         Pure functional mapping from ARPAbet token sequence to SyntheticCherokeeTarget
-        using the argmax Cherokee phoneme per ARPAbet phoneme from the confusion matrix.
+        using dynamic programming (Viterbi tiling) across 1-gram and 2-gram transitions
+        from the AcousticConfusionMatrix.
         """
         active_matrix = matrix if matrix is not None else self._matrix
         if active_matrix is None:
             active_matrix = load_default_confusion_matrix()
 
-        cherokee_tokens: List[CherokeeToken] = []
-        token_probs: List[float] = []
+        K = len(arpabet_tokens)
+        if K == 0:
+            return SyntheticCherokeeTarget(
+                source_word=source_word,
+                arpabet_tokens=(),
+                cherokee_tokens=(),
+                projected_tth="",
+                syllabary=None,
+                confidence_score=1.0,
+                per_token_probabilities=(),
+            )
 
-        for a_tok in arpabet_tokens:
-            best_phone, prob = active_matrix.best_cherokee_for(a_tok.phone)
-            # Filter epsilon deletions (coda loss or silence)
-            if not best_phone or best_phone in (
+        # Dynamic programming arrays for Viterbi tiling
+        dp_cost = [0.0] + [1e9] * K
+        dp_step = [0] * (K + 1)
+        dp_target = [""] * (K + 1)
+        dp_prob = [1.0] * (K + 1)
+
+        for k in range(1, K + 1):
+            # 1. Option 1: 1-gram step on arpabet_tokens[k - 1]
+            t1 = arpabet_tokens[k - 1].phone
+            best_c1, p1 = active_matrix.best_cherokee_for(t1)
+            if not best_c1 or best_c1 in (
                 "",
                 "<eps>",
                 "<EPS>",
@@ -244,11 +261,63 @@ class SyntheticTargetProjector:
                 "eps",
                 EPSILON_TOKEN,
             ):
-                continue
-            cherokee_tokens.append(
-                CherokeeToken(phone=best_phone, orthography=Orthography.TTH)
-            )
-            token_probs.append(prob)
+                cost1 = active_matrix.get_deletion_cost(t1)
+                target1 = ""
+                prob1 = active_matrix.get_deletion_probability(t1)
+            else:
+                cost1 = active_matrix.get_substitution_cost(t1, best_c1)
+                target1 = best_c1
+                prob1 = p1
+
+            best_cost = dp_cost[k - 1] + cost1
+            best_step = 1
+            best_t = target1
+            best_p = prob1
+
+            # 2. Option 2: 2-gram step on arpabet_tokens[k - 2 : k]
+            if k >= 2:
+                pair_key = (
+                    f"{arpabet_tokens[k - 2].phone} {arpabet_tokens[k - 1].phone}"
+                )
+                if active_matrix.has_transition(pair_key):
+                    best_c2, p2 = active_matrix.best_cherokee_for(pair_key)
+                    if best_c2 and best_c2 not in (
+                        "",
+                        "<eps>",
+                        "<EPS>",
+                        "EPS",
+                        "eps",
+                        EPSILON_TOKEN,
+                    ):
+                        cost2 = active_matrix.get_substitution_cost(pair_key, best_c2)
+                        if dp_cost[k - 2] + cost2 < best_cost:
+                            best_cost = dp_cost[k - 2] + cost2
+                            best_step = 2
+                            best_t = best_c2
+                            best_p = p2
+
+            dp_cost[k] = best_cost
+            dp_step[k] = best_step
+            dp_target[k] = best_t
+            dp_prob[k] = best_p
+
+        # Traceback from K down to 0
+        cherokee_tokens: List[CherokeeToken] = []
+        token_probs: List[float] = []
+        k = K
+        while k > 0:
+            step = dp_step[k]
+            t_phone = dp_target[k]
+            p_val = dp_prob[k]
+            if t_phone:
+                cherokee_tokens.append(
+                    CherokeeToken(phone=t_phone, orthography=Orthography.TTH)
+                )
+                token_probs.append(p_val)
+            k -= step
+
+        cherokee_tokens.reverse()
+        token_probs.reverse()
 
         projected_tth = "".join(t.phone for t in cherokee_tokens)
         confidence = float(np.mean(token_probs)) if token_probs else 1.0
