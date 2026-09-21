@@ -1,0 +1,163 @@
+# -*- coding: utf-8 -*-
+"""
+transcription.evaluation.cost_engine
+
+ConfusionCostEngine converts stochastic conditional confusion probabilities into
+clamped, numerically stabilized logarithmic substitution costs and handles JSON
+serialization for alignment distance metric consumption.
+"""
+
+from __future__ import annotations
+
+import json
+from pathlib import Path
+from typing import Any, Optional
+
+import numpy as np
+
+
+def probability_to_normalized_cost(prob: float, epsilon: float = 1e-5) -> float:
+    """
+    Convert conditional probability into clamped normalized logarithmic cost.
+    """
+    if not (0.0 < epsilon < 1.0):
+        raise ValueError(f"epsilon must be strictly between 0 and 1, got {epsilon}")
+    val = float(np.log(prob + epsilon) / np.log(epsilon))
+    return float(np.clip(val, 0.0, 1.0))
+
+
+class ConfusionCostEngine:
+    """
+    Transforms conditional confusion probabilities into clamped normalized log costs.
+
+    The cost metric d(i, j) in [0.0, 1.0] is computed as:
+        - d(i, i) = 0.0
+        - For i != j:
+            If raw_counts is provided and row support sum_k(counts[i, k]) < min_support:
+                cost = default_substitution_cost (1.0)
+            Else:
+                val = ln(P[i, j] + epsilon) / ln(epsilon)
+                cost = clip(val, 0.0, 1.0)
+    """
+
+    probability_to_normalized_cost = staticmethod(probability_to_normalized_cost)
+
+    def __init__(self) -> None:
+        pass
+
+    def compute_costs(
+        self,
+        cond_probs: np.ndarray,
+        labels: list[str],
+        raw_counts: Optional[np.ndarray] = None,
+        min_support: int = 5,
+        epsilon: float = 1e-5,
+        default_substitution_cost: float = 1.0,
+        insertion_cost: float = 1.0,
+        deletion_cost: float = 1.0,
+    ) -> dict[str, Any]:
+        """
+        Compute normalized logarithmic substitution cost dictionary from conditional probabilities.
+
+        Args:
+            cond_probs: Square matrix (V, V) where cond_probs[i, j] = P(hyp=j | ref=i).
+            labels: List of V character labels corresponding to rows and columns.
+            raw_counts: Optional (V, V) or (V, K) count matrix used to evaluate sample support per row.
+            min_support: Minimum sample count for a reference character before falling back to default cost.
+            epsilon: Small positive constant for numerical stabilization and log-normalization (0 < epsilon < 1).
+            default_substitution_cost: Fallback substitution cost for unsupported or unseen pairs.
+            insertion_cost: Default insertion penalty.
+            deletion_cost: Default deletion penalty.
+
+        Returns:
+            Dictionary containing metadata and nested unigram substitution costs.
+        """
+        v = len(labels)
+        cond_probs_arr = np.asarray(cond_probs, dtype=np.float64)
+
+        if (
+            cond_probs_arr.ndim != 2
+            or cond_probs_arr.shape[0] != v
+            or cond_probs_arr.shape[1] != v
+        ):
+            raise ValueError(
+                f"cond_probs shape {cond_probs_arr.shape} does not match vocabulary size ({v}, {v})"
+            )
+
+        if not (0.0 < epsilon < 1.0):
+            raise ValueError(f"epsilon must be strictly between 0 and 1, got {epsilon}")
+
+        if min_support < 0:
+            raise ValueError(f"min_support must be non-negative, got {min_support}")
+
+        raw_counts_arr: Optional[np.ndarray] = None
+        if raw_counts is not None:
+            raw_counts_arr = np.asarray(raw_counts, dtype=np.float64)
+            if raw_counts_arr.shape[0] != v:
+                raise ValueError(
+                    f"raw_counts row dimension {raw_counts_arr.shape[0]} does not match vocabulary size {v}"
+                )
+
+        log_eps = np.log(epsilon)
+        unigram_costs: dict[str, dict[str, float]] = {}
+
+        for i, ref in enumerate(labels):
+            unigram_costs[ref] = {}
+            has_low_support = False
+            if raw_counts_arr is not None:
+                row_support = float(np.sum(raw_counts_arr[i, :]))
+                if row_support < min_support:
+                    has_low_support = True
+
+            for j, hyp in enumerate(labels):
+                if i == j:
+                    unigram_costs[ref][hyp] = 0.0
+                elif has_low_support:
+                    unigram_costs[ref][hyp] = float(default_substitution_cost)
+                else:
+                    prob = float(cond_probs_arr[i, j])
+                    val = float(np.log(prob + epsilon) / log_eps)
+                    clamped_cost = float(np.clip(val, 0.0, 1.0))
+                    unigram_costs[ref][hyp] = clamped_cost
+
+        return {
+            "epsilon": float(epsilon),
+            "min_support": int(min_support),
+            "vocabulary": list(labels),
+            "unigram_costs": unigram_costs,
+            "default_substitution_cost": float(default_substitution_cost),
+            "insertion_cost": float(insertion_cost),
+            "deletion_cost": float(deletion_cost),
+        }
+
+    @staticmethod
+    def save_cost_artifact(cost_dict: dict[str, Any], path: str | Path) -> None:
+        """
+        Serialize cost dictionary to a JSON file.
+
+        Args:
+            cost_dict: Cost dictionary generated by compute_costs.
+            path: Destination file path.
+        """
+        target_path = Path(path)
+        target_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(target_path, "w", encoding="utf-8") as f:
+            json.dump(cost_dict, f, indent=2, ensure_ascii=False)
+
+    @staticmethod
+    def load_cost_artifact(path: str | Path) -> dict[str, Any]:
+        """
+        Load cost dictionary from a JSON artifact file.
+
+        Args:
+            path: Source file path.
+
+        Returns:
+            Parsed cost dictionary.
+        """
+        target_path = Path(path)
+        if not target_path.exists():
+            raise FileNotFoundError(f"Cost artifact file not found: {target_path}")
+        with open(target_path, "r", encoding="utf-8") as f:
+            data: dict[str, Any] = json.load(f)
+        return data

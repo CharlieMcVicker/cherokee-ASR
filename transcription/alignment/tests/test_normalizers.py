@@ -7,22 +7,23 @@ import pytest
 from transcription.alignment.normalizers import (
     normalize_phonetics_for_alignment,
     normalize_syllabary_for_alignment,
-    normalize_text_for_alignment,
 )
 
 
-def test_normalize_syllabary_for_alignment_strips_h():
-    # Word-initial 'h' and hyphenation
-    assert normalize_syllabary_for_alignment("ho-wa") == "owa"
-    assert normalize_syllabary_for_alignment("hi-la") == "ila"
-    assert normalize_syllabary_for_alignment("ha-tsv") == "atsv"
-
+def test_normalize_syllabary_for_alignment():
     # Syllabary transliteration with hyphens, case, punctuation
     result = normalize_syllabary_for_alignment("A-da-le-ni-s-gv.")
-    assert result == "ataleniskv"
-    assert "h" not in result
+    assert result == "atalenihskv"
     assert "-" not in result
     assert "." not in result
+
+
+def test_normalize_syllabary_hiatus_glottal_stops():
+    # Syllabary with adjacent vowels receives hiatus glottal stop
+    assert normalize_syllabary_for_alignment("ᎢᎾᎨᎢ") == "inake'i"
+    assert normalize_syllabary_for_alignment("ᎯᎠ") == "hi'a"
+    assert normalize_syllabary_for_alignment("ᎠᏍᎦᏅᏨᎢ") == "ahskanvtsv'i"
+    assert normalize_syllabary_for_alignment("ᎣᏏᏲ") == "ohsiyo"
 
 
 def test_normalize_phonetics_for_alignment_preserves_h():
@@ -32,9 +33,24 @@ def test_normalize_phonetics_for_alignment_preserves_h():
 
     # Phonetic text preserves aspiration 'h'
     result = normalize_phonetics_for_alignment("A-da-le-ni-s-gv.")
+    assert result == "atalenihskv"
     assert "h" in result
     assert "-" not in result
     assert "." not in result
+
+
+def test_normalize_phonetics_tl_to_dl():
+    # Citation 'tl' becomes unaspirated 'tl'
+    assert normalize_phonetics_for_alignment("tli") == "tli"
+    assert normalize_phonetics_for_alignment("tla") == "tla"
+    assert normalize_phonetics_for_alignment("i-da-li-nv-tli") == "italinvtli"
+    # Aspirated 'tlh' remains aspirated 'tlha'
+    assert normalize_phonetics_for_alignment("tlha") == "tlha"
+
+
+def test_normalize_phonetics_hiatus_glottals():
+    assert normalize_phonetics_for_alignment("e-hna-i") == "enha'i"
+    assert normalize_phonetics_for_alignment("hi-a") == "hi'a"
 
 
 def test_normalizers_qu_conversion():
@@ -50,11 +66,3 @@ def test_normalizers_empty_and_whitespace():
     assert normalize_syllabary_for_alignment("   ") == ""
     assert normalize_phonetics_for_alignment("") == ""
     assert normalize_phonetics_for_alignment("   ") == ""
-
-
-def test_normalize_text_for_alignment_backwards_compat():
-    # normalize_text_for_alignment is an alias for normalize_syllabary_for_alignment
-    assert normalize_text_for_alignment(
-        "A-da-le-ni-s-gv."
-    ) == normalize_syllabary_for_alignment("A-da-le-ni-s-gv.")
-    assert normalize_text_for_alignment("ho-wa") == "owa"

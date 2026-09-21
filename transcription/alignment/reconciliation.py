@@ -45,12 +45,19 @@ def reconcile_word_intervals(
 
     syll_words = [sw for sw in syll_text.split() if sw]
     reconciled: List[WordInterval] = []
+    syll_idx = 0
 
-    for w_idx, w in enumerate(words):
-        if len(syll_words) == len(words):
-            target_syll = syll_words[w_idx]
+    for w in words:
+        k = max(1, len(w.word.split())) if w.word else 1
+        if syll_words:
+            if syll_idx < len(syll_words):
+                target_syll_words = syll_words[syll_idx : syll_idx + k]
+                syll_idx += k
+                target_syll = " ".join(target_syll_words)
+            else:
+                target_syll = syll_words[-1]
         else:
-            target_syll = syll_words[w_idx] if w_idx < len(syll_words) else syll_text
+            target_syll = syll_text
 
         target_emitted = w.emitted_word or w.word
         try:

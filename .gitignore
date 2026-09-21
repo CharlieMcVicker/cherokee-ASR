@@ -10,6 +10,7 @@ data/processed/sentence_audio
 archive/sentence_audio.zip
 
 .DS_Store
+.cache/
 .venv/
 __pycache__/
 */__pycache__/
@@ -128,3 +129,11 @@ cherokee_new_testament/audio_source
 
 transcriber_build
 transcriber_dist
+
+# Large streaming evaluation cache & experiment runs
+*.jsonl
+runs/
+
+# Alignment datasets and local inference caches
+data/librispeech/
+data/arpabet_alignment/cache/

@@ -14,7 +14,7 @@ from csv import DictReader, DictWriter
 from transcription.utils.tone_normalization import respell_consonants
 from transcription.utils.syllabary_map import (
     CHEROKEE_SYLLABARY_MAP,
-    cherokee_to_bad_phonetics,
+    syllabary_to_phonetics,
 )
 
 
@@ -75,8 +75,8 @@ def clean_syllabary(syl):
 
 
 def syllabary_matches_phonetics(syl: str, phonetics: str):
-    bad_phonetics = cherokee_to_bad_phonetics(syl)
-    syl_phonetics = respell_consonants(bad_phonetics)
+    phon = syllabary_to_phonetics(syl)
+    syl_phonetics = respell_consonants(phon)
 
     # check that consonants match
     vowels = "aeiouv"

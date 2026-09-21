@@ -23,7 +23,6 @@ from transcription.alignment.distance_metrics import (
 from transcription.alignment.normalizers import (
     normalize_phonetics_for_alignment,
     normalize_syllabary_for_alignment,
-    normalize_text_for_alignment,
 )
 
 
@@ -82,6 +81,27 @@ def test_models_instantiation():
     assert output.metrics is not None
 
 
+def test_ctc_aligner_config_defaults():
+    from transcription.alignment.models import CTCAlignerConfig
+
+    cfg = CTCAlignerConfig()
+    assert cfg.syncope_tokens == (("a", "e", "i", "o", "u", "v"), "t")
+    assert cfg.intrusive_tokens == ("h", "'")
+    assert cfg.intrusive_max_stride == 4
+    assert cfg.enforce_phonotactics is True
+    assert cfg.flag_min_confidence == 0.05
+    assert cfg.flag_min_char_confidence == 0.0
+    assert cfg.index_duration == 0.02
+    assert cfg.min_window_size == 8000
+    assert cfg.max_window_size == 100000
+    assert cfg.buffer_trail_ms == 300
+    assert cfg.buffer_lead_ms == 100
+    assert cfg.chunk_seconds == 30.0
+    assert cfg.margin_seconds == 1.0
+    assert cfg.cache is True
+    assert cfg.cache_dir is None
+
+
 def test_default_cer_distance_metric():
     metric = DefaultCERDistanceMetric()
     assert isinstance(metric, DistanceMetric)
@@ -134,22 +154,21 @@ def test_custom_callable_distance_metric():
     assert metric.compute_cost("a", "b") == 0.42
 
 
-def test_normalize_text_for_alignment():
+def test_normalize_phonetics_for_alignment():
     # Hyphens stripped, lowercase, punctuation removed, Cherokee consonants normalized
-    res = normalize_text_for_alignment("A-da-le-ni-s-gv.")
+    res = normalize_phonetics_for_alignment("A-da-le-ni-s-gv.")
     assert "-" not in res
     assert "." not in res
-    assert res == "ataleniskv"
+    assert res == "atalenihskv"
 
     # qu -> gw / kw
-    qu_res = normalize_text_for_alignment("quana")
+    qu_res = normalize_phonetics_for_alignment("quana")
     assert "qu" not in qu_res
 
 
 def test_normalize_syllabary_and_phonetics():
-    # Syllabary strips 'h'
-    assert normalize_syllabary_for_alignment("ho-wa") == "owa"
-    assert normalize_syllabary_for_alignment("hi-la") == "ila"
+    assert normalize_syllabary_for_alignment("ho-wa") == "howa"
+    assert normalize_syllabary_for_alignment("hi-la") == "hila"
 
     # Phonetics preserves 'h'
     assert normalize_phonetics_for_alignment("ho-wa") == "howa"

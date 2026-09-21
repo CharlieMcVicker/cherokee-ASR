@@ -2,60 +2,53 @@
 Text normalization utilities for alignment.
 """
 
-import re
-from transcription.utils.tone_normalization import respell_consonants
+from transcription.utils.orthography import (
+    Orthography,
+    clean_punctuation_and_whitespace,
+    convert_orthography,
+    strip_tones_and_colons,
+)
 
-PUNCTUATION_REGEX = r"[\,\?\.\!\-\;\:\"\'\“\%\”\(\)\[\]\{\}«»…\’\‘\ʼ\ʻ\`\´\‛]"
+PUNCTUATION_REGEX = r"[\,\?\.\!\-\;\:\"\“\%\”\(\)\[\]\{\}«»…\´\‛]"
+GLOTTAL_VARIANTS_REGEX = r"[\’\‘\ʼ\ʻ\`]"
 
 
-def normalize_syllabary_for_alignment(text: str) -> str:
+def normalize_phonetics_for_alignment(
+    text: str,
+    source: Orthography = Orthography.DG,
+) -> str:
     """
-    Normalizes transliterated Cherokee Syllabary text for ASR alignment matching:
-    1. Lowercase text and strip hyphens (e.g., A-da-le-ni-s-gv -> adalenisgv).
-    2. Convert 'qu' to 'gw'.
-    3. Apply consonant & aspiration respelling (t->th, d->t, k->kh, g->k, etc.).
-    4. Strip all /h/ sound markers (Syllabary transliteration does not encode aspiration contrast).
-    5. Remove punctuation and collapse extra whitespace.
-    """
-    if not text:
-        return ""
+    Normalizes phonetic Cherokee text for ASR alignment matching.
 
-    text = text.lower()
-    text = text.replace("-", "")
-    text = text.replace("qu", "gw")
-    text = respell_consonants(text)
-    text = text.replace("h", "")
-    text = re.sub(PUNCTUATION_REGEX, "", text)
-    text = re.sub(r"\s+", " ", text).strip()
-    return text
-
-
-def normalize_phonetics_for_alignment(text: str) -> str:
-    """
-    Normalizes phonetic Cherokee text for ASR alignment matching, preserving aspiration 'h':
-    1. Lowercase text and strip hyphens.
-    2. Convert 'qu' to 'gw'.
-    3. Apply consonant & aspiration respelling (t->th, d->t, k->kh, g->k, etc.).
-    4. Preserve /h/ aspiration markers.
-    5. Remove punctuation and collapse extra whitespace.
+    Default source is Orthography.DG (transliteration / dictionary phonetics).
+    Target is canonical Orthography.TTH (alignment and ASR acoustic representation).
+    When source is Orthography.TTH, conversion is an exact no-op on consonants.
     """
     if not text:
         return ""
 
-    text = text.lower()
-    text = text.replace("-", "")
-    text = text.replace("qu", "gw")
-    text = respell_consonants(text)
-    text = re.sub(PUNCTUATION_REGEX, "", text)
-    text = re.sub(r"\s+", " ", text).strip()
-    return text
+    return convert_orthography(text, source=source, target=Orthography.TTH)
 
 
-# Backward compatibility alias
-normalize_text_for_alignment = normalize_syllabary_for_alignment
+def normalize_syllabary_for_alignment(
+    text: str,
+    source: Orthography = Orthography.SYLLABARY,
+    target: Orthography = Orthography.TTH,
+) -> str:
+    """
+    Normalizes Cherokee Syllabary (or Latin transliteration) for ASR alignment matching.
+
+    Default maps Cherokee Syllabary characters to canonical Orthography.TTH alignment phonetics.
+    """
+    if not text:
+        return ""
+
+    return convert_orthography(text, source=source, target=target)
+
 
 __all__ = [
-    "normalize_syllabary_for_alignment",
+    "Orthography",
+    "convert_orthography",
     "normalize_phonetics_for_alignment",
-    "normalize_text_for_alignment",
+    "normalize_syllabary_for_alignment",
 ]

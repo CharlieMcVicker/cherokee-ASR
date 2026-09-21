@@ -100,9 +100,16 @@ _BASE_CHEROKEE_SYLLABARY_MAP: Dict[str, str] = {
 }
 
 # Authoritative centralized Cherokee Syllabary mapping
-# Derived from base transliterations with respell_consonants rules (specifically Ꮏ -> nha instead of hna)
+# Derived from base transliterations with respell_consonants rules (specifically Ꮏ -> nha, s-series -> hs)
 CHEROKEE_SYLLABARY_MAP: Dict[str, str] = dict(_BASE_CHEROKEE_SYLLABARY_MAP)
 CHEROKEE_SYLLABARY_MAP["Ꮏ"] = "nha"
+CHEROKEE_SYLLABARY_MAP["Ꮜ"] = "hsa"
+CHEROKEE_SYLLABARY_MAP["Ꮝ"] = "hs"
+CHEROKEE_SYLLABARY_MAP["Ꮞ"] = "hse"
+CHEROKEE_SYLLABARY_MAP["Ꮟ"] = "hsi"
+CHEROKEE_SYLLABARY_MAP["Ꮠ"] = "hso"
+CHEROKEE_SYLLABARY_MAP["Ꮡ"] = "hsu"
+CHEROKEE_SYLLABARY_MAP["Ꮢ"] = "hsv"
 
 
 import re
@@ -111,6 +118,14 @@ import re
 PHONETIC_TO_SYLLABARY_MAP: Dict[str, str] = {
     phon: char for char, phon in CHEROKEE_SYLLABARY_MAP.items()
 }
+PHONETIC_TO_SYLLABARY_MAP["s"] = "Ꮝ"
+PHONETIC_TO_SYLLABARY_MAP["hs"] = "Ꮝ"
+PHONETIC_TO_SYLLABARY_MAP["sa"] = "Ꮜ"
+PHONETIC_TO_SYLLABARY_MAP["se"] = "Ꮞ"
+PHONETIC_TO_SYLLABARY_MAP["si"] = "Ꮟ"
+PHONETIC_TO_SYLLABARY_MAP["so"] = "Ꮠ"
+PHONETIC_TO_SYLLABARY_MAP["su"] = "Ꮡ"
+PHONETIC_TO_SYLLABARY_MAP["sv"] = "Ꮢ"
 
 
 # Add common voiced/unvoiced variants
@@ -141,12 +156,17 @@ PHONETIC_TO_SYLLABARY_MAP.update(
 )
 
 
-def cherokee_to_bad_phonetics(text: str) -> str:
+def syllabary_to_phonetics(text: str) -> str:
     """
     Translates Cherokee syllabary into phonetic transliteration character by character.
+    Inserts a glottal stop /'/ between adjacent vowels to resolve vowel hiatus (e.g. ᎢᎾᎨᎢ -> inake'i).
     Preserves spaces, punctuation, and unknown non-syllabary characters.
     """
-    return "".join(CHEROKEE_SYLLABARY_MAP.get(char, char) for char in text)
+    if not text:
+        return ""
+    phonetic = "".join(CHEROKEE_SYLLABARY_MAP.get(char, char) for char in text.upper())
+    # Cherokee does not permit vowel hiatus; insert required glottal stop between adjacent vowels
+    return re.sub(r"([aeiouvAEIOUV])(?=[aeiouvAEIOUV])", r"\1'", phonetic)
 
 
 def phonetics_to_syllabary(text: str) -> str:

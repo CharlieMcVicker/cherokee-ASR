@@ -8,9 +8,17 @@ from transcription.alignment.aligner import (
     NeedlemanWunschWordAligner,
     SlidingWindowDTWAligner,
 )
+from transcription.alignment.ctc_aligner import (
+    CTCSegmentationAligner,
+    get_logits_cached,
+)
 from transcription.alignment.cli import run_alignment_pipeline
+from transcription.alignment.calibrated_distance_metrics import (
+    PhonologicalConfusionCostMetric,
+)
 from transcription.alignment.distance_metrics import (
     CharacterErrorRateMetric,
+    ConfusionMatrixCostMetric,
     CustomCallableDistanceMetric,
     DefaultCERDistanceMetric,
     DistanceMetric,
@@ -24,6 +32,7 @@ from transcription.alignment.exporters import (
 )
 from transcription.alignment.extractors import (
     ASREmissionsExtractor,
+    CachedASREmissionsExtractor,
     CallbackEmissionsExtractor,
     CherokeeASRExtractor,
     PrecomputedEmissionsExtractor,
@@ -32,12 +41,19 @@ from transcription.alignment.extractors import (
 from transcription.alignment.ingestion import (
     load_bible_chunks,
     load_generic_chunks,
+    load_interview_transcript,
+    load_syllabary_transcript,
     prepare_alignment_input,
+)
+from transcription.alignment.pipeline import (
+    align_syllabary_ctc,
+    align_syllabary_greedy,
 )
 from transcription.alignment.models import (
     AlignedChunk,
     AlignmentMetrics,
     AlignmentOutput,
+    CTCAlignerConfig,
     TextChunk,
     TokenEmission,
     WordInterval,
@@ -45,12 +61,31 @@ from transcription.alignment.models import (
 from transcription.alignment.normalizers import (
     normalize_phonetics_for_alignment,
     normalize_syllabary_for_alignment,
-    normalize_text_for_alignment,
 )
 from transcription.alignment.reconciliation import (
     reconcile_alignment_by_chunk,
     reconcile_alignment_words,
     reconcile_word_intervals,
+)
+from transcription.alignment.phonotactics import (
+    PhonemeCategory,
+    PhonotacticAnalysis,
+    PhonotacticToken,
+    analyze_phonotactics,
+    get_intrusion_site_mask,
+    get_syncope_mask,
+    is_valid_phonotactic_sequence,
+    prepare_cherokee_text,
+    tokenize_phonemes,
+)
+from transcription.alignment.threshold_finder import (
+    AlignmentRecord,
+    AlignmentThresholdFinder,
+    ThresholdMetrics,
+    ThresholdSearchStep,
+    find_threshold_bounds,
+    load_alignment_records,
+    parse_verse_reference,
 )
 
 __all__ = [
@@ -58,18 +93,21 @@ __all__ = [
     "AlignedChunk",
     "AlignmentMetrics",
     "AlignmentOutput",
+    "CTCAlignerConfig",
     "TextChunk",
     "TokenEmission",
     "WordInterval",
     # Ingestion & Normalizers
     "load_bible_chunks",
     "load_generic_chunks",
+    "load_interview_transcript",
+    "load_syllabary_transcript",
     "prepare_alignment_input",
     "normalize_syllabary_for_alignment",
     "normalize_phonetics_for_alignment",
-    "normalize_text_for_alignment",
     # Extractors
     "ASREmissionsExtractor",
+    "CachedASREmissionsExtractor",
     "CherokeeASRExtractor",
     "CallbackEmissionsExtractor",
     "PrecomputedEmissionsExtractor",
@@ -78,12 +116,18 @@ __all__ = [
     "DistanceMetric",
     "DefaultCERDistanceMetric",
     "CharacterErrorRateMetric",
+    "ConfusionMatrixCostMetric",
+    "PhonologicalConfusionCostMetric",
     "LevenshteinDistanceMetric",
     "CustomCallableDistanceMetric",
     "calculate_cer",
-    # Aligners
+    # Aligners & Runners
     "NeedlemanWunschWordAligner",
     "SlidingWindowDTWAligner",
+    "CTCSegmentationAligner",
+    "get_logits_cached",
+    "align_syllabary_greedy",
+    "align_syllabary_ctc",
     # Reconciliation
     "reconcile_word_intervals",
     "reconcile_alignment_words",
@@ -94,4 +138,22 @@ __all__ = [
     "export_debug_json",
     # Pipeline / CLI
     "run_alignment_pipeline",
+    # Threshold Finder
+    "AlignmentRecord",
+    "AlignmentThresholdFinder",
+    "ThresholdMetrics",
+    "ThresholdSearchStep",
+    "find_threshold_bounds",
+    "load_alignment_records",
+    "parse_verse_reference",
+    # Phonotactics & Custom Text Preparation
+    "PhonemeCategory",
+    "PhonotacticToken",
+    "PhonotacticAnalysis",
+    "tokenize_phonemes",
+    "get_syncope_mask",
+    "get_intrusion_site_mask",
+    "is_valid_phonotactic_sequence",
+    "analyze_phonotactics",
+    "prepare_cherokee_text",
 ]

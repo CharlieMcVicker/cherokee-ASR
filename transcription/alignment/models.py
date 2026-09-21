@@ -5,7 +5,46 @@ Pure dataclasses with generic chunk semantics.
 """
 
 from dataclasses import dataclass, field
-from typing import List, Optional
+from pathlib import Path
+from typing import Dict, List, Optional, Tuple
+import math
+from transcription.utils.orthography import Orthography
+
+
+@dataclass(frozen=True)
+class CTCAlignerConfig:
+    """Strongly-typed configuration for syncope- and intrusion-aware CTC alignment."""
+
+    syncope_tokens: Tuple[Tuple[str, ...] | str, ...] = (
+        (
+            "a",
+            "e",
+            "i",
+            "o",
+            "u",
+            "v",
+        ),
+        "t",
+    )
+    intrusive_tokens: Tuple[str, ...] = ("h", "'")
+    intrusive_max_stride: int = 4
+    enforce_phonotactics: bool = True
+    flag_min_confidence: float = 0.05
+    flag_min_char_confidence: float = 0.0
+    index_duration: float = 0.02
+    min_window_size: int = 8000
+    max_window_size: int = 100000
+    buffer_trail_ms: int = 300
+    buffer_lead_ms: int = 100
+    boundary_pad_sec: float = 0.1
+    chunk_seconds: float = 30.0
+    margin_seconds: float = 1.0
+    cache: bool = True
+    cache_dir: Optional[Path] = None
+    enable_vad_soft_masking: bool = False
+    vad_p_low: float = 0.15
+    vad_p_high: float = 0.60
+    vad_pad_ms: int = 60
 
 
 @dataclass(frozen=True)
@@ -36,6 +75,7 @@ class WordInterval:
     confidence: float = 1.0
     flagged: bool = False
     emitted_word: Optional[str] = None
+    min_char_confidence: Optional[float] = None
 
 
 @dataclass
@@ -49,6 +89,14 @@ class AlignedChunk:
     distance_score: float = 1.0
     emitted_text: str = ""
 
+    @property
+    def has_anomalies(self) -> bool:
+        return any(w.flagged for w in self.words)
+
+    @property
+    def flagged_words(self) -> List[WordInterval]:
+        return [w for w in self.words if w.flagged]
+
 
 @dataclass
 class AlignmentMetrics:
@@ -60,6 +108,7 @@ class AlignmentMetrics:
     mean_distance_score: float
     total_ground_truth_chars: int
     total_emitted_chars: int
+    flagged_words_count: int = 0
 
 
 @dataclass

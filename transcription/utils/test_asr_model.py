@@ -59,16 +59,6 @@ class TestDataStructures(unittest.TestCase):
         self.assertEqual(result.confidence, 0.98)
         self.assertEqual(len(result.words), 1)
 
-        # Dict item access
-        self.assertEqual(result["text"], "osiyo")
-        self.assertEqual(result["transcription"], "osiyo")
-        self.assertEqual(result["confidence"], 0.98)
-        self.assertEqual(result["words"], [wc])
-
-        # Dict get method
-        self.assertEqual(result.get("text"), "osiyo")
-        self.assertEqual(result.get("nonexistent_key", "default_val"), "default_val")
-
         # to_dict serialization
         res_dict = result.to_dict()
         self.assertIsInstance(res_dict, dict)
@@ -360,7 +350,7 @@ class TestCherokeeASRModel(unittest.TestCase):
         result = asr_model.decode(logits, compute_word_confidences=True)
         self.assertIsInstance(result, ASRResult)
         self.assertEqual(result.text, "ad la")
-        self.assertEqual(result["transcription"], "ad la")
+        self.assertEqual(result.transcription, "ad la")
         self.assertGreater(result.confidence, 0.9)
         self.assertEqual(len(result.words), 2)
 

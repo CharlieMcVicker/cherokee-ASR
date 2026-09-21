@@ -15,7 +15,7 @@ from transcription.alignment.models import (
     TokenEmission,
     WordInterval,
 )
-from transcription.alignment.normalizers import normalize_text_for_alignment
+from transcription.alignment.normalizers import normalize_phonetics_for_alignment
 
 
 def test_word_aligner_default_normalizers_identity():
@@ -111,8 +111,8 @@ def test_word_aligner_empty_and_gap_handling():
 
 def test_sliding_window_dtw_alignment_flow():
     word_aligner = NeedlemanWunschWordAligner(
-        chunk_normalizer=normalize_text_for_alignment,
-        emission_normalizer=normalize_text_for_alignment,
+        chunk_normalizer=normalize_phonetics_for_alignment,
+        emission_normalizer=normalize_phonetics_for_alignment,
     )
     aligner = SlidingWindowDTWAligner(word_aligner=word_aligner)
 
