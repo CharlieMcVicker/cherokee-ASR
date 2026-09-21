@@ -40,6 +40,7 @@ from transcription.alignment.models import (
     WordInterval,
 )
 from transcription.alignment.reconciliation import reconcile_alignment_words
+from transcription.audio.non_speech_masking import extract_vad_intervals
 from transcription.models.asr_model import CherokeeASRModel
 
 
@@ -321,6 +322,18 @@ def align_syllabary_ctc(
     if reconcile:
         reconciled_words = reconcile_alignment_words(alignment, syllabary_lookup)
         additional_word_tiers["Reconciled Words"] = reconciled_words
+
+    if config and getattr(config, "enable_vad_soft_masking", False):
+        vad_intervals = extract_vad_intervals(
+            audio=audio,
+            p_low=getattr(config, "vad_p_low", 0.15),
+            p_high=getattr(config, "vad_p_high", 0.60),
+            pad_ms=getattr(config, "vad_pad_ms", 60),
+        )
+        additional_word_tiers["VAD State"] = [
+            WordInterval(word=label, start_sec=s, end_sec=e)
+            for s, e, label in vad_intervals
+        ]
 
     if output_dir is not None:
         out_dir_path = Path(output_dir)

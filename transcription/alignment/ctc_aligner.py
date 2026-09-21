@@ -37,6 +37,7 @@ from transcription.alignment.normalizers import (
     normalize_syllabary_for_alignment,
 )
 from transcription.alignment.phonotactics import prepare_cherokee_text
+from transcription.audio.non_speech_masking import mask_non_speech_logits
 from transcription.models.asr_model import CherokeeASRModel
 
 logger = logging.getLogger(__name__)
@@ -509,6 +510,17 @@ class CTCSegmentationAligner:
         )
         char_list, pad_id = self._get_char_list_and_blank(model)
 
+        if getattr(self.config, "enable_vad_soft_masking", False) and lpz.shape[0] > 0:
+            lpz = mask_non_speech_logits(
+                lpz=lpz,
+                audio=audio_input,
+                index_duration=self.index_duration,
+                blank_id=pad_id,
+                p_low=getattr(self.config, "vad_p_low", 0.15),
+                p_high=getattr(self.config, "vad_p_high", 0.60),
+                pad_ms=getattr(self.config, "vad_pad_ms", 60),
+            )
+
         target_text = (phonetic_text if phonetic_text else syllabary_text) or ""
         words = [w for w in target_text.split() if w]
 
@@ -610,6 +622,17 @@ class CTCSegmentationAligner:
             audio_input, asr_model=model, apply_buffers=False, cache=cache
         )
         char_list, pad_id = self._get_char_list_and_blank(model)
+
+        if getattr(self.config, "enable_vad_soft_masking", False) and lpz.shape[0] > 0:
+            lpz = mask_non_speech_logits(
+                lpz=lpz,
+                audio=audio_input,
+                index_duration=self.index_duration,
+                blank_id=pad_id,
+                p_low=getattr(self.config, "vad_p_low", 0.15),
+                p_high=getattr(self.config, "vad_p_high", 0.60),
+                pad_ms=getattr(self.config, "vad_pad_ms", 60),
+            )
 
         win_size = max(self.min_window_size, min(20000, int(lpz.shape[0])))
         max_win = max(self.max_window_size, win_size * 2)

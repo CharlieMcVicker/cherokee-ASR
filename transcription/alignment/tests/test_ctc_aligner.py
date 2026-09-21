@@ -18,7 +18,7 @@ from transcription.alignment.ctc_aligner import (
     CTCSegmentationAligner,
     get_logits_cached,
 )
-from transcription.alignment.models import CTCAlignerConfig
+from transcription.alignment.models import CTCAlignerConfig, TextChunk
 from transcription.alignment.phonotactics import prepare_cherokee_text
 
 
@@ -1055,3 +1055,63 @@ def test_ctc_aligner_codeswitched_masks_forwarding(dummy_audio_file: Path):
                 khasi_sync, khasi_intrus = token_masks[1]
                 assert not any(khasi_sync)
                 assert not any(khasi_intrus)
+
+
+def test_ctc_aligner_with_vad_soft_masking(tmp_path: Path):
+    """Verify that CTCSegmentationAligner invokes mask_non_speech_logits when enable_vad_soft_masking=True."""
+    dummy_audio_file = tmp_path / "dummy.wav"
+    audio = AudioSegment.silent(duration=2000, frame_rate=16000)
+    audio.export(dummy_audio_file, format="wav")
+
+    config = CTCAlignerConfig(
+        enable_vad_soft_masking=True,
+        vad_p_low=0.15,
+        vad_p_high=0.60,
+    )
+    aligner = CTCSegmentationAligner(config=config)
+    chunks = [TextChunk(chunk_id="c1", text="tsisa kalonetv")]
+
+    mock_model = MagicMock()
+    mock_model.processor.tokenizer.get_vocab.return_value = {
+        "<pad>": 0,
+        "t": 1,
+        "s": 2,
+        "i": 3,
+        "a": 4,
+        "k": 5,
+        "l": 6,
+        "o": 7,
+        "n": 8,
+        "e": 9,
+        "v": 10,
+        "|": 11,
+    }
+    mock_model.processor.tokenizer.pad_token_id = 0
+
+    fake_lpz = np.zeros((100, 12), dtype=np.float32)
+
+    with patch.object(
+        aligner, "get_logits_cached", return_value=(fake_lpz, 2.0, 16000)
+    ):
+        with patch(
+            "transcription.alignment.ctc_aligner.mask_non_speech_logits",
+            wraps=lambda lpz, **kwargs: lpz,
+        ) as mock_mask:
+            with patch(
+                "transcription.alignment.ctc_aligner.ctc_segmentation"
+            ) as mock_ctc:
+                mock_ctc.return_value = (
+                    np.zeros(20),
+                    np.zeros(100),
+                    ["ε"] * 100,
+                )
+                aligner.align(
+                    dummy_audio_file,
+                    chunks=chunks,
+                    source_id="test_audio",
+                    asr_model=mock_model,
+                )
+                assert mock_mask.called
+                _, kwargs = mock_mask.call_args
+                assert kwargs["p_low"] == 0.15
+                assert kwargs["p_high"] == 0.60

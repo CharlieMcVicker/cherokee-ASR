@@ -65,6 +65,10 @@ def run_interview_ctc_realignment() -> Dict[str, Any]:
     config = CTCAlignerConfig(
         enforce_phonotactics=True,
         cache=True,
+        enable_vad_soft_masking=True,
+        vad_p_low=0.30,
+        vad_p_high=0.75,
+        vad_pad_ms=20,
     )
 
     logger.info(

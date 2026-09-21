@@ -41,6 +41,10 @@ class CTCAlignerConfig:
     margin_seconds: float = 1.0
     cache: bool = True
     cache_dir: Optional[Path] = None
+    enable_vad_soft_masking: bool = False
+    vad_p_low: float = 0.15
+    vad_p_high: float = 0.60
+    vad_pad_ms: int = 60
 
 
 @dataclass(frozen=True)
