@@ -61,7 +61,6 @@ from transcription.alignment.models import (
 from transcription.alignment.normalizers import (
     normalize_phonetics_for_alignment,
     normalize_syllabary_for_alignment,
-    normalize_text_for_alignment,
 )
 from transcription.alignment.reconciliation import (
     reconcile_alignment_by_chunk,
@@ -106,7 +105,6 @@ __all__ = [
     "prepare_alignment_input",
     "normalize_syllabary_for_alignment",
     "normalize_phonetics_for_alignment",
-    "normalize_text_for_alignment",
     # Extractors
     "ASREmissionsExtractor",
     "CachedASREmissionsExtractor",

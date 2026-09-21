@@ -23,7 +23,6 @@ from transcription.alignment.distance_metrics import (
 from transcription.alignment.normalizers import (
     normalize_phonetics_for_alignment,
     normalize_syllabary_for_alignment,
-    normalize_text_for_alignment,
 )
 
 
@@ -155,15 +154,15 @@ def test_custom_callable_distance_metric():
     assert metric.compute_cost("a", "b") == 0.42
 
 
-def test_normalize_text_for_alignment():
+def test_normalize_phonetics_for_alignment():
     # Hyphens stripped, lowercase, punctuation removed, Cherokee consonants normalized
-    res = normalize_text_for_alignment("A-da-le-ni-s-gv.")
+    res = normalize_phonetics_for_alignment("A-da-le-ni-s-gv.")
     assert "-" not in res
     assert "." not in res
     assert res == "atalenihskv"
 
     # qu -> gw / kw
-    qu_res = normalize_text_for_alignment("quana")
+    qu_res = normalize_phonetics_for_alignment("quana")
     assert "qu" not in qu_res
 
 

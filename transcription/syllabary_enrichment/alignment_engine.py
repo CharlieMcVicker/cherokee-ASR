@@ -11,7 +11,7 @@ from typing import List, Tuple, Dict, Any, Optional
 
 from transcription.utils.syllabary_map import (
     CHEROKEE_SYLLABARY_MAP,
-    cherokee_to_bad_phonetics,
+    syllabary_to_phonetics,
 )
 from transcription.utils.tone_normalization import respell_consonants
 
@@ -48,9 +48,7 @@ def get_base_transliteration(syllabary_text: str) -> str:
         if char in CHEROKEE_SYLLABARY_MAP:
             res.append(CHEROKEE_SYLLABARY_MAP[char])
         elif is_cherokee_syllable(char):
-            res.append(
-                CHEROKEE_SYLLABARY_MAP.get(char, cherokee_to_bad_phonetics(char))
-            )
+            res.append(CHEROKEE_SYLLABARY_MAP.get(char, syllabary_to_phonetics(char)))
         else:
             res.append(char)
     return "".join(res)
@@ -122,7 +120,7 @@ def align_character_syllable_detailed(
     for char in syllabary_text:
         base_phon = CHEROKEE_SYLLABARY_MAP.get(
             char,
-            cherokee_to_bad_phonetics(char) if is_cherokee_syllable(char) else char,
+            syllabary_to_phonetics(char) if is_cherokee_syllable(char) else char,
         )
         units.append((char, base_phon, idx, idx + len(char)))
         idx += len(char)

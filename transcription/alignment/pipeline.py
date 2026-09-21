@@ -59,11 +59,13 @@ def _build_syllabary_word_tier(
         syll_idx = 0
         for w in chunk.words:
             k = max(1, len(w.word.split())) if w.word else 1
+            if s_words and syll_idx >= len(s_words):
+                raise ValueError(
+                    f"Syllabary word index {syll_idx} exceeds token bounds ({len(s_words)}) for chunk '{chunk.chunk_id}'."
+                )
             if s_words and syll_idx < len(s_words):
                 syll_w = " ".join(s_words[syll_idx : syll_idx + k])
                 syll_idx += k
-            elif s_words and syll_idx >= len(s_words):
-                syll_w = s_words[-1]
             else:
                 syll_w = w.word
             syllabary_words.append(
@@ -95,6 +97,10 @@ def _build_english_word_tier(
         tok_idx = 0
         for w in chunk.words:
             k = max(1, len(w.word.split())) if w.word else 1
+            if tokens and tok_idx >= len(tokens):
+                raise ValueError(
+                    f"Code-switched token index {tok_idx} exceeds token bounds ({len(tokens)}) for chunk '{chunk.chunk_id}'."
+                )
             eng_parts = []
             if tokens and tok_idx < len(tokens):
                 for t in tokens[tok_idx : tok_idx + k]:

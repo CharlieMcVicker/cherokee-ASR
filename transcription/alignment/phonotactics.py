@@ -467,19 +467,12 @@ def prepare_cherokee_text(
             - ground_truth_mat: 2D numpy array of shape (L, 1) with token integer indices.
             - utt_begin_indices: List of start row indices for each utterance/word in ground_truth_mat.
     """
-    c_list = (
-        list(char_list)
-        if char_list is not None
-        else (
-            list(config.char_list)
-            if hasattr(config, "char_list") and config.char_list is not None
-            else None
-        )
-    )
-    if c_list is None:
+    raw_char_list = char_list or getattr(config, "char_list", None)
+    if raw_char_list is None:
         raise ValueError(
             "char_list must be provided explicitly or via config.char_list to prepare_cherokee_text"
         )
+    c_list = list(raw_char_list)
 
     space_symbol = getattr(config, "space", " ")
     blank_symbol = int(getattr(config, "blank", 0))

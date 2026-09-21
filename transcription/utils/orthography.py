@@ -14,8 +14,8 @@ import re
 from typing import Optional, Set
 
 from transcription.utils.syllabary_map import (
-    cherokee_to_bad_phonetics,
     phonetics_to_syllabary,
+    syllabary_to_phonetics,
 )
 from transcription.utils.tone_normalization import respell_consonants
 
@@ -103,7 +103,7 @@ def convert_orthography(
             0x13A0 <= ord(c) <= 0x13FF or 0xAB70 <= ord(c) <= 0xABBF for c in t
         )
         if has_cherokee:
-            out = cherokee_to_bad_phonetics(t)
+            out = syllabary_to_phonetics(t)
             return clean_punctuation_and_whitespace(out)
         else:
             # Latin transliteration passed with SYLLABARY source

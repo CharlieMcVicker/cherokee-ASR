@@ -46,13 +46,9 @@ def normalize_syllabary_for_alignment(
     return convert_orthography(text, source=source, target=target)
 
 
-# Backward compatibility alias
-normalize_text_for_alignment = normalize_phonetics_for_alignment
-
 __all__ = [
     "Orthography",
     "convert_orthography",
     "normalize_phonetics_for_alignment",
     "normalize_syllabary_for_alignment",
-    "normalize_text_for_alignment",
 ]

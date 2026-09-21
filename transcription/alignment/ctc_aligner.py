@@ -892,14 +892,17 @@ def get_logits_cached(
     Tuple[np.ndarray, float, float]
         (lpz, total_audio_sec, lead_offset_sec)
     """
-    aligner = CTCSegmentationAligner(
-        model=asr_model,
+    config = CTCAlignerConfig(
         buffer_lead_ms=buffer_lead_ms,
         buffer_trail_ms=buffer_trail_ms,
         chunk_seconds=chunk_seconds,
         margin_seconds=margin_seconds,
         cache=cache,
-        cache_dir=cache_dir,
+        cache_dir=Path(cache_dir) if cache_dir is not None else None,
+    )
+    aligner = CTCSegmentationAligner(
+        model=asr_model,
+        config=config,
     )
     return aligner.get_logits_cached(
         audio_input=audio_input,

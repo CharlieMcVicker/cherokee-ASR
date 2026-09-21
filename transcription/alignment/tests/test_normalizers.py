@@ -7,7 +7,6 @@ import pytest
 from transcription.alignment.normalizers import (
     normalize_phonetics_for_alignment,
     normalize_syllabary_for_alignment,
-    normalize_text_for_alignment,
 )
 
 
@@ -67,11 +66,3 @@ def test_normalizers_empty_and_whitespace():
     assert normalize_syllabary_for_alignment("   ") == ""
     assert normalize_phonetics_for_alignment("") == ""
     assert normalize_phonetics_for_alignment("   ") == ""
-
-
-def test_normalize_text_for_alignment_backwards_compat():
-    # normalize_text_for_alignment is an alias for normalize_phonetics_for_alignment
-    assert normalize_text_for_alignment(
-        "A-da-le-ni-s-gv."
-    ) == normalize_phonetics_for_alignment("A-da-le-ni-s-gv.")
-    assert normalize_text_for_alignment("ho-wa") == "howa"

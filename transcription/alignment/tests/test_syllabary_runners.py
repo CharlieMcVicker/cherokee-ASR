@@ -253,3 +253,69 @@ def test_align_syllabary_runners_code_switching(dummy_audio: Path, tmp_path: Pat
     assert len(result_ctc.aligned_chunks) == 1
     tg_path = out_dir / "ctc_alignment.TextGrid"
     assert tg_path.exists()
+
+
+def test_build_syllabary_word_tier_length_mismatch_raises_value_error():
+    from transcription.alignment.models import (
+        AlignedChunk,
+        AlignmentMetrics,
+        AlignmentOutput,
+        WordInterval,
+    )
+    from transcription.alignment.pipeline import _build_syllabary_word_tier
+
+    alignment = AlignmentOutput(
+        aligned_chunks=[
+            AlignedChunk(
+                chunk_id="chunk_001",
+                start_sec=0.0,
+                end_sec=1.0,
+                words=[
+                    WordInterval(word="w1", start_sec=0.0, end_sec=0.5),
+                    WordInterval(word="w2", start_sec=0.5, end_sec=1.0),
+                ],
+            )
+        ],
+        source_id="test",
+        raw_tokens=[],
+        metrics=AlignmentMetrics(0, 0, 0.0, 0.0, 0, 0, 0),
+    )
+    syllabary_lookup = {"chunk_001": "ᎣᏏᏲ"}
+
+    with pytest.raises(ValueError, match="Syllabary word index 1 exceeds token bounds"):
+        _build_syllabary_word_tier(alignment, syllabary_lookup)
+
+
+def test_build_english_word_tier_length_mismatch_raises_value_error():
+    from transcription.alignment.models import (
+        AlignedChunk,
+        AlignmentMetrics,
+        AlignmentOutput,
+        WordInterval,
+    )
+    from transcription.alignment.pipeline import _build_english_word_tier
+
+    alignment = AlignmentOutput(
+        aligned_chunks=[
+            AlignedChunk(
+                chunk_id="chunk_001",
+                start_sec=0.0,
+                end_sec=1.0,
+                words=[
+                    WordInterval(word="w1", start_sec=0.0, end_sec=0.5),
+                    WordInterval(word="w2", start_sec=0.5, end_sec=1.0),
+                ],
+            )
+        ],
+        source_id="test",
+        raw_tokens=[],
+        metrics=AlignmentMetrics(0, 0, 0.0, 0.0, 0, 0, 0),
+    )
+    source_lookup = {
+        "chunk_001": {"code_switched": {"tokens": [{"english_stem": "Hello"}]}}
+    }
+
+    with pytest.raises(
+        ValueError, match="Code-switched token index 1 exceeds token bounds"
+    ):
+        _build_english_word_tier(alignment, source_lookup)

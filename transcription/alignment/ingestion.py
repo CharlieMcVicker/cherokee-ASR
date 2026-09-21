@@ -18,7 +18,6 @@ from transcription.alignment.models import TextChunk
 from transcription.alignment.normalizers import (
     normalize_phonetics_for_alignment,
     normalize_syllabary_for_alignment,
-    normalize_text_for_alignment,
 )
 
 
@@ -178,6 +177,24 @@ def load_generic_chunks(
     return chunks, source_lookup
 
 
+def _build_chunk_normalizer(
+    base_normalizer: Callable[[str], str] = normalize_phonetics_for_alignment,
+    projector: Optional[SyntheticTargetProjectorProtocol] = None,
+    code_switched: bool = False,
+) -> Callable[[str], str]:
+    if code_switched and projector is not None:
+        return lambda t: create_groundtruth_for_code_switched_syllabary(
+            t, projector=projector
+        ).unified_tth
+    if projector is not None:
+        return lambda t: normalize_code_switched_text(
+            t,
+            normalizer=base_normalizer,
+            projector=projector,
+        )
+    return base_normalizer
+
+
 def prepare_alignment_input(
     bible_metadata: Optional[Union[str, Dict[str, Any], List[Dict[str, Any]]]] = None,
     chunk_list: Optional[Union[str, List[Dict[str, Any]], Dict[str, Any]]] = None,
@@ -238,24 +255,10 @@ def prepare_alignment_input(
             projector=active_projector,
             code_switched=code_switched,
         )
-        chunk_norm: Callable[[str], str] = (
-            (
-                lambda t: create_groundtruth_for_code_switched_syllabary(
-                    t, projector=active_projector
-                ).unified_tth
-            )
-            if code_switched and active_projector is not None
-            else (
-                (
-                    lambda t: normalize_code_switched_text(
-                        t,
-                        normalizer=normalize_syllabary_for_alignment,
-                        projector=active_projector,
-                    )
-                )
-                if active_projector is not None
-                else normalize_syllabary_for_alignment
-            )
+        chunk_norm = _build_chunk_normalizer(
+            base_normalizer=normalize_syllabary_for_alignment,
+            projector=active_projector,
+            code_switched=code_switched,
         )
         return (
             chunks,
@@ -265,16 +268,9 @@ def prepare_alignment_input(
         )
 
     if bible_metadata is not None:
-        chunk_norm = (
-            (
-                lambda t: normalize_code_switched_text(
-                    t,
-                    normalizer=normalize_phonetics_for_alignment,
-                    projector=active_projector,
-                )
-            )
-            if active_projector is not None
-            else normalize_phonetics_for_alignment
+        chunk_norm = _build_chunk_normalizer(
+            base_normalizer=normalize_phonetics_for_alignment,
+            projector=active_projector,
         )
         chunks, source_lookup = load_bible_chunks(bible_metadata, normalizer=chunk_norm)
         return (
@@ -285,16 +281,9 @@ def prepare_alignment_input(
         )
 
     if chunk_list is not None:
-        chunk_norm = (
-            (
-                lambda t: normalize_code_switched_text(
-                    t,
-                    normalizer=normalize_phonetics_for_alignment,
-                    projector=active_projector,
-                )
-            )
-            if active_projector is not None
-            else normalize_phonetics_for_alignment
+        chunk_norm = _build_chunk_normalizer(
+            base_normalizer=normalize_phonetics_for_alignment,
+            projector=active_projector,
         )
         chunks, source_lookup = load_generic_chunks(chunk_list, normalizer=chunk_norm)
         return (

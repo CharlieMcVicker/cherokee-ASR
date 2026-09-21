@@ -1,8 +1,8 @@
 import unittest
 from transcription.utils.syllabary_map import (
     CHEROKEE_SYLLABARY_MAP,
-    cherokee_to_bad_phonetics,
     phonetics_to_syllabary,
+    syllabary_to_phonetics,
 )
 
 
@@ -19,13 +19,13 @@ class TestSyllabaryMap(unittest.TestCase):
         self.assertEqual(CHEROKEE_SYLLABARY_MAP["Ꮣ"], "ta")
         self.assertEqual(CHEROKEE_SYLLABARY_MAP["Ꮤ"], "tha")
 
-    def test_cherokee_to_bad_phonetics(self):
+    def test_syllabary_to_phonetics(self):
         """Ensure transliteration function converts syllabary while preserving punctuation/unknown chars and inserting hiatus glottals."""
-        self.assertEqual(cherokee_to_bad_phonetics("ᎣᏏᏲ"), "ohsiyo")
-        self.assertEqual(cherokee_to_bad_phonetics("Ꮏ!"), "nha!")
-        self.assertEqual(cherokee_to_bad_phonetics("ᎢᎾᎨᎢ"), "inake'i")
-        self.assertEqual(cherokee_to_bad_phonetics("ᎯᎠ"), "hi'a")
-        self.assertEqual(cherokee_to_bad_phonetics("ᎠᏍᎦᏅᏨᎢ"), "ahskanvtsv'i")
+        self.assertEqual(syllabary_to_phonetics("ᎣᏏᏲ"), "ohsiyo")
+        self.assertEqual(syllabary_to_phonetics("Ꮏ!"), "nha!")
+        self.assertEqual(syllabary_to_phonetics("ᎢᎾᎨᎢ"), "inake'i")
+        self.assertEqual(syllabary_to_phonetics("ᎯᎠ"), "hi'a")
+        self.assertEqual(syllabary_to_phonetics("ᎠᏍᎦᏅᏨᎢ"), "ahskanvtsv'i")
 
     def test_phonetics_to_syllabary_direct_matches(self):
         """Test phonetic transliteration to Cherokee syllabary conversion."""

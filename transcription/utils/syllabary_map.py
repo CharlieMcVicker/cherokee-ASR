@@ -156,7 +156,7 @@ PHONETIC_TO_SYLLABARY_MAP.update(
 )
 
 
-def cherokee_to_bad_phonetics(text: str) -> str:
+def syllabary_to_phonetics(text: str) -> str:
     """
     Translates Cherokee syllabary into phonetic transliteration character by character.
     Inserts a glottal stop /'/ between adjacent vowels to resolve vowel hiatus (e.g. ᎢᎾᎨᎢ -> inake'i).
