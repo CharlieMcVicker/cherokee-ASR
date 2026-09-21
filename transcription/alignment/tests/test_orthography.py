@@ -44,6 +44,26 @@ def test_syllabary_to_tth_conversion():
     assert "hh" not in converted
 
 
+def test_syllabary_to_tth_contextual_vs_unconditional_sibilants():
+    # Word-initial sibilant word: ᏍᎩ (ski vs hski) and ᏌᏊ (sakwu vs hsakwu)
+    text = "ᏍᎩ ᏌᏊ ᎠᏍᎦᏯ ᏣᎳᎩ"
+    contextual = convert_orthography(
+        text,
+        source=Orthography.SYLLABARY,
+        target=Orthography.TTH,
+        contextual_preaspiration=True,
+    )
+    assert contextual == "ski sakwu ahskaya tsalaki"
+
+    unconditional = convert_orthography(
+        text,
+        source=Orthography.SYLLABARY,
+        target=Orthography.TTH,
+        contextual_preaspiration=False,
+    )
+    assert unconditional == "hski hsakwu ahskaya tsalaki"
+
+
 def test_syllabary_to_dg_conversion():
     syl = "ᎢᎾᎨᎢ"
     converted = convert_orthography(

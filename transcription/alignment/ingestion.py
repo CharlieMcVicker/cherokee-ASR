@@ -303,10 +303,11 @@ def load_syllabary_transcript(
         Sequence[Union[str, Dict[str, Any]]],
         Dict[str, Union[str, Dict[str, Any]]],
     ],
-    normalizer: Callable[[str], str] = normalize_syllabary_for_alignment,
+    normalizer: Optional[Callable[[str], str]] = None,
     projector: Optional[SyntheticTargetProjectorProtocol] = None,
     code_switched: bool = False,
     strip_speaker: bool = False,
+    contextual_preaspiration: bool = True,
 ) -> Tuple[List[TextChunk], Dict[str, Dict[str, Any]]]:
     """
     Loads raw Cherokee Syllabary transcripts (lines or chunks) into TextChunks.
@@ -318,10 +319,12 @@ def load_syllabary_transcript(
         source: Raw multiline text string, path to .txt/.json file, list of text lines/chunks,
                 or dictionary of chunks.
         normalizer: Function to convert syllabary text into canonical TTH phonetics.
-                    Defaults to normalize_syllabary_for_alignment.
+                    Defaults to normalize_syllabary_for_alignment(contextual_preaspiration=...).
         projector: Optional SyntheticTargetProjectorProtocol instance.
         code_switched: Whether to enable code-switched English projection (defaults to False).
         strip_speaker: Whether to strip leading speaker prefixes (e.g. 'Guy Soldier:') from alignment targets.
+        contextual_preaspiration: Whether to apply contextual pre-aspiration (suppressing
+            leading 'h' before word-initial 's' and affricates) or unconditional 'hs' conversion.
 
     Returns:
         A tuple of (chunks, source_lookup) where:
@@ -333,18 +336,31 @@ def load_syllabary_transcript(
     if code_switched and active_projector is None:
         active_projector = get_default_projector()
 
+    resolved_normalizer: Callable[[str], str] = (
+        normalizer
+        if normalizer is not None
+        else (
+            lambda s: normalize_syllabary_for_alignment(
+                s, contextual_preaspiration=contextual_preaspiration
+            )
+        )
+    )
+
     if code_switched and active_projector is not None:
         effective_norm: Callable[[str], str] = (
             lambda s: create_groundtruth_for_code_switched_syllabary(
-                s, projector=active_projector, strip_speaker=strip_speaker
+                s,
+                projector=active_projector,
+                strip_speaker=strip_speaker,
+                contextual_preaspiration=contextual_preaspiration,
             ).unified_tth
         )
     elif active_projector is not None:
-        effective_norm: Callable[[str], str] = lambda s: normalize_code_switched_text(
-            s, normalizer=normalizer, projector=active_projector
+        effective_norm = lambda s: normalize_code_switched_text(
+            s, normalizer=resolved_normalizer, projector=active_projector
         )
     else:
-        effective_norm = normalizer
+        effective_norm = resolved_normalizer
 
     def _build_metadata(text_val: str, norm_val: str) -> Dict[str, Any]:
         meta: Dict[str, Any] = {
@@ -355,7 +371,10 @@ def load_syllabary_transcript(
         }
         if code_switched and active_projector is not None:
             cs_res = create_groundtruth_for_code_switched_syllabary(
-                text_val, projector=active_projector, strip_speaker=strip_speaker
+                text_val,
+                projector=active_projector,
+                strip_speaker=strip_speaker,
+                contextual_preaspiration=contextual_preaspiration,
             )
             meta["code_switched"] = cs_res.to_dict()
             if cs_res.speaker is not None:
@@ -392,6 +411,7 @@ def load_syllabary_transcript(
                     projector=active_projector,
                     code_switched=code_switched,
                     strip_speaker=strip_speaker,
+                    contextual_preaspiration=contextual_preaspiration,
                 )
             else:
                 with open(s_str, "r", encoding="utf-8") as f:
@@ -412,6 +432,7 @@ def load_syllabary_transcript(
                     projector=active_projector,
                     code_switched=code_switched,
                     strip_speaker=strip_speaker,
+                    contextual_preaspiration=contextual_preaspiration,
                 )
             except Exception:
                 pass
@@ -453,6 +474,7 @@ def load_syllabary_transcript(
                         raw_syll,
                         projector=active_projector,
                         strip_speaker=strip_speaker,
+                        contextual_preaspiration=contextual_preaspiration,
                     )
                     meta["code_switched"] = cs_res.to_dict()
                     if cs_res.speaker is not None:
@@ -490,6 +512,7 @@ def load_syllabary_transcript(
                         raw_syll,
                         projector=active_projector,
                         strip_speaker=strip_speaker,
+                        contextual_preaspiration=contextual_preaspiration,
                     )
                     meta["code_switched"] = cs_res.to_dict()
                     if cs_res.speaker is not None:
@@ -507,9 +530,10 @@ def load_syllabary_transcript(
 
 def load_interview_transcript(
     source: Union[str, Path, List[str]],
-    normalizer: Callable[[str], str] = normalize_syllabary_for_alignment,
+    normalizer: Optional[Callable[[str], str]] = None,
     projector: Optional[SyntheticTargetProjectorProtocol] = None,
     code_switched: bool = False,
+    contextual_preaspiration: bool = True,
 ) -> Tuple[List[TextChunk], Dict[str, Dict[str, Any]]]:
     """
     Ingests dialogue and interview transcripts formatted as 'Speaker: Spoken text',
@@ -521,9 +545,11 @@ def load_interview_transcript(
     Args:
         source: File path to transcript (.txt), raw multiline string, or list of line strings.
         normalizer: Function to convert syllabary text into canonical TTH phonetics.
-                    Defaults to normalize_syllabary_for_alignment.
+                    Defaults to normalize_syllabary_for_alignment(contextual_preaspiration=...).
         projector: Optional SyntheticTargetProjectorProtocol instance.
         code_switched: Whether to enable code-switched English projection (defaults to False).
+        contextual_preaspiration: Whether to apply contextual pre-aspiration (suppressing
+            leading 'h' before word-initial 's' and affricates) or unconditional 'hs' conversion.
 
     Returns:
         A tuple of (chunks, source_lookup) where:
@@ -535,18 +561,30 @@ def load_interview_transcript(
     if code_switched and active_projector is None:
         active_projector = get_default_projector()
 
+    resolved_normalizer: Callable[[str], str] = (
+        normalizer
+        if normalizer is not None
+        else (
+            lambda s: normalize_syllabary_for_alignment(
+                s, contextual_preaspiration=contextual_preaspiration
+            )
+        )
+    )
+
     if code_switched and active_projector is not None:
         effective_norm: Callable[[str], str] = (
             lambda s: create_groundtruth_for_code_switched_syllabary(
-                s, projector=active_projector
+                s,
+                projector=active_projector,
+                contextual_preaspiration=contextual_preaspiration,
             ).unified_tth
         )
     elif active_projector is not None:
-        effective_norm: Callable[[str], str] = lambda s: normalize_code_switched_text(
-            s, normalizer=normalizer, projector=active_projector
+        effective_norm = lambda s: normalize_code_switched_text(
+            s, normalizer=resolved_normalizer, projector=active_projector
         )
     else:
-        effective_norm = normalizer
+        effective_norm = resolved_normalizer
 
     if isinstance(source, (str, Path)):
         s_str = str(source).strip()
@@ -604,7 +642,9 @@ def load_interview_transcript(
         }
         if code_switched and active_projector is not None:
             turn_meta["code_switched"] = create_groundtruth_for_code_switched_syllabary(
-                text_to_process, projector=active_projector
+                text_to_process,
+                projector=active_projector,
+                contextual_preaspiration=contextual_preaspiration,
             ).to_dict()
         source_lookup[cid] = turn_meta
 

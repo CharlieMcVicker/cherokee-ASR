@@ -274,6 +274,7 @@ def classify_token(token: str) -> TokenType:
 def prepare_code_switched_token(
     token: str,
     projector: Optional[SyntheticTargetProjectorProtocol] = None,
+    contextual_preaspiration: bool = True,
 ) -> CodeSwitchedToken:
     """
     Parses and projects an individual token into a CodeSwitchedToken with canonical TTH phonetics.
@@ -300,7 +301,13 @@ def prepare_code_switched_token(
         stem_tth = stem_target.projected_tth
 
         # Convert Cherokee Syllabary clitic directly to canonical TTH
-        clitic_tth = normalize_syllabary_for_alignment(clitic) if clitic else ""
+        clitic_tth = (
+            normalize_syllabary_for_alignment(
+                clitic, contextual_preaspiration=contextual_preaspiration
+            )
+            if clitic
+            else ""
+        )
         canonical_tth = f"{stem_tth}{clitic_tth}"
 
         # English stem receives ZERO syncope/intrusion; Syllabary clitic receives Cherokee phonotactics
@@ -350,7 +357,9 @@ def prepare_code_switched_token(
     elif tok_type == TokenType.CHEROKEE_SYLLABARY:
         clean_word = strip_boundary_punctuation(stripped)
         # Convert Cherokee Syllabary directly to canonical TTH phonetics
-        norm_tth = normalize_syllabary_for_alignment(clean_word)
+        norm_tth = normalize_syllabary_for_alignment(
+            clean_word, contextual_preaspiration=contextual_preaspiration
+        )
         # Native Cherokee Syllabary receives full Cherokee phonotactic analysis
         syll_syncope = tuple(get_syncope_mask(norm_tth, return_char_mask=True))
         syll_intrusion = tuple(get_intrusion_site_mask(norm_tth, return_char_mask=True))
@@ -398,6 +407,7 @@ def create_groundtruth_for_code_switched_syllabary(
     text: str,
     projector: Optional[SyntheticTargetProjectorProtocol] = None,
     strip_speaker: bool = False,
+    contextual_preaspiration: bool = True,
 ) -> CodeSwitchedLineResult:
     """
     Prepares mixed Cherokee Syllabary and English code-switched text for acoustic alignment
@@ -416,6 +426,8 @@ def create_groundtruth_for_code_switched_syllabary(
                    Defaults to get_default_projector().
         strip_speaker: If True, strips leading speaker prefix (e.g. 'Guy Soldier:') and
                        records speaker on the result. If False, preserves all tokens.
+        contextual_preaspiration: Whether to apply contextual pre-aspiration (suppressing
+            leading 'h' before word-initial 's' and affricates) or unconditional 'hs' conversion.
 
     Returns:
         CodeSwitchedLineResult containing token breakdown, speaker, and unified canonical TTH string.
@@ -443,7 +455,11 @@ def create_groundtruth_for_code_switched_syllabary(
     processed_tokens: List[CodeSwitchedToken] = []
 
     for tok in raw_tokens:
-        tok_obj = prepare_code_switched_token(tok, projector=active_projector)
+        tok_obj = prepare_code_switched_token(
+            tok,
+            projector=active_projector,
+            contextual_preaspiration=contextual_preaspiration,
+        )
         processed_tokens.append(tok_obj)
 
     tth_parts = [t.canonical_tth for t in processed_tokens if t.canonical_tth]

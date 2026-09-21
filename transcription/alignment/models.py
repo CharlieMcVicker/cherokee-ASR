@@ -45,6 +45,7 @@ class CTCAlignerConfig:
     vad_p_low: float = 0.15
     vad_p_high: float = 0.60
     vad_pad_ms: int = 60
+    contextual_preaspiration: bool = True
 
 
 @dataclass(frozen=True)

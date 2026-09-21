@@ -507,3 +507,26 @@ def test_codeswitched_token_phonotactic_masks(default_projector):
     restored_tok = CodeSwitchedToken.from_dict(tok_dict)
     assert restored_tok.syncope_mask == jay_tok.syncope_mask
     assert restored_tok.intrusion_mask == jay_tok.intrusion_mask
+
+
+def test_codeswitched_preparer_contextual_preaspiration(default_projector):
+    """
+    Validates that contextual_preaspiration flag properly controls sibilant pre-aspiration
+    for Cherokee tokens and clitics within code-switched text.
+    """
+    line = "Jay ᏍᎩ ᏌᏊ ᎠᏍᎦᏯ"
+
+    res_contextual = create_groundtruth_for_code_switched_syllabary(
+        line,
+        projector=default_projector,
+        contextual_preaspiration=True,
+    )
+    # Word-initial 's' in ᏍᎩ and ᏌᏊ remains bare 's'; medial in ᎠᏍᎦᏯ receives 'hs'
+    assert res_contextual.unified_tth == "tse ski sakwu ahskaya"
+
+    res_unconditional = create_groundtruth_for_code_switched_syllabary(
+        line,
+        projector=default_projector,
+        contextual_preaspiration=False,
+    )
+    assert res_unconditional.unified_tth == "tse hski hsakwu ahskaya"

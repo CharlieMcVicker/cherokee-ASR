@@ -66,6 +66,7 @@ def convert_orthography(
     source: Orthography,
     target: Orthography,
     strip_tones: bool = True,
+    contextual_preaspiration: bool = True,
 ) -> str:
     """
     Pure and deterministic transformation map between explicit orthographies.
@@ -77,6 +78,8 @@ def convert_orthography(
         source: Explicit source Orthography.
         target: Explicit target Orthography.
         strip_tones: Whether to strip tone digits and vowel-length colons.
+        contextual_preaspiration: Whether to apply contextual pre-aspiration (suppressing
+            leading 'h' before word-initial 's' and affricates) or unconditional 'hs' conversion.
 
     Returns:
         Converted Cherokee string in target orthography.
@@ -103,7 +106,9 @@ def convert_orthography(
             0x13A0 <= ord(c) <= 0x13FF or 0xAB70 <= ord(c) <= 0xABBF for c in t
         )
         if has_cherokee:
-            out = syllabary_to_phonetics(t)
+            out = syllabary_to_phonetics(
+                t, contextual_preaspiration=contextual_preaspiration
+            )
             return clean_punctuation_and_whitespace(out)
         else:
             # Latin transliteration passed with SYLLABARY source
@@ -113,6 +118,8 @@ def convert_orthography(
                 t_low = t.lower()
                 out = t_low.replace("qu", "gw").replace("tl", "dl").replace("TL", "dl")
                 out = respell_consonants(out)
+                if not contextual_preaspiration:
+                    out = re.sub(r"(?<![ht])\b(s)", r"h\1", out)
                 out = re.sub(r"([aeiouvAEIOUV])(?=[aeiouvAEIOUV])", r"\1'", out)
                 return clean_punctuation_and_whitespace(out)
             if target == Orthography.DG:
@@ -127,6 +134,8 @@ def convert_orthography(
             t_low = t.lower()
             out = t_low.replace("qu", "gw").replace("tl", "dl").replace("TL", "dl")
             out = respell_consonants(out)
+            if not contextual_preaspiration:
+                out = re.sub(r"(?<![ht])\b(s)", r"h\1", out)
             out = re.sub(r"([aeiouvAEIOUV])(?=[aeiouvAEIOUV])", r"\1'", out)
             return clean_punctuation_and_whitespace(out)
 

@@ -257,6 +257,7 @@ def align_syllabary_ctc(
     projector: Optional[SyntheticTargetProjectorProtocol] = None,
     code_switched: bool = False,
     strip_speaker: bool = False,
+    contextual_preaspiration: Optional[bool] = None,
 ) -> AlignmentOutput:
     """
     Aligns Cherokee audio against a syllabary transcript using the syncope-
@@ -279,15 +280,24 @@ def align_syllabary_ctc(
         projector: Optional SyntheticTargetProjectorProtocol instance.
         code_switched: Whether to enable code-switched English projection (defaults to False).
         strip_speaker: Whether to strip leading speaker prefixes (e.g. 'Guy Soldier:') from alignment targets.
+        contextual_preaspiration: Whether to apply contextual pre-aspiration (suppressing
+            leading 'h' before word-initial 's' and affricates) or unconditional 'hs' conversion.
+            If None, inherits from config.contextual_preaspiration (defaults to True).
 
     Returns:
         AlignmentOutput object with CTC-segmented aligned chunks, word intervals, and tiers.
     """
+    effective_contextual_preaspiration = (
+        contextual_preaspiration
+        if contextual_preaspiration is not None
+        else (config.contextual_preaspiration if config is not None else True)
+    )
     chunks, source_lookup = load_syllabary_transcript(
         transcript,
         projector=projector,
         code_switched=code_switched,
         strip_speaker=strip_speaker,
+        contextual_preaspiration=effective_contextual_preaspiration,
     )
 
     asr_model = model

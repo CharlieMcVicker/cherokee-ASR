@@ -99,17 +99,22 @@ _BASE_CHEROKEE_SYLLABARY_MAP: Dict[str, str] = {
     "Ᏼ": "yv",
 }
 
-# Authoritative centralized Cherokee Syllabary mapping
-# Derived from base transliterations with respell_consonants rules (specifically Ꮏ -> nha, s-series -> hs)
-CHEROKEE_SYLLABARY_MAP: Dict[str, str] = dict(_BASE_CHEROKEE_SYLLABARY_MAP)
-CHEROKEE_SYLLABARY_MAP["Ꮏ"] = "nha"
-CHEROKEE_SYLLABARY_MAP["Ꮜ"] = "hsa"
-CHEROKEE_SYLLABARY_MAP["Ꮝ"] = "hs"
-CHEROKEE_SYLLABARY_MAP["Ꮞ"] = "hse"
-CHEROKEE_SYLLABARY_MAP["Ꮟ"] = "hsi"
-CHEROKEE_SYLLABARY_MAP["Ꮠ"] = "hso"
-CHEROKEE_SYLLABARY_MAP["Ꮡ"] = "hsu"
-CHEROKEE_SYLLABARY_MAP["Ꮢ"] = "hsv"
+# Base TTH Cherokee Syllabary character mapping (base transliteration with nha)
+CHEROKEE_SYLLABARY_BASE_MAP: Dict[str, str] = dict(_BASE_CHEROKEE_SYLLABARY_MAP)
+CHEROKEE_SYLLABARY_BASE_MAP["Ꮏ"] = "nha"
+
+# Unconditional pre-aspirated Syllabary mapping (maps all s-series to hs)
+CHEROKEE_SYLLABARY_UNCONDITIONAL_MAP: Dict[str, str] = dict(CHEROKEE_SYLLABARY_BASE_MAP)
+CHEROKEE_SYLLABARY_UNCONDITIONAL_MAP["Ꮜ"] = "hsa"
+CHEROKEE_SYLLABARY_UNCONDITIONAL_MAP["Ꮝ"] = "hs"
+CHEROKEE_SYLLABARY_UNCONDITIONAL_MAP["Ꮞ"] = "hse"
+CHEROKEE_SYLLABARY_UNCONDITIONAL_MAP["Ꮟ"] = "hsi"
+CHEROKEE_SYLLABARY_UNCONDITIONAL_MAP["Ꮠ"] = "hso"
+CHEROKEE_SYLLABARY_UNCONDITIONAL_MAP["Ꮡ"] = "hsu"
+CHEROKEE_SYLLABARY_UNCONDITIONAL_MAP["Ꮢ"] = "hsv"
+
+# Backward compatible alias pointing to unconditional map
+CHEROKEE_SYLLABARY_MAP: Dict[str, str] = CHEROKEE_SYLLABARY_UNCONDITIONAL_MAP
 
 
 import re
@@ -156,15 +161,37 @@ PHONETIC_TO_SYLLABARY_MAP.update(
 )
 
 
-def syllabary_to_phonetics(text: str) -> str:
+def syllabary_to_phonetics(
+    text: str,
+    contextual_preaspiration: bool = True,
+) -> str:
     """
     Translates Cherokee syllabary into phonetic transliteration character by character.
     Inserts a glottal stop /'/ between adjacent vowels to resolve vowel hiatus (e.g. ᎢᎾᎨᎢ -> inake'i).
     Preserves spaces, punctuation, and unknown non-syllabary characters.
+
+    Args:
+        text: Input Cherokee syllabary string.
+        contextual_preaspiration: If True (default), suppresses leading 'h' on word-initial
+            sibilants (^s) and in affricates (ts/tsh), applying pre-aspiration (hs) only
+            postvocalically/medially. If False, applies unconditional 'hs' mapping.
     """
     if not text:
         return ""
-    phonetic = "".join(CHEROKEE_SYLLABARY_MAP.get(char, char) for char in text.upper())
+
+    if contextual_preaspiration:
+        phonetic = "".join(
+            CHEROKEE_SYLLABARY_BASE_MAP.get(char, char) for char in text.upper()
+        )
+        # Apply contextual pre-aspiration: postvocalic/medial s preceded by non-h, non-t, non-whitespace
+        # Note: word-initial s and affricates (ts, tsh) remain bare s
+        phonetic = re.sub(r"([^ht\s])s", r"\1hs", phonetic)
+    else:
+        phonetic = "".join(
+            CHEROKEE_SYLLABARY_UNCONDITIONAL_MAP.get(char, char)
+            for char in text.upper()
+        )
+
     # Cherokee does not permit vowel hiatus; insert required glottal stop between adjacent vowels
     return re.sub(r"([aeiouvAEIOUV])(?=[aeiouvAEIOUV])", r"\1'", phonetic)
 
