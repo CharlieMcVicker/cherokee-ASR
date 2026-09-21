@@ -5,7 +5,7 @@ Ingestion utilities for loading text chunks from Bible metadata and generic JSON
 import json
 import os
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, Union
 
 from transcription.alignment.arpabet import (
     CodeSwitchedLineResult,
@@ -308,15 +308,22 @@ def prepare_alignment_input(
 
 
 def load_syllabary_transcript(
-    source: Union[str, Path, List[str], List[Dict[str, Any]], Dict[str, Any]],
+    source: Union[
+        str,
+        Path,
+        Sequence[Union[str, Dict[str, Any]]],
+        Dict[str, Union[str, Dict[str, Any]]],
+    ],
     normalizer: Callable[[str], str] = normalize_syllabary_for_alignment,
     projector: Optional[SyntheticTargetProjectorProtocol] = None,
     code_switched: bool = False,
+    strip_speaker: bool = False,
 ) -> Tuple[List[TextChunk], Dict[str, Dict[str, Any]]]:
     """
-    Ingests Cherokee Syllabary transcripts (or mixed Cherokee/English code-switched text)
-    from raw strings, text files, JSON files, or chunk lists into normalized TextChunks
-    and a source lookup dictionary.
+    Loads raw Cherokee Syllabary transcripts (lines or chunks) into TextChunks.
+
+    When code_switched=True or a projector is provided, English words in the transcript
+    are projected into synthetic Cherokee TTH phonetics using the projector.
 
     Args:
         source: Raw multiline text string, path to .txt/.json file, list of text lines/chunks,
@@ -325,6 +332,7 @@ def load_syllabary_transcript(
                     Defaults to normalize_syllabary_for_alignment.
         projector: Optional SyntheticTargetProjectorProtocol instance.
         code_switched: Whether to enable code-switched English projection (defaults to False).
+        strip_speaker: Whether to strip leading speaker prefixes (e.g. 'Guy Soldier:') from alignment targets.
 
     Returns:
         A tuple of (chunks, source_lookup) where:
@@ -339,7 +347,7 @@ def load_syllabary_transcript(
     if code_switched and active_projector is not None:
         effective_norm: Callable[[str], str] = (
             lambda s: create_groundtruth_for_code_switched_syllabary(
-                s, projector=active_projector
+                s, projector=active_projector, strip_speaker=strip_speaker
             ).unified_tth
         )
     elif active_projector is not None:
@@ -354,11 +362,30 @@ def load_syllabary_transcript(
             "syllabary": text_val,
             "text": text_val,
             "phonetic": norm_val,
+            "raw_line": text_val,
         }
         if code_switched and active_projector is not None:
-            meta["code_switched"] = create_groundtruth_for_code_switched_syllabary(
-                text_val, projector=active_projector
-            ).to_dict()
+            cs_res = create_groundtruth_for_code_switched_syllabary(
+                text_val, projector=active_projector, strip_speaker=strip_speaker
+            )
+            meta["code_switched"] = cs_res.to_dict()
+            if cs_res.speaker is not None:
+                meta["speaker"] = cs_res.speaker
+                spoken_display = " ".join(
+                    t.source_display for t in cs_res.tokens if t.source_display
+                )
+                meta["syllabary"] = spoken_display
+                meta["text"] = spoken_display
+        elif strip_speaker:
+            from transcription.alignment.arpabet.codeswitched_preparer import (
+                extract_speaker_prefix,
+            )
+
+            speaker, spoken_text = extract_speaker_prefix(text_val)
+            if speaker is not None:
+                meta["speaker"] = speaker
+                meta["syllabary"] = spoken_text
+                meta["text"] = spoken_text
         return meta
 
     chunks: List[TextChunk] = []
@@ -375,6 +402,7 @@ def load_syllabary_transcript(
                     normalizer=normalizer,
                     projector=active_projector,
                     code_switched=code_switched,
+                    strip_speaker=strip_speaker,
                 )
             else:
                 with open(s_str, "r", encoding="utf-8") as f:
@@ -394,6 +422,7 @@ def load_syllabary_transcript(
                     normalizer=normalizer,
                     projector=active_projector,
                     code_switched=code_switched,
+                    strip_speaker=strip_speaker,
                 )
             except Exception:
                 pass
@@ -406,7 +435,7 @@ def load_syllabary_transcript(
             source_lookup[cid] = _build_metadata(line, norm)
         return chunks, source_lookup
 
-    elif isinstance(source, list):
+    elif isinstance(source, (list, tuple)):
         for idx, item in enumerate(source, 1):
             if isinstance(item, dict):
                 cid = str(
@@ -431,11 +460,14 @@ def load_syllabary_transcript(
                 meta["text"] = raw_syll
                 meta["phonetic"] = norm
                 if code_switched and active_projector is not None:
-                    meta["code_switched"] = (
-                        create_groundtruth_for_code_switched_syllabary(
-                            raw_syll, projector=active_projector
-                        ).to_dict()
+                    cs_res = create_groundtruth_for_code_switched_syllabary(
+                        raw_syll,
+                        projector=active_projector,
+                        strip_speaker=strip_speaker,
                     )
+                    meta["code_switched"] = cs_res.to_dict()
+                    if cs_res.speaker is not None:
+                        meta["speaker"] = cs_res.speaker
                 source_lookup[cid] = meta
             else:
                 line_str = str(item).strip()
@@ -465,11 +497,14 @@ def load_syllabary_transcript(
                 meta["text"] = raw_syll
                 meta["phonetic"] = norm
                 if code_switched and active_projector is not None:
-                    meta["code_switched"] = (
-                        create_groundtruth_for_code_switched_syllabary(
-                            raw_syll, projector=active_projector
-                        ).to_dict()
+                    cs_res = create_groundtruth_for_code_switched_syllabary(
+                        raw_syll,
+                        projector=active_projector,
+                        strip_speaker=strip_speaker,
                     )
+                    meta["code_switched"] = cs_res.to_dict()
+                    if cs_res.speaker is not None:
+                        meta["speaker"] = cs_res.speaker
                 source_lookup[cid_str] = meta
             else:
                 raw_syll = str(item).strip()

@@ -30,6 +30,10 @@ from typing import (
 from transcription.alignment.arpabet.projector import get_default_projector
 from transcription.alignment.arpabet.types import SyntheticTargetProjectorProtocol
 from transcription.alignment.normalizers import normalize_syllabary_for_alignment
+from transcription.alignment.phonotactics import (
+    get_intrusion_site_mask,
+    get_syncope_mask,
+)
 
 # Regex matching compound clitic: English Latin stem + Cherokee Syllabary clitic/suffix
 # Cherokee Syllabary unicode range: U+13A0-U+13FF (main) and U+AB70-U+ABBF (supplement)
@@ -69,6 +73,7 @@ class CodeSwitchedToken:
     - Script token classification (TokenType).
     - Segmented English stem and Syllabary clitic for compound clitics.
     - Canonical Cherokee TTH phonetic target.
+    - Phonotactic syncope and intrusion masks (zeroed for English stems/words).
     """
 
     raw_token: str
@@ -77,6 +82,8 @@ class CodeSwitchedToken:
     syllabary_clitic: Optional[str] = None
     canonical_tth: str = ""
     source_display: str = ""
+    syncope_mask: Tuple[bool, ...] = field(default_factory=tuple)
+    intrusion_mask: Tuple[bool, ...] = field(default_factory=tuple)
 
     @property
     def syllabary_tier(self) -> Optional[str]:
@@ -108,6 +115,8 @@ class CodeSwitchedToken:
             "syllabary_clitic": self.syllabary_clitic,
             "canonical_tth": self.canonical_tth,
             "source_display": self.source_display,
+            "syncope_mask": list(self.syncope_mask),
+            "intrusion_mask": list(self.intrusion_mask),
         }
 
     @classmethod
@@ -120,6 +129,8 @@ class CodeSwitchedToken:
             syllabary_clitic=data.get("syllabary_clitic"),
             canonical_tth=str(data.get("canonical_tth", "")),
             source_display=str(data.get("source_display", "")),
+            syncope_mask=tuple(bool(x) for x in data.get("syncope_mask", [])),
+            intrusion_mask=tuple(bool(x) for x in data.get("intrusion_mask", [])),
         )
 
 
@@ -292,6 +303,20 @@ def prepare_code_switched_token(
         clitic_tth = normalize_syllabary_for_alignment(clitic) if clitic else ""
         canonical_tth = f"{stem_tth}{clitic_tth}"
 
+        # English stem receives ZERO syncope/intrusion; Syllabary clitic receives Cherokee phonotactics
+        stem_syncope = (False,) * len(stem_tth)
+        stem_intrusion = (False,) * len(stem_tth)
+        clitic_syncope = (
+            tuple(get_syncope_mask(clitic_tth, return_char_mask=True))
+            if clitic_tth
+            else ()
+        )
+        clitic_intrusion = (
+            tuple(get_intrusion_site_mask(clitic_tth, return_char_mask=True))
+            if clitic_tth
+            else ()
+        )
+
         return CodeSwitchedToken(
             raw_token=token,
             token_type=TokenType.COMPOUND_CLITIC,
@@ -299,12 +324,18 @@ def prepare_code_switched_token(
             syllabary_clitic=clitic,
             canonical_tth=canonical_tth,
             source_display=stripped,
+            syncope_mask=stem_syncope + clitic_syncope,
+            intrusion_mask=stem_intrusion + clitic_intrusion,
         )
 
     elif tok_type == TokenType.ENGLISH:
         clean_word = strip_boundary_punctuation(stripped)
         # Project English word strictly via projector (zero DG-to-TTH mutation)
         target = active_projector.project_word(clean_word)
+        # English words receive strictly ZERO Cherokee syncope and ZERO intrusion
+        zero_syncope = (False,) * len(target.projected_tth)
+        zero_intrusion = (False,) * len(target.projected_tth)
+
         return CodeSwitchedToken(
             raw_token=token,
             token_type=TokenType.ENGLISH,
@@ -312,12 +343,18 @@ def prepare_code_switched_token(
             syllabary_clitic=None,
             canonical_tth=target.projected_tth,
             source_display=stripped,
+            syncope_mask=zero_syncope,
+            intrusion_mask=zero_intrusion,
         )
 
     elif tok_type == TokenType.CHEROKEE_SYLLABARY:
         clean_word = strip_boundary_punctuation(stripped)
         # Convert Cherokee Syllabary directly to canonical TTH phonetics
         norm_tth = normalize_syllabary_for_alignment(clean_word)
+        # Native Cherokee Syllabary receives full Cherokee phonotactic analysis
+        syll_syncope = tuple(get_syncope_mask(norm_tth, return_char_mask=True))
+        syll_intrusion = tuple(get_intrusion_site_mask(norm_tth, return_char_mask=True))
+
         return CodeSwitchedToken(
             raw_token=token,
             token_type=TokenType.CHEROKEE_SYLLABARY,
@@ -325,6 +362,8 @@ def prepare_code_switched_token(
             syllabary_clitic=None,
             canonical_tth=norm_tth,
             source_display=stripped,
+            syncope_mask=syll_syncope,
+            intrusion_mask=syll_intrusion,
         )
 
     else:  # TokenType.PUNCTUATION
@@ -335,6 +374,8 @@ def prepare_code_switched_token(
             syllabary_clitic=None,
             canonical_tth="",
             source_display=stripped,
+            syncope_mask=(),
+            intrusion_mask=(),
         )
 
 

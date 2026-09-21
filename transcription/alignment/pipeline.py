@@ -131,6 +131,7 @@ def align_syllabary_greedy(
     emissions_extractor: Optional[ASREmissionsExtractor] = None,
     projector: Optional[SyntheticTargetProjectorProtocol] = None,
     code_switched: bool = False,
+    strip_speaker: bool = False,
 ) -> AlignmentOutput:
     """
     Aligns Cherokee audio against a syllabary transcript using the established
@@ -154,12 +155,16 @@ def align_syllabary_greedy(
         emissions_extractor: Optional custom ASREmissionsExtractor.
         projector: Optional SyntheticTargetProjectorProtocol instance.
         code_switched: Whether to enable code-switched English projection (defaults to False).
+        strip_speaker: Whether to strip leading speaker prefixes (e.g. 'Guy Soldier:') from alignment targets.
 
     Returns:
         AlignmentOutput object with aligned chunks, word intervals, metrics, and tiers.
     """
     chunks, source_lookup = load_syllabary_transcript(
-        transcript, projector=projector, code_switched=code_switched
+        transcript,
+        projector=projector,
+        code_switched=code_switched,
+        strip_speaker=strip_speaker,
     )
 
     if emissions_extractor is not None:
@@ -244,6 +249,7 @@ def align_syllabary_ctc(
     manifest_filename: str = "alignment_manifest.json",
     projector: Optional[SyntheticTargetProjectorProtocol] = None,
     code_switched: bool = False,
+    strip_speaker: bool = False,
 ) -> AlignmentOutput:
     """
     Aligns Cherokee audio against a syllabary transcript using the syncope-
@@ -265,12 +271,16 @@ def align_syllabary_ctc(
         manifest_filename: Name of the generated JSON manifest (default: alignment_manifest.json).
         projector: Optional SyntheticTargetProjectorProtocol instance.
         code_switched: Whether to enable code-switched English projection (defaults to False).
+        strip_speaker: Whether to strip leading speaker prefixes (e.g. 'Guy Soldier:') from alignment targets.
 
     Returns:
         AlignmentOutput object with CTC-segmented aligned chunks, word intervals, and tiers.
     """
     chunks, source_lookup = load_syllabary_transcript(
-        transcript, projector=projector, code_switched=code_switched
+        transcript,
+        projector=projector,
+        code_switched=code_switched,
+        strip_speaker=strip_speaker,
     )
 
     asr_model = model
@@ -291,6 +301,7 @@ def align_syllabary_ctc(
         chunks=chunks,
         source_id=audio_source_id,
         cache=cache,
+        source_metadata=source_lookup,
     )
 
     syllabary_lookup = {

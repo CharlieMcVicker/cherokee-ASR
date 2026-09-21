@@ -470,3 +470,40 @@ def test_load_syllabary_transcript_with_codeswitched_compounds(default_projector
     assert chunks[1].text.startswith("khukhhsani")
     assert "code_switched" in source_lookup["chunk_001"]
     assert "code_switched" in source_lookup["chunk_002"]
+
+
+def test_codeswitched_token_phonotactic_masks(default_projector):
+    """
+    Validates that English tokens receive strictly zero syncope and intrusion masks,
+    Syllabary tokens receive Cherokee phonotactics, and compound clitics are segmented.
+    """
+    # 1. Pure English word: Soldier
+    soldier_tok = prepare_code_switched_token("Soldier", projector=default_projector)
+    assert soldier_tok.token_type == TokenType.ENGLISH
+    assert len(soldier_tok.syncope_mask) == len(soldier_tok.canonical_tth)
+    assert len(soldier_tok.intrusion_mask) == len(soldier_tok.canonical_tth)
+    assert not any(soldier_tok.syncope_mask)
+    assert not any(soldier_tok.intrusion_mask)
+
+    # 2. Pure Cherokee Syllabary word: ᎠᏓᎴᏂᏍᎬ (canonical TTH: adalenisgv)
+    syll_tok = prepare_code_switched_token("ᎠᏓᎴᏂᏍᎬ", projector=default_projector)
+    assert syll_tok.token_type == TokenType.CHEROKEE_SYLLABARY
+    assert len(syll_tok.syncope_mask) == len(syll_tok.canonical_tth)
+    assert len(syll_tok.intrusion_mask) == len(syll_tok.canonical_tth)
+    # Cherokee word has weak vowels (e.g., 'a' at idx 0 or syncopatable sites)
+    assert any(syll_tok.syncope_mask)
+
+    # 3. Compound Clitic: JayᎢ (stem Jay -> tse, clitic Ꭲ -> i)
+    jay_tok = prepare_code_switched_token("JayᎢ", projector=default_projector)
+    assert jay_tok.token_type == TokenType.COMPOUND_CLITIC
+    assert jay_tok.canonical_tth == "tsei"
+    assert len(jay_tok.syncope_mask) == 4
+    # Stem 'tse' (first 3 chars) must be strictly all False for syncope and intrusion
+    assert not any(jay_tok.syncope_mask[:3])
+    assert not any(jay_tok.intrusion_mask[:3])
+
+    # 4. Serialization roundtrip preserves masks
+    tok_dict = jay_tok.to_dict()
+    restored_tok = CodeSwitchedToken.from_dict(tok_dict)
+    assert restored_tok.syncope_mask == jay_tok.syncope_mask
+    assert restored_tok.intrusion_mask == jay_tok.intrusion_mask

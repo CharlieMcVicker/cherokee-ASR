@@ -971,3 +971,87 @@ def test_extract_word_intervals_vectorized_confidence():
     assert np.isclose(w0.confidence, expected_word_conf, atol=1e-4)
     assert w0.min_char_confidence is not None
     assert np.isclose(w0.min_char_confidence, expected_min_char, atol=1e-4)
+
+
+def test_ctc_aligner_codeswitched_masks_forwarding(dummy_audio_file: Path):
+    """
+    Verify that CTCSegmentationAligner.align extracts code-switched token metadata
+    from source_metadata and forwards custom token masks into prepare_cherokee_text.
+    """
+    from unittest.mock import MagicMock, patch
+    from transcription.alignment.models import TextChunk
+    from transcription.alignment.arpabet import (
+        create_groundtruth_for_code_switched_syllabary,
+    )
+
+    aligner = CTCSegmentationAligner()
+
+    line = "Guy Soldier: ᎯᎠ coffee ᎠᎩᏚᎵ"
+    cs_res = create_groundtruth_for_code_switched_syllabary(line, strip_speaker=True)
+    chunks = [TextChunk(chunk_id="chunk_01", text=cs_res.unified_tth)]
+    source_metadata = {
+        "chunk_01": {
+            "text": line,
+            "code_switched": cs_res.to_dict(),
+        }
+    }
+
+    mock_model = MagicMock()
+    mock_model.vocab = {
+        "<pad>": 0,
+        "a": 1,
+        "e": 2,
+        "i": 3,
+        "o": 4,
+        "u": 5,
+        "v": 6,
+        "k": 7,
+        "h": 8,
+        "s": 9,
+        "t": 10,
+        "l": 11,
+        "'": 12,
+        "|": 13,
+    }
+    mock_model.pad_token = "<pad>"
+    mock_model.word_delimiter_token = "|"
+    mock_model.decode.return_value = MagicMock(
+        text="hi'a khasi akituli", confidence=0.95
+    )
+
+    fake_lpz = np.zeros((100, len(mock_model.vocab)), dtype=np.float32)
+
+    with patch.object(
+        aligner, "get_logits_cached", return_value=(fake_lpz, 2.0, 16000)
+    ):
+        with patch(
+            "transcription.alignment.ctc_aligner.prepare_cherokee_text",
+            wraps=prepare_cherokee_text,
+        ) as mock_prep:
+            with patch(
+                "transcription.alignment.ctc_aligner.ctc_segmentation"
+            ) as mock_ctc:
+                # Mock ctc_segmentation returns
+                mock_ctc.return_value = (
+                    np.zeros(20),
+                    np.zeros(100),
+                    ["ε"] * 100,
+                )
+                aligner.align(
+                    dummy_audio_file,
+                    chunks=chunks,
+                    source_id="test_audio",
+                    asr_model=mock_model,
+                    source_metadata=source_metadata,
+                )
+
+                assert mock_prep.called
+                _, kwargs = mock_prep.call_args
+                assert "token_masks" in kwargs
+                token_masks = kwargs["token_masks"]
+                assert token_masks is not None
+                # Word 0: hi'a (Cherokee), Word 1: khasi (English coffee -> zero masks), Word 2: akituli (Cherokee)
+                # Word 1 (khasi) must have all False for syncope and intrusion
+                khasi_sync, khasi_intrus = token_masks[1]
+                assert not any(khasi_sync)
+                assert not any(khasi_intrus)

@@ -445,6 +445,7 @@ def prepare_cherokee_text(
     text: Union[str, Sequence[str]],
     char_list: Optional[Sequence[str]] = None,
     enforce_phonotactics: bool = True,
+    token_masks: Optional[Sequence[Tuple[Sequence[bool], Sequence[bool]]]] = None,
 ) -> Tuple[np.ndarray, List[int]]:
     """
     Prepares Cherokee phonetic text for syncope- and intrusion-aware CTC segmentation.
@@ -458,6 +459,8 @@ def prepare_cherokee_text(
         text: Input text as a single string, list of words, or list of utterances.
         char_list: Sequence of vocabulary characters/tokens from the ASR model.
         enforce_phonotactics: If True, generates phonotactically accurate syncope and intrusive masks.
+        token_masks: Optional pre-computed sequence of (syncope_mask, intrusion_mask) tuples per word
+                     (e.g., from CodeSwitchedToken to strictly isolate English loanwords from Cherokee phonotactics).
 
     Returns:
         Tuple[np.ndarray, List[int]]:
@@ -492,6 +495,7 @@ def prepare_cherokee_text(
         (0, False, False)
     ]  # (gt_idx, is_syncope, is_intrusion)
 
+    word_mask_idx = 0
     for utt in utterances:
         if ground_truth[-1] != space_symbol:
             ground_truth.append(space_symbol)
@@ -505,16 +509,26 @@ def prepare_cherokee_text(
                 ground_truth.append(space_symbol)
                 gt_char_coords.append((len(ground_truth) - 1, False, False))
 
-            word_syncope = (
-                get_syncope_mask(word, return_char_mask=True)
-                if enforce_phonotactics
-                else [False] * len(word)
-            )
-            word_intrusion = (
-                get_intrusion_site_mask(word, return_char_mask=True)
-                if enforce_phonotactics
-                else [False] * len(word)
-            )
+            if token_masks is not None and word_mask_idx < len(token_masks):
+                custom_sync, custom_intrus = token_masks[word_mask_idx]
+                word_mask_idx += 1
+                word_syncope = (
+                    list(custom_sync) if enforce_phonotactics else [False] * len(word)
+                )
+                word_intrusion = (
+                    list(custom_intrus) if enforce_phonotactics else [False] * len(word)
+                )
+            else:
+                word_syncope = (
+                    get_syncope_mask(word, return_char_mask=True)
+                    if enforce_phonotactics
+                    else [False] * len(word)
+                )
+                word_intrusion = (
+                    get_intrusion_site_mask(word, return_char_mask=True)
+                    if enforce_phonotactics
+                    else [False] * len(word)
+                )
 
             for ch_idx, ch in enumerate(word):
                 if ch in c_list:

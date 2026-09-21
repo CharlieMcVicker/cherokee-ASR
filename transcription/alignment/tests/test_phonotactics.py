@@ -197,6 +197,60 @@ def test_prepare_cherokee_text_matrix_and_masks():
     assert len(config.is_intrusive_site) == gt_mat.shape[0]
 
 
+def test_prepare_cherokee_text_with_token_masks():
+    """Verify prepare_cherokee_text respects explicit token_masks to isolate English words."""
+    from ctc_segmentation import CtcSegmentationParameters  # type: ignore
+    from transcription.alignment.phonotactics import prepare_cherokee_text
+
+    char_list = [
+        "a",
+        "e",
+        "i",
+        "o",
+        "u",
+        "v",
+        "k",
+        "w",
+        "h",
+        "m",
+        "t",
+        "s",
+        "d",
+        "l",
+        "n",
+        "g",
+        "'",
+    ]
+    config = CtcSegmentationParameters(
+        char_list=char_list,
+        blank=0,
+        space=" ",
+    )
+
+    # Word 1: 'hsowtsa' (English Soldier, len 7) -> zero masks
+    # Word 2: 'adalenisgv' (Cherokee Syllabary, len 10) -> Cherokee phonotactics
+    text = "hsowtsa adalenisgv"
+    english_masks = ([False] * 7, [False] * 7)
+    cherokee_masks = (
+        [True, False, False, False, True, False, False, False, False, False],
+        [False, False, False, False, False, False, False, True, False, False],
+    )
+    token_masks = [english_masks, cherokee_masks]
+
+    gt_mat, utt_indices = prepare_cherokee_text(
+        config, text, char_list=char_list, token_masks=token_masks
+    )
+
+    # In ground_truth: ["", " ", "h", "s", "o", "w", "t", "s", "a", " ", "a", "d", "a", "l", "e", "n", "i", "s", "g", "v", " "]
+    # Indices 2..8 correspond to 'hsowtsa'
+    for idx in range(2, 9):
+        assert config.is_syncope_token[idx] == 0
+        assert config.is_intrusive_site[idx] == 0
+
+    # Index 10 is the start char 'a' of Cherokee 'adalenisgv' -> syncope = 1
+    assert config.is_syncope_token[10] == 1
+
+
 def test_intrusion_site_mask_post_aspiration_and_coda_laryngeals():
     """Verify that get_intrusion_site_mask licenses coda laryngeals and post-consonantal aspiration on vowels."""
     # ukvwali -> u, k, v, w, a, l, i

@@ -579,6 +579,7 @@ class CTCSegmentationAligner:
         source_id: str = "",
         asr_model: Optional[CherokeeASRModel] = None,
         cache: Optional[bool] = None,
+        source_metadata: Optional[Dict[str, Dict[str, Any]]] = None,
     ) -> AlignmentOutput:
         """
         Full chapter/recording alignment:
@@ -627,12 +628,31 @@ class CTCSegmentationAligner:
         )
 
         all_words: List[str] = []
+        all_token_masks: List[Tuple[Sequence[bool], Sequence[bool]]] = []
         chunk_word_slices: List[Tuple[int, int]] = []
+        has_custom_masks = False
+
         for c in chunks:
             chunk_words = [w for w in (c.text or "").split() if w]
             w_start = len(all_words)
             all_words.extend(chunk_words)
             chunk_word_slices.append((w_start, len(all_words)))
+
+            cs_meta = (
+                source_metadata.get(c.chunk_id, {}).get("code_switched")
+                if source_metadata
+                else None
+            )
+            if isinstance(cs_meta, dict):
+                has_custom_masks = True
+                for t in cs_meta.get("tokens", []):
+                    if t.get("canonical_tth"):
+                        sync_m = t.get("syncope_mask", [])
+                        intrus_m = t.get("intrusion_mask", [])
+                        all_token_masks.append((sync_m, intrus_m))
+            else:
+                for _ in chunk_words:
+                    all_token_masks.append(((), ()))
 
         if not all_words or lpz.shape[0] == 0:
             aligned_chunks = [
@@ -661,8 +681,13 @@ class CTCSegmentationAligner:
                 ),
             )
 
+        token_masks_arg = all_token_masks if has_custom_masks else None
         gt_mat, utt_indices = prepare_cherokee_text(
-            config, all_words, char_list, enforce_phonotactics=self.enforce_phonotactics
+            config,
+            all_words,
+            char_list,
+            enforce_phonotactics=self.enforce_phonotactics,
+            token_masks=token_masks_arg,
         )
         timings, char_probs, state_list = ctc_segmentation(config, lpz, gt_mat)
 
