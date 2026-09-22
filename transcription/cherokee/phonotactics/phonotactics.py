@@ -446,6 +446,7 @@ def prepare_cherokee_text(
     char_list: Optional[Sequence[str]] = None,
     enforce_phonotactics: bool = True,
     token_masks: Optional[Sequence[Tuple[Sequence[bool], Sequence[bool]]]] = None,
+    **kwargs: Any,
 ) -> Tuple[np.ndarray, List[int]]:
     """
     Prepares Cherokee phonetic text for syncope- and intrusion-aware CTC segmentation.

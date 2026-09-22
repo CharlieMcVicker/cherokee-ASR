@@ -10,6 +10,7 @@ Unit tests for transcription.core.alignment:
 """
 
 from pathlib import Path
+from typing import Any, List, Optional, Sequence, Tuple, Union
 import numpy as np
 import pytest
 
@@ -248,9 +249,14 @@ def test_ctc_segmentation_aligner_with_model_output():
 def test_ctc_segmentation_aligner_custom_preparer():
     call_log = []
 
-    def custom_preparer(config, words, char_list, **kwargs):
-        call_log.append((words, kwargs))
-        return default_text_preparer(config, words, char_list, **kwargs)
+    def custom_preparer(
+        config: Any,
+        text: Union[str, Sequence[str]],
+        char_list: Optional[Sequence[str]] = None,
+        **kwargs: Any,
+    ) -> Tuple[np.ndarray, List[int]]:
+        call_log.append((text, kwargs))
+        return default_text_preparer(config, text, char_list, **kwargs)
 
     char_list = ["[PAD]", "a", "b"]
     lpz = np.zeros((20, 3), dtype=np.float32)

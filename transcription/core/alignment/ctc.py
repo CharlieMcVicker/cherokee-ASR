@@ -54,8 +54,8 @@ class TextPreparerProtocol(Protocol):
     def __call__(
         self,
         config: Any,
-        words: Sequence[str],
-        char_list: Sequence[str],
+        text: Union[str, Sequence[str]],
+        char_list: Optional[Sequence[str]] = None,
         **kwargs: Any,
     ) -> Tuple[np.ndarray, List[int]]:
         """
@@ -75,8 +75,8 @@ class TextPreparerProtocol(Protocol):
 
 def default_text_preparer(
     config: Any,
-    words: Sequence[str],
-    char_list: Sequence[str],
+    text: Union[str, Sequence[str]],
+    char_list: Optional[Sequence[str]] = None,
     **kwargs: Any,
 ) -> Tuple[np.ndarray, List[int]]:
     """
@@ -85,9 +85,11 @@ def default_text_preparer(
     """
     from ctc_segmentation import prepare_text  # type: ignore
 
-    # Format words separated by spaces
-    text = list(words)
-    return prepare_text(config, text)
+    if isinstance(text, str):
+        formatted_text = [text]
+    else:
+        formatted_text = list(text)
+    return prepare_text(config, formatted_text)
 
 
 class CTCSegmentationAligner:

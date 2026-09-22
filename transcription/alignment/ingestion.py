@@ -13,12 +13,6 @@ from transcription.alignment.normalizers import (
     normalize_phonetics_for_alignment,
     normalize_syllabary_for_alignment,
 )
-from transcription.cherokee.codeswitching import (
-    create_groundtruth_for_code_switched_syllabary,
-    extract_speaker_prefix,
-    get_default_projector,
-    normalize_code_switched_text,
-)
 
 
 def load_bible_chunks(
@@ -182,6 +176,11 @@ def _build_chunk_normalizer(
     projector: Optional[SyntheticTargetProjectorProtocol] = None,
     code_switched: bool = False,
 ) -> Callable[[str], str]:
+    from transcription.cherokee.codeswitching import (
+        create_groundtruth_for_code_switched_syllabary,
+        normalize_code_switched_text,
+    )
+
     if code_switched and projector is not None:
         return lambda t: create_groundtruth_for_code_switched_syllabary(
             t, projector=projector
@@ -246,6 +245,8 @@ def prepare_alignment_input(
 
     active_projector: Optional[SyntheticTargetProjectorProtocol] = projector
     if code_switched and active_projector is None:
+        from transcription.cherokee.codeswitching import get_default_projector
+
         active_projector = get_default_projector()
 
     if transcript is not None:
@@ -332,6 +333,13 @@ def load_syllabary_transcript(
             source_lookup: Dict[str, Dict[str, Any]] mapping chunk_id to metadata dictionaries
                            with keys 'syllabary', 'text', 'phonetic', etc.
     """
+    from transcription.cherokee.codeswitching import (
+        create_groundtruth_for_code_switched_syllabary,
+        extract_speaker_prefix,
+        get_default_projector,
+        normalize_code_switched_text,
+    )
+
     active_projector = projector
     if code_switched and active_projector is None:
         active_projector = get_default_projector()
@@ -553,6 +561,12 @@ def load_interview_transcript(
             source_lookup: Dict[str, Dict[str, Any]] mapping turn ID to metadata dictionary with keys:
                            'speaker', 'syllabary', 'text', 'phonetic', 'raw_line', and 'line_number'.
     """
+    from transcription.cherokee.codeswitching import (
+        create_groundtruth_for_code_switched_syllabary,
+        get_default_projector,
+        normalize_code_switched_text,
+    )
+
     active_projector = projector
     if code_switched and active_projector is None:
         active_projector = get_default_projector()

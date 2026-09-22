@@ -1,8 +1,9 @@
 """
 New Testament audio and transcript matching & syllabary/ASR reconciliation package.
+Delegates to transcription.pipelines.scripture for canonical pipeline implementation.
 """
 
-from transcription.new_testament.pipeline import (
+from transcription.pipelines.scripture import (
     align_chapter,
     load_chapter_transcript,
     reconcile_syllabary_asr,
