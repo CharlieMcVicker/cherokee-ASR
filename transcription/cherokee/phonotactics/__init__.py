@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-phonotactics.py
+transcription.cherokee.phonotactics
 
-Cherokee Phonotactic Engine and Rule Parser.
-Re-exported from transcription.cherokee.phonotactics for backwards compatibility.
+Cherokee surface phonotactic constraints, token classification,
+syncope/intrusion masks, and CTC segmentation text preparation.
 """
 
-from transcription.cherokee.phonotactics import (
+from transcription.cherokee.phonotactics.phonotactics import (
     ASPIRATED_STOP_SET,
     LARYNGEAL_SET,
     PLAIN_SONORANT_SET,

@@ -29,11 +29,11 @@ from typing import (
 
 from transcription.alignment.arpabet.projector import get_default_projector
 from transcription.alignment.arpabet.types import SyntheticTargetProjectorProtocol
-from transcription.alignment.normalizers import normalize_syllabary_for_alignment
 from transcription.alignment.phonotactics import (
     get_intrusion_site_mask,
     get_syncope_mask,
 )
+from transcription.cherokee.orthography import Orthography, convert_orthography
 
 # Regex matching compound clitic: English Latin stem + Cherokee Syllabary clitic/suffix
 # Cherokee Syllabary unicode range: U+13A0-U+13FF (main) and U+AB70-U+ABBF (supplement)
@@ -302,8 +302,11 @@ def prepare_code_switched_token(
 
         # Convert Cherokee Syllabary clitic directly to canonical TTH
         clitic_tth = (
-            normalize_syllabary_for_alignment(
-                clitic, contextual_preaspiration=contextual_preaspiration
+            convert_orthography(
+                clitic,
+                source=Orthography.SYLLABARY,
+                target=Orthography.TTH,
+                contextual_preaspiration=contextual_preaspiration,
             )
             if clitic
             else ""
@@ -357,8 +360,11 @@ def prepare_code_switched_token(
     elif tok_type == TokenType.CHEROKEE_SYLLABARY:
         clean_word = strip_boundary_punctuation(stripped)
         # Convert Cherokee Syllabary directly to canonical TTH phonetics
-        norm_tth = normalize_syllabary_for_alignment(
-            clean_word, contextual_preaspiration=contextual_preaspiration
+        norm_tth = convert_orthography(
+            clean_word,
+            source=Orthography.SYLLABARY,
+            target=Orthography.TTH,
+            contextual_preaspiration=contextual_preaspiration,
         )
         # Native Cherokee Syllabary receives full Cherokee phonotactic analysis
         syll_syncope = tuple(get_syncope_mask(norm_tth, return_char_mask=True))

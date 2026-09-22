@@ -44,7 +44,6 @@ from transcription.alignment.arpabet.types import (
     SyntheticCherokeeTarget,
     SyntheticTargetProjectorProtocol,
 )
-from transcription.alignment.normalizers import normalize_syllabary_for_alignment
 from transcription.utils.orthography import convert_orthography
 
 logger = logging.getLogger(__name__)
@@ -493,9 +492,15 @@ def generate_static_dictionary(
     return out_dict
 
 
+def _default_syllabary_to_tth(text: str) -> str:
+    return convert_orthography(
+        text, source=Orthography.SYLLABARY, target=Orthography.TTH
+    )
+
+
 def normalize_code_switched_text(
     text: str,
-    normalizer: Callable[[str], str] = normalize_syllabary_for_alignment,
+    normalizer: Callable[[str], str] = _default_syllabary_to_tth,
     projector: Optional[SyntheticTargetProjectorProtocol] = None,
 ) -> str:
     """
@@ -529,7 +534,9 @@ def normalize_code_switched_text(
             0x13A0 <= ord(c) <= 0x13FF or 0xAB70 <= ord(c) <= 0xABBF for c in tok
         )
         if has_syllabary:
-            norm = normalize_syllabary_for_alignment(tok)
+            norm = convert_orthography(
+                tok, source=Orthography.SYLLABARY, target=Orthography.TTH
+            )
             if norm:
                 output_tokens.append(norm)
         elif is_english_word(tok):
