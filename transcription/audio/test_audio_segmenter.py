@@ -2,14 +2,18 @@
 """
 test_audio_segmenter.py
 
-Unit tests for audio segmentation in transcription.audio.segment.
+Unit tests for audio segmentation in transcription.core.audio.segment.
 """
 
 import unittest
 from pydub import AudioSegment
 from pydub.generators import Sine
 
-from transcription.audio.segment import segment_long_audio, AudioChunk
+from transcription.core.audio.segment import (
+    segment_long_audio,
+    AudioChunk,
+    get_energy_profile,
+)
 
 
 class TestAudioSegmenter(unittest.TestCase):
@@ -27,6 +31,12 @@ class TestAudioSegmenter(unittest.TestCase):
         self.assertIsInstance(chunks[0], AudioChunk)
         self.assertGreaterEqual(chunks[0].end_sec, chunks[0].start_sec)
         self.assertEqual(chunks[0].start_sec, 0.0)
+
+    def test_energy_profile(self):
+        tone = Sine(440).to_audio_segment(duration=1000)
+        profile = get_energy_profile(tone, step_ms=10)
+        self.assertEqual(len(profile), 100)
+        self.assertTrue(all(profile > -60.0))
 
 
 if __name__ == "__main__":

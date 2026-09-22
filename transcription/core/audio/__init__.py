@@ -1,4 +1,4 @@
-# Audio package init
+# Core audio processing, segmentation, and VAD masking
 from transcription.core.audio.segment import (
     AudioChunk,
     get_energy_profile,

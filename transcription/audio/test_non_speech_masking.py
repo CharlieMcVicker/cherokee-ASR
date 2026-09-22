@@ -12,10 +12,12 @@ from pydub import AudioSegment
 import pytest
 import torch
 
-from transcription.audio.non_speech_masking import (
+from transcription.core.audio.masking import (
     SileroVADDetector,
     _load_audio_as_16k_tensor,
     mask_non_speech_logits,
+    apply_vad_soft_masking,
+    extract_vad_intervals,
 )
 
 
@@ -86,8 +88,31 @@ def test_mask_non_speech_logits_convex_blending():
     )
 
 
+def test_apply_vad_soft_masking_alias():
+    """Verify apply_vad_soft_masking functions identically to mask_non_speech_logits."""
+    assert apply_vad_soft_masking is mask_non_speech_logits
+
+
 def test_mask_non_speech_logits_empty_or_zero():
     """Verify edge case of empty or zero-duration logits."""
     empty_lpz = np.zeros((0, 30), dtype=np.float32)
     res = mask_non_speech_logits(empty_lpz, audio=np.zeros(100))
     assert res.shape == (0, 30)
+
+
+def test_extract_vad_intervals():
+    """Verify interval extraction returns valid intervals."""
+    mock_detector = MagicMock(spec=SileroVADDetector)
+    # 32 windows of 32ms
+    probs = np.array([0.9] * 10 + [0.05] * 10 + [0.9] * 12, dtype=np.float32)
+    mock_detector.predict_speech_probabilities.return_value = probs
+
+    intervals = extract_vad_intervals(
+        audio=np.zeros(32 * 512, dtype=np.float32),
+        pad_ms=0,
+        detector=mock_detector,
+    )
+    assert len(intervals) >= 3
+    assert intervals[0][2] == "speech"
+    assert intervals[1][2] == "non-speech"
+    assert intervals[2][2] == "speech"
