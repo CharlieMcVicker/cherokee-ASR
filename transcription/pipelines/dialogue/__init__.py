@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-transcription.pipelines
+transcription.pipelines.dialogue module.
 
-Domain and task-specific alignment and transcription pipelines.
+Multi-speaker code-switched dialogue alignment pipeline orchestrating
+token discrimination, acoustic CTC segmentation, phonetic syllabary reconciliation,
+and 7-tier Praat TextGrid and JSON manifest exporting.
 """
 
-from transcription.pipelines.dialogue import (
+from transcription.pipelines.dialogue.pipeline import (
     DialogueAlignmentPipeline,
     align_dialogue,
     align_syllabary_ctc,
@@ -16,13 +18,6 @@ from transcription.pipelines.dialogue import (
     build_syllabary_word_tier,
     build_turn_intervals,
     export_7tier_textgrid,
-)
-from transcription.pipelines.scripture import (
-    ScripturePipeline,
-    align_chapter,
-    load_bible_chunks,
-    load_chapter_transcript,
-    reconcile_syllabary_asr,
 )
 
 __all__ = [
@@ -36,9 +31,4 @@ __all__ = [
     "build_syllabary_word_tier",
     "build_turn_intervals",
     "export_7tier_textgrid",
-    "ScripturePipeline",
-    "align_chapter",
-    "reconcile_syllabary_asr",
-    "load_chapter_transcript",
-    "load_bible_chunks",
 ]
