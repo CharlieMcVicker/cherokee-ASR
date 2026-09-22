@@ -12,6 +12,7 @@ from __future__ import annotations
 import logging
 import os
 from dataclasses import asdict, dataclass, field
+from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Union, cast
 
 import numpy as np
@@ -20,6 +21,8 @@ import torch
 import torchaudio
 from transformers import Wav2Vec2ForCTC, Wav2Vec2Processor
 
+from transcription.core.models.model import ASRModel
+from transcription.core.models.output import ModelOutput
 from transcription.utils.model_utils import get_best_model_config, get_model
 
 logger = logging.getLogger(__name__)
@@ -58,10 +61,11 @@ class ASRResult:
         }
 
 
-class CherokeeASRModel:
+class CherokeeASRModel(ASRModel):
     """
     Core Cherokee ASR model wrapper encapsulating Wav2Vec2ForCTC and Wav2Vec2Processor.
-    Provides procedural inference layers and batch execution.
+    Inherits clean infer() and infer_batch() returning ModelOutput from ASRModel,
+    while providing backwards-compatible procedural inference layers and batch execution.
     """
 
     def __init__(
@@ -70,13 +74,15 @@ class CherokeeASRModel:
         processor: Any,
         device: Union[str, torch.device] = "cpu",
         model_name: Optional[str] = None,
+        cache_dir: Optional[Union[str, Path]] = None,
     ):
-        self.model: Any = model
-        self.processor: Any = processor
-        self.device = str(device)
-        self.model_name = model_name
-        self.model.to(self.device)
-        self.model.eval()
+        super().__init__(
+            model=model,
+            processor=processor,
+            device=device,
+            model_name=model_name,
+            cache_dir=cache_dir,
+        )
 
     def to(self, device: Union[str, torch.device]) -> CherokeeASRModel:
         """
@@ -230,59 +236,6 @@ class CherokeeASRModel:
                     eval_mode=eval_mode,
                     use_cache=use_cache,
                 )
-
-    # -------------------------------------------------------------------------
-    # Audio Preprocessing Helpers
-    # -------------------------------------------------------------------------
-
-    @staticmethod
-    def preprocess_audio(
-        audio_input: Union[str, bytes, List[float], np.ndarray, torch.Tensor],
-        sample_rate: int = TARGET_SAMPLE_RATE,
-    ) -> np.ndarray:
-        """
-        Normalize and resample audio input to 1D float32 numpy array at 16kHz.
-        """
-        if isinstance(audio_input, str):
-            if not os.path.exists(audio_input):
-                raise FileNotFoundError(f"Audio file '{audio_input}' not found.")
-            speech_array, sr = sf.read(audio_input)
-            waveform = torch.tensor(speech_array, dtype=torch.float32)
-            if len(waveform.shape) == 1:
-                waveform = waveform.unsqueeze(0)
-            else:
-                waveform = waveform.transpose(0, 1)
-            if waveform.shape[0] > 1:
-                waveform = torch.mean(waveform, dim=0, keepdim=True)
-            if sr != TARGET_SAMPLE_RATE:
-                resampler = torchaudio.transforms.Resample(
-                    orig_freq=sr, new_freq=TARGET_SAMPLE_RATE
-                )
-                waveform = resampler(waveform)
-            return waveform.squeeze(0).numpy().astype(np.float32)
-
-        elif isinstance(audio_input, bytes):
-            speech = np.frombuffer(audio_input, dtype=np.float32)
-        elif isinstance(audio_input, list):
-            speech = np.array(audio_input, dtype=np.float32)
-        elif isinstance(audio_input, torch.Tensor):
-            speech = audio_input.detach().cpu().numpy().astype(np.float32)
-        elif isinstance(audio_input, np.ndarray):
-            speech = audio_input.astype(np.float32)
-        else:
-            raise TypeError(f"Unsupported audio input type: {type(audio_input)}")
-
-        if len(speech.shape) > 1:
-            speech = np.mean(speech, axis=-1)
-
-        if sample_rate != TARGET_SAMPLE_RATE:
-            waveform = torch.tensor(speech, dtype=torch.float32).unsqueeze(0)
-            resampler = torchaudio.transforms.Resample(
-                orig_freq=sample_rate, new_freq=TARGET_SAMPLE_RATE
-            )
-            speech = resampler(waveform).squeeze(0).numpy().astype(np.float32)
-
-        return speech
 
     # -------------------------------------------------------------------------
     # Procedural Inference Layers
