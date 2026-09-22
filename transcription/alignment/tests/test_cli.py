@@ -11,7 +11,11 @@ from unittest.mock import MagicMock, patch
 
 from pydub import AudioSegment
 
-from transcription.alignment.cli import main, run_alignment_pipeline
+from transcription.alignment.cli import (
+    main as legacy_main,
+    run_alignment_pipeline as legacy_run_alignment_pipeline,
+)
+from transcription.apps.cli import main, run_alignment_pipeline
 from transcription.alignment.models import AlignmentOutput
 from transcription.audio.segment import AudioChunk
 
@@ -142,7 +146,7 @@ def test_cli_main_argument_parsing(tmp_path):
     ]
 
     with patch.object(sys, "argv", test_args):
-        with patch("transcription.alignment.cli.run_alignment_pipeline") as mock_run:
+        with patch("transcription.apps.cli.run_alignment_pipeline") as mock_run:
             main()
             mock_run.assert_called_once_with(
                 audio_path="audio.wav",
@@ -176,7 +180,7 @@ def test_cli_main_code_switched(tmp_path):
     ]
 
     with patch.object(sys, "argv", test_args):
-        with patch("transcription.alignment.cli.run_alignment_pipeline") as mock_run:
+        with patch("transcription.apps.cli.run_alignment_pipeline") as mock_run:
             main()
             mock_run.assert_called_once_with(
                 audio_path="audio.wav",
@@ -191,3 +195,8 @@ def test_cli_main_code_switched(tmp_path):
                 reconcile=False,
                 code_switched=True,
             )
+
+
+def test_legacy_cli_shim_forwarding():
+    assert legacy_main is main
+    assert legacy_run_alignment_pipeline is run_alignment_pipeline

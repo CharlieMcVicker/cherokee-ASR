@@ -17,6 +17,13 @@ from transcription.pipelines.dialogue import (
     build_turn_intervals,
     export_7tier_textgrid,
 )
+from transcription.pipelines.enrichment import (
+    EnrichmentPipeline,
+    EnrichmentRecord,
+    calculate_cer,
+    calculate_relative_improvement,
+    enrich_syllabary,
+)
 from transcription.pipelines.scripture import (
     ScripturePipeline,
     align_chapter,
@@ -36,6 +43,11 @@ __all__ = [
     "build_syllabary_word_tier",
     "build_turn_intervals",
     "export_7tier_textgrid",
+    "EnrichmentPipeline",
+    "EnrichmentRecord",
+    "calculate_cer",
+    "calculate_relative_improvement",
+    "enrich_syllabary",
     "ScripturePipeline",
     "align_chapter",
     "reconcile_syllabary_asr",

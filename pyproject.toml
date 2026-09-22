@@ -43,7 +43,7 @@ dev = [
 ]
 
 [project.scripts]
-align-cherokee = "transcription.alignment.cli:main"
+align-cherokee = "transcription.apps.cli:main"
 syllabary-transcriber = "syllabary_transcriber.__main__:main"
 
 [tool.setuptools.packages.find]
