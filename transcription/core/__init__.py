@@ -6,6 +6,13 @@ from transcription.core.models.inference import (
     infer_emissions_batch,
     preprocess_audio,
 )
+from transcription.core.exporters import (
+    IntervalTier,
+    TextGridBuilder,
+    export_textgrid,
+    export_manifest,
+    export_debug_json,
+)
 
 __all__ = [
     "ModelOutput",
@@ -13,4 +20,9 @@ __all__ = [
     "infer_emissions",
     "infer_emissions_batch",
     "preprocess_audio",
+    "IntervalTier",
+    "TextGridBuilder",
+    "export_textgrid",
+    "export_manifest",
+    "export_debug_json",
 ]
