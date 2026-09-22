@@ -13,6 +13,21 @@ from transcription.core.exporters import (
     export_manifest,
     export_debug_json,
 )
+from transcription.core.alignment import (
+    AlignedChunk,
+    AlignmentMetrics,
+    AlignmentOutput,
+    CTCAlignerConfig,
+    CTCSegmentationAligner,
+    DefaultCERDistanceMetric,
+    DistanceMetric,
+    NeedlemanWunschWordAligner,
+    SlidingWindowDTWAligner,
+    TextChunk,
+    TextPreparerProtocol,
+    TokenEmission,
+    WordInterval,
+)
 
 __all__ = [
     "ModelOutput",
@@ -25,4 +40,17 @@ __all__ = [
     "export_textgrid",
     "export_manifest",
     "export_debug_json",
+    "CTCAlignerConfig",
+    "TokenEmission",
+    "TextChunk",
+    "WordInterval",
+    "AlignedChunk",
+    "AlignmentMetrics",
+    "AlignmentOutput",
+    "DistanceMetric",
+    "DefaultCERDistanceMetric",
+    "NeedlemanWunschWordAligner",
+    "SlidingWindowDTWAligner",
+    "CTCSegmentationAligner",
+    "TextPreparerProtocol",
 ]

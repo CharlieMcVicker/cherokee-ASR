@@ -10,7 +10,7 @@ import os
 from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional, Sequence, Union
 
-from transcription.alignment.models import AlignmentOutput, WordInterval
+from transcription.core.alignment.models import AlignmentOutput, WordInterval
 
 
 def serialize_word_interval(w: WordInterval) -> Dict[str, Any]:
