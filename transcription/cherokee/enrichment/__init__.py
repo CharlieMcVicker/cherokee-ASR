@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-transcription.syllabary_enrichment.alignment_engine module.
+transcription.cherokee.enrichment
 
-Compatibility shim forwarding to transcription.cherokee.enrichment.syllable_alignment.
+Cherokee syllabary enrichment package: fine-grained syllable alignment and phonetic
+reconciliation using acoustic ASR emissions while preserving Cherokee Syllabary
+as the immutable structural anchor.
 """
 
 from transcription.cherokee.enrichment.syllable_alignment import (
@@ -12,6 +14,10 @@ from transcription.cherokee.enrichment.syllable_alignment import (
     align_character_syllable_detailed,
     get_base_transliteration,
     is_cherokee_syllable,
+    reconcile_alignment_by_chunk,
+    reconcile_alignment_words,
+    reconcile_phonetics,
+    reconcile_word_intervals,
 )
 
 __all__ = [
@@ -21,4 +27,8 @@ __all__ = [
     "align_character_syllable_detailed",
     "get_base_transliteration",
     "is_cherokee_syllable",
+    "reconcile_alignment_by_chunk",
+    "reconcile_alignment_words",
+    "reconcile_phonetics",
+    "reconcile_word_intervals",
 ]

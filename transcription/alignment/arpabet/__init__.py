@@ -6,16 +6,59 @@ Acoustic alignment and empirical statistical mapping between ARPAbet
 phonetic sequences and Cherokee ASR emissions.
 """
 
-from transcription.alignment.arpabet.codeswitched_preparer import (
-    CodeSwitchedLineResult,
-    CodeSwitchedToken,
-    TokenType,
-    classify_token,
-    create_groundtruth_for_code_switched_syllabary,
-    extract_speaker_prefix,
-    prepare_code_switched_token,
-    split_compound_clitic,
-    strip_boundary_punctuation,
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from transcription.alignment.arpabet.projector import (
+        DEFAULT_CONFUSION_MATRIX_PATH,
+        DEFAULT_STATIC_DICTIONARY_PATH,
+        SyntheticTargetProjector,
+        generate_static_dictionary,
+        get_default_projector,
+        get_english_loanwords_tth_dict,
+        is_english_word,
+        load_default_confusion_matrix,
+        normalize_code_switched_text,
+        project_english_text,
+        project_english_word,
+    )
+    from transcription.alignment.arpabet.codeswitched_preparer import (
+        CodeSwitchedLineResult,
+        CodeSwitchedPreparer,
+        CodeSwitchedToken,
+        TokenType,
+        classify_token,
+        create_groundtruth_for_code_switched_syllabary,
+        extract_speaker_prefix,
+        prepare_code_switched_token,
+        split_compound_clitic,
+        strip_boundary_punctuation,
+    )
+
+from transcription.alignment.arpabet.types import (
+    CANONICAL_CHEROKEE_CONSONANTS,
+    CANONICAL_CHEROKEE_PHONEMES,
+    CANONICAL_CHEROKEE_TTH_PHONEMES,
+    CANONICAL_CHEROKEE_VOWELS,
+    EPSILON_TOKEN,
+    STANDARD_ARPABET_CONSONANTS,
+    STANDARD_ARPABET_PHONEMES,
+    STANDARD_ARPABET_VOWELS,
+    AcousticConfusionMatrix,
+    AlignedTokenPair,
+    ArpabetToken,
+    CherokeeToken,
+    DPTracebackAccumulatorProtocol,
+    EnglishToArpabetProtocol,
+    G2PExtractorProtocol,
+    InferenceCacheManifest,
+    SyntheticCherokeeTarget,
+    SyntheticTargetProjectorProtocol,
+    TopKHypothesis,
+    TracebackAlignerProtocol,
+    TracebackAlignmentResult,
+    WordInferenceCacheEntry,
+    WordManifestEntry,
 )
 from transcription.alignment.arpabet.dataset import (
     PhoneticWordBalancer,
@@ -54,43 +97,46 @@ from transcription.alignment.arpabet.matrix import (
     get_articulatory_distance,
     train_acoustic_confusion_matrix,
 )
-from transcription.alignment.arpabet.projector import (
-    DEFAULT_CONFUSION_MATRIX_PATH,
-    DEFAULT_STATIC_DICTIONARY_PATH,
-    SyntheticTargetProjector,
-    generate_static_dictionary,
-    get_default_projector,
-    is_english_word,
-    load_default_confusion_matrix,
-    normalize_code_switched_text,
-    project_english_text,
-    project_english_word,
-)
-from transcription.alignment.arpabet.types import (
-    CANONICAL_CHEROKEE_CONSONANTS,
-    CANONICAL_CHEROKEE_PHONEMES,
-    CANONICAL_CHEROKEE_TTH_PHONEMES,
-    CANONICAL_CHEROKEE_VOWELS,
-    EPSILON_TOKEN,
-    STANDARD_ARPABET_CONSONANTS,
-    STANDARD_ARPABET_PHONEMES,
-    STANDARD_ARPABET_VOWELS,
-    AcousticConfusionMatrix,
-    AlignedTokenPair,
-    ArpabetToken,
-    CherokeeToken,
-    DPTracebackAccumulatorProtocol,
-    EnglishToArpabetProtocol,
-    G2PExtractorProtocol,
-    InferenceCacheManifest,
-    SyntheticCherokeeTarget,
-    SyntheticTargetProjectorProtocol,
-    TopKHypothesis,
-    TracebackAlignerProtocol,
-    TracebackAlignmentResult,
-    WordInferenceCacheEntry,
-    WordManifestEntry,
-)
+
+_LAZY_PROJECTOR_EXPORTS = {
+    "DEFAULT_CONFUSION_MATRIX_PATH",
+    "DEFAULT_STATIC_DICTIONARY_PATH",
+    "SyntheticTargetProjector",
+    "generate_static_dictionary",
+    "get_default_projector",
+    "get_english_loanwords_tth_dict",
+    "is_english_word",
+    "load_default_confusion_matrix",
+    "normalize_code_switched_text",
+    "project_english_text",
+    "project_english_word",
+}
+
+_LAZY_PREPARER_EXPORTS = {
+    "CodeSwitchedLineResult",
+    "CodeSwitchedPreparer",
+    "CodeSwitchedToken",
+    "TokenType",
+    "classify_token",
+    "create_groundtruth_for_code_switched_syllabary",
+    "extract_speaker_prefix",
+    "prepare_code_switched_token",
+    "split_compound_clitic",
+    "strip_boundary_punctuation",
+}
+
+
+def __getattr__(name: str):
+    if name in _LAZY_PROJECTOR_EXPORTS:
+        from transcription.alignment.arpabet import projector
+
+        return getattr(projector, name)
+    if name in _LAZY_PREPARER_EXPORTS:
+        from transcription.alignment.arpabet import codeswitched_preparer
+
+        return getattr(codeswitched_preparer, name)
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
 
 __all__ = [
     # Constants

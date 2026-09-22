@@ -23,7 +23,7 @@ from transcription.alignment.extractors import (
     ASREmissionsExtractor,
     CherokeeASRExtractor,
 )
-from transcription.alignment.arpabet import SyntheticTargetProjectorProtocol
+from transcription.alignment.arpabet.types import SyntheticTargetProjectorProtocol
 from transcription.alignment.ingestion import prepare_alignment_input
 from transcription.alignment.models import AlignmentOutput
 from transcription.alignment.reconciliation import reconcile_alignment_words

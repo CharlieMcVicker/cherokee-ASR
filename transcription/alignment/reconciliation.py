@@ -8,7 +8,7 @@ and enriching phonetic representations using acoustic ASR emissions into new Wor
 
 from typing import Dict, List, Sequence
 from transcription.alignment.models import AlignmentOutput, WordInterval
-from transcription.syllabary_enrichment import (
+from transcription.cherokee.enrichment import (
     align_character_syllable,
     reconcile_phonetics,
 )

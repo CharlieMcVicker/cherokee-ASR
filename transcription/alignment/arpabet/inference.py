@@ -29,9 +29,9 @@ from transcription.alignment.arpabet.types import (
     WordInferenceCacheEntry,
     WordManifestEntry,
 )
-from transcription.alignment.phonotactics import tokenize_phonemes
-from transcription.models.asr_model import CherokeeASRModel
-from transcription.utils.orthography import Orthography
+from transcription.cherokee.phonotactics import tokenize_phonemes
+from transcription.cherokee.models import CherokeeASRModel
+from transcription.cherokee.orthography import Orthography
 
 logger = logging.getLogger(__name__)
 

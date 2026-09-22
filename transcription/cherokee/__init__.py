@@ -5,14 +5,6 @@ transcription.cherokee
 Domain-specific Cherokee phonetic, linguistic, orthographic representations, and models.
 """
 
-from transcription.cherokee.distance import (
-    ConfusionMatrixCostMetric,
-    PhonologicalConfusionCostMetric,
-)
-from transcription.cherokee.models import (
-    CherokeeASRModel,
-    load_cherokee_asr_model,
-)
 from transcription.cherokee.orthography import (
     CHEROKEE_SYLLABARY_BASE_MAP,
     CHEROKEE_SYLLABARY_MAP,
@@ -38,6 +30,49 @@ from transcription.cherokee.phonotactics import (
     is_valid_phonotactic_sequence,
     prepare_cherokee_text,
     tokenize_phonemes,
+)
+from transcription.cherokee.models import (
+    CherokeeASRModel,
+    load_cherokee_asr_model,
+)
+from transcription.cherokee.distance import (
+    ConfusionMatrixCostMetric,
+    PhonologicalConfusionCostMetric,
+)
+from transcription.cherokee.enrichment import (
+    SyllableAlignment,
+    SyllableAlignmentEngine,
+    align_character_syllable,
+    align_character_syllable_detailed,
+    get_base_transliteration,
+    is_cherokee_syllable,
+    reconcile_alignment_by_chunk,
+    reconcile_alignment_words,
+    reconcile_phonetics,
+    reconcile_word_intervals,
+)
+from transcription.cherokee.codeswitching import (
+    CodeSwitchedLineResult,
+    CodeSwitchedPreparer,
+    CodeSwitchedToken,
+    DEFAULT_CONFUSION_MATRIX_PATH,
+    DEFAULT_STATIC_DICTIONARY_PATH,
+    SyntheticTargetProjector,
+    TokenType,
+    classify_token,
+    create_groundtruth_for_code_switched_syllabary,
+    extract_speaker_prefix,
+    generate_static_dictionary,
+    get_default_projector,
+    get_english_loanwords_tth_dict,
+    is_english_word,
+    load_default_confusion_matrix,
+    normalize_code_switched_text,
+    prepare_code_switched_token,
+    project_english_text,
+    project_english_word,
+    split_compound_clitic,
+    strip_boundary_punctuation,
 )
 
 __all__ = [
@@ -73,4 +108,37 @@ __all__ = [
     "is_valid_phonotactic_sequence",
     "analyze_phonotactics",
     "prepare_cherokee_text",
+    # Codeswitching
+    "CodeSwitchedLineResult",
+    "CodeSwitchedPreparer",
+    "CodeSwitchedToken",
+    "DEFAULT_CONFUSION_MATRIX_PATH",
+    "DEFAULT_STATIC_DICTIONARY_PATH",
+    "SyntheticTargetProjector",
+    "TokenType",
+    "classify_token",
+    "create_groundtruth_for_code_switched_syllabary",
+    "extract_speaker_prefix",
+    "generate_static_dictionary",
+    "get_default_projector",
+    "get_english_loanwords_tth_dict",
+    "is_english_word",
+    "load_default_confusion_matrix",
+    "normalize_code_switched_text",
+    "prepare_code_switched_token",
+    "project_english_text",
+    "project_english_word",
+    "split_compound_clitic",
+    "strip_boundary_punctuation",
+    # Enrichment
+    "SyllableAlignment",
+    "SyllableAlignmentEngine",
+    "align_character_syllable",
+    "align_character_syllable_detailed",
+    "get_base_transliteration",
+    "is_cherokee_syllable",
+    "reconcile_alignment_by_chunk",
+    "reconcile_alignment_words",
+    "reconcile_phonetics",
+    "reconcile_word_intervals",
 ]

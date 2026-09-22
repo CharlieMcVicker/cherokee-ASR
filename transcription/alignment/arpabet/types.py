@@ -32,7 +32,7 @@ from typing import (
     runtime_checkable,
 )
 
-from transcription.utils.orthography import Orthography
+from transcription.cherokee.orthography.orthography import Orthography
 
 # Special token used to represent epsilon / null transitions in alignment
 EPSILON_TOKEN: str = "<eps>"

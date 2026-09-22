@@ -7,17 +7,17 @@ import os
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, Union
 
-from transcription.alignment.arpabet import (
-    CodeSwitchedLineResult,
-    SyntheticTargetProjectorProtocol,
-    create_groundtruth_for_code_switched_syllabary,
-    get_default_projector,
-    normalize_code_switched_text,
-)
+from transcription.alignment.arpabet.types import SyntheticTargetProjectorProtocol
 from transcription.alignment.models import TextChunk
 from transcription.alignment.normalizers import (
     normalize_phonetics_for_alignment,
     normalize_syllabary_for_alignment,
+)
+from transcription.cherokee.codeswitching import (
+    create_groundtruth_for_code_switched_syllabary,
+    extract_speaker_prefix,
+    get_default_projector,
+    normalize_code_switched_text,
 )
 
 
@@ -385,10 +385,6 @@ def load_syllabary_transcript(
                 meta["syllabary"] = spoken_display
                 meta["text"] = spoken_display
         elif strip_speaker:
-            from transcription.alignment.arpabet.codeswitched_preparer import (
-                extract_speaker_prefix,
-            )
-
             speaker, spoken_text = extract_speaker_prefix(text_val)
             if speaker is not None:
                 meta["speaker"] = speaker
