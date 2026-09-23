@@ -78,15 +78,6 @@ from transcription.alignment.phonotactics import (
     prepare_cherokee_text,
     tokenize_phonemes,
 )
-from transcription.alignment.threshold_finder import (
-    AlignmentRecord,
-    AlignmentThresholdFinder,
-    ThresholdMetrics,
-    ThresholdSearchStep,
-    find_threshold_bounds,
-    load_alignment_records,
-    parse_verse_reference,
-)
 
 __all__ = [
     # Models
@@ -138,14 +129,6 @@ __all__ = [
     "export_debug_json",
     # Pipeline / CLI
     "run_alignment_pipeline",
-    # Threshold Finder
-    "AlignmentRecord",
-    "AlignmentThresholdFinder",
-    "ThresholdMetrics",
-    "ThresholdSearchStep",
-    "find_threshold_bounds",
-    "load_alignment_records",
-    "parse_verse_reference",
     # Phonotactics & Custom Text Preparation
     "PhonemeCategory",
     "PhonotacticToken",
