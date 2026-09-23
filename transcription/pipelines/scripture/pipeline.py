@@ -47,7 +47,7 @@ from transcription.pipelines.scripture.ingestion import (
     load_bible_chunks,
     load_chapter_transcript,
 )
-from transcription.syllabary_enrichment import (
+from transcription.cherokee.enrichment import (
     align_character_syllable,
     reconcile_phonetics,
 )
