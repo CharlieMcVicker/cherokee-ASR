@@ -12,7 +12,7 @@ from transcription.core.models.inference import (
     compute_audio_cache_key,
 )
 from transcription.core.models.model import ASRModel
-from transcription.models.asr_model import CherokeeASRModel
+from transcription.cherokee.models import CherokeeASRModel
 
 
 class TestModelOutput(unittest.TestCase):

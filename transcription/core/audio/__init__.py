@@ -15,7 +15,10 @@ from transcription.core.audio.masking import (
     extract_vad_intervals,
 )
 
+TARGET_SAMPLE_RATE = 16000
+
 __all__ = [
+    "TARGET_SAMPLE_RATE",
     "AudioChunk",
     "get_energy_profile",
     "segment_audio_from_profile",

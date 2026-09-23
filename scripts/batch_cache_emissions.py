@@ -19,7 +19,7 @@ from transcription.core.models.inference import (
     compute_audio_cache_key,
     infer_emissions_batch,
 )
-from transcription.models.asr_model import CherokeeASRModel
+from transcription.cherokee.models import CherokeeASRModel
 
 logger = logging.getLogger(__name__)
 

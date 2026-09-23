@@ -31,11 +31,14 @@ from transcription.cherokee.orthography.tones import (
     respell_consonants,
 )
 
+normalize_text = clean_punctuation_and_whitespace
+
 __all__ = [
     # Orthography
     "Orthography",
     "convert_orthography",
     "clean_punctuation_and_whitespace",
+    "normalize_text",
     "strip_tones_and_colons",
     "PUNCTUATION_REGEX",
     "GLOTTAL_VARIANTS_REGEX",

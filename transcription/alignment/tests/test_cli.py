@@ -25,7 +25,7 @@ from transcription.core.models.output import ModelOutput
 @pytest.fixture
 def mock_asr_model():
     with patch(
-        "transcription.models.asr_model.CherokeeASRModel.from_pretrained_or_best"
+        "transcription.cherokee.models.CherokeeASRModel.from_pretrained_or_best"
     ) as mock_from_pretrained:
         mock_model = MagicMock()
         # Synthetic ModelOutput with tokens for "osiyo tohiju"

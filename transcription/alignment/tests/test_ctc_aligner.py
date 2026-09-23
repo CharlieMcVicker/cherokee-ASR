@@ -190,7 +190,7 @@ def test_get_logits_cached_ndarray_and_audiosegment(tmp_path: Path):
 
 
 def test_cherokee_asr_model_get_logits_sliding_window():
-    from transcription.models.asr_model import CherokeeASRModel
+    from transcription.cherokee.models import CherokeeASRModel
 
     # Mock inner Wav2Vec2 model and processor
     mock_model = MagicMock()

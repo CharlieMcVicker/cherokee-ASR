@@ -28,7 +28,7 @@ if str(BASE_DIR) not in sys.path:
 from transcription.alignment.ctc_aligner import CTCSegmentationAligner
 from transcription.alignment.models import CTCAlignerConfig
 from transcription.alignment.normalizers import normalize_phonetics_for_alignment
-from transcription.models.asr_model import CherokeeASRModel
+from transcription.cherokee.models import CherokeeASRModel
 from transcription.new_testament.pipeline import (
     load_chapter_transcript,
 )

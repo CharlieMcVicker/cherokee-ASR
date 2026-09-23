@@ -330,7 +330,7 @@ Wraps [`CherokeeASRModel`](file:///Users/julietmcvicker/code/workshop-transcript
 
 ```python
 from transcription.alignment.extractors import CherokeeASRExtractor
-from transcription.models.asr_model import CherokeeASRModel
+from transcription.cherokee.models import CherokeeASRModel
 
 model = CherokeeASRModel.from_pretrained("charliemcvicker/asr-cherokee")
 extractor = CherokeeASRExtractor(model=model, skip_vad=False)
@@ -1008,7 +1008,7 @@ from transcription.alignment import (
     prepare_alignment_input,
     reconcile_alignment_words,
 )
-from transcription.models.asr_model import CherokeeASRModel
+from transcription.cherokee.models import CherokeeASRModel
 
 # Step 1: Ingest ground-truth chunks & resolve representation-aware normalizers
 chunks, source_lookup, chunk_norm, emission_norm = prepare_alignment_input(

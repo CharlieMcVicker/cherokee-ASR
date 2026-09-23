@@ -21,15 +21,15 @@ from datasets import Dataset, Audio, Features, Value
 from jiwer import wer as jiwer_wer, cer as jiwer_cer
 from tqdm import tqdm
 
-from transcription.inference.infer import (
-    TARGET_SAMPLE_RATE,
-    greedy_inference,
-    normalize_text,
+from transcription.core.audio import TARGET_SAMPLE_RATE
+from transcription.cherokee.orthography import normalize_text
+from transcription.utils.evaluation import (
+    run_evaluation,
     strip_both,
     strip_length,
     strip_tones,
+    yield_local_checkpoints,
 )
-from transcription.utils.evaluation import run_evaluation, yield_local_checkpoints
 
 
 def _try_read_csv(path):

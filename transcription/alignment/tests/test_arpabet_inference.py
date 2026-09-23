@@ -31,7 +31,7 @@ from transcription.alignment.arpabet.types import (
     WordInferenceCacheEntry,
     WordManifestEntry,
 )
-from transcription.models.asr_model import CherokeeASRModel
+from transcription.cherokee.models import CherokeeASRModel
 from transcription.utils.orthography import Orthography
 
 # ============================================================================

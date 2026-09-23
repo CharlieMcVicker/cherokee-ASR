@@ -32,7 +32,7 @@ from transcription.alignment.ingestion import prepare_alignment_input
 from transcription.alignment.models import AlignmentOutput
 from transcription.alignment.reconciliation import reconcile_alignment_words
 from transcription.core.models.output import ModelOutput
-from transcription.models.asr_model import CherokeeASRModel
+from transcription.cherokee.models import CherokeeASRModel
 
 
 def run_alignment_pipeline(

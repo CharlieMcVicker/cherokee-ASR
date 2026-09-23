@@ -23,8 +23,8 @@ except ImportError:
 
 from transcription.evaluation.confusion import character_levenshtein_align
 from transcription.evaluation.perturbations import AudioTransform
-from transcription.inference.infer import normalize_text
-from transcription.models.asr_model import CherokeeASRModel
+from transcription.cherokee.orthography import normalize_text
+from transcription.cherokee.models import CherokeeASRModel
 
 logger = logging.getLogger(__name__)
 

@@ -7,16 +7,32 @@ import pandas as pd
 import numpy as np
 from tqdm import tqdm
 from torch.utils.data import DataLoader
-from transcription.models.asr_model import CherokeeASRModel
+from transcription.cherokee.models import CherokeeASRModel
 
 from jiwer import wer as jiwer_wer, cer as jiwer_cer
 
 
-from transcription.inference.infer import (
-    strip_tones,
-    strip_length,
-    strip_both,
+from transcription.cherokee.orthography import (
+    strip_tones_and_colons,
 )
+
+
+def strip_tones(text: str) -> str:
+    """Remove tone digits."""
+    return re.sub(r"\d", "", str(text)).strip()
+
+
+def strip_length(text: str) -> str:
+    """Collapse any sequence of 2 or more of the same vowel or vowel-colon into a single vowel."""
+    if not isinstance(text, str):
+        return ""
+    t = re.sub(r"([aeiouv]):", r"\1", text)
+    return re.sub(r"([aeiouv])\1+", r"\1", t)
+
+
+def strip_both(text: str) -> str:
+    """Remove both tones and collapse vowel lengths."""
+    return strip_length(strip_tones(text))
 
 
 def get_eval_device():

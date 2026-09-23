@@ -7,6 +7,7 @@ Cherokee ASR model factory and encapsulation loading default Cherokee repositori
 
 from __future__ import annotations
 
+from dataclasses import asdict, dataclass, field
 import logging
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Union
@@ -22,6 +23,36 @@ logger = logging.getLogger(__name__)
 DEFAULT_CHEROKEE_FALLBACK_REPO = "facebook/wav2vec2-base-960h"
 TARGET_SAMPLE_RATE = 16000
 FRAME_DURATION_SEC = 0.02
+
+
+@dataclass
+class WordConfidence:
+    word: str
+    confidence: float
+    start_time: float
+    end_time: float
+    chars: List[Dict[str, Any]] = field(default_factory=list)
+
+    def to_dict(self) -> Dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass
+class ASRResult:
+    text: str
+    transcription: str
+    confidence: float
+    words: List[WordConfidence] = field(default_factory=list)
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "text": self.text,
+            "transcription": self.transcription,
+            "confidence": self.confidence,
+            "words": [
+                w.to_dict() if isinstance(w, WordConfidence) else w for w in self.words
+            ],
+        }
 
 
 class CherokeeASRModel(ASRModel):
@@ -425,8 +456,6 @@ class CherokeeASRModel(ASRModel):
         """
         Layer 3: Computes word-level and character-level confidence details with timestamps.
         """
-        from transcription.models.asr_model import WordConfidence
-
         if isinstance(probs_or_logits, torch.Tensor):
             tensor_data = probs_or_logits.detach().cpu()
         else:
@@ -543,8 +572,6 @@ class CherokeeASRModel(ASRModel):
         """
         Layer 4: Decodes logits or probabilities tensor into structured ASRResult.
         """
-        from transcription.models.asr_model import ASRResult
-
         if isinstance(logits_or_probs, np.ndarray):
             tensor_data = torch.tensor(logits_or_probs)
         else:
@@ -647,5 +674,7 @@ def load_cherokee_asr_model(
 __all__ = [
     "CherokeeASRModel",
     "load_cherokee_asr_model",
+    "ASRResult",
+    "WordConfidence",
     "DEFAULT_CHEROKEE_FALLBACK_REPO",
 ]

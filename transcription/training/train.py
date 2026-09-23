@@ -36,8 +36,11 @@ from transformers import (
     Wav2Vec2Processor,
 )
 
-from transcription.inference.infer import greedy_inference, strip_length
-from transcription.utils.evaluation import run_evaluation, yield_local_checkpoints
+from transcription.utils.evaluation import (
+    run_evaluation,
+    strip_length,
+    yield_local_checkpoints,
+)
 
 TARGET_SAMPLE_RATE = 16000
 apostrophe_variants = r"[’‘ʼʻ`´‛]"  # curly, modifier letter, grave/acute, etc.

@@ -279,7 +279,7 @@ def test_align_chapter_default_fallback_instantiation(
     out_dir = tmp_path / "output_default"
 
     with patch(
-        "transcription.models.asr_model.CherokeeASRModel.from_pretrained_or_best"
+        "transcription.cherokee.models.CherokeeASRModel.from_pretrained_or_best"
     ) as mock_model_load:
         mock_model = MockASRModel()
         mock_model_load.return_value = mock_model
