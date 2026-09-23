@@ -21,7 +21,7 @@ from typing import (
     Tuple,
 )
 
-from transcription.alignment.arpabet.types import SyntheticTargetProjectorProtocol
+from transcription.cherokee.arpabet.types import SyntheticTargetProjectorProtocol
 from transcription.cherokee.orthography import Orthography, convert_orthography
 from transcription.cherokee.phonotactics import (
     get_intrusion_site_mask,

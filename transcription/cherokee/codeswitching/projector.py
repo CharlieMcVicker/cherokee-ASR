@@ -24,7 +24,7 @@ from typing import (
 
 import numpy as np
 
-from transcription.alignment.arpabet.types import (
+from transcription.cherokee.arpabet.types import (
     EPSILON_TOKEN,
     AcousticConfusionMatrix,
     ArpabetToken,
@@ -122,7 +122,7 @@ class SyntheticTargetProjector:
         if g2p is not None:
             self._g2p: EnglishToArpabetProtocol = g2p
         else:
-            from transcription.alignment.arpabet.g2p import get_default_g2p
+            from transcription.cherokee.arpabet.g2p import get_default_g2p
 
             self._g2p = get_default_g2p()
         self._static_dict: Dict[str, Any] = {}

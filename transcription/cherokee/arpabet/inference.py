@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-transcription.alignment.arpabet.inference module.
+transcription.cherokee.arpabet.inference module.
 
 Batched procedural inference and emissions caching for CherokeeASRModel over
 single-word audio clips. Implements duration-sorted batching, greedy decoding
@@ -21,8 +21,8 @@ from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, TypeVar
 import numpy as np
 import torch
 
-from transcription.alignment.arpabet.dataset import load_words_manifest
-from transcription.alignment.arpabet.types import (
+from transcription.cherokee.arpabet.dataset import load_words_manifest
+from transcription.cherokee.arpabet.types import (
     CherokeeToken,
     InferenceCacheManifest,
     TopKHypothesis,

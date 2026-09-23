@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Unit and integration tests for the code-switching ground truth preparer
-(transcription.alignment.arpabet.codeswitched_preparer).
+(transcription.cherokee.arpabet.codeswitched_preparer).
 
 Validates:
 1. Script-level token discrimination into Cherokee Syllabary, English, Compound Clitics, and Punctuation.
@@ -20,7 +20,7 @@ from transcription.alignment.ingestion import (
     load_interview_transcript,
     load_syllabary_transcript,
 )
-from transcription.alignment.arpabet.types import SyntheticTargetProjectorProtocol
+from transcription.cherokee.arpabet.types import SyntheticTargetProjectorProtocol
 from transcription.cherokee.codeswitching import (
     CodeSwitchedLineResult,
     CodeSwitchedToken,

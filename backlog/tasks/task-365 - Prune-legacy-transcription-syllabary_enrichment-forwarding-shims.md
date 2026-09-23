@@ -1,11 +1,11 @@
 ---
 id: TASK-365
 title: Prune legacy transcription/syllabary_enrichment forwarding shims
-status: In Progress
+status: Done
 assignee:
   - '@subagent'
 created_date: '2026-09-23 15:55'
-updated_date: '2026-09-23 16:30'
+updated_date: '2026-09-23 16:34'
 labels: []
 dependencies: []
 modified_files:

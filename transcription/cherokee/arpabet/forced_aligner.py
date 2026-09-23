@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-transcription.alignment.arpabet.forced_aligner
+transcription.cherokee.arpabet.forced_aligner
 
 Word-level forced alignment for English audio using torchaudio's MMS_FA pipeline.
 Aligns speech audio waveforms against sentence transcripts to produce precise

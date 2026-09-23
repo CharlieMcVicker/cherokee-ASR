@@ -19,7 +19,7 @@ from pydub import AudioSegment
 import pytest
 import torch
 
-from transcription.alignment.ctc_aligner import CTCSegmentationAligner
+from transcription.core.alignment.ctc import CTCSegmentationAligner
 from transcription.alignment.distance_metrics import (
     ConfusionMatrixCostMetric,
     DefaultCERDistanceMetric,
@@ -85,6 +85,19 @@ class MockASRModel:
         res.confidence = 0.95
         res.text = "adalenisgv yisdv"
         return res
+
+    def infer(self, audio: Any, **kwargs: Any) -> ModelOutput:
+        self.call_count += 1
+        vocab = self.processor.tokenizer.get_vocab.return_value
+        n_frames = 200
+        lpz = np.zeros((n_frames, len(vocab)), dtype=np.float32)
+        lpz[:, 1] = 2.0
+        return ModelOutput(
+            lpz=lpz,
+            vocab=vocab,
+            frame_duration_sec=0.02,
+            metadata={"pad_token_id": 0},
+        )
 
 
 @pytest.fixture

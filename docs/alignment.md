@@ -588,7 +588,7 @@ chunks, source_lookup = load_interview_transcript(
 
 ---
 
-### Code-Switched Ingestion & Synthetic Target Projection (`transcription.alignment.arpabet.projector`)
+### Code-Switched Ingestion & Synthetic Target Projection (`transcription.cherokee.arpabet.projector`)
 
 When Cherokee speakers code-switch or use English loanwords (e.g., *coffee*, *hospital*, *doctor*, *car*), standard ASR and alignment pipelines fail because Latin English spellings do not match the Cherokee acoustic model's emission vocabulary.
 
@@ -601,7 +601,7 @@ The projector module translates English text -> ARPAbet -> synthetic Cherokee TT
 #### Programmatic Example
 
 ```python
-from transcription.alignment.arpabet import (
+from transcription.cherokee.arpabet import (
     get_default_projector,
     normalize_code_switched_text,
     project_english_text,
@@ -624,12 +624,12 @@ norm_tth = normalize_code_switched_text(mixed)
 print(norm_tth)  # "hi'a khasi akituli"
 ```
 
-### Code-Switching Ground Truth Preparer (`transcription.alignment.arpabet.codeswitched_preparer`)
+### Code-Switching Ground Truth Preparer (`transcription.cherokee.arpabet.codeswitched_preparer`)
 
 For dialogue transcripts with mixed Syllabary, English loanwords, speaker prefixes, and compound clitics (e.g. *JayᎢ* -> English 'Jay' + Syllabary 'Ꭲ'), `create_groundtruth_for_code_switched_syllabary` performs script-level token discrimination with zero double conversion.
 
 ```python
-from transcription.alignment.arpabet import (
+from transcription.cherokee.arpabet import (
     create_groundtruth_for_code_switched_syllabary,
     split_compound_clitic,
     TokenType,

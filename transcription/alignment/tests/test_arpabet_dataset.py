@@ -13,24 +13,24 @@ import pytest
 import soundfile as sf
 import torch
 
-from transcription.alignment.arpabet.dataset import (
+from transcription.cherokee.arpabet.dataset import (
     PhoneticWordBalancer,
     WordCandidate,
     extract_word_clip,
     load_words_manifest,
     save_words_manifest,
 )
-from transcription.alignment.arpabet.forced_aligner import (
+from transcription.cherokee.arpabet.forced_aligner import (
     AlignedWordSpan,
     MMSForcedAligner,
     get_default_forced_aligner,
 )
-from transcription.alignment.arpabet.g2p import (
+from transcription.cherokee.arpabet.g2p import (
     G2pExtractor,
     extract_arpabet,
     get_default_g2p,
 )
-from transcription.alignment.arpabet.types import (
+from transcription.cherokee.arpabet.types import (
     STANDARD_ARPABET_PHONEMES,
     ArpabetToken,
     EnglishToArpabetProtocol,

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-transcription.alignment.arpabet.matrix module.
+transcription.cherokee.arpabet.matrix module.
 
 Articulatory phonetic seed initialization, Numba-accelerated Wagner-Fischer
 dynamic programming alignment, and iterative Expectation-Maximization (EM)
@@ -36,9 +36,9 @@ from typing import (
 import numba
 import numpy as np
 
-from transcription.alignment.arpabet.dataset import load_words_manifest
-from transcription.alignment.arpabet.inference import sanitize_model_id
-from transcription.alignment.arpabet.types import (
+from transcription.cherokee.arpabet.dataset import load_words_manifest
+from transcription.cherokee.arpabet.inference import sanitize_model_id
+from transcription.cherokee.arpabet.types import (
     CANONICAL_CHEROKEE_CONSONANTS,
     CANONICAL_CHEROKEE_PHONEMES,
     CANONICAL_CHEROKEE_VOWELS,

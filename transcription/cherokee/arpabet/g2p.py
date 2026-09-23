@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-transcription.alignment.arpabet.g2p
+transcription.cherokee.arpabet.g2p
 
 Grapheme-to-Phoneme (G2P) extraction for English text using g2p_en.
 Normalizes text, strips punctuation, and maps words to standardized stress-stripped
@@ -13,7 +13,7 @@ import re
 from typing import Optional, Sequence, Tuple
 import g2p_en
 
-from transcription.alignment.arpabet.types import (
+from transcription.cherokee.arpabet.types import (
     STANDARD_ARPABET_PHONEMES,
     ArpabetToken,
     EnglishToArpabetProtocol,

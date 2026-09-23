@@ -21,13 +21,12 @@ from pydub import AudioSegment
 
 from transcription.cherokee.models import CherokeeASRModel
 from transcription.cherokee.phonotactics import prepare_cherokee_text
-from transcription.alignment.ctc_aligner import (
+from transcription.core.alignment.ctc import (
     DEFAULT_CACHE_DIR,
     CTCSegmentationAligner,
 )
-from transcription.core.alignment.ctc import (
-    CTCSegmentationAligner as CoreCTCSegmentationAligner,
-)
+
+CoreCTCSegmentationAligner = CTCSegmentationAligner
 from transcription.core.alignment.models import (
     AlignmentMetrics,
     AlignmentOutput,
@@ -354,7 +353,7 @@ def align_chapter(
     model_revision: Optional[str] = None,
     cache_dir: Optional[Union[str, Path]] = None,
     engine: str = "ctc",
-    ctc_aligner: Optional[CTCSegmentationAligner] = None,
+    ctc_aligner: Optional[CoreCTCSegmentationAligner] = None,
     asr_model: Optional[CherokeeASRModel] = None,
     cache: bool = True,
     aligner_config: Optional[CTCAlignerConfig] = None,

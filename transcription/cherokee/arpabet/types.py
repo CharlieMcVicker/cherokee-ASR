@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-transcription.alignment.arpabet.types
+transcription.cherokee.arpabet.types
 
 Domain models, pure transformation protocols, and serialization specifications
 for the ARPAbet-to-Cherokee phonetic mapping and acoustic alignment system.

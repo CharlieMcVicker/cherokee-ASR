@@ -14,7 +14,7 @@ from pathlib import Path
 import tempfile
 import pytest
 
-from transcription.alignment.arpabet.types import (
+from transcription.cherokee.arpabet.types import (
     ArpabetToken,
     CherokeeToken,
     SyntheticCherokeeTarget,

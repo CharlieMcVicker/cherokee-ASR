@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-transcription.alignment.arpabet package.
+transcription.cherokee.arpabet package.
 
 Acoustic alignment and empirical statistical mapping between ARPAbet
 phonetic sequences and Cherokee ASR emissions.
 """
 
-from transcription.alignment.arpabet.types import (
+from transcription.cherokee.arpabet.types import (
     CANONICAL_CHEROKEE_CONSONANTS,
     CANONICAL_CHEROKEE_PHONEMES,
     CANONICAL_CHEROKEE_TTH_PHONEMES,
@@ -31,7 +31,7 @@ from transcription.alignment.arpabet.types import (
     WordInferenceCacheEntry,
     WordManifestEntry,
 )
-from transcription.alignment.arpabet.dataset import (
+from transcription.cherokee.arpabet.dataset import (
     PhoneticWordBalancer,
     WordCandidate,
     extract_balanced_dataset,
@@ -40,18 +40,18 @@ from transcription.alignment.arpabet.dataset import (
     load_words_manifest,
     save_words_manifest,
 )
-from transcription.alignment.arpabet.forced_aligner import (
+from transcription.cherokee.arpabet.forced_aligner import (
     AlignedWordSpan,
     ForcedAlignerProtocol,
     MMSForcedAligner,
     get_default_forced_aligner,
 )
-from transcription.alignment.arpabet.g2p import (
+from transcription.cherokee.arpabet.g2p import (
     G2pExtractor,
     extract_arpabet,
     get_default_g2p,
 )
-from transcription.alignment.arpabet.inference import (
+from transcription.cherokee.arpabet.inference import (
     bucket_by_duration,
     ctc_prefix_beam_search,
     decode_greedy_with_confidences,
@@ -60,7 +60,7 @@ from transcription.alignment.arpabet.inference import (
     run_model_inference_on_manifest,
     sanitize_model_id,
 )
-from transcription.alignment.arpabet.matrix import (
+from transcription.cherokee.arpabet.matrix import (
     ARTICULATORY_FEATURE_DISTANCES,
     WagnerFischerAligner,
     align_word_pair,

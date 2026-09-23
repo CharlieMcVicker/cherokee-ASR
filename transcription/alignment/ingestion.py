@@ -7,7 +7,7 @@ import os
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, Union
 
-from transcription.alignment.arpabet.types import SyntheticTargetProjectorProtocol
+from transcription.cherokee.arpabet.types import SyntheticTargetProjectorProtocol
 from transcription.alignment.models import TextChunk
 from transcription.cherokee.orthography import (
     Orthography,

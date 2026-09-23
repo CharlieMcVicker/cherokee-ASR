@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Unit tests for ARPAbet and Cherokee alignment domain types, models, protocols,
-and serialization (transcription.alignment.arpabet.types).
+and serialization (transcription.cherokee.arpabet.types).
 """
 
 from dataclasses import FrozenInstanceError
@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Optional
 import pytest
 
-from transcription.alignment.arpabet import (
+from transcription.cherokee.arpabet import (
     EPSILON_TOKEN,
     STANDARD_ARPABET_CONSONANTS,
     STANDARD_ARPABET_PHONEMES,

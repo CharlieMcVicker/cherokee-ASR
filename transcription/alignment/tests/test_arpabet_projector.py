@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Unit and integration tests for the runtime synthetic target projector and
-code-switched aligner integration (transcription.alignment.arpabet.projector).
+code-switched aligner integration (transcription.cherokee.arpabet.projector).
 """
 
 import json
@@ -9,7 +9,7 @@ from pathlib import Path
 import tempfile
 import pytest
 
-from transcription.alignment.arpabet.types import (
+from transcription.cherokee.arpabet.types import (
     ArpabetToken,
     CherokeeToken,
     SyntheticCherokeeTarget,
@@ -259,7 +259,7 @@ def test_prepare_alignment_input_code_switched(default_projector):
 
 def test_project_arpabet_multigram_viterbi():
     """Verify 1,2-gram Viterbi projection selects multi-phone cluster targets."""
-    from transcription.alignment.arpabet.types import (
+    from transcription.cherokee.arpabet.types import (
         AcousticConfusionMatrix,
         ArpabetToken,
     )

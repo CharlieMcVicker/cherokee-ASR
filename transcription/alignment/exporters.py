@@ -11,22 +11,22 @@ Re-exports core language-agnostic exporters from transcription.core.exporters.
 from transcription.core.exporters.manifest import (
     export_debug_json,
     export_manifest,
-    serialize_word_interval as _serialize_word_interval,
+    serialize_word_interval,
 )
 from transcription.core.exporters.textgrid import (
     IntervalTier,
     TextGridBuilder,
-    build_contiguous_intervals as _build_contiguous_intervals,
-    build_padded_word_intervals as _build_padded_word_intervals,
+    build_contiguous_intervals,
+    build_padded_word_intervals,
     export_textgrid,
 )
 
 __all__ = [
     "IntervalTier",
     "TextGridBuilder",
-    "_build_contiguous_intervals",
-    "_build_padded_word_intervals",
-    "_serialize_word_interval",
+    "build_contiguous_intervals",
+    "build_padded_word_intervals",
+    "serialize_word_interval",
     "export_textgrid",
     "export_manifest",
     "export_debug_json",
