@@ -33,7 +33,7 @@ from transcription.alignment.models import (
     WordInterval,
 )
 from transcription.cherokee.phonotactics import prepare_cherokee_text
-from transcription.audio.non_speech_masking import mask_non_speech_logits
+from transcription.core.audio import mask_non_speech_logits
 from transcription.cherokee.models import CherokeeASRModel
 
 logger = logging.getLogger(__name__)

@@ -25,7 +25,7 @@ from transcription.alignment.pipeline import (
     align_syllabary_ctc,
     align_syllabary_greedy,
 )
-from transcription.audio.segment import AudioChunk
+from transcription.core.audio import AudioChunk
 from transcription.core.models.output import ModelOutput
 
 

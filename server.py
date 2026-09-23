@@ -190,7 +190,7 @@ audio_profile_cache = {}
 @app.post("/api/julie_segments")
 def get_julie_segments(req: JulieVADRequest):
     try:
-        from transcription.audio.segment import (
+        from transcription.core.audio import (
             get_energy_profile,
             segment_audio_from_profile,
         )
@@ -294,7 +294,7 @@ def process_file_preview(
     default_keep_silence,
     custom_setting=None,
 ):
-    from transcription.audio.segment import (
+    from transcription.core.audio import (
         get_energy_profile,
         segment_audio_from_profile,
     )
@@ -486,7 +486,7 @@ class SmartSegmentRequest(BaseModel):
 @app.post("/api/smart_segment")
 def smart_segment(req: SmartSegmentRequest):
     try:
-        from transcription.audio.segment import (
+        from transcription.core.audio import (
             get_energy_profile,
             segment_audio_from_profile,
             compute_metrics,
@@ -604,7 +604,7 @@ class BatchSegmentRequest(BaseModel):
 @app.post("/api/batch_segment")
 def batch_segment(req: BatchSegmentRequest):
     try:
-        from transcription.audio.segment import (
+        from transcription.core.audio import (
             get_energy_profile,
             segment_audio_from_profile,
         )

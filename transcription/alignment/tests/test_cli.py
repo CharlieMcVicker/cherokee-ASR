@@ -18,7 +18,7 @@ from transcription.alignment.cli import (
 )
 from transcription.apps.cli import main, run_alignment_pipeline
 from transcription.alignment.models import AlignmentOutput
-from transcription.audio.segment import AudioChunk
+from transcription.core.audio import AudioChunk
 from transcription.core.models.output import ModelOutput
 
 

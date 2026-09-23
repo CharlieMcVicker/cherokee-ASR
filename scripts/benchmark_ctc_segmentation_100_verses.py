@@ -29,7 +29,7 @@ from transcription.alignment.ctc_aligner import CTCSegmentationAligner
 from transcription.alignment.models import CTCAlignerConfig
 from transcription.alignment.normalizers import normalize_phonetics_for_alignment
 from transcription.cherokee.models import CherokeeASRModel
-from transcription.new_testament.pipeline import (
+from transcription.pipelines.scripture import (
     load_chapter_transcript,
 )
 

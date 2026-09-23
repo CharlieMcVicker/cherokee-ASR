@@ -25,7 +25,7 @@ if str(BASE_DIR) not in sys.path:
 from transcription.alignment.ctc_aligner import CTCSegmentationAligner
 from transcription.alignment.models import CTCAlignerConfig, TextChunk
 from transcription.cherokee.models import CherokeeASRModel
-from transcription.new_testament.pipeline import load_chapter_transcript
+from transcription.pipelines.scripture import load_chapter_transcript
 
 DEFAULT_MODEL_REPO = "charliemcvicker/length-only-20260704-155307-asr-cherokee-colon"
 DEFAULT_REVISION = "76e62140955f4738abdab345ea34068b02d8d2a2"

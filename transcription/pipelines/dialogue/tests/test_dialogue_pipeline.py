@@ -28,7 +28,7 @@ from transcription.alignment.models import (
     WordInterval,
 )
 from transcription.alignment.tests.test_syllabary_runners import DummyASRModel
-from transcription.audio.segment import AudioChunk
+from transcription.core.audio import AudioChunk
 from transcription.cherokee.codeswitching import CodeSwitchedPreparer, TokenType
 from transcription.pipelines.dialogue import (
     DialogueAlignmentPipeline,
