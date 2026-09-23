@@ -15,7 +15,25 @@ from transcription.alignment.models import (
     TokenEmission,
     WordInterval,
 )
-from transcription.alignment.normalizers import normalize_phonetics_for_alignment
+from transcription.cherokee.orthography import (
+    Orthography,
+    convert_orthography,
+)
+
+
+def normalize_phonetics_for_alignment(
+    text: str,
+    source: Orthography = Orthography.DG,
+    contextual_preaspiration: bool = True,
+) -> str:
+    if not text:
+        return ""
+    return convert_orthography(
+        text,
+        source=source,
+        target=Orthography.TTH,
+        contextual_preaspiration=contextual_preaspiration,
+    )
 
 
 def test_word_aligner_default_normalizers_identity():

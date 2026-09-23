@@ -9,14 +9,16 @@ from pathlib import Path
 import tempfile
 import pytest
 
-from transcription.alignment.arpabet import (
-    DEFAULT_CONFUSION_MATRIX_PATH,
-    DEFAULT_STATIC_DICTIONARY_PATH,
+from transcription.alignment.arpabet.types import (
     ArpabetToken,
     CherokeeToken,
     SyntheticCherokeeTarget,
-    SyntheticTargetProjector,
     SyntheticTargetProjectorProtocol,
+)
+from transcription.cherokee.codeswitching import (
+    DEFAULT_CONFUSION_MATRIX_PATH,
+    DEFAULT_STATIC_DICTIONARY_PATH,
+    SyntheticTargetProjector,
     generate_static_dictionary,
     get_default_projector,
     is_english_word,

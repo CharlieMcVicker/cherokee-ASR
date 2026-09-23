@@ -11,13 +11,11 @@ import pytest
 from transcription.alignment.ingestion import (
     load_bible_chunks,
     load_generic_chunks,
+    normalize_phonetics_for_alignment,
+    normalize_syllabary_for_alignment,
     prepare_alignment_input,
 )
 from transcription.alignment.models import TextChunk
-from transcription.alignment.normalizers import (
-    normalize_phonetics_for_alignment,
-    normalize_syllabary_for_alignment,
-)
 
 
 def test_load_bible_chunks_dict():

@@ -14,7 +14,7 @@ from unittest.mock import patch
 import pytest
 
 from transcription.alignment.models import AlignmentOutput
-from transcription.alignment.pipeline import align_syllabary_greedy
+from transcription.pipelines.dialogue import align_syllabary_greedy
 from transcription.alignment.tests.test_syllabary_runners import DummyASRModel
 from transcription.core.audio import AudioChunk
 from pydub import AudioSegment

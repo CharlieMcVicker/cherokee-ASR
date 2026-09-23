@@ -469,7 +469,7 @@ def align_chapter(
 
     # Fallback to legacy DTW alignment pipeline if custom metric/model_output provided
     from transcription.alignment.cli import run_alignment_pipeline
-    from transcription.alignment.calibrated_distance_metrics import (
+    from transcription.cherokee.distance import (
         PhonologicalConfusionCostMetric,
     )
     from transcription.alignment.distance_metrics import ConfusionMatrixCostMetric

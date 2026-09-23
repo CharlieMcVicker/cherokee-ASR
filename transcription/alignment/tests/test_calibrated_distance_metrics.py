@@ -8,19 +8,21 @@ from pathlib import Path
 import pytest
 
 from transcription.alignment import (
-    ConfusionMatrixCostMetric,
-    DistanceMetric,
     NeedlemanWunschWordAligner,
-    PhonologicalConfusionCostMetric,
     SlidingWindowDTWAligner,
     TextChunk,
     TokenEmission,
 )
-from transcription.alignment.calibrated_distance_metrics import (
+from transcription.core.alignment.distance import (
+    ConfusionMatrixCostMetric,
+    DistanceMetric,
+)
+from transcription.cherokee.distance import (
     CHEROKEE_VOWEL_DROP_COUNTS,
     CHEROKEE_VOWEL_DROP_PROBABILITIES,
     DEFAULT_CALIBRATED_DELETION_COSTS,
     DEFAULT_CALIBRATED_INSERTION_COSTS,
+    PhonologicalConfusionCostMetric,
 )
 
 

@@ -9,10 +9,47 @@ from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, Union
 
 from transcription.alignment.arpabet.types import SyntheticTargetProjectorProtocol
 from transcription.alignment.models import TextChunk
-from transcription.alignment.normalizers import (
-    normalize_phonetics_for_alignment,
-    normalize_syllabary_for_alignment,
+from transcription.cherokee.orthography import (
+    Orthography,
+    convert_orthography,
 )
+
+
+def normalize_phonetics_for_alignment(
+    text: str,
+    source: Orthography = Orthography.DG,
+    contextual_preaspiration: bool = True,
+) -> str:
+    """
+    Normalizes phonetic Cherokee text for ASR alignment matching.
+    """
+    if not text:
+        return ""
+    return convert_orthography(
+        text,
+        source=source,
+        target=Orthography.TTH,
+        contextual_preaspiration=contextual_preaspiration,
+    )
+
+
+def normalize_syllabary_for_alignment(
+    text: str,
+    source: Orthography = Orthography.SYLLABARY,
+    target: Orthography = Orthography.TTH,
+    contextual_preaspiration: bool = True,
+) -> str:
+    """
+    Normalizes Cherokee Syllabary (or Latin transliteration) for ASR alignment matching.
+    """
+    if not text:
+        return ""
+    return convert_orthography(
+        text,
+        source=source,
+        target=target,
+        contextual_preaspiration=contextual_preaspiration,
+    )
 
 
 def load_bible_chunks(

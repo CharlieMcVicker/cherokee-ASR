@@ -980,7 +980,7 @@ def test_ctc_aligner_codeswitched_masks_forwarding(dummy_audio_file: Path):
     """
     from unittest.mock import MagicMock, patch
     from transcription.alignment.models import TextChunk
-    from transcription.alignment.arpabet import (
+    from transcription.cherokee.codeswitching import (
         create_groundtruth_for_code_switched_syllabary,
     )
 

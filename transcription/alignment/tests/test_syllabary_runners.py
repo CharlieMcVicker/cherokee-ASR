@@ -21,7 +21,7 @@ import torch
 
 from transcription.alignment.ingestion import load_syllabary_transcript
 from transcription.alignment.models import AlignmentOutput, CTCAlignerConfig
-from transcription.alignment.pipeline import (
+from transcription.pipelines.dialogue import (
     align_syllabary_ctc,
     align_syllabary_greedy,
 )
@@ -283,7 +283,7 @@ def test_build_syllabary_word_tier_length_mismatch_raises_value_error():
         AlignmentOutput,
         WordInterval,
     )
-    from transcription.alignment.pipeline import _build_syllabary_word_tier
+    from transcription.pipelines.dialogue import build_syllabary_word_tier
 
     alignment = AlignmentOutput(
         aligned_chunks=[
@@ -304,7 +304,7 @@ def test_build_syllabary_word_tier_length_mismatch_raises_value_error():
     syllabary_lookup = {"chunk_001": "ᎣᏏᏲ"}
 
     with pytest.raises(ValueError, match="Syllabary word index 1 exceeds token bounds"):
-        _build_syllabary_word_tier(alignment, syllabary_lookup)
+        build_syllabary_word_tier(alignment, syllabary_lookup)
 
 
 def test_build_english_word_tier_length_mismatch_raises_value_error():
@@ -314,7 +314,7 @@ def test_build_english_word_tier_length_mismatch_raises_value_error():
         AlignmentOutput,
         WordInterval,
     )
-    from transcription.alignment.pipeline import _build_english_word_tier
+    from transcription.pipelines.dialogue import build_english_word_tier
 
     alignment = AlignmentOutput(
         aligned_chunks=[
@@ -339,4 +339,4 @@ def test_build_english_word_tier_length_mismatch_raises_value_error():
     with pytest.raises(
         ValueError, match="Code-switched token index 1 exceeds token bounds"
     ):
-        _build_english_word_tier(alignment, source_lookup)
+        build_english_word_tier(alignment, source_lookup)

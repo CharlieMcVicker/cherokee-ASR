@@ -13,9 +13,6 @@ from transcription.alignment.ctc_aligner import (
     get_logits_cached,
 )
 from transcription.alignment.cli import run_alignment_pipeline
-from transcription.alignment.calibrated_distance_metrics import (
-    PhonologicalConfusionCostMetric,
-)
 from transcription.alignment.distance_metrics import (
     CharacterErrorRateMetric,
     ConfusionMatrixCostMetric,
@@ -35,11 +32,9 @@ from transcription.alignment.ingestion import (
     load_generic_chunks,
     load_interview_transcript,
     load_syllabary_transcript,
+    normalize_phonetics_for_alignment,
+    normalize_syllabary_for_alignment,
     prepare_alignment_input,
-)
-from transcription.alignment.pipeline import (
-    align_syllabary_ctc,
-    align_syllabary_greedy,
 )
 from transcription.alignment.models import (
     AlignedChunk,
@@ -49,10 +44,6 @@ from transcription.alignment.models import (
     TextChunk,
     TokenEmission,
     WordInterval,
-)
-from transcription.alignment.normalizers import (
-    normalize_phonetics_for_alignment,
-    normalize_syllabary_for_alignment,
 )
 from transcription.alignment.reconciliation import (
     reconcile_alignment_by_chunk,
@@ -93,7 +84,6 @@ __all__ = [
     "DefaultCERDistanceMetric",
     "CharacterErrorRateMetric",
     "ConfusionMatrixCostMetric",
-    "PhonologicalConfusionCostMetric",
     "LevenshteinDistanceMetric",
     "CustomCallableDistanceMetric",
     "calculate_cer",
@@ -102,8 +92,6 @@ __all__ = [
     "SlidingWindowDTWAligner",
     "CTCSegmentationAligner",
     "get_logits_cached",
-    "align_syllabary_greedy",
-    "align_syllabary_ctc",
     # Reconciliation
     "reconcile_word_intervals",
     "reconcile_alignment_words",
