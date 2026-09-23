@@ -62,7 +62,9 @@ class ASRModel:
 
     def infer(
         self,
-        audio_input: Union[str, Path, bytes, Sequence[float], np.ndarray, torch.Tensor],
+        audio_input: Union[
+            str, Path, bytes, Sequence[float], np.ndarray, torch.Tensor, Any
+        ],
         sample_rate: int = TARGET_SAMPLE_RATE,
         cache_dir: Optional[Union[str, Path]] = None,
     ) -> ModelOutput:
@@ -70,7 +72,7 @@ class ASRModel:
         Execute forward inference on single audio input and return ModelOutput universal currency.
 
         Args:
-            audio_input: Audio path, PCM array, tensor, or bytes.
+            audio_input: Audio path, PCM array, tensor, bytes, or AudioSegment.
             sample_rate: Input sampling rate (default: 16000).
             cache_dir: Optional directory for .npz emission caching (overrides instance cache_dir).
 
@@ -91,7 +93,7 @@ class ASRModel:
     def infer_batch(
         self,
         audio_inputs: Sequence[
-            Union[str, Path, bytes, Sequence[float], np.ndarray, torch.Tensor]
+            Union[str, Path, bytes, Sequence[float], np.ndarray, torch.Tensor, Any]
         ],
         sample_rate: int = TARGET_SAMPLE_RATE,
         batch_size: int = 16,
@@ -123,7 +125,9 @@ class ASRModel:
 
     @staticmethod
     def preprocess_audio(
-        audio_input: Union[str, Path, bytes, Sequence[float], np.ndarray, torch.Tensor],
+        audio_input: Union[
+            str, Path, bytes, Sequence[float], np.ndarray, torch.Tensor, Any
+        ],
         sample_rate: int = TARGET_SAMPLE_RATE,
     ) -> np.ndarray:
         """Preprocess audio to 16kHz mono float32 ndarray."""

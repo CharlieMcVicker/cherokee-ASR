@@ -9,6 +9,7 @@ import sys
 import pytest
 from unittest.mock import MagicMock, patch
 
+import numpy as np
 from pydub import AudioSegment
 
 from transcription.alignment.cli import (
@@ -18,19 +19,45 @@ from transcription.alignment.cli import (
 from transcription.apps.cli import main, run_alignment_pipeline
 from transcription.alignment.models import AlignmentOutput
 from transcription.audio.segment import AudioChunk
+from transcription.core.models.output import ModelOutput
 
 
 @pytest.fixture
 def mock_asr_model():
     with patch(
-        "transcription.models.asr_model.CherokeeASRModel.from_pretrained"
+        "transcription.models.asr_model.CherokeeASRModel.from_pretrained_or_best"
     ) as mock_from_pretrained:
         mock_model = MagicMock()
-        mock_model.get_logits.return_value = "mock_logits"
-        mock_model.get_word_confidences.return_value = [
-            {"word": "osiyo", "start_time": 0.2, "end_time": 0.8, "confidence": 0.95},
-            {"word": "tohiju", "start_time": 0.9, "end_time": 1.5, "confidence": 0.92},
-        ]
+        # Synthetic ModelOutput with tokens for "osiyo tohiju"
+        vocab = {
+            "[PAD]": 0,
+            "|": 1,
+            "o": 2,
+            "s": 3,
+            "i": 4,
+            "y": 5,
+            "t": 6,
+            "h": 7,
+            "j": 8,
+            "u": 9,
+        }
+        lpz = np.full((100, len(vocab)), -10.0, dtype=np.float32)
+        lpz[:, 0] = 0.0
+        # osiyo: 10..30
+        for i, ch in enumerate(["o", "s", "i", "y", "o"]):
+            lpz[10 + i * 4 : 10 + i * 4 + 2, vocab[ch]] = 8.0
+        lpz[32:34, vocab["|"]] = 8.0
+        # tohiju: 40..65
+        for i, ch in enumerate(["t", "o", "h", "i", "j", "u"]):
+            lpz[40 + i * 4 : 40 + i * 4 + 2, vocab[ch]] = 8.0
+
+        mock_out = ModelOutput(
+            lpz=lpz,
+            vocab=vocab,
+            frame_duration_sec=0.02,
+            metadata={"pad_token_id": 0, "word_delimiter_token_id": 1},
+        )
+        mock_model.infer.return_value = mock_out
         mock_from_pretrained.return_value = mock_model
         yield mock_model
 
@@ -51,24 +78,15 @@ def test_run_alignment_pipeline_with_bible_metadata(tmp_path, mock_asr_model):
 
     out_dir = str(tmp_path / "output")
 
-    with patch("transcription.alignment.extractors.segment_long_audio") as mock_segment:
-        dummy_chunk = AudioChunk(
-            chunk_index=0,
-            audio=AudioSegment.silent(duration=2000, frame_rate=16000),
-            start_sec=0.0,
-            end_sec=2.0,
-        )
-        mock_segment.return_value = [dummy_chunk]
-
-        result = run_alignment_pipeline(
-            audio_path="dummy_path.wav",
-            output_dir=out_dir,
-            bible_metadata_path=str(meta_path),
-            export_praat=True,
-            export_manifest=True,
-            debug_export=True,
-            reconcile=True,
-        )
+    result = run_alignment_pipeline(
+        audio_path="dummy_path.wav",
+        output_dir=out_dir,
+        bible_metadata_path=str(meta_path),
+        export_praat=True,
+        export_manifest=True,
+        debug_export=True,
+        reconcile=True,
+    )
 
     assert isinstance(result, AlignmentOutput)
     assert len(result.aligned_chunks) == 1
@@ -98,21 +116,12 @@ def test_run_alignment_pipeline_with_chunk_list(tmp_path, mock_asr_model):
 
     out_dir = str(tmp_path / "output_chunks")
 
-    with patch("transcription.alignment.extractors.segment_long_audio") as mock_segment:
-        dummy_chunk = AudioChunk(
-            chunk_index=0,
-            audio=AudioSegment.silent(duration=1000, frame_rate=16000),
-            start_sec=0.0,
-            end_sec=1.0,
-        )
-        mock_segment.return_value = [dummy_chunk]
-
-        result = run_alignment_pipeline(
-            audio_path="dummy_path.wav",
-            output_dir=out_dir,
-            chunk_list_path=str(chunks_path),
-            skip_vad=False,
-        )
+    result = run_alignment_pipeline(
+        audio_path="dummy_path.wav",
+        output_dir=out_dir,
+        chunk_list_path=str(chunks_path),
+        skip_vad=False,
+    )
 
     assert isinstance(result, AlignmentOutput)
     assert len(result.aligned_chunks) == 1

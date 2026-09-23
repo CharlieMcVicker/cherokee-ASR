@@ -21,6 +21,11 @@ import torchaudio
 
 from transcription.core.models.output import ModelOutput
 
+try:
+    from pydub import AudioSegment
+except ImportError:
+    AudioSegment = None  # type: ignore
+
 logger = logging.getLogger(__name__)
 
 TARGET_SAMPLE_RATE = 16000
@@ -40,7 +45,9 @@ def _resolve_device(
 
 
 def preprocess_audio(
-    audio_input: Union[str, Path, bytes, Sequence[float], np.ndarray, torch.Tensor],
+    audio_input: Union[
+        str, Path, bytes, Sequence[float], np.ndarray, torch.Tensor, Any
+    ],
     sample_rate: int = TARGET_SAMPLE_RATE,
 ) -> np.ndarray:
     """
@@ -52,7 +59,18 @@ def preprocess_audio(
         - Sequence of floats / Python list
         - NumPy ndarray (1D or 2D stereo averaged to mono)
         - PyTorch Tensor (1D or 2D stereo averaged to mono)
+        - pydub.AudioSegment
     """
+    if AudioSegment is not None and isinstance(audio_input, AudioSegment):
+        seg = audio_input
+        if seg.frame_rate != TARGET_SAMPLE_RATE:
+            seg = seg.set_frame_rate(TARGET_SAMPLE_RATE)
+        if seg.channels > 1:
+            seg = seg.set_channels(1)
+        samples = np.array(seg.get_array_of_samples(), dtype=np.float32)
+        max_val = float(1 << (8 * seg.sample_width - 1))
+        return (samples / max_val).astype(np.float32)
+
     if isinstance(audio_input, (str, Path)):
         path_str = str(audio_input)
         if not os.path.exists(path_str):
@@ -133,7 +151,9 @@ def extract_vocab_and_metadata(processor: Any) -> tuple[dict[str, int], dict[str
 
 
 def compute_audio_cache_key(
-    audio_input: Union[str, Path, bytes, Sequence[float], np.ndarray, torch.Tensor],
+    audio_input: Union[
+        str, Path, bytes, Sequence[float], np.ndarray, torch.Tensor, Any
+    ],
     model_identifier: str = "asr_model",
 ) -> str:
     """
@@ -157,6 +177,17 @@ def compute_audio_cache_key(
         return f"{stem}_{hasher.hexdigest()[:16]}"
 
     stem = "audio"
+    if AudioSegment is not None and isinstance(audio_input, AudioSegment):
+        hasher.update(
+            f"|audioseg:{audio_input.channels}:{audio_input.frame_rate}:{audio_input.sample_width}|".encode(
+                "utf-8"
+            )
+        )
+        raw = getattr(audio_input, "raw_data", None)
+        if isinstance(raw, (bytes, bytearray, memoryview)):
+            hasher.update(raw)
+        return f"{stem}_{hasher.hexdigest()[:16]}"
+
     if isinstance(audio_input, bytes):
         hasher.update(b"|bytes|")
         hasher.update(audio_input)
@@ -178,7 +209,9 @@ def compute_audio_cache_key(
 def infer_emissions(
     model: Any,
     processor: Any,
-    audio_input: Union[str, Path, bytes, Sequence[float], np.ndarray, torch.Tensor],
+    audio_input: Union[
+        str, Path, bytes, Sequence[float], np.ndarray, torch.Tensor, Any
+    ],
     sample_rate: int = TARGET_SAMPLE_RATE,
     device: Optional[Union[str, torch.device]] = None,
     cache_dir: Optional[Union[str, Path]] = None,
@@ -191,7 +224,7 @@ def infer_emissions(
     Args:
         model: Wav2Vec2ForCTC or compatible model.
         processor: Wav2Vec2Processor or compatible processor.
-        audio_input: File path, PCM array, tensor, or bytes.
+        audio_input: File path, PCM array, tensor, bytes, or AudioSegment.
         sample_rate: Input sample rate (default: 16000).
         device: PyTorch device ('cpu', 'cuda', 'mps', or torch.device).
         cache_dir: Optional directory to cache and retrieve ModelOutput .npz files.
@@ -273,7 +306,7 @@ def infer_emissions_batch(
     model: Any,
     processor: Any,
     audio_inputs: Sequence[
-        Union[str, Path, bytes, Sequence[float], np.ndarray, torch.Tensor]
+        Union[str, Path, bytes, Sequence[float], np.ndarray, torch.Tensor, Any]
     ],
     sample_rate: int = TARGET_SAMPLE_RATE,
     device: Optional[Union[str, torch.device]] = None,

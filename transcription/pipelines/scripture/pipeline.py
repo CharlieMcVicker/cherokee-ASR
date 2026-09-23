@@ -363,7 +363,7 @@ def align_chapter(
     Procedural backward-compatible wrapper for scripture chapter alignment.
 
     Supports continuous chapter alignment using CTCSegmentationAligner (default, engine="ctc"),
-    or DTW emissions alignment via run_alignment_pipeline (engine="dtw" or when DTW extractors are provided).
+    or DTW emissions alignment via run_alignment_pipeline (engine="dtw" or when DTW ModelOutput is provided).
     """
     use_ctc = engine.lower() == "ctc" and (
         ctc_aligner is not None
@@ -467,16 +467,12 @@ def align_chapter(
 
         return alignment
 
-    # Fallback to legacy DTW alignment pipeline if custom metric/extractor provided
+    # Fallback to legacy DTW alignment pipeline if custom metric/model_output provided
     from transcription.alignment.cli import run_alignment_pipeline
     from transcription.alignment.calibrated_distance_metrics import (
         PhonologicalConfusionCostMetric,
     )
     from transcription.alignment.distance_metrics import ConfusionMatrixCostMetric
-    from transcription.alignment.extractors import (
-        CachedASREmissionsExtractor,
-        CherokeeASRExtractor,
-    )
 
     if distance_metric is None:
         cost_matrix_path = Path("runs/evaluation/confusion_cost_matrix_prebible.json")
@@ -491,7 +487,10 @@ def align_chapter(
             base_metric = ConfusionMatrixCostMetric.from_json(cost_matrix_path)
             distance_metric = PhonologicalConfusionCostMetric(base_metric=base_metric)
 
-    if emissions_extractor is None:
+    model_out = (
+        emissions_extractor if isinstance(emissions_extractor, ModelOutput) else None
+    )
+    if model_out is None:
         rev = model_revision or "5464d15"
         repo = model_path or "charliemcvicker/asr-cherokee"
         token = os.environ.get("HF_TOKEN", None)
@@ -500,16 +499,10 @@ def align_chapter(
             revision=rev,
             token=token,
         )
-        base_extractor = CherokeeASRExtractor(model=model, skip_vad=skip_vad)
         c_dir = (
             Path(cache_dir) if cache_dir is not None else Path("runs/cache/emissions")
         )
-        c_prefix = f"charliemcvicker_asr-cherokee_{rev}"
-        emissions_extractor = CachedASREmissionsExtractor(
-            extractor=base_extractor,
-            cache_dir=c_dir,
-            cache_key_prefix=c_prefix,
-        )
+        model_out = model.infer(audio_path, cache_dir=c_dir if cache else None)
 
     return run_alignment_pipeline(
         audio_path=str(audio_path),
@@ -522,7 +515,7 @@ def align_chapter(
         debug_export=debug_export,
         reconcile=reconcile,
         distance_metric=distance_metric,
-        emissions_extractor=emissions_extractor,
+        model_output=model_out,
     )
 
 

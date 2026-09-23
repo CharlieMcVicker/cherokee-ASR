@@ -17,10 +17,6 @@ from transcription.alignment.distance_metrics import (
     ConfusionMatrixCostMetric,
     DefaultCERDistanceMetric,
 )
-from transcription.alignment.extractors import (
-    CachedASREmissionsExtractor,
-    PrecomputedEmissionsExtractor,
-)
 from transcription.alignment.models import (
     AlignmentOutput,
     CTCAlignerConfig,
@@ -28,6 +24,7 @@ from transcription.alignment.models import (
     TokenEmission,
 )
 from transcription.audio.segment import AudioChunk
+from transcription.core.models.output import ModelOutput
 from transcription.new_testament.pipeline import (
     align_chapter,
     load_chapter_transcript,
@@ -136,15 +133,51 @@ def test_reconcile_syllabary_asr():
     assert len(pairs) > 0
 
 
+def _build_dummy_model_output() -> ModelOutput:
+    vocab = {
+        "[PAD]": 0,
+        "|": 1,
+        "a": 2,
+        "d": 3,
+        "l": 4,
+        "e": 5,
+        "n": 6,
+        "i": 7,
+        "s": 8,
+        "g": 9,
+        "v": 10,
+        "y": 11,
+        "k": 12,
+        "o": 13,
+        "h": 14,
+        "t": 15,
+    }
+    lpz = np.full((100, len(vocab)), -10.0, dtype=np.float32)
+    lpz[:, 0] = 0.0
+    for i, ch in enumerate("adalenisgv"):
+        if ch in vocab:
+            lpz[10 + i * 2 : 10 + i * 2 + 2, vocab[ch]] = 8.0
+    lpz[32:34, vocab["|"]] = 8.0
+    for i, ch in enumerate("yisdv"):
+        if ch in vocab:
+            lpz[36 + i * 2 : 36 + i * 2 + 2, vocab[ch]] = 8.0
+    lpz[48:50, vocab["|"]] = 8.0
+    for i, ch in enumerate("kanohedv"):
+        if ch in vocab:
+            lpz[52 + i * 2 : 52 + i * 2 + 2, vocab[ch]] = 8.0
+
+    return ModelOutput(
+        lpz=lpz,
+        vocab=vocab,
+        frame_duration_sec=0.02,
+        metadata={"pad_token_id": 0, "word_delimiter_token_id": 1},
+    )
+
+
 def test_align_chapter_with_custom_distance_metric_and_extractor(
     tmp_path: Path, dummy_transcript: Path
 ):
-    dummy_emissions = [
-        TokenEmission(word="adalenisgv", start_sec=0.1, end_sec=0.6, confidence=0.95),
-        TokenEmission(word="yisdv", start_sec=0.7, end_sec=1.1, confidence=0.92),
-        TokenEmission(word="kanohedv", start_sec=1.2, end_sec=1.8, confidence=0.90),
-    ]
-    extractor = PrecomputedEmissionsExtractor(token_emissions=dummy_emissions)
+    model_out = _build_dummy_model_output()
     metric = DefaultCERDistanceMetric()
 
     out_dir = tmp_path / "output_custom"
@@ -156,7 +189,7 @@ def test_align_chapter_with_custom_distance_metric_and_extractor(
         export_praat=True,
         reconcile=True,
         distance_metric=metric,
-        emissions_extractor=extractor,
+        emissions_extractor=model_out,
     )
 
     assert isinstance(res, AlignmentOutput)
@@ -170,17 +203,7 @@ def test_align_chapter_with_custom_distance_metric_and_extractor(
 def test_align_chapter_with_cached_extractor_and_confusion_metric(
     tmp_path: Path, dummy_transcript: Path, dummy_cost_matrix: Path
 ):
-    dummy_emissions = [
-        TokenEmission(word="adalenisgv", start_sec=0.1, end_sec=0.6, confidence=0.95),
-        TokenEmission(word="yisdv", start_sec=0.7, end_sec=1.1, confidence=0.92),
-        TokenEmission(word="kanohedv", start_sec=1.2, end_sec=1.8, confidence=0.90),
-    ]
-    base_extractor = PrecomputedEmissionsExtractor(token_emissions=dummy_emissions)
-    cached_extractor = CachedASREmissionsExtractor(
-        extractor=base_extractor,
-        cache_dir=tmp_path / "cache",
-        cache_key_prefix="test_prefix",
-    )
+    model_out = _build_dummy_model_output()
     metric = ConfusionMatrixCostMetric.from_json(dummy_cost_matrix)
 
     out_dir = tmp_path / "output_cached"
@@ -190,7 +213,7 @@ def test_align_chapter_with_cached_extractor_and_confusion_metric(
         transcript_path=dummy_transcript,
         output_dir=out_dir,
         distance_metric=metric,
-        emissions_extractor=cached_extractor,
+        emissions_extractor=model_out,
     )
 
     assert isinstance(res, AlignmentOutput)

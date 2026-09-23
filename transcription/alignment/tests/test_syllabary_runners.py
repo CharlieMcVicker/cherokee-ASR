@@ -26,6 +26,7 @@ from transcription.alignment.pipeline import (
     align_syllabary_greedy,
 )
 from transcription.audio.segment import AudioChunk
+from transcription.core.models.output import ModelOutput
 
 
 class DummyTokenizer:
@@ -68,6 +69,8 @@ class DummyASRModel:
         self.processor = DummyProcessor()
         self.model_name = name
         self.call_count = 0
+        self.device = "cpu"
+        self.model = self
 
     def get_logits(self, samples: np.ndarray, sample_rate: int = 16000) -> torch.Tensor:
         self.call_count += 1
@@ -92,6 +95,33 @@ class DummyASRModel:
                 word="nikahlisthiha", start_time=0.7, end_time=1.4, confidence=0.92
             ),
         ]
+
+    def infer(self, audio_input: Any, **kwargs: Any) -> ModelOutput:
+        vocab = self.processor.tokenizer.get_vocab()
+        # Synthetic logits with greedy token activations for "ohsda nikahlisthiha"
+        # 100 frames = 2.0s
+        lpz = np.full((100, len(vocab)), -10.0, dtype=np.float32)
+        lpz[:, 0] = 0.0  # pad
+        # Activate tokens for ohsda: o, h, s, d, a
+        tokens_1 = ["o", "h", "s", "d", "a"]
+        for idx, tok in enumerate(tokens_1):
+            if tok in vocab:
+                f = 10 + idx * 3
+                lpz[f : f + 2, vocab[tok]] = 8.0
+        # Activate tokens for nikahlisthiha: n, i, k, a, h, l, i, s, t, h, i, h, a
+        tokens_2 = ["n", "i", "k", "a", "h", "l", "i", "s", "t", "h", "i", "h", "a"]
+        for idx, tok in enumerate(tokens_2):
+            if tok in vocab:
+                f = 40 + idx * 3
+                if f + 2 <= 100:
+                    lpz[f : f + 2, vocab[tok]] = 8.0
+
+        return ModelOutput(
+            lpz=lpz,
+            vocab=vocab,
+            frame_duration_sec=0.02,
+            metadata={"pad_token_id": 0},
+        )
 
 
 @pytest.fixture
@@ -162,23 +192,14 @@ def test_align_syllabary_greedy(dummy_audio: Path, tmp_path: Path):
     model = DummyASRModel()
     out_dir = tmp_path / "greedy_out"
 
-    with patch("transcription.alignment.extractors.segment_long_audio") as mock_segment:
-        mock_chunk = AudioChunk(
-            chunk_index=0,
-            audio=AudioSegment.silent(duration=2000, frame_rate=16000),
-            start_sec=0.0,
-            end_sec=2.0,
-        )
-        mock_segment.return_value = [mock_chunk]
-
-        result = align_syllabary_greedy(
-            audio=dummy_audio,
-            transcript="ᎣᏍᏓ ᏂᎦᎵᏍᏗᎭ",
-            output_dir=out_dir,
-            model=cast(Any, model),
-            export_praat=True,
-            export_manifest=True,
-        )
+    result = align_syllabary_greedy(
+        audio=dummy_audio,
+        transcript="ᎣᏍᏓ ᏂᎦᎵᏍᏗᎭ",
+        output_dir=out_dir,
+        model=cast(Any, model),
+        export_praat=True,
+        export_manifest=True,
+    )
 
     assert isinstance(result, AlignmentOutput)
     assert len(result.aligned_chunks) == 1

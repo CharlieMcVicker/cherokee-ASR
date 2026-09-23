@@ -30,14 +30,6 @@ from transcription.alignment.exporters import (
     export_manifest,
     export_textgrid,
 )
-from transcription.alignment.extractors import (
-    ASREmissionsExtractor,
-    CachedASREmissionsExtractor,
-    CallbackEmissionsExtractor,
-    CherokeeASRExtractor,
-    PrecomputedEmissionsExtractor,
-    prepare_audio_chunks,
-)
 from transcription.alignment.ingestion import (
     load_bible_chunks,
     load_generic_chunks,
@@ -96,13 +88,6 @@ __all__ = [
     "prepare_alignment_input",
     "normalize_syllabary_for_alignment",
     "normalize_phonetics_for_alignment",
-    # Extractors
-    "ASREmissionsExtractor",
-    "CachedASREmissionsExtractor",
-    "CherokeeASRExtractor",
-    "CallbackEmissionsExtractor",
-    "PrecomputedEmissionsExtractor",
-    "prepare_audio_chunks",
     # Distance Metrics
     "DistanceMetric",
     "DefaultCERDistanceMetric",

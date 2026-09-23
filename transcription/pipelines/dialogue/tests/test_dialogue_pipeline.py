@@ -200,26 +200,17 @@ def test_align_syllabary_greedy_dialogue_pipeline(dummy_audio: Path, tmp_path: P
     model = DummyASRModel()
     out_dir = tmp_path / "greedy_out"
 
-    with patch("transcription.alignment.extractors.segment_long_audio") as mock_segment:
-        mock_chunk = AudioChunk(
-            chunk_index=0,
-            audio=AudioSegment.silent(duration=2000, frame_rate=16000),
-            start_sec=0.0,
-            end_sec=2.0,
-        )
-        mock_segment.return_value = [mock_chunk]
-
-        result = align_syllabary_greedy(
-            audio=dummy_audio,
-            transcript="Guy Soldier: ᎯᏅ JayᎢ ᎣᏏᏍ",
-            output_dir=out_dir,
-            model=cast(Any, model),
-            code_switched=True,
-            export_praat=True,
-            export_manifest=True,
-            textgrid_filename="greedy_7tier.TextGrid",
-            manifest_filename="greedy_manifest.json",
-        )
+    result = align_syllabary_greedy(
+        audio=dummy_audio,
+        transcript="Guy Soldier: ᎯᏅ JayᎢ ᎣᏏᏍ",
+        output_dir=out_dir,
+        model=cast(Any, model),
+        code_switched=True,
+        export_praat=True,
+        export_manifest=True,
+        textgrid_filename="greedy_7tier.TextGrid",
+        manifest_filename="greedy_manifest.json",
+    )
 
     assert isinstance(result, AlignmentOutput)
     tg_path = out_dir / "greedy_7tier.TextGrid"

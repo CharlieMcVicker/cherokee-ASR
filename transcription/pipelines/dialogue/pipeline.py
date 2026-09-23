@@ -760,13 +760,12 @@ def align_syllabary_greedy(
         NeedlemanWunschWordAligner,
         SlidingWindowDTWAligner,
     )
-    from transcription.alignment.extractors import (
-        ASREmissionsExtractor as _ASREmissionsExtractor,
-        CherokeeASRExtractor as _CherokeeASRExtractor,
-    )
+    from transcription.core.models.output import ModelOutput
 
-    if emissions_extractor is not None:
-        extractor = emissions_extractor
+    if emissions_extractor is not None and isinstance(
+        emissions_extractor, (ModelOutput, list)
+    ):
+        emissions = emissions_extractor
     else:
         asr_model = model
         if asr_model is None:
@@ -775,12 +774,11 @@ def align_syllabary_greedy(
                 path_or_repo=model_path,
                 token=token,
             )
-        extractor = _CherokeeASRExtractor(model=asr_model, skip_vad=skip_vad)
+        emissions = asr_model.infer(audio)
 
     audio_source_id = (
         str(audio) if isinstance(audio, (str, Path)) else "in_memory_audio"
     )
-    emissions = extractor.extract(audio)
 
     word_aligner = NeedlemanWunschWordAligner(distance_metric=distance_metric)
     aligner = SlidingWindowDTWAligner(word_aligner=word_aligner)

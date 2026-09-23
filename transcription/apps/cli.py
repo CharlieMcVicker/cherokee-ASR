@@ -28,13 +28,10 @@ from transcription.alignment.exporters import (
     export_manifest as export_manifest_file,
     export_textgrid,
 )
-from transcription.alignment.extractors import (
-    ASREmissionsExtractor,
-    CherokeeASRExtractor,
-)
 from transcription.alignment.ingestion import prepare_alignment_input
 from transcription.alignment.models import AlignmentOutput
 from transcription.alignment.reconciliation import reconcile_alignment_words
+from transcription.core.models.output import ModelOutput
 from transcription.models.asr_model import CherokeeASRModel
 
 
@@ -51,7 +48,7 @@ def run_alignment_pipeline(
     debug_export: bool = False,
     reconcile: bool = False,
     distance_metric: Optional[Any] = None,
-    emissions_extractor: Optional[ASREmissionsExtractor] = None,
+    model_output: Optional[ModelOutput] = None,
     projector: Optional[SyntheticTargetProjectorProtocol] = None,
     code_switched: bool = False,
 ) -> AlignmentOutput:
@@ -86,17 +83,15 @@ def run_alignment_pipeline(
 
     print(f"[3/4] Running ASR emission extraction & alignment...")
 
-    if emissions_extractor is not None:
-        extractor = emissions_extractor
+    if model_output is not None:
+        emissions = model_output
     else:
         token = os.environ.get("HF_TOKEN", None)
         asr_model = CherokeeASRModel.from_pretrained_or_best(
             path_or_repo=model_path,
             token=token,
         )
-        extractor = CherokeeASRExtractor(model=asr_model, skip_vad=skip_vad)
-
-    emissions = extractor.extract(audio_path)
+        emissions = asr_model.infer(audio_path)
 
     word_aligner = NeedlemanWunschWordAligner(
         distance_metric=distance_metric,
