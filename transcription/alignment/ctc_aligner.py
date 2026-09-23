@@ -32,13 +32,9 @@ from transcription.alignment.models import (
     TokenEmission,
     WordInterval,
 )
-from transcription.alignment.normalizers import (
-    normalize_phonetics_for_alignment,
-    normalize_syllabary_for_alignment,
-)
-from transcription.alignment.phonotactics import prepare_cherokee_text
-from transcription.audio.non_speech_masking import mask_non_speech_logits
-from transcription.models.asr_model import CherokeeASRModel
+from transcription.cherokee.phonotactics import prepare_cherokee_text
+from transcription.core.audio import mask_non_speech_logits
+from transcription.cherokee.models import CherokeeASRModel
 
 logger = logging.getLogger(__name__)
 

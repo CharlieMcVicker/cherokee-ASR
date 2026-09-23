@@ -21,11 +21,12 @@ import torch
 
 from transcription.alignment.ingestion import load_syllabary_transcript
 from transcription.alignment.models import AlignmentOutput, CTCAlignerConfig
-from transcription.alignment.pipeline import (
+from transcription.pipelines.dialogue import (
     align_syllabary_ctc,
     align_syllabary_greedy,
 )
-from transcription.audio.segment import AudioChunk
+from transcription.core.audio import AudioChunk
+from transcription.core.models.output import ModelOutput
 
 
 class DummyTokenizer:
@@ -68,6 +69,8 @@ class DummyASRModel:
         self.processor = DummyProcessor()
         self.model_name = name
         self.call_count = 0
+        self.device = "cpu"
+        self.model = self
 
     def get_logits(self, samples: np.ndarray, sample_rate: int = 16000) -> torch.Tensor:
         self.call_count += 1
@@ -92,6 +95,33 @@ class DummyASRModel:
                 word="nikahlisthiha", start_time=0.7, end_time=1.4, confidence=0.92
             ),
         ]
+
+    def infer(self, audio_input: Any, **kwargs: Any) -> ModelOutput:
+        vocab = self.processor.tokenizer.get_vocab()
+        # Synthetic logits with greedy token activations for "ohsda nikahlisthiha"
+        # 100 frames = 2.0s
+        lpz = np.full((100, len(vocab)), -10.0, dtype=np.float32)
+        lpz[:, 0] = 0.0  # pad
+        # Activate tokens for ohsda: o, h, s, d, a
+        tokens_1 = ["o", "h", "s", "d", "a"]
+        for idx, tok in enumerate(tokens_1):
+            if tok in vocab:
+                f = 10 + idx * 3
+                lpz[f : f + 2, vocab[tok]] = 8.0
+        # Activate tokens for nikahlisthiha: n, i, k, a, h, l, i, s, t, h, i, h, a
+        tokens_2 = ["n", "i", "k", "a", "h", "l", "i", "s", "t", "h", "i", "h", "a"]
+        for idx, tok in enumerate(tokens_2):
+            if tok in vocab:
+                f = 40 + idx * 3
+                if f + 2 <= 100:
+                    lpz[f : f + 2, vocab[tok]] = 8.0
+
+        return ModelOutput(
+            lpz=lpz,
+            vocab=vocab,
+            frame_duration_sec=0.02,
+            metadata={"pad_token_id": 0},
+        )
 
 
 @pytest.fixture
@@ -162,23 +192,14 @@ def test_align_syllabary_greedy(dummy_audio: Path, tmp_path: Path):
     model = DummyASRModel()
     out_dir = tmp_path / "greedy_out"
 
-    with patch("transcription.alignment.extractors.segment_long_audio") as mock_segment:
-        mock_chunk = AudioChunk(
-            chunk_index=0,
-            audio=AudioSegment.silent(duration=2000, frame_rate=16000),
-            start_sec=0.0,
-            end_sec=2.0,
-        )
-        mock_segment.return_value = [mock_chunk]
-
-        result = align_syllabary_greedy(
-            audio=dummy_audio,
-            transcript="ᎣᏍᏓ ᏂᎦᎵᏍᏗᎭ",
-            output_dir=out_dir,
-            model=cast(Any, model),
-            export_praat=True,
-            export_manifest=True,
-        )
+    result = align_syllabary_greedy(
+        audio=dummy_audio,
+        transcript="ᎣᏍᏓ ᏂᎦᎵᏍᏗᎭ",
+        output_dir=out_dir,
+        model=cast(Any, model),
+        export_praat=True,
+        export_manifest=True,
+    )
 
     assert isinstance(result, AlignmentOutput)
     assert len(result.aligned_chunks) == 1
@@ -262,7 +283,7 @@ def test_build_syllabary_word_tier_length_mismatch_raises_value_error():
         AlignmentOutput,
         WordInterval,
     )
-    from transcription.alignment.pipeline import _build_syllabary_word_tier
+    from transcription.pipelines.dialogue import build_syllabary_word_tier
 
     alignment = AlignmentOutput(
         aligned_chunks=[
@@ -283,7 +304,7 @@ def test_build_syllabary_word_tier_length_mismatch_raises_value_error():
     syllabary_lookup = {"chunk_001": "ᎣᏏᏲ"}
 
     with pytest.raises(ValueError, match="Syllabary word index 1 exceeds token bounds"):
-        _build_syllabary_word_tier(alignment, syllabary_lookup)
+        build_syllabary_word_tier(alignment, syllabary_lookup)
 
 
 def test_build_english_word_tier_length_mismatch_raises_value_error():
@@ -293,7 +314,7 @@ def test_build_english_word_tier_length_mismatch_raises_value_error():
         AlignmentOutput,
         WordInterval,
     )
-    from transcription.alignment.pipeline import _build_english_word_tier
+    from transcription.pipelines.dialogue import build_english_word_tier
 
     alignment = AlignmentOutput(
         aligned_chunks=[
@@ -318,4 +339,4 @@ def test_build_english_word_tier_length_mismatch_raises_value_error():
     with pytest.raises(
         ValueError, match="Code-switched token index 1 exceeds token bounds"
     ):
-        _build_english_word_tier(alignment, source_lookup)
+        build_english_word_tier(alignment, source_lookup)

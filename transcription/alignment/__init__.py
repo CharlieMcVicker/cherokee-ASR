@@ -13,9 +13,6 @@ from transcription.alignment.ctc_aligner import (
     get_logits_cached,
 )
 from transcription.alignment.cli import run_alignment_pipeline
-from transcription.alignment.calibrated_distance_metrics import (
-    PhonologicalConfusionCostMetric,
-)
 from transcription.alignment.distance_metrics import (
     CharacterErrorRateMetric,
     ConfusionMatrixCostMetric,
@@ -30,24 +27,14 @@ from transcription.alignment.exporters import (
     export_manifest,
     export_textgrid,
 )
-from transcription.alignment.extractors import (
-    ASREmissionsExtractor,
-    CachedASREmissionsExtractor,
-    CallbackEmissionsExtractor,
-    CherokeeASRExtractor,
-    PrecomputedEmissionsExtractor,
-    prepare_audio_chunks,
-)
 from transcription.alignment.ingestion import (
     load_bible_chunks,
     load_generic_chunks,
     load_interview_transcript,
     load_syllabary_transcript,
+    normalize_phonetics_for_alignment,
+    normalize_syllabary_for_alignment,
     prepare_alignment_input,
-)
-from transcription.alignment.pipeline import (
-    align_syllabary_ctc,
-    align_syllabary_greedy,
 )
 from transcription.alignment.models import (
     AlignedChunk,
@@ -57,10 +44,6 @@ from transcription.alignment.models import (
     TextChunk,
     TokenEmission,
     WordInterval,
-)
-from transcription.alignment.normalizers import (
-    normalize_phonetics_for_alignment,
-    normalize_syllabary_for_alignment,
 )
 from transcription.alignment.reconciliation import (
     reconcile_alignment_by_chunk,
@@ -77,15 +60,6 @@ from transcription.alignment.phonotactics import (
     is_valid_phonotactic_sequence,
     prepare_cherokee_text,
     tokenize_phonemes,
-)
-from transcription.alignment.threshold_finder import (
-    AlignmentRecord,
-    AlignmentThresholdFinder,
-    ThresholdMetrics,
-    ThresholdSearchStep,
-    find_threshold_bounds,
-    load_alignment_records,
-    parse_verse_reference,
 )
 
 __all__ = [
@@ -105,19 +79,11 @@ __all__ = [
     "prepare_alignment_input",
     "normalize_syllabary_for_alignment",
     "normalize_phonetics_for_alignment",
-    # Extractors
-    "ASREmissionsExtractor",
-    "CachedASREmissionsExtractor",
-    "CherokeeASRExtractor",
-    "CallbackEmissionsExtractor",
-    "PrecomputedEmissionsExtractor",
-    "prepare_audio_chunks",
     # Distance Metrics
     "DistanceMetric",
     "DefaultCERDistanceMetric",
     "CharacterErrorRateMetric",
     "ConfusionMatrixCostMetric",
-    "PhonologicalConfusionCostMetric",
     "LevenshteinDistanceMetric",
     "CustomCallableDistanceMetric",
     "calculate_cer",
@@ -126,8 +92,6 @@ __all__ = [
     "SlidingWindowDTWAligner",
     "CTCSegmentationAligner",
     "get_logits_cached",
-    "align_syllabary_greedy",
-    "align_syllabary_ctc",
     # Reconciliation
     "reconcile_word_intervals",
     "reconcile_alignment_words",
@@ -138,14 +102,6 @@ __all__ = [
     "export_debug_json",
     # Pipeline / CLI
     "run_alignment_pipeline",
-    # Threshold Finder
-    "AlignmentRecord",
-    "AlignmentThresholdFinder",
-    "ThresholdMetrics",
-    "ThresholdSearchStep",
-    "find_threshold_bounds",
-    "load_alignment_records",
-    "parse_verse_reference",
     # Phonotactics & Custom Text Preparation
     "PhonemeCategory",
     "PhonotacticToken",

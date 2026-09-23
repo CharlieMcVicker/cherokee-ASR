@@ -7,7 +7,7 @@ Converts transcription column to length-only format (normalizing, removing accen
 
 import os
 import csv
-from transcription.utils.tone_normalization import remove_tones_and_double_vowels
+from transcription.cherokee.orthography import remove_tones_and_double_vowels
 from transcription.training.prepare_csv import clean_transcription
 
 

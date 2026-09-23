@@ -10,12 +10,45 @@ Detailed documentation for each subsystem is organized in the [`docs/`](docs/) d
 
 | Guide | Description | Key Modules / Tools |
 |---|---|---|
-| **[Ground-Truth Alignment](docs/alignment.md)** | Sliding-Window DTW & Needleman-Wunsch word DP alignment, Praat TextGrid & JSON manifest export. | `transcription.alignment`, `align-cherokee` |
-| **[Models & Inference](docs/models_and_inference.md)** | `CherokeeASRModel` encapsulation, tiered inference primitives (`get_logits`, `get_word_confidences`), batch inference, and Web Active Labeler. | `transcription.models`, `transcription.inference` |
-| **[Syllabary Enrichment](docs/syllabary_enrichment.md)** | Character/syllable DP alignment and rule merger engine (syncopation, aspiration transfer, glottal filtering) with diagnostic inspector. | `transcription.syllabary_enrichment` |
-| **[Audio Segmentation](docs/audio_segmentation.md)** | Hybrid VAD audio chunking (`segment_long_audio`), energy profiling, and hyperparameter parameter sweeps. | `transcription.audio` |
-| **[Training & Evaluation](docs/training_and_evaluation.md)** | Multi-domain dataset preparation, offline/remote Wav2Vec2 training, checkpoint evaluation, and HF revision benchmarks. | `transcription.training` |
+| **[Ground-Truth Alignment](docs/alignment.md)** | Sliding-Window DTW & Needleman-Wunsch word DP alignment, Praat TextGrid & JSON manifest export. | `transcription.core.alignment`, `transcription.apps.cli`, `align-cherokee` |
+| **[Models & Inference](docs/models_and_inference.md)** | `CherokeeASRModel` encapsulation, `ModelOutput` currency, tiered procedural inference, and Web Active Labeler. | `transcription.core.models`, `transcription.cherokee.models` |
+| **[Syllabary Enrichment](docs/syllabary_enrichment.md)** | Character/syllable DP alignment and rule merger engine (syncopation, aspiration transfer, glottal filtering) with diagnostic inspector. | `transcription.cherokee.enrichment`, `transcription.pipelines.enrichment` |
+| **[Audio Segmentation](docs/audio_segmentation.md)** | Hybrid VAD audio chunking (`segment_long_audio`), energy profiling, and Silero VAD soft-masking. | `transcription.core.audio` |
+| **[Training & Evaluation](docs/training_and_evaluation.md)** | Multi-domain dataset preparation, offline/remote Wav2Vec2 training, checkpoint evaluation, and HF revision benchmarks. | `transcription.training`, `transcription.evaluation` |
 | **[Desktop Transcriber App](docs/desktop_transcriber.md)** | Standalone desktop application (PyWebView + React TypeScript + FastAPI) and PyInstaller build guides for macOS and Windows. | `syllabary_transcriber` |
+
+---
+
+## 4-Tier Architecture
+
+The repository is organized into four decoupled architectural layers:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ Tier 4: Applications & Entrypoints (transcription.apps)     │
+│   • CLI (align-cherokee)                                    │
+│   • Desktop Transcriber (syllabary_transcriber)             │
+├─────────────────────────────────────────────────────────────┤
+│ Tier 3: Domain Pipelines (transcription.pipelines)          │
+│   • scripture: Continuous chapter alignment & verse slicing │
+│   • dialogue: Code-switched interview alignment             │
+│   • enrichment: Phonetic syllabary enrichment & alignment   │
+├─────────────────────────────────────────────────────────────┤
+│ Tier 2: Cherokee Domain (transcription.cherokee)            │
+│   • orthography: Syllabary, DG, TTH conversion & tables     │
+│   • phonotactics: Intrusions, syncope, surface constraints  │
+│   • distance: Phonological confusion cost metrics           │
+│   • codeswitching: Synthetic loanword target projection     │
+│   • enrichment: Syllable reconciliation engine              │
+│   • models: CherokeeASRModel factory & weights              │
+├─────────────────────────────────────────────────────────────┤
+│ Tier 1: Core Engine (transcription.core)                    │
+│   • audio: Segmenting & Silero VAD soft-masking             │
+│   • models: ModelOutput currency, inference & ASRModel      │
+│   • alignment: DP (DTW, Needleman-Wunsch) & CTC trellis     │
+│   • exporters: Praat TextGrid & Manifest serialization      │
+└─────────────────────────────────────────────────────────────┘
+```
 
 ---
 
@@ -31,31 +64,39 @@ workshop-transcription/
 │   ├── syllabary_enrichment.md   # Syllabary reconciliation rule engine guide
 │   └── training_and_evaluation.md# Wav2Vec2 training and evaluation guide
 │
-├── transcription/                # Core Python package
-│   ├── alignment/                # Ground-truth DTW timestamp alignment pipeline
-│   │   ├── aligner.py            # SlidingWindowDTWAligner & NeedlemanWunschWordAligner
-│   │   ├── cli.py                # align-cherokee CLI runner & pipeline orchestrator
-│   │   ├── distance_metrics.py   # Distance metrics (CER, Levenshtein, custom callable)
-│   │   ├── exporters.py          # Praat TextGrid, JSON manifest, and debug exporters
-│   │   ├── extractors.py         # ASREmissionsExtractor protocol & CherokeeASRExtractor
-│   │   ├── ingestion.py          # Chunk ingestion parsers (generic & Bible JSON)
-│   │   ├── models.py             # Domain models (TextChunk, TokenEmission, WordInterval, AlignedChunk)
-│   │   ├── normalizers.py        # Phonetic & orthographic normalizers
-│   │   └── reconciliation.py     # Pure syllabary phonetic word interval reconciliation
-│   ├── audio/                    # Audio preprocessing and segmentation
-│   ├── inference/                # Model inference, batch runners, and active labeler
-│   ├── models/                   # CherokeeASRModel class and procedural inference
-│   ├── syllabary_enrichment/     # Syllabary phonetic rule merger & evaluation
-│   ├── training/                 # Dataset preparation, training, and evaluation
-│   └── utils/                    # Syllabary maps, model configs, and helpers
+├── transcription/                # Core Python package (4-tier architecture)
+│   ├── core/                     # Tier 1: Language-agnostic foundational engine
+│   │   ├── alignment/            # DP (DTW, Needleman-Wunsch), CTC trellis, models, distance
+│   │   ├── audio/                # AudioChunk, segment_long_audio, Silero VAD soft-masking
+│   │   ├── exporters/            # Multi-tier Praat TextGrid & JSON manifest builders
+│   │   └── models/               # ModelOutput universal currency, standalone inference, ASRModel
+│   │
+│   ├── cherokee/                 # Tier 2: Cherokee phonetic & linguistic domain logic
+│   │   ├── codeswitching/        # SyntheticTargetProjector, CodeSwitchedPreparer, compound clitics
+│   │   ├── distance/             # PhonologicalConfusionCostMetric, ConfusionMatrixCostMetric
+│   │   ├── enrichment/           # SyllableAlignmentEngine, reconcile_phonetics
+│   │   ├── models/               # CherokeeASRModel factory and weights loader
+│   │   ├── orthography/          # Orthography enum, convert_orthography, syllabary tables, tones
+│   │   └── phonotactics/         # Surface phonotactic rules, transition masks, prepare_cherokee_text
+│   │
+│   ├── pipelines/                # Tier 3: Domain use-case orchestration
+│   │   ├── dialogue/             # DialogueAlignmentPipeline (code-switched interviews, 7-tier TextGrid)
+│   │   ├── enrichment/           # EnrichmentPipeline (phonetic syllabary enrichment)
+│   │   └── scripture/            # ScripturePipeline (continuous chapter alignment & verse slicing)
+│   │
+│   ├── apps/                     # Tier 4: Applications & CLI entrypoints
+│   │   └── cli.py                # align-cherokee console script entrypoint
+│   │
+│   ├── evaluation/               # Model evaluation, confusion matrices, and manifold analysis
+│   └── training/                 # Wav2Vec2 dataset preparation, training, and checkpoint benchmarking
 │
 ├── syllabary_transcriber/        # Desktop transcription app (PyWebView + React + FastAPI)
 │   ├── app.py                    # PyWebView desktop bridge & FastAPI server
 │   ├── packaging/                # PyInstaller spec files
 │   └── ui/                       # React 18 / TypeScript / Vite frontend
 │
-├── data/                         # Data directories (raw audio, processed splits, results)
-├── scripts/                      # Standalone data processing & generation scripts
+├── data/                         # Data directories (raw audio, processed splits, dictionaries)
+├── scripts/                      # Declarative pipeline runner scripts (realign_bible.py, realign_gs_mm_ctc.py)
 └── timestamping_test_data/       # Test audio and sample ground truth inputs
 ```
 
@@ -86,7 +127,7 @@ export PYTHONPATH=".:${PYTHONPATH}"
 
 ---
 
-## Quick CLI Cheatsheet
+## Quick Usage Cheatsheet
 
 ### 1. Timestamp Alignment (`align-cherokee`)
 
@@ -102,41 +143,53 @@ align-cherokee \
 ```
 *See [docs/alignment.md](docs/alignment.md) for full options and Python API examples.*
 
-### 2. Speech-to-Text Inference
+### 2. Python Speech-to-Text Inference
 
-Run inference on a single audio file or batch directory:
+Run inference programmatically using `CherokeeASRModel` and `ModelOutput`:
 
-```bash
-# Single file inference
-python3 -m transcription.inference.single data/raw/sample.wav \
-  --checkpoint charliemcvicker/asr-cherokee
+```python
+from transcription.cherokee.models.loader import CherokeeASRModel
 
-# Batch directory inference
-python3 -m transcription.inference.batch data/processed/segments \
-  --checkpoint charliemcvicker/asr-cherokee \
-  --output data/results/batch_results.csv
+# Load model checkpoint
+model = CherokeeASRModel.from_pretrained_or_best()
+
+# Single audio inference
+output = model.infer("data/raw/sample.wav")
+print("Transcription:", output.decode_greedy())
+
+# Batch inference
+outputs = model.infer_batch(["sample1.wav", "sample2.wav"], batch_size=16)
+for out in outputs:
+    print("Batch Item:", out.decode_greedy())
 ```
-*See [docs/models_and_inference.md](docs/models_and_inference.md) for `CherokeeASRModel` Python usage.*
+*See [docs/models_and_inference.md](docs/models_and_inference.md) for full `ModelOutput` and inference details.*
 
-### 3. Syllabary Enrichment & Diagnostic Inspection
+### 3. Syllabary Enrichment
 
-Inspect character/syllable alignment and phonetic rule decisions for a recording:
+Reconcile native Cherokee Syllabary against acoustic ASR emissions:
 
-```bash
-python3 -m transcription.syllabary_enrichment.inspect_pipeline \
-  --record-id Sentence_for_entry_1136_01.wav
+```python
+from transcription.pipelines.enrichment import align_and_enrich_syllabary
+
+result = align_and_enrich_syllabary(
+    audio="data/raw/sample.wav",
+    syllabary="ᎠᏓᎴᏂᏍᎬ ᏱᏍᏛ ᎧᏃᎮᏛ",
+)
+print("Reconciled Phonetics:", result)
 ```
 *See [docs/syllabary_enrichment.md](docs/syllabary_enrichment.md) for rule engine details.*
 
-### 4. Audio Segmentation
+### 4. Continuous Scripture & Dialogue Realignment Scripts
 
-Evaluate segmentation parameters or extract segmented clips:
+Run declarative pipeline drivers:
 
 ```bash
-python3 -m transcription.audio.segment data/raw/recording.wav --sweep
-python3 -m transcription.audio.extract data/raw/recording.wav --out-dir data/processed/segments
+# Realign New Testament chapters
+python3 scripts/realign_bible.py --book mark --chapter 1
+
+# Realign code-switched dialogue interview
+python3 scripts/realign_gs_mm_ctc.py
 ```
-*See [docs/audio_segmentation.md](docs/audio_segmentation.md) for VAD parameter tuning.*
 
 ### 5. Desktop Transcriber App
 
@@ -157,4 +210,3 @@ Run the test suite and static type checker:
 pytest
 pyright transcription
 ```
-

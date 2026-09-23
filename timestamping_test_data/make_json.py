@@ -1,11 +1,11 @@
 import json
-from transcription.utils.syllabary_map import cherokee_to_bad_phonetics
+from transcription.cherokee.orthography import syllabary_to_phonetics
 
 
 def syl_to_bad_phonetic(s):
     for drop in ".!?:,;'\"“”":
         s = s.replace(drop, "")
-    return cherokee_to_bad_phonetics(s)
+    return syllabary_to_phonetics(s)
 
 
 def main():

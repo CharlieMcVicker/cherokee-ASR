@@ -15,7 +15,7 @@ import numpy as np
 import pytest
 import torch
 
-from transcription.alignment.arpabet.inference import (
+from transcription.cherokee.arpabet.inference import (
     bucket_by_duration,
     ctc_prefix_beam_search,
     decode_greedy_with_confidences,
@@ -24,15 +24,15 @@ from transcription.alignment.arpabet.inference import (
     run_model_inference_on_manifest,
     sanitize_model_id,
 )
-from transcription.alignment.arpabet.types import (
+from transcription.cherokee.arpabet.types import (
     CherokeeToken,
     InferenceCacheManifest,
     TopKHypothesis,
     WordInferenceCacheEntry,
     WordManifestEntry,
 )
-from transcription.models.asr_model import CherokeeASRModel
-from transcription.utils.orthography import Orthography
+from transcription.cherokee.models import CherokeeASRModel
+from transcription.cherokee.orthography import Orthography
 
 # ============================================================================
 # Dummy / Helper Objects for Testing

@@ -62,7 +62,7 @@ flowchart TD
 2. **Pluggable Normalization & Distance Metrics**: Word and chunk distance scoring are parameterized via the [`DistanceMetric`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/distance_metrics.py#L9-L16) protocol, allowing Character Error Rate (CER), Levenshtein edit distance with custom substitution weights, or arbitrary callables.
 3. **Multi-to-Multi DP Fusion**: The word aligner dynamically solves $1$-to-$N$ and $M$-to-$1$ ASR token-to-word grouping discrepancies with configurable fusion penalties and gap costs.
 4. **Isolated Outbound Exporters**: Exporters receive pure [`AlignmentOutput`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/models.py#L65-L73) objects and output directories, generating Praat TextGrids and JSON manifests without coupling to alignment execution.
-5. **Language-Agnostic Extraction Schemas & Protocols**: While `CherokeeASRModel` is the dedicated Cherokee acoustic model, the output schemas and alignment protocols ([`TokenEmission`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/models.py#L11-L19), [`ASRResult`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/models/asr_model.py#L21-L32), [`SlidingWindowDTWAligner`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/aligner.py#L129-L232)) are language-agnostic. Downstream Cherokee Syllabary transliteration and phonetic rule reconciliation are explicitly performed by `transcription.syllabary_enrichment` and `transcription.utils.syllabary_map`.
+5. **Language-Agnostic Extraction Schemas & Protocols**: While `CherokeeASRModel` is the dedicated Cherokee acoustic model, the output schemas and alignment protocols ([`TokenEmission`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/models.py#L11-L19), [`ASRResult`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/models/asr_model.py#L21-L32), [`SlidingWindowDTWAligner`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/aligner.py#L129-L232)) are language-agnostic. Downstream Cherokee Syllabary transliteration and phonetic rule reconciliation are explicitly performed by `transcription.cherokee.enrichment` and `transcription.cherokee.orthography`.
 
 ### Module Map
 
@@ -330,7 +330,7 @@ Wraps [`CherokeeASRModel`](file:///Users/julietmcvicker/code/workshop-transcript
 
 ```python
 from transcription.alignment.extractors import CherokeeASRExtractor
-from transcription.models.asr_model import CherokeeASRModel
+from transcription.cherokee.models import CherokeeASRModel
 
 model = CherokeeASRModel.from_pretrained("charliemcvicker/asr-cherokee")
 extractor = CherokeeASRExtractor(model=model, skip_vad=False)
@@ -434,7 +434,7 @@ metric = CustomCallableDistanceMetric(fn=lambda hyp, ref: 0.0 if hyp == ref else
 
 ### Representation-Aware Text Normalization & Orthography System (`transcription.alignment.normalizers`)
 
-Located in [`transcription/alignment/normalizers.py`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/normalizers.py) and backed by [`transcription.utils.orthography.Orthography`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/utils/orthography.py), text normalizers ensure deterministic conversions across Cherokee orthographic representations.
+Located in [`transcription/alignment/normalizers.py`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/normalizers.py) and backed by [`transcription.cherokee.orthography.Orthography`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/cherokee/orthography/orthography.py), text normalizers ensure deterministic conversions across Cherokee orthographic representations.
 
 #### Orthography Enum System
 
@@ -588,7 +588,7 @@ chunks, source_lookup = load_interview_transcript(
 
 ---
 
-### Code-Switched Ingestion & Synthetic Target Projection (`transcription.alignment.arpabet.projector`)
+### Code-Switched Ingestion & Synthetic Target Projection (`transcription.cherokee.arpabet.projector`)
 
 When Cherokee speakers code-switch or use English loanwords (e.g., *coffee*, *hospital*, *doctor*, *car*), standard ASR and alignment pipelines fail because Latin English spellings do not match the Cherokee acoustic model's emission vocabulary.
 
@@ -601,7 +601,7 @@ The projector module translates English text -> ARPAbet -> synthetic Cherokee TT
 #### Programmatic Example
 
 ```python
-from transcription.alignment.arpabet import (
+from transcription.cherokee.arpabet import (
     get_default_projector,
     normalize_code_switched_text,
     project_english_text,
@@ -624,12 +624,12 @@ norm_tth = normalize_code_switched_text(mixed)
 print(norm_tth)  # "hi'a khasi akituli"
 ```
 
-### Code-Switching Ground Truth Preparer (`transcription.alignment.arpabet.codeswitched_preparer`)
+### Code-Switching Ground Truth Preparer (`transcription.cherokee.arpabet.codeswitched_preparer`)
 
 For dialogue transcripts with mixed Syllabary, English loanwords, speaker prefixes, and compound clitics (e.g. *JayᎢ* -> English 'Jay' + Syllabary 'Ꭲ'), `create_groundtruth_for_code_switched_syllabary` performs script-level token discrimination with zero double conversion.
 
 ```python
-from transcription.alignment.arpabet import (
+from transcription.cherokee.arpabet import (
     create_groundtruth_for_code_switched_syllabary,
     split_compound_clitic,
     TokenType,
@@ -679,7 +679,7 @@ def reconcile_word_intervals(
     """Pure mapping: returns new WordIntervals with reconciled phonetics in `word`."""
 ```
 - Splits `syllabary_text` into words.
-- Uses character-syllable dynamic programming alignment ([`align_character_syllable`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/syllabary_enrichment/alignment_engine.py)) and phonetic rule merger ([`reconcile_phonetics`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/syllabary_enrichment/enrich_syllabary.py)).
+- Uses character-syllable dynamic programming alignment ([`align_character_syllable`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/cherokee/enrichment/syllable_alignment.py)) and phonetic rule merger ([`reconcile_phonetics`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/cherokee/enrichment/syllable_alignment.py)).
 - Returns new, immutable [`WordInterval`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/models.py#L30-L39) instances with reconciled word strings.
 
 #### `reconcile_alignment_words`
@@ -1008,7 +1008,7 @@ from transcription.alignment import (
     prepare_alignment_input,
     reconcile_alignment_words,
 )
-from transcription.models.asr_model import CherokeeASRModel
+from transcription.cherokee.models import CherokeeASRModel
 
 # Step 1: Ingest ground-truth chunks & resolve representation-aware normalizers
 chunks, source_lookup, chunk_norm, emission_norm = prepare_alignment_input(

@@ -2,7 +2,7 @@ import csv
 import json
 
 from jiwer import wer as jiwer_wer, cer as jiwer_cer
-from transcription.utils.tone_normalization import respell_consonants
+from transcription.cherokee.orthography import respell_consonants
 import re
 
 # file_path,filename,greedy_transcription,greedy_confidence,word_confidences

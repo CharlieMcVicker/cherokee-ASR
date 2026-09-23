@@ -7,13 +7,13 @@ from datasets import Audio, Dataset, Features, Value
 from jiwer import cer as jiwer_cer, wer as jiwer_wer
 from tqdm import tqdm
 
-from transcription.inference.infer import (
-    TARGET_SAMPLE_RATE,
-    greedy_inference,
-    normalize_text,
+from transcription.core.audio import TARGET_SAMPLE_RATE
+from transcription.cherokee.orthography import normalize_text
+from transcription.utils.evaluation import (
+    run_evaluation,
     strip_tones,
+    yield_single_checkpoint,
 )
-from transcription.utils.evaluation import run_evaluation, yield_single_checkpoint
 from transformers import Wav2Vec2ForCTC, Wav2Vec2Processor
 
 

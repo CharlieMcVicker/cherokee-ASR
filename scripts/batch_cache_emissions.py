@@ -15,11 +15,11 @@ import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Union
 
-from transcription.alignment.extractors import (
-    CachedASREmissionsExtractor,
-    CherokeeASRExtractor,
+from transcription.core.models.inference import (
+    compute_audio_cache_key,
+    infer_emissions_batch,
 )
-from transcription.models.asr_model import CherokeeASRModel
+from transcription.cherokee.models import CherokeeASRModel
 
 logger = logging.getLogger(__name__)
 
@@ -70,7 +70,7 @@ def batch_cache_emissions(
     device: Optional[str] = None,
 ) -> Dict[str, Any]:
     """
-    Runs bulk batch inference across audio files and populates CachedASREmissionsExtractor disk cache.
+    Runs bulk batch inference across audio files and populates ModelOutput .npz disk cache.
     """
     resolved_cache_dir = Path(cache_dir)
     resolved_cache_dir.mkdir(parents=True, exist_ok=True)
@@ -102,23 +102,13 @@ def batch_cache_emissions(
     )
     print(f"Model loaded on {asr_model.device} in {time.time() - t0_load:.2f}s")
 
-    base_extractor = CherokeeASRExtractor(model=asr_model, skip_vad=skip_vad)
-    cached_extractor = CachedASREmissionsExtractor(
-        extractor=base_extractor,
-        cache_dir=resolved_cache_dir,
-        cache_key_prefix=prefix_slug,
-    )
-
     # Check cache status upfront
     cached_count = 0
     uncached_count = 0
     for f in file_list:
-        k = cached_extractor._get_cache_key(f)
-        if (
-            k is not None
-            and cached_extractor._get_cache_path(k).exists()
-            and not force_reload
-        ):
+        k = compute_audio_cache_key(f, model_identifier=prefix_slug)
+        c_path = resolved_cache_dir / f"{k}.npz"
+        if c_path.exists() and not force_reload:
             cached_count += 1
         else:
             uncached_count += 1
@@ -128,14 +118,16 @@ def batch_cache_emissions(
     )
 
     t0_infer = time.time()
-    emissions_list = cached_extractor.populate_cache(
+    outputs = infer_emissions_batch(
+        model=asr_model.model,
+        processor=asr_model.processor,
         audio_inputs=file_list,
         batch_size=batch_size,
-        force_reload=force_reload,
+        cache_dir=resolved_cache_dir,
+        model_identifier=prefix_slug,
+        device=asr_model.device,
     )
     elapsed_infer = time.time() - t0_infer
-
-    total_tokens = sum(len(em) for em in emissions_list)
 
     print("\n" + "=" * 60)
     print("BULK EMISSIONS CACHE SUMMARY")
@@ -143,7 +135,7 @@ def batch_cache_emissions(
     print(f"Total audio files      : {len(file_list)}")
     print(f"Existing cache hits    : {cached_count}")
     print(f"Newly computed/cached  : {uncached_count}")
-    print(f"Total token emissions  : {total_tokens}")
+    print(f"Total ModelOutputs     : {len(outputs)}")
     print(f"Inference / cache time : {elapsed_infer:.2f}s")
     if uncached_count > 0 and elapsed_infer > 0:
         print(f"Average time per file  : {elapsed_infer / uncached_count:.2f}s")
@@ -154,10 +146,10 @@ def batch_cache_emissions(
         "total_files": len(file_list),
         "cache_hits": cached_count,
         "newly_cached": uncached_count,
-        "total_tokens": total_tokens,
+        "total_outputs": len(outputs),
         "elapsed_sec": elapsed_infer,
         "cache_dir": str(resolved_cache_dir.resolve()),
-        "emissions": emissions_list,
+        "outputs": outputs,
     }
 
 

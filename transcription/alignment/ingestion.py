@@ -7,18 +7,49 @@ import os
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, Union
 
-from transcription.alignment.arpabet import (
-    CodeSwitchedLineResult,
-    SyntheticTargetProjectorProtocol,
-    create_groundtruth_for_code_switched_syllabary,
-    get_default_projector,
-    normalize_code_switched_text,
-)
+from transcription.cherokee.arpabet.types import SyntheticTargetProjectorProtocol
 from transcription.alignment.models import TextChunk
-from transcription.alignment.normalizers import (
-    normalize_phonetics_for_alignment,
-    normalize_syllabary_for_alignment,
+from transcription.cherokee.orthography import (
+    Orthography,
+    convert_orthography,
 )
+
+
+def normalize_phonetics_for_alignment(
+    text: str,
+    source: Orthography = Orthography.DG,
+    contextual_preaspiration: bool = True,
+) -> str:
+    """
+    Normalizes phonetic Cherokee text for ASR alignment matching.
+    """
+    if not text:
+        return ""
+    return convert_orthography(
+        text,
+        source=source,
+        target=Orthography.TTH,
+        contextual_preaspiration=contextual_preaspiration,
+    )
+
+
+def normalize_syllabary_for_alignment(
+    text: str,
+    source: Orthography = Orthography.SYLLABARY,
+    target: Orthography = Orthography.TTH,
+    contextual_preaspiration: bool = True,
+) -> str:
+    """
+    Normalizes Cherokee Syllabary (or Latin transliteration) for ASR alignment matching.
+    """
+    if not text:
+        return ""
+    return convert_orthography(
+        text,
+        source=source,
+        target=target,
+        contextual_preaspiration=contextual_preaspiration,
+    )
 
 
 def load_bible_chunks(
@@ -182,6 +213,11 @@ def _build_chunk_normalizer(
     projector: Optional[SyntheticTargetProjectorProtocol] = None,
     code_switched: bool = False,
 ) -> Callable[[str], str]:
+    from transcription.cherokee.codeswitching import (
+        create_groundtruth_for_code_switched_syllabary,
+        normalize_code_switched_text,
+    )
+
     if code_switched and projector is not None:
         return lambda t: create_groundtruth_for_code_switched_syllabary(
             t, projector=projector
@@ -246,6 +282,8 @@ def prepare_alignment_input(
 
     active_projector: Optional[SyntheticTargetProjectorProtocol] = projector
     if code_switched and active_projector is None:
+        from transcription.cherokee.codeswitching import get_default_projector
+
         active_projector = get_default_projector()
 
     if transcript is not None:
@@ -332,6 +370,13 @@ def load_syllabary_transcript(
             source_lookup: Dict[str, Dict[str, Any]] mapping chunk_id to metadata dictionaries
                            with keys 'syllabary', 'text', 'phonetic', etc.
     """
+    from transcription.cherokee.codeswitching import (
+        create_groundtruth_for_code_switched_syllabary,
+        extract_speaker_prefix,
+        get_default_projector,
+        normalize_code_switched_text,
+    )
+
     active_projector = projector
     if code_switched and active_projector is None:
         active_projector = get_default_projector()
@@ -385,10 +430,6 @@ def load_syllabary_transcript(
                 meta["syllabary"] = spoken_display
                 meta["text"] = spoken_display
         elif strip_speaker:
-            from transcription.alignment.arpabet.codeswitched_preparer import (
-                extract_speaker_prefix,
-            )
-
             speaker, spoken_text = extract_speaker_prefix(text_val)
             if speaker is not None:
                 meta["speaker"] = speaker
@@ -557,6 +598,12 @@ def load_interview_transcript(
             source_lookup: Dict[str, Dict[str, Any]] mapping turn ID to metadata dictionary with keys:
                            'speaker', 'syllabary', 'text', 'phonetic', 'raw_line', and 'line_number'.
     """
+    from transcription.cherokee.codeswitching import (
+        create_groundtruth_for_code_switched_syllabary,
+        get_default_projector,
+        normalize_code_switched_text,
+    )
+
     active_projector = projector
     if code_switched and active_projector is None:
         active_projector = get_default_projector()

@@ -3,15 +3,12 @@ from unittest.mock import MagicMock, patch
 import numpy as np
 import torch
 
-from transcription.models.asr_model import CherokeeASRModel, ASRResult, WordConfidence
-from transcription.utils.model_utils import _MODEL_CACHE
-from transcription.inference.infer import (
-    greedy_inference,
-    infer_pcm_array,
-    infer_single_audio,
-    calculate_word_confidences,
-    transcribe_audio_batch,
+from transcription.cherokee.models import (
+    CherokeeASRModel,
+    ASRResult,
+    WordConfidence,
 )
+from transcription.utils.model_utils import _MODEL_CACHE
 
 
 class TestDataStructures(unittest.TestCase):
@@ -473,140 +470,6 @@ class TestCherokeeASRModel(unittest.TestCase):
         results = asr_model.transcribe_batch(batch_pcm, batch_size=2)
         self.assertEqual(len(results), 2)
         self.assertEqual(results[0].text, "a")
-
-
-class TestInferBackwardsCompatibility(unittest.TestCase):
-    """
-    Verify backwards compatibility of infer.py functions.
-    """
-
-    def test_greedy_inference_2d_and_3d(self):
-        mock_proc = MagicMock()
-        mock_proc.tokenizer.pad_token_id = 0
-        mock_proc.tokenizer.vocab = {"[PAD]": 0, "a": 1}
-        mock_proc.batch_decode.return_value = ["osiyo"]
-
-        # 2D logits [seq_len, vocab_size]
-        logits_2d = torch.zeros((5, 2))
-        logits_2d[:, 1] = 10.0
-        res_2d = greedy_inference(logits_2d, mock_proc)
-        self.assertIsInstance(res_2d, dict)
-        assert isinstance(res_2d, dict)
-        self.assertEqual(res_2d["transcription"], "osiyo")
-        self.assertIn("syllabary", res_2d)
-        self.assertIn("confidence", res_2d)
-
-        # 3D logits [batch_size, seq_len, vocab_size]
-        mock_proc.batch_decode.return_value = ["osiyo", "wado"]
-        logits_3d = torch.zeros((2, 5, 2))
-        logits_3d[:, :, 1] = 10.0
-        res_3d = greedy_inference(logits_3d, mock_proc)
-        self.assertIsInstance(res_3d, list)
-        assert isinstance(res_3d, list)
-        self.assertEqual(len(res_3d), 2)
-        self.assertEqual(res_3d[0]["transcription"], "osiyo")
-        self.assertEqual(res_3d[1]["transcription"], "wado")
-
-    def test_calculate_word_confidences_compat(self):
-        mock_proc = MagicMock()
-        mock_proc.tokenizer.pad_token_id = 0
-        mock_proc.tokenizer.word_delimiter_token_id = 4
-        mock_proc.tokenizer.vocab = {"[PAD]": 0, "a": 1, "d": 2, "|": 4}
-        mock_proc.decode.side_effect = lambda ids: (
-            "a" if ids == [1] else ("d" if ids == [2] else "")
-        )
-
-        probs = np.zeros((3, 5))
-        probs[0, 1] = 0.99
-        probs[1, 2] = 0.95
-        probs[2, 0] = 0.99  # PAD
-
-        pred_ids = np.array([1, 2, 0])
-        word_details = calculate_word_confidences(probs, pred_ids, mock_proc)
-        self.assertIsInstance(word_details, list)
-        self.assertEqual(len(word_details), 1)
-        self.assertEqual(word_details[0]["word"], "ad")
-        self.assertIn("start_time", word_details[0])
-        self.assertIn("end_time", word_details[0])
-        self.assertIn("chars", word_details[0])
-
-    def test_infer_pcm_array_compat(self):
-        mock_model = MagicMock()
-        mock_proc = MagicMock()
-        mock_proc.tokenizer.pad_token_id = 0
-        mock_proc.tokenizer.vocab = {"[PAD]": 0, "a": 1}
-        mock_proc.batch_decode.return_value = ["osiyo"]
-
-        mock_inputs = MagicMock()
-        mock_inputs.input_values = [np.zeros(16000, dtype=np.float32)]
-        mock_proc.return_value = mock_inputs
-
-        logits_tensor = torch.zeros((1, 5, 2))
-        logits_tensor[:, :, 1] = 10.0
-        mock_output = MagicMock()
-        mock_output.logits = logits_tensor
-        mock_model.return_value = mock_output
-
-        pcm = np.zeros(16000, dtype=np.float32)
-        res = infer_pcm_array(mock_model, mock_proc, pcm, device="cpu")
-        self.assertIsInstance(res, list)
-        self.assertEqual(res[0]["transcription"], "osiyo")
-
-    @patch("soundfile.read")
-    @patch("os.path.exists")
-    def test_infer_single_audio_compat(self, mock_exists, mock_sf_read):
-        mock_exists.return_value = True
-        mock_sf_read.return_value = (np.zeros(16000, dtype=np.float32), 16000)
-
-        mock_model = MagicMock()
-        mock_proc = MagicMock()
-        mock_proc.tokenizer.pad_token_id = 0
-        mock_proc.tokenizer.vocab = {"[PAD]": 0, "a": 1}
-        mock_proc.batch_decode.return_value = ["osiyo"]
-
-        mock_inputs = MagicMock()
-        mock_inputs.input_values = [np.zeros(16000, dtype=np.float32)]
-        mock_proc.return_value = mock_inputs
-
-        logits_tensor = torch.zeros((1, 5, 2))
-        logits_tensor[:, :, 1] = 10.0
-        mock_output = MagicMock()
-        mock_output.logits = logits_tensor
-        mock_model.return_value = mock_output
-
-        res = infer_single_audio(mock_model, mock_proc, "audio.wav", device="cpu")
-        self.assertIsInstance(res, list)
-        self.assertEqual(res[0]["transcription"], "osiyo")
-
-    @patch("soundfile.read")
-    @patch("os.path.exists")
-    def test_transcribe_audio_batch_compat(self, mock_exists, mock_sf_read):
-        mock_exists.return_value = True
-        mock_sf_read.return_value = (np.zeros(16000, dtype=np.float32), 16000)
-
-        mock_model = MagicMock()
-        mock_proc = MagicMock()
-        mock_proc.tokenizer.pad_token_id = 0
-        mock_proc.tokenizer.vocab = {"[PAD]": 0, "a": 1}
-        mock_proc.batch_decode.return_value = ["osiyo", "osiyo"]
-
-        mock_inputs = MagicMock()
-        mock_inputs.input_values = torch.zeros((2, 16000))
-        mock_inputs.attention_mask = torch.ones((2, 16000))
-        mock_proc.return_value = mock_inputs
-
-        logits_tensor = torch.zeros((2, 5, 2))
-        logits_tensor[:, :, 1] = 10.0
-        mock_output = MagicMock()
-        mock_output.logits = logits_tensor
-        mock_model.return_value = mock_output
-        mock_model._get_feat_extract_output_lengths.return_value = torch.tensor([5, 5])
-
-        results = transcribe_audio_batch(
-            mock_model, mock_proc, ["a1.wav", "a2.wav"], device="cpu", batch_size=2
-        )
-        self.assertEqual(len(results), 2)
-        self.assertEqual(results[0]["transcription"], "osiyo")
 
 
 if __name__ == "__main__":

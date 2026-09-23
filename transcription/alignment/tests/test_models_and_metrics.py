@@ -20,10 +20,41 @@ from transcription.alignment.distance_metrics import (
     LevenshteinDistanceMetric,
     calculate_cer,
 )
-from transcription.alignment.normalizers import (
-    normalize_phonetics_for_alignment,
-    normalize_syllabary_for_alignment,
+from transcription.cherokee.orthography import (
+    Orthography,
+    convert_orthography,
 )
+
+
+def normalize_phonetics_for_alignment(
+    text: str,
+    source: Orthography = Orthography.DG,
+    contextual_preaspiration: bool = True,
+) -> str:
+    if not text:
+        return ""
+    return convert_orthography(
+        text,
+        source=source,
+        target=Orthography.TTH,
+        contextual_preaspiration=contextual_preaspiration,
+    )
+
+
+def normalize_syllabary_for_alignment(
+    text: str,
+    source: Orthography = Orthography.SYLLABARY,
+    target: Orthography = Orthography.TTH,
+    contextual_preaspiration: bool = True,
+) -> str:
+    if not text:
+        return ""
+    return convert_orthography(
+        text,
+        source=source,
+        target=target,
+        contextual_preaspiration=contextual_preaspiration,
+    )
 
 
 def test_models_instantiation():

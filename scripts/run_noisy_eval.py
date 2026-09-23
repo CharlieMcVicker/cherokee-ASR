@@ -42,8 +42,8 @@ from transcription.evaluation.evaluator import EvaluationRecord, NoisyEvaluator
 from transcription.evaluation.manifold import PhoneticManifoldAnalyzer
 from transcription.evaluation.perturbations import AdditiveNoise, AudioTransform
 from transcription.evaluation.visualizer import ManifoldVisualizer
-from transcription.inference.infer import normalize_text
-from transcription.models.asr_model import CherokeeASRModel
+from transcription.cherokee.orthography import normalize_text
+from transcription.cherokee.models import CherokeeASRModel
 
 logging.basicConfig(
     level=logging.INFO,

@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import List, Tuple
 import pytest
 
-from transcription.alignment.arpabet import (
+from transcription.cherokee.arpabet import (
     CANONICAL_CHEROKEE_CONSONANTS,
     CANONICAL_CHEROKEE_PHONEMES,
     CANONICAL_CHEROKEE_VOWELS,
@@ -36,7 +36,7 @@ from transcription.alignment.arpabet import (
     get_articulatory_distance,
     train_acoustic_confusion_matrix,
 )
-from transcription.alignment.arpabet.matrix import parse_args, main
+from transcription.cherokee.arpabet.matrix import parse_args, main
 
 # ============================================================================
 # 1. Articulatory Seed Matrix & Distance Tests

@@ -7,7 +7,7 @@ import torch
 import numpy as np
 import pandas as pd
 
-from transcription.models.asr_model import CherokeeASRModel, ASRResult
+from transcription.cherokee.models import CherokeeASRModel, ASRResult
 from transcription.utils.evaluation import (
     get_eval_device,
     clean_eval_cache,
@@ -43,7 +43,7 @@ class TestEvaluationUtils(unittest.TestCase):
                 json.dump({}, f)
 
             with patch(
-                "transcription.models.asr_model.CherokeeASRModel.from_pretrained"
+                "transcription.cherokee.models.CherokeeASRModel.from_pretrained"
             ) as mock_from_pretrained:
                 mock_model = MagicMock(spec=CherokeeASRModel)
                 mock_model.processor = MagicMock()
@@ -58,7 +58,7 @@ class TestEvaluationUtils(unittest.TestCase):
     def test_yield_hf_revisions(self):
         revisions = [("rev1", "hash1234567890"), ("rev2", "hash0987654321")]
         with patch(
-            "transcription.models.asr_model.CherokeeASRModel.from_pretrained"
+            "transcription.cherokee.models.CherokeeASRModel.from_pretrained"
         ) as mock_from_pretrained:
             mock_model = MagicMock(spec=CherokeeASRModel)
             mock_model.processor = MagicMock()
@@ -71,7 +71,7 @@ class TestEvaluationUtils(unittest.TestCase):
 
     def test_yield_single_checkpoint(self):
         with patch(
-            "transcription.models.asr_model.CherokeeASRModel.from_pretrained"
+            "transcription.cherokee.models.CherokeeASRModel.from_pretrained"
         ) as mock_from_pretrained:
             mock_model = MagicMock(spec=CherokeeASRModel)
             mock_model.processor = MagicMock()

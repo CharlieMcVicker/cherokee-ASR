@@ -44,8 +44,8 @@ from transcription.alignment.normalizers import (
 )
 from transcription.alignment.phonotactics import prepare_cherokee_text
 from transcription.evaluation.perturbations import AdditiveNoise
-from transcription.models.asr_model import CherokeeASRModel
-from transcription.utils.syllabary_map import cherokee_to_bad_phonetics
+from transcription.cherokee.models import CherokeeASRModel
+from transcription.cherokee.orthography import syllabary_to_phonetics
 
 logging.basicConfig(
     level=logging.INFO,

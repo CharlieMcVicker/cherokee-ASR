@@ -1,6 +1,6 @@
 # Cherokee Syllabary Phonetic Enrichment Documentation
 
-This guide provides a comprehensive technical reference for the **Cherokee Syllabary Phonetic Enrichment and Reconciliation Pipeline** in `transcription.syllabary_enrichment`.
+This guide provides a comprehensive technical reference for the **Cherokee Syllabary Phonetic Enrichment and Reconciliation Pipeline** in `transcription.cherokee.enrichment` (Tier 2 domain logic) and `transcription.pipelines.enrichment` (Tier 3 orchestration pipeline).
 
 ---
 
@@ -9,10 +9,8 @@ This guide provides a comprehensive technical reference for the **Cherokee Sylla
 1. [Core Concepts](#1-core-concepts)
 2. [Phonetic Rules Engine](#2-phonetic-rules-engine)
 3. [Alignment Engine](#3-alignment-engine)
-4. [Batch Inference & Disk Caching](#4-batch-inference--disk-caching)
-5. [Evaluation Framework](#5-evaluation-framework)
-6. [Step-by-Step Diagnostic CLI](#6-step-by-step-diagnostic-cli)
-7. [Programmatic Python Usage](#7-programmatic-python-usage)
+4. [Domain Pipeline](#4-domain-pipeline)
+5. [Programmatic Python Usage](#5-programmatic-python-usage)
 
 ---
 
@@ -38,7 +36,7 @@ Conversely, acoustic Automatic Speech Recognition (ASR) acoustic models output f
                          v
        +-----------------+------------------+
        |   Fine-Grained Dynamic             |
-       |   Programming Alignment            |  (transcription.syllabary_enrichment.alignment_engine)
+       |   Programming Alignment            |  (transcription.cherokee.enrichment.syllable_alignment)
        +-----------------+------------------+
                          ^
                          |
@@ -49,7 +47,7 @@ Conversely, acoustic Automatic Speech Recognition (ASR) acoustic models output f
                          |
                          v
        +-----------------+------------------+
-       |   Phonetic Rule Merger Engine      |  (transcription.syllabary_enrichment.enrich_syllabary)
+       |   Phonetic Rule Merger Engine      |  (transcription.cherokee.enrichment.syllable_alignment)
        +-----------------+------------------+
                          |
                          v
@@ -69,18 +67,18 @@ The reconciliation engine treats the **Cherokee Syllabary as the immutable struc
 
 ## 2. Phonetic Rules Engine
 
-The phonetic reconciliation logic is implemented in [`transcription.syllabary_enrichment.enrich_syllabary`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/syllabary_enrichment/enrich_syllabary.py).
+The phonetic reconciliation logic is implemented in [`transcription.cherokee.enrichment.syllable_alignment`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/cherokee/enrichment/syllable_alignment.py).
 
 ### Syllabary Character Map
 
-Centralized transliterations are defined in [`transcription.utils.syllabary_map`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/utils/syllabary_map.py):
+Centralized transliterations are defined in [`transcription.cherokee.orthography.syllabary_map`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/cherokee/orthography/syllabary_map.py):
 - Maps all 85 syllabary characters (Unicode `U+13A0`--`U+13F5` and `U+AB70`--`U+ABBF`).
 - Reflects unified phonetic respellings (e.g., `Ꮏ` $\rightarrow$ `nha` instead of `hna`).
-- Provides reverse lookup [`phonetics_to_syllabary()`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/utils/syllabary_map.py#L152-L214) with pre-aspiration and cluster fallback handling (`hska` $\rightarrow$ `ᏍᎦ`, `thv` $\rightarrow$ `Ꮫ`).
+- Provides reverse lookup [`phonetics_to_syllabary()`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/cherokee/orthography/syllabary_map.py#L152-L214) with pre-aspiration and cluster fallback handling (`hska` $\rightarrow$ `ᏍᎦ`, `thv` $\rightarrow$ `Ꮫ`).
 
 ### Phonetic Rules Overview
 
-Each aligned pair `(syllabary_char, emitted_slice)` is evaluated by [`_enrich_single_syllable(base, emitted)`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/syllabary_enrichment/enrich_syllabary.py#L87-L178):
+Each aligned pair `(syllabary_char, emitted_slice)` is evaluated by [`_enrich_single_syllable(base, emitted)`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/cherokee/enrichment/syllable_alignment.py):
 
 #### 1. Rule 1: Vowel Syncopation / Deletion
 When ASR emits a consonant without a vowel for a CV (consonant-vowel) syllable, the vowel is dropped:
@@ -116,7 +114,7 @@ ASR-detected aspiration shifts are systematically mapped onto base consonants:
 
 ## 3. Alignment Engine
 
-Implemented in [`transcription.syllabary_enrichment.alignment_engine`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/syllabary_enrichment/alignment_engine.py).
+Implemented in [`transcription.cherokee.enrichment.syllable_alignment`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/cherokee/enrichment/syllable_alignment.py).
 
 ### Data Structures
 
@@ -134,7 +132,7 @@ class SyllableAlignment:
 
 ### Dynamic Programming Algorithm
 
-[`align_character_syllable_detailed(syllabary_text, emitted_text)`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/syllabary_enrichment/alignment_engine.py#L101-L226) maps $M$ syllabary units (characters + whitespace + punctuation) to $N$ emitted ASR characters using a customized 2D DP cost matrix:
+[`align_character_syllable_detailed(syllabary_text, emitted_text)`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/cherokee/enrichment/syllable_alignment.py) maps $M$ syllabary units (characters + whitespace + punctuation) to $N$ emitted ASR characters using a customized 2D DP cost matrix:
 
 1. **Deletion Option:** Syllable mapped to empty slice (cost $1.5$, or $0.5$ for whitespace/punctuation).
 2. **Expansion Option:** Syllable mapped to $k$ emitted characters ($1 \le k \le \text{len}(\text{base}) + 3$).
@@ -144,141 +142,38 @@ class SyllableAlignment:
    - Consonant group substitution (`d`/`t`/`th` or `g`/`k`/`kh`): cost $0.3$.
    - Other substitutions: cost $1.0$.
    - Insertions / deletions inside slice: cost $0.8$.
-4. **Fallback Mechanism:** If no valid DP path exists, [`_proportional_fallback()`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/syllabary_enrichment/alignment_engine.py#L256-L278) distributes character boundaries proportionally across the emitted text.
+4. **Fallback Mechanism:** If no valid DP path exists, `_proportional_fallback()` distributes character boundaries proportionally across the emitted text.
 
 ---
 
-## 4. Batch Inference & Disk Caching
+## 4. Domain Pipeline
 
-Implemented in [`transcription.syllabary_enrichment.batch_inference_aligner`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/syllabary_enrichment/batch_inference_aligner.py).
+Implemented in [`transcription.pipelines.enrichment`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/pipelines/enrichment/pipeline.py).
 
-### Pipeline Execution
-
-```bash
-python -m transcription.syllabary_enrichment.batch_inference_aligner \
-    data/manifests/test_manifest.json \
-    --output-cache data/results/aligned_manifest_cache.json \
-    --batch-size 16 \
-    --num-workers 4
-```
-
-### Features:
-- Automatically loads the best model checkpoint configuration via [`get_best_model_config()`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/utils/model_utils.py#L22-L37).
-- Uses multi-worker CPU CTC decoding pools for high throughput.
-- Persists aligned pairs to JSON cache; subsequent runs load instantly unless `--force-recompute` is provided.
+The `EnrichmentPipeline` class orchestrates:
+- `enrich_syllabary(syllabary_text, emitted_text)`
+- Batched manifest processing via `enrich_manifest`
+- CER evaluation metrics via `calculate_cer` and `calculate_relative_improvement`
 
 ---
 
-## 5. Evaluation Framework
-
-The evaluation script [`transcription.syllabary_enrichment.evaluate_reconciliation`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/syllabary_enrichment/evaluate_reconciliation.py) measures phonetic reconciliation performance against ground truth phonetics.
-
-### Metrics Computed
-
-- **Raw CER:** Character Error Rate between raw ASR `emitted_text` and `target_phonetics`.
-- **Reconciled CER:** Character Error Rate between `reconciled_phonetics` and `target_phonetics`.
-- **Delta CER ($\Delta\text{CER}$):** Relative percentage error reduction:
-  $$\Delta\text{CER} = \frac{\text{Raw CER} - \text{Reconciled CER}}{\text{Raw CER}} \times 100\%$$
-
-### CLI Usage
-
-```bash
-python -m transcription.syllabary_enrichment.evaluate_reconciliation \
-    training_data/processed/split_audio_syl_target.csv \
-    --output-cache data/results/aligned_cache.json \
-    --output-artifact data/results/eval_results.json
-```
-
-### Summary Output Example
-
-```
-================================================================================
-PHONETIC RECONCILIATION EVALUATION SUMMARY
-================================================================================
-Split           | Count    | Raw CER    | Reconciled CER  | Δ CER (%) 
---------------------------------------------------------------------------------
-train           | 1250     | 0.1420     | 0.0812          | +42.82%   
-validation      | 150      | 0.1510     | 0.0865          | +42.72%   
-test            | 150      | 0.1485     | 0.0840          | +43.43%   
-overall         | 1550     | 0.1435     | 0.0820          | +42.86%   
-================================================================================
-```
-
----
-
-## 6. Step-by-Step Diagnostic CLI
-
-The visual inspector [`transcription.syllabary_enrichment.inspect_pipeline`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/syllabary_enrichment/inspect_pipeline.py) provides formatted step-by-step traces of individual audio records.
-
-### CLI Options
-
-```bash
-# Inspect a specific record by ID or audio filename substring
-python -m transcription.syllabary_enrichment.inspect_pipeline \
-    --manifest training_data/processed/split_audio_syl_target.csv \
-    --output-cache data/results/aligned_cache.json \
-    --record-id "audio_sample_0042"
-
-# Inspect the top 5 records with highest error rate
-python -m transcription.syllabary_enrichment.inspect_pipeline \
-    --manifest training_data/processed/split_audio_syl_target.csv \
-    --output-cache data/results/aligned_cache.json \
-    --top-errors 5
-```
-
-### Sample Inspection Output
-
-```
-================================================================================
- PIPELINE INSPECTION: audio_sample_0042.wav (Split: test)
-================================================================================
-
---- STEP 1: Syllabary Input & Base Transliteration ---
-  Syllabary Input:       ᎠᏓᎴᏂᏍᎬ
-  Base Transliteration:  adalenisgv
-
---- STEP 2: ASR Emitted Text ---
-  ASR Emitted Text:      athaleniskv
-
---- STEP 3: Character / Syllable Aligned Slices ---
-  Aligned Slices: ('Ꭰ'[a] -> 'a'), ('Ꮣ'[da] -> 'tha'), ('Ꮄ'[le] -> 'le'), ('Ꮒ'[ni] -> 'ni'), ('Ꮝ'[s] -> 's'), ('Ꭼ'[kv] -> 'kv')
-
---- STEP 4: Syllable Rule Action & Output ---
-  Char: Ꭰ   | Base: a     | ASR: a      | Output: a      | Action: Base unchanged (a)
-  Char: Ꮣ   | Base: da    | ASR: tha    | Output: tha    | Action: Enriched (da + ASR 'tha' -> tha)
-  Char: Ꮄ   | Base: le    | ASR: le     | Output: le     | Action: Base unchanged (le)
-  Char: Ꮒ   | Base: ni    | ASR: ni     | Output: ni     | Action: Base unchanged (ni)
-  Char: Ꮝ   | Base: s     | ASR: s      | Output: s      | Action: Base unchanged (s)
-  Char: Ꭼ   | Base: kv    | ASR: kv     | Output: kv     | Action: Base unchanged (kv)
-
---- STEP 5: Target vs Reconciled String Diff & CER ---
-  Target Phonetics:      athaleniskv
-  Reconciled Phonetics:  athaleniskv
-  Inline Diff:           athaleniskv
-  Raw ASR CER:           0.0000
-  Reconciled CER:        0.0000
-================================================================================
-```
-
----
-
-## 7. Programmatic Python Usage
+## 5. Programmatic Python Usage
 
 ### Example 1: Reconciling Syllabary with ASR Emissions
 
 ```python
-from transcription.syllabary_enrichment.alignment_engine import (
+from transcription.cherokee.enrichment import (
     align_character_syllable,
     get_base_transliteration,
+    reconcile_phonetics,
 )
-from transcription.syllabary_enrichment.enrich_syllabary import reconcile_phonetics
 
 syllabary_text = "ᎠᏓᎴᏂᏍᎬ"
 emitted_text = "athaleniskv"
 
 # 1. Generate base transliteration
 base_trans = get_base_transliteration(syllabary_text)
-print(f"Base Transliteration: {base_trans}")  # "adalenisgv"
+print(f"Base Transliteration: {base_trans}")  # "atalenihskv"
 
 # 2. Align syllabary characters to ASR emitted text
 aligned_pairs = align_character_syllable(syllabary_text, emitted_text)
@@ -297,7 +192,7 @@ print(f"Reconciled Phonetics: {reconciled}")  # "athaleniskv"
 ### Example 2: Inspecting Detailed Alignments with Indices
 
 ```python
-from transcription.syllabary_enrichment.alignment_engine import (
+from transcription.cherokee.enrichment import (
     align_character_syllable_detailed,
 )
 
@@ -317,10 +212,13 @@ for align in detailed:
 ### Example 3: Converting Phonetic Transcriptions Back to Syllabary
 
 ```python
-from transcription.utils.syllabary_map import phonetics_to_syllabary
+from transcription.cherokee.orthography import (
+    Orthography,
+    convert_orthography,
+)
 
-# Supports aspiration clusters and tone-stripped inputs
+# Supports conversion across orthographies
 phonetic_input = "osiyo thaleniskv"
-syllabary_output = phonetics_to_syllabary(phonetic_input)
-print(f"Converted Syllabary: {syllabary_output}")  # "ᎣᏏᏲ ᏔᎴᏂᏍᎬ"
+syllabary_output = convert_orthography(phonetic_input, Orthography.TTH, Orthography.SYLLABARY)
+print(f"Converted Syllabary: {syllabary_output}")
 ```

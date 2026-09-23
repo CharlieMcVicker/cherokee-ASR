@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Unit and integration tests for the code-switching ground truth preparer
-(transcription.alignment.arpabet.codeswitched_preparer).
+(transcription.cherokee.arpabet.codeswitched_preparer).
 
 Validates:
 1. Script-level token discrimination into Cherokee Syllabary, English, Compound Clitics, and Punctuation.
@@ -16,11 +16,15 @@ Validates:
 from pathlib import Path
 import pytest
 
-from transcription.alignment.arpabet import (
+from transcription.alignment.ingestion import (
+    load_interview_transcript,
+    load_syllabary_transcript,
+)
+from transcription.cherokee.arpabet.types import SyntheticTargetProjectorProtocol
+from transcription.cherokee.codeswitching import (
     CodeSwitchedLineResult,
     CodeSwitchedToken,
     SyntheticTargetProjector,
-    SyntheticTargetProjectorProtocol,
     TokenType,
     classify_token,
     create_groundtruth_for_code_switched_syllabary,
@@ -30,11 +34,7 @@ from transcription.alignment.arpabet import (
     split_compound_clitic,
     strip_boundary_punctuation,
 )
-from transcription.alignment.ingestion import (
-    load_interview_transcript,
-    load_syllabary_transcript,
-)
-from transcription.utils.orthography import Orthography, convert_orthography
+from transcription.cherokee.orthography import Orthography, convert_orthography
 
 
 @pytest.fixture(scope="module")
