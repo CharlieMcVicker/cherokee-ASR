@@ -32,7 +32,7 @@ from transcription.alignment.arpabet.types import (
     WordManifestEntry,
 )
 from transcription.cherokee.models import CherokeeASRModel
-from transcription.utils.orthography import Orthography
+from transcription.cherokee.orthography import Orthography
 
 # ============================================================================
 # Dummy / Helper Objects for Testing

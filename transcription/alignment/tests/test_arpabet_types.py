@@ -36,7 +36,7 @@ from transcription.alignment.arpabet import (
     WordInferenceCacheEntry,
     WordManifestEntry,
 )
-from transcription.utils.orthography import Orthography
+from transcription.cherokee.orthography import Orthography
 
 # ============================================================================
 # 1. Phonetic Tokens Tests

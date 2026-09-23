@@ -71,10 +71,10 @@ The phonetic reconciliation logic is implemented in [`transcription.cherokee.enr
 
 ### Syllabary Character Map
 
-Centralized transliterations are defined in [`transcription.utils.syllabary_map`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/utils/syllabary_map.py):
+Centralized transliterations are defined in [`transcription.cherokee.orthography.syllabary_map`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/cherokee/orthography/syllabary_map.py):
 - Maps all 85 syllabary characters (Unicode `U+13A0`--`U+13F5` and `U+AB70`--`U+ABBF`).
 - Reflects unified phonetic respellings (e.g., `Ꮏ` $\rightarrow$ `nha` instead of `hna`).
-- Provides reverse lookup [`phonetics_to_syllabary()`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/utils/syllabary_map.py#L152-L214) with pre-aspiration and cluster fallback handling (`hska` $\rightarrow$ `ᏍᎦ`, `thv` $\rightarrow$ `Ꮫ`).
+- Provides reverse lookup [`phonetics_to_syllabary()`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/cherokee/orthography/syllabary_map.py#L152-L214) with pre-aspiration and cluster fallback handling (`hska` $\rightarrow$ `ᏍᎦ`, `thv` $\rightarrow$ `Ꮫ`).
 
 ### Phonetic Rules Overview
 

@@ -12,7 +12,7 @@ import random
 import wave
 import contextlib
 import csv
-from transcription.utils.tone_normalization import remove_tones_and_double_vowels
+from transcription.cherokee.orthography import remove_tones_and_double_vowels
 
 
 def clean_transcription(text):

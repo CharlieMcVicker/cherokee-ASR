@@ -434,7 +434,7 @@ metric = CustomCallableDistanceMetric(fn=lambda hyp, ref: 0.0 if hyp == ref else
 
 ### Representation-Aware Text Normalization & Orthography System (`transcription.alignment.normalizers`)
 
-Located in [`transcription/alignment/normalizers.py`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/normalizers.py) and backed by [`transcription.utils.orthography.Orthography`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/utils/orthography.py), text normalizers ensure deterministic conversions across Cherokee orthographic representations.
+Located in [`transcription/alignment/normalizers.py`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/normalizers.py) and backed by [`transcription.cherokee.orthography.Orthography`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/cherokee/orthography/orthography.py), text normalizers ensure deterministic conversions across Cherokee orthographic representations.
 
 #### Orthography Enum System
 

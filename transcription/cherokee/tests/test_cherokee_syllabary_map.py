@@ -31,6 +31,14 @@ def test_base_syllabary_mappings():
     assert CHEROKEE_SYLLABARY_BASE_MAP["Ꮤ"] == "tha"
 
 
+def test_respell_consonants_applied_consistently():
+    assert CHEROKEE_SYLLABARY_MAP["Ꭰ"] == "a"
+    assert CHEROKEE_SYLLABARY_MAP["Ꭶ"] == "ka"
+    assert CHEROKEE_SYLLABARY_MAP["Ꭷ"] == "kha"
+    assert CHEROKEE_SYLLABARY_MAP["Ꮣ"] == "ta"
+    assert CHEROKEE_SYLLABARY_MAP["Ꮤ"] == "tha"
+
+
 def test_unconditional_sibilants():
     assert CHEROKEE_SYLLABARY_UNCONDITIONAL_MAP["Ꮜ"] == "hsa"
     assert CHEROKEE_SYLLABARY_UNCONDITIONAL_MAP["Ꮝ"] == "hs"
@@ -51,7 +59,13 @@ def test_syllabary_to_phonetics_contextual_vs_unconditional():
     assert syllabary_to_phonetics("ᏌᏊ", contextual_preaspiration=True) == "sakwu"
     assert syllabary_to_phonetics("ᏌᏊ", contextual_preaspiration=False) == "hsakwu"
     assert syllabary_to_phonetics("ᎠᏍᎦᏯ", contextual_preaspiration=True) == "ahskaya"
+    assert syllabary_to_phonetics("ᎠᏍᎦᏯ", contextual_preaspiration=False) == "ahskaya"
+    assert syllabary_to_phonetics("ᎣᏏᏲ", contextual_preaspiration=True) == "ohsiyo"
+    assert syllabary_to_phonetics("ᎣᏏᏲ", contextual_preaspiration=False) == "ohsiyo"
     assert syllabary_to_phonetics("ᏣᎳᎩ", contextual_preaspiration=True) == "tsalaki"
+    assert syllabary_to_phonetics("ᏣᎳᎩ", contextual_preaspiration=False) == "tsalaki"
+    assert syllabary_to_phonetics("ᏥᏍᏆ", contextual_preaspiration=True) == "tsihskwa"
+    assert syllabary_to_phonetics("ᏥᏍᏆ", contextual_preaspiration=False) == "tsihskwa"
 
 
 def test_phonetics_to_syllabary():
@@ -60,5 +74,8 @@ def test_phonetics_to_syllabary():
     assert phonetics_to_syllabary("ta") == "Ꮣ"
     assert phonetics_to_syllabary("tha") == "Ꮤ"
     assert phonetics_to_syllabary("ohsiyo") == "ᎣᏏᏲ"
+    assert phonetics_to_syllabary("kanolv'vhska") == "ᎦᏃᎸᎥᏍᎦ"
+    assert phonetics_to_syllabary("kakhahiya") == "ᎦᎧᎯᏯ"
     assert phonetics_to_syllabary("thv") == "Ꮫ"  # h-drop fallback
     assert phonetics_to_syllabary("khv") == "Ꭼ"  # h-drop fallback
+    assert phonetics_to_syllabary("kakhahv'a") == "ᎦᎧᎲᎠ"

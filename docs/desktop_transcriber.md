@@ -55,7 +55,7 @@ The desktop transcriber operates as a continuous, hands-free dictation tool. As 
 | **Frontend UI** | [React 18](https://react.dev/), [TypeScript](https://www.typescriptlang.org/), [Vite](https://vitejs.dev/) | Modern responsive UI, audio stream management, and document state. |
 | **Audio Processing** | Web Audio API (`AudioWorkletProcessor`) | Low-latency in-browser voice activity detection and 16kHz float32 PCM frame accumulation. |
 | **ASR Inference** | [PyTorch](https://pytorch.org/), [Hugging Face Transformers](https://huggingface.co/docs/transformers/) | Fine-tuned `Wav2Vec2ForCTC` acoustic model wrapped by `CherokeeASRModel`. |
-| **Transliteration** | `transcription.utils.syllabary_map` | Phonetic-to-Syllabary deterministic conversion engine. |
+| **Transliteration** | `transcription.cherokee.orthography` | Phonetic-to-Syllabary deterministic conversion engine. |
 | **Packaging** | [PyInstaller](https://pyinstaller.org/) | Bundles Python runtime, PyTorch dependencies, React build, and native assets into a single executable. |
 
 ---
