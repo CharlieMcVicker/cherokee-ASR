@@ -1,6 +1,6 @@
 # Audio Segmentation and Voice Activity Detection (VAD)
 
-This guide documents the **Voice Activity Detection (VAD) audio segmentation engine** and **audio extraction pipeline** in `transcription.audio`.
+This guide documents the **Voice Activity Detection (VAD) audio segmentation engine** and **audio extraction pipeline** in `transcription.core.audio`.
 
 ---
 
@@ -11,7 +11,6 @@ This guide documents the **Voice Activity Detection (VAD) audio segmentation eng
 3. [Segmentation Algorithm & Smart Splitting](#3-segmentation-algorithm--smart-splitting)
 4. [CLI Tools](#4-cli-tools)
    - [Hyperparameter Sweep Evaluation](#hyperparameter-sweep-evaluation)
-   - [Audio Segment Extraction](#audio-segment-extraction)
 5. [Programmatic Python Usage](#5-programmatic-python-usage)
 
 ---
@@ -23,7 +22,7 @@ Long continuous Cherokee audio recordings (e.g., historical interviews, conversa
 - Character and word timestamping (`transcription.alignment`)
 - Active learning and Praat TextGrid generation
 
-The segmentation engine in [`transcription.audio.segment`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/audio/segment.py) employs a **two-phase hybrid VAD algorithm**:
+The segmentation engine in [`transcription.core.audio.segment`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/core/audio/segment.py) employs a **two-phase hybrid VAD algorithm**:
 1. **Vectorized Energy Profiling:** Computes exact decibels relative to full scale (dBFS) energy curves over 10ms windows.
 2. **Dynamic Parameter Selection & Smart Recursive Splitting:** Automatically selects optimal silence thresholds to maximize speech coverage without exceeding target duration limits, using quiet-window fallbacks to avoid cutting in the middle of words.
 
@@ -31,7 +30,7 @@ The segmentation engine in [`transcription.audio.segment`](file:///Users/julietm
 
 ## 2. Key Functions & Classes
 
-The primary module is [`transcription.audio.segment`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/audio/segment.py).
+The primary module is [`transcription.core.audio.segment`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/core/audio/segment.py).
 
 ### `AudioChunk`
 
@@ -166,14 +165,14 @@ The top-level orchestrator for audio chunking:
 
 ### Hyperparameter Sweep Evaluation
 
-Run [`transcription.audio.segment`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/audio/segment.py) directly from the command line to evaluate VAD thresholds or run a hyperparameter sweep over a target audio file.
+Run [`transcription.core.audio.segment`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/core/audio/segment.py) directly from the command line to evaluate VAD thresholds or run a hyperparameter sweep over a target audio file.
 
 ```bash
 # Perform an exhaustive hyperparameter sweep across threshold combinations
-python -m transcription.audio.segment path/to/interview.wav --sweep
+python -m transcription.core.audio.segment path/to/interview.wav --sweep
 
 # Evaluate segmentation with specific manual parameters
-python -m transcription.audio.segment path/to/interview.wav \
+python -m transcription.core.audio.segment path/to/interview.wav \
     --thresh -35 \
     --min-silence 400 \
     --keep-silence 150
@@ -194,65 +193,12 @@ python -m transcription.audio.segment path/to/interview.wav \
 
 ---
 
-### Audio Segment Extraction
-
-The extraction script [`transcription.audio.extract`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/audio/extract.py) slices audio files on silence boundaries, saves individual `.wav` files to an output directory, and generates a `manifest.json`.
-
-```bash
-python -m transcription.audio.extract path/to/recording.wav \
-    --out-dir data/processed/segments \
-    --thresh -30 \
-    --min-silence 500 \
-    --keep-silence 200
-```
-
-#### Generated Output Structure
-
-```
-data/processed/segments/
-├── recording_segment_0000_0_4520.wav
-├── recording_segment_0001_4900_9100.wav
-├── recording_segment_0002_9500_14200.wav
-└── manifest.json
-```
-
-#### `manifest.json` Format
-
-```json
-[
-  {
-    "id": 0,
-    "filename": "recording_segment_0000_0_4520.wav",
-    "filepath": "data/processed/segments/recording_segment_0000_0_4520.wav",
-    "start_ms": 0,
-    "end_ms": 4520,
-    "duration_ms": 4520,
-    "start_seconds": 0.0,
-    "end_seconds": 4.52,
-    "duration_seconds": 4.52
-  },
-  {
-    "id": 1,
-    "filename": "recording_segment_0001_4900_9100.wav",
-    "filepath": "data/processed/segments/recording_segment_0001_4900_9100.wav",
-    "start_ms": 4900,
-    "end_ms": 9100,
-    "duration_ms": 4200,
-    "start_seconds": 4.9,
-    "end_seconds": 9.1,
-    "duration_seconds": 4.2
-  }
-]
-```
-
----
-
 ## 5. Programmatic Python Usage
 
 ### Example 1: In-Memory Long Audio Segmentation
 
 ```python
-from transcription.audio.segment import segment_long_audio
+from transcription.core.audio import segment_long_audio
 
 audio_path = "data/raw_audio/cherokee_interview_01.wav"
 
@@ -278,7 +224,7 @@ for chunk in chunks[:5]:
 ```python
 from pydub import AudioSegment
 from pydub.effects import normalize
-from transcription.audio.segment import (
+from transcription.core.audio import (
     get_energy_profile,
     get_best_parameters,
     segment_audio_from_profile,
@@ -317,7 +263,7 @@ print(f"Max Length:        {metrics['max_len']:.2f}s")
 
 ```python
 import os
-from transcription.audio.segment import segment_long_audio
+from transcription.core.audio import segment_long_audio
 
 output_dir = "data/processed/exported_chunks"
 os.makedirs(output_dir, exist_ok=True)

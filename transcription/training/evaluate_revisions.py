@@ -16,19 +16,19 @@ from datasets import Dataset, Audio, Features, Value
 from jiwer import wer as jiwer_wer, cer as jiwer_cer
 from tqdm import tqdm
 
-from transcription.inference.infer import (
-    TARGET_SAMPLE_RATE,
-    greedy_inference,
-    normalize_text,
-    strip_length,
-    strip_tones,
-)
+from transcription.core.audio import TARGET_SAMPLE_RATE
+from transcription.cherokee.orthography import normalize_text
 from transcription.training.evaluate_checkpoint import (
     _detect_columns,
     _resolve_audio_path,
     _try_read_csv,
 )
-from transcription.utils.evaluation import run_evaluation, yield_hf_revisions
+from transcription.utils.evaluation import (
+    run_evaluation,
+    strip_length,
+    strip_tones,
+    yield_hf_revisions,
+)
 
 
 def safe(s):

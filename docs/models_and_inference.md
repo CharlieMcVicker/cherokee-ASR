@@ -20,9 +20,9 @@ This guide provides an in-depth reference for model loading, procedural inferenc
    - [Layer 3: Word & Character Confidences (`get_word_confidences`)](#layer-3-word--character-confidences-get_word_confidences)
    - [Layer 4: Greedy CTC Decoding (`decode`)](#layer-4-greedy-ctc-decoding-decode)
    - [End-to-End Transcription (`transcribe` & `transcribe_batch`)](#end-to-end-transcription-transcribe--transcribe_batch)
-4. [Command-Line Interfaces (CLI)](#4-command-line-interfaces-cli)
-   - [Single Audio Inference (`transcription.inference.single`)](#single-audio-inference-transcriptioninferencesingle)
-   - [High-Performance Batch Inference (`transcription.inference.batch`)](#high-performance-batch-inference-transcriptioninferencebatch)
+4. [Model Inference & Execution](#4-model-inference--execution)
+   - [Single Audio Inference (`CherokeeASRModel.infer`)](#single-audio-inference-cherokeeasrmodelinfer)
+   - [High-Performance Batch Inference (`CherokeeASRModel.infer_batch`)](#high-performance-batch-inference-cherokeeasrmodelinfer_batch)
 5. [Web-Based Active Labeler](#5-web-based-active-labeler)
    - [Workflow & Architecture](#workflow--architecture)
    - [Running the Labeler Server](#running-the-labeler-server)
@@ -76,7 +76,7 @@ The Cherokee ASR system is built on fine-tuned [Wav2Vec 2.0](https://huggingface
        └─────────────────────────┘
 ```
 
-The system is encapsulated in `CherokeeASRModel` (`transcription/models/asr_model.py`), providing a tiered, decoupled architecture where each layer can be invoked independently or as part of a high-level end-to-end pipeline. The core model and `ASRResult` abstractions remain strictly language-agnostic (producing phonetic hypotheses), leaving Cherokee syllabary conversion and reconciliation to downstream libraries (`transcription.syllabary_enrichment` and `transcription.utils.syllabary_map`).
+The system is encapsulated in `CherokeeASRModel` (`transcription.cherokee.models.loader`), providing a tiered, decoupled architecture where each layer can be invoked independently or as part of a high-level end-to-end pipeline. The core model and `ASRResult` abstractions remain strictly language-agnostic (producing phonetic hypotheses), leaving Cherokee syllabary conversion and reconciliation to Tier 2 Cherokee domain modules (`transcription.cherokee.enrichment` and `transcription.cherokee.orthography`).
 
 ---
 
@@ -234,7 +234,7 @@ To prevent redundant weight loading and VRAM bloat, `model_utils.py` maintains a
 
 ### Data Structures: WordConfidence & ASRResult
 
-All structured outputs are strongly typed dataclasses defined in `transcription/models/asr_model.py`.
+All structured outputs are strongly typed dataclasses defined in `transcription.cherokee.models.loader`.
 
 #### `WordConfidence`
 Encapsulates word-level alignment, start/end timestamps, confidence score, and per-character breakdown.
@@ -282,7 +282,7 @@ class ASRResult:
 
 > **Note**: `ASRResult` implements `__getitem__` and `.get()`, enabling backwards-compatible dictionary-style indexing (`result["transcription"]`, `result["confidence"]`) as well as attribute access (`result.transcription`).
 
-> **Language-Agnostic Abstraction**: `ASRResult` purposefully does not contain language-specific fields such as `syllabary`. The acoustic CTC decoder produces phonetic text hypotheses. Transliteration to Cherokee Syllabary and phonetic reconciliation are explicitly performed downstream by `transcription.utils.syllabary_map.phonetics_to_syllabary` or `transcription.syllabary_enrichment`.
+> **Language-Agnostic Abstraction**: `ASRResult` purposefully does not contain language-specific fields such as `syllabary`. The acoustic CTC decoder produces phonetic text hypotheses. Transliteration to Cherokee Syllabary and phonetic reconciliation are explicitly performed downstream by `transcription.cherokee.orthography.convert_orthography` or `transcription.cherokee.enrichment`.
 
 ---
 
@@ -393,91 +393,39 @@ def transcribe_batch(
 
 ---
 
-## 4. Command-Line Interfaces (CLI)
+## 4. Model Inference & Execution
 
-The package provides two standalone CLI entry points for running inference directly from the terminal.
+The system provides streamlined procedural inference and unified container models (`ASRModel` and `CherokeeASRModel`).
 
-### Single Audio Inference (`transcription.inference.single`)
+### Single Audio Inference (`CherokeeASRModel.infer`)
 
-Transcribes a single audio file and prints greedy phonetic output and confidence score.
+Transcribes a single audio file and returns the universal `ModelOutput` currency containing logits, vocab mapping, and greedy decode projections.
 
-#### Syntax
-```bash
-python3 -m transcription.inference.single <audio_path> [options]
-```
+```python
+from transcription.cherokee.models.loader import CherokeeASRModel
 
-#### CLI Options
-| Option | Type | Default | Description |
-|---|---|---|---|
-| `audio_path` | `str` (Positional) | *Required* | Path to input audio file (`.wav`, `.mp3`, `.flac`, etc.). |
-| `--checkpoint` | `str` | `best_model.json` repo | Model checkpoint directory or Hugging Face Hub repo ID. |
-| `--processor` | `str` | `best_model.json` repo | Processor checkpoint directory or Hugging Face Hub repo ID. |
-| `--revision` | `str` | `best_model.json` rev | Specific Hugging Face commit hash, branch, or tag. |
-| `--hf-token` | `str` | `None` | Hugging Face authentication token. |
+model = CherokeeASRModel.from_pretrained_or_best()
+output = model.infer("data/raw/Bessie-Summerfield-2.wav")
 
-#### Example
-```bash
-python3 -m transcription.inference.single data/raw/Bessie-Summerfield-2.wav \
-  --checkpoint charliemcvicker/asr-cherokee \
-  --revision 5464d15
-```
-
-#### Sample Terminal Output
-```
-Loading model and processor: charliemcvicker/asr-cherokee (revision: 5464d15)...
-Using device: cuda:0
-Transcribing audio file: data/raw/Bessie-Summerfield-2.wav...
-
-============================================================
-GREEDY DECODING PREDICTIONS:
-  Transcription: osiyo kohi iga
-  Confidence:    0.9634 (96.34%)
-============================================================
+print("Transcription:", output.decode_greedy())
 ```
 
 ---
 
-### High-Performance Batch Inference (`transcription.inference.batch`)
+### High-Performance Batch Inference (`CherokeeASRModel.infer_batch`)
 
-Processes an entire directory of WAV files with batched GPU forward execution and parallel multiprocessing CPU CTC decoding.
+Processes multiple audio files with batched tensor execution:
 
-#### Architecture
-1. **Metadata Pre-scan**: Scans all `.wav` files, filters zero-byte or corrupt files, and sorts files by audio duration to minimize padding overhead.
-2. **Batched GPU Forward Pass**: Feeds padded batches to the GPU for acoustic feature extraction.
-3. **Multiprocessing CPU Decoding Pool**: Unloads CTC beam/greedy decoding, character alternative evaluation, and JSON serialization to a pool of worker processes (`multiprocessing.Pool`).
-4. **Bounded Queue Semaphore**: Regulates IPC memory buffer (`threading.Semaphore(batch_size * 5)`) to prevent RAM exhaustion.
-5. **Streaming Thread-Safe CSV Output**: Progressively appends results to disk behind a mutex lock and re-sorts back to directory order at completion.
+```python
+from transcription.cherokee.models.loader import CherokeeASRModel
 
-#### Syntax
-```bash
-python3 -m transcription.inference.batch <dir_path> [options]
+model = CherokeeASRModel.from_pretrained_or_best()
+audio_paths = ["audio1.wav", "audio2.wav", "audio3.wav"]
+outputs = model.infer_batch(audio_paths, batch_size=16)
+
+for path, out in zip(audio_paths, outputs):
+    print(f"{path}: {out.decode_greedy()}")
 ```
-
-#### CLI Options
-| Option | Type | Default | Description |
-|---|---|---|---|
-| `dir_path` | `str` (Positional) | *Required* | Directory containing `.wav` audio files. |
-| `--output` | `str` | `data/results/batch_inference_results.csv` | Destination CSV file path. |
-| `--batch-size` | `int` | `16` | Batch size for GPU forward passes. |
-| `--num-workers` | `int` | CPU core count | Number of parallel worker processes for CPU decoding. |
-| `--checkpoint` | `str` | `best_model.json` repo | Model checkpoint directory or Hugging Face repo. |
-| `--processor` | `str` | `best_model.json` repo | Processor checkpoint directory or Hugging Face repo. |
-| `--revision` | `str` | `best_model.json` rev | Hugging Face git commit hash, branch, or tag. |
-| `--hf-token` | `str` | `None` | Hugging Face authentication token. |
-
-#### Example
-```bash
-python3 -m transcription.inference.batch data/processed/segments \
-  --output data/results/batch_inference_results.csv \
-  --batch-size 32 \
-  --num-workers 8
-```
-
-#### Generated CSV Schema
-The output CSV contains the following columns:
-- `file_path`: Absolute or relative path to the audio file.
-- `filename`: Base audio filename.
-- `greedy_transcription`: Greedy phonetic transcript.
 - `greedy_confidence`: Sequence confidence formatted to 4 decimal places (`0.0000` to `1.0000`).
 - `word_confidences`: JSON string containing serialized `WordConfidence` objects with timestamps and alternatives.
 
@@ -532,10 +480,12 @@ Open `http://localhost:8000` in your web browser.
 
 ### Active Learning Lifecycle
 
-1. Run batch inference across uncurated audio recordings:
-   ```bash
-   python3 -m transcription.inference.batch data/raw/new_interviews \
-     --output data/results/batch_inference_results.csv
+1. Run batch inference across uncurated audio recordings using `CherokeeASRModel.infer_batch()`:
+   ```python
+   from transcription.cherokee.models.loader import CherokeeASRModel
+
+   model = CherokeeASRModel.from_pretrained_or_best()
+   # Process recordings to produce batch_inference_results.csv
    ```
 2. Start the labeling server:
    ```bash
@@ -559,8 +509,8 @@ Open `http://localhost:8000` in your web browser.
 Transcribing an audio file to phonetic text and performing optional downstream Cherokee Syllabary transliteration:
 
 ```python
-from transcription.models.asr_model import CherokeeASRModel
-from transcription.utils.syllabary_map import phonetics_to_syllabary
+from transcription.cherokee.models.loader import CherokeeASRModel
+from transcription.cherokee.orthography import convert_orthography, Orthography
 
 # 1. Load the recommended model checkpoint
 asr = CherokeeASRModel.get_best_model()
@@ -569,7 +519,7 @@ asr = CherokeeASRModel.get_best_model()
 result = asr.transcribe("data/raw/sample.wav")
 
 # 3. Downstream Cherokee Syllabary transliteration
-syllabary_text = phonetics_to_syllabary(result.transcription)
+syllabary_text = convert_orthography(result.transcription, target=Orthography.SYLLABARY)
 
 print("Phonetic Transcript :", result.transcription)
 print("Cherokee Syllabary  :", syllabary_text)
@@ -584,7 +534,7 @@ Transcribing live PCM audio arrays or raw bytes directly in memory (e.g., from a
 
 ```python
 import numpy as np
-from transcription.models.asr_model import CherokeeASRModel
+from transcription.cherokee.models.loader import CherokeeASRModel
 
 asr = CherokeeASRModel.get_best_model()
 
@@ -603,7 +553,7 @@ print("Transcription:", result.transcription)
 Extracting word boundaries, timestamps, and character-level alternatives:
 
 ```python
-from transcription.models.asr_model import CherokeeASRModel
+from transcription.cherokee.models.loader import CherokeeASRModel
 
 asr = CherokeeASRModel.get_best_model()
 
@@ -627,7 +577,7 @@ for w in words:
 Performing batched inference over a list of file paths with custom batch sizing:
 
 ```python
-from transcription.models.asr_model import CherokeeASRModel
+from transcription.cherokee.models.loader import CherokeeASRModel
 
 asr = CherokeeASRModel.get_best_model(device="cuda")
 

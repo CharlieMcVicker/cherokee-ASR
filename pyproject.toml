@@ -10,6 +10,7 @@ readme = "README.md"
 requires-python = ">=3.9"
 dependencies = [
     "accelerate",
+    "ctc-segmentation @ git+https://github.com/CharlieMcVicker/ctc-segmentation.git",
     "datasets",
     "evaluate",
     "fastapi",
@@ -43,7 +44,7 @@ dev = [
 ]
 
 [project.scripts]
-align-cherokee = "transcription.alignment.cli:main"
+align-cherokee = "transcription.apps.cli:main"
 syllabary-transcriber = "syllabary_transcriber.__main__:main"
 
 [tool.setuptools.packages.find]

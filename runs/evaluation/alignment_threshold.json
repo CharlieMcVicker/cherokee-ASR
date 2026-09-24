@@ -1,0 +1,96 @@
+{
+  "threshold": 0.073217,
+  "total_verses": 678,
+  "accepted_count": 372,
+  "rejected_count": 306,
+  "acceptance_rate": 0.5487,
+  "percentile": 54.87,
+  "cost_min": 0.0,
+  "cost_max": 0.1994,
+  "cost_mean": 0.0725,
+  "cost_median": 0.0687,
+  "mean_accepted_cost": 0.0491,
+  "mean_rejected_cost": 0.101,
+  "t_low": 0.071659,
+  "t_high": 0.074775,
+  "tolerance": 0.005,
+  "iterations": 6,
+  "timestamp": "2026-09-10T20:58:17.222867+00:00",
+  "source_files": [
+    "cherokee_new_testament/alignments/mark_alignment_records.json"
+  ],
+  "history": [
+    {
+      "iteration": 1,
+      "t_low": 0.0,
+      "t_high": 0.1994,
+      "t_mid": 0.0997,
+      "action": "reject",
+      "sampled_verse_ids": [
+        "020620",
+        "020124",
+        "021454"
+      ]
+    },
+    {
+      "iteration": 2,
+      "t_low": 0.0,
+      "t_high": 0.0997,
+      "t_mid": 0.04985,
+      "action": "accept",
+      "sampled_verse_ids": [
+        "020825",
+        "021033",
+        "021527"
+      ]
+    },
+    {
+      "iteration": 3,
+      "t_low": 0.04985,
+      "t_high": 0.0997,
+      "t_mid": 0.074775,
+      "action": "reject",
+      "sampled_verse_ids": [
+        "021312",
+        "021427",
+        "021208"
+      ]
+    },
+    {
+      "iteration": 4,
+      "t_low": 0.04985,
+      "t_high": 0.074775,
+      "t_mid": 0.06231249999999999,
+      "action": "accept",
+      "sampled_verse_ids": [
+        "020834",
+        "020907",
+        "020412"
+      ]
+    },
+    {
+      "iteration": 5,
+      "t_low": 0.06231249999999999,
+      "t_high": 0.074775,
+      "t_mid": 0.06854374999999999,
+      "action": "accept",
+      "sampled_verse_ids": [
+        "020648",
+        "020939",
+        "020321"
+      ]
+    },
+    {
+      "iteration": 6,
+      "t_low": 0.06854374999999999,
+      "t_high": 0.074775,
+      "t_mid": 0.071659375,
+      "action": "accept",
+      "sampled_verse_ids": [
+        "020107",
+        "020540",
+        "020209"
+      ]
+    }
+  ]
+}

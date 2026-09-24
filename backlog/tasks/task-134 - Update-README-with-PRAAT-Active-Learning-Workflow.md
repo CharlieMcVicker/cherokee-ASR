@@ -1,11 +1,11 @@
 ---
 id: TASK-134
 title: Update README with PRAAT Active Learning Workflow
-status: In Progress
+status: To Do
 assignee:
   - '@agent'
 created_date: '2026-07-10 14:39'
-updated_date: '2026-07-10 14:40'
+updated_date: '2026-09-14 13:26'
 labels: []
 dependencies: []
 ordinal: 130000

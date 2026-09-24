@@ -16,7 +16,7 @@ This indicates a severe degradation introduced by the current reconciliation pro
 ## 2. Key Hypotheses: What Might Be Going Wrong?
 
 ### Hypothesis A: Target Notation Schema Discrepancy (t/th vs d/g vs t/k)
-- **The Issue**: `CHOKEE_SYLLABARY_MAP` in `transcription.syllabary_enrichment.alignment_engine` maps Cherokee Syllabary characters (e.g. Ꭶ, Ꮣ, Ꭸ, Ꮥ) to base transliterations using **`g/d`** voicing (`ga`, `da`, `ge`, `de`). However, our target ground-truth dataset was pre-normalized into the **`t/th` and `k/kh`** acoustic scheme (`ka`, `ta`, `kha`, `tha`, `nikhv`, `uwesdanelidoho`).
+- **The Issue**: `CHEROKEE_SYLLABARY_MAP` historically mapped Cherokee Syllabary characters (e.g. Ꭶ, Ꮣ, Ꭸ, Ꮥ) to base transliterations using **`g/d`** voicing (`ga`, `da`, `ge`, `de`). However, our target ground-truth dataset was pre-normalized into the **`t/th` and `k/kh`** acoustic scheme (`ka`, `ta`, `kha`, `tha`, `nikhv`, `uwesdanelidoho`).
 - **Impact**: The base transliteration engine produces `d` and `g` instead of `t` and `k`. If ASR emits `t` or `k`, or if the target ground-truth expects `t` / `k`, starting from `d` or `g` forces artificial errors on almost every single stop consonant in the Cherokee language.
 
 ### Hypothesis B: Syllabary Character-to-ASR Alignment Drift
@@ -76,11 +76,11 @@ To see the exact outputs at every step and isolate the root cause, we will build
 
 1. **Detailed Single-Record Visualizer**:
    ```bash
-   conda run -n cherokee-asr python -m transcription.syllabary_enrichment.inspect_pipeline --record-id "Sentence_for_entry_1368_01.wav"
+   conda run -n cherokee-asr python -m transcription.pipelines.enrichment.pipeline --record-id "Sentence_for_entry_1368_01.wav"
    ```
 2. **Top-N Error Breakdown & Diff Analysis**:
    ```bash
-   conda run -n cherokee-asr python -m transcription.syllabary_enrichment.inspect_pipeline --top-errors 20
+   conda run -n cherokee-asr python -m transcription.pipelines.enrichment.pipeline --top-errors 20
    ```
 
 ---

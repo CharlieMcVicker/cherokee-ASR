@@ -1,0 +1,466 @@
+[
+  {
+    "config_name": "h_3.0_glottal_0.5_no_mlp",
+    "h_penalty": 3.0,
+    "glottal_penalty": 0.5,
+    "min_logprobs": null,
+    "total_glottal_stops": 2,
+    "total_h_aspirations": 399,
+    "total_flagged_words": 158,
+    "anomalous_verses_count": 45,
+    "mark_1_1_yihstv_flagged": true,
+    "mean_distance_score": -222222232.2494,
+    "elapsed_sec": 3.64
+  },
+  {
+    "config_name": "h_3.0_glottal_0.5_with_mlp",
+    "h_penalty": 3.0,
+    "glottal_penalty": 0.5,
+    "min_logprobs": {
+      "h": -1.0498221244986778,
+      "'": -1.6094379124341003
+    },
+    "total_glottal_stops": 2,
+    "total_h_aspirations": 399,
+    "total_flagged_words": 158,
+    "anomalous_verses_count": 45,
+    "mark_1_1_yihstv_flagged": true,
+    "mean_distance_score": -222222232.2494,
+    "elapsed_sec": 2.88
+  },
+  {
+    "config_name": "h_3.0_glottal_0.8_no_mlp",
+    "h_penalty": 3.0,
+    "glottal_penalty": 0.8,
+    "min_logprobs": null,
+    "total_glottal_stops": 2,
+    "total_h_aspirations": 399,
+    "total_flagged_words": 158,
+    "anomalous_verses_count": 45,
+    "mark_1_1_yihstv_flagged": true,
+    "mean_distance_score": -222222232.2494,
+    "elapsed_sec": 3.63
+  },
+  {
+    "config_name": "h_3.0_glottal_0.8_with_mlp",
+    "h_penalty": 3.0,
+    "glottal_penalty": 0.8,
+    "min_logprobs": {
+      "h": -1.0498221244986778,
+      "'": -1.6094379124341003
+    },
+    "total_glottal_stops": 2,
+    "total_h_aspirations": 399,
+    "total_flagged_words": 158,
+    "anomalous_verses_count": 45,
+    "mark_1_1_yihstv_flagged": true,
+    "mean_distance_score": -222222232.2494,
+    "elapsed_sec": 2.85
+  },
+  {
+    "config_name": "h_3.0_glottal_1.0_no_mlp",
+    "h_penalty": 3.0,
+    "glottal_penalty": 1.0,
+    "min_logprobs": null,
+    "total_glottal_stops": 2,
+    "total_h_aspirations": 399,
+    "total_flagged_words": 158,
+    "anomalous_verses_count": 45,
+    "mark_1_1_yihstv_flagged": true,
+    "mean_distance_score": -222222232.2494,
+    "elapsed_sec": 3.58
+  },
+  {
+    "config_name": "h_3.0_glottal_1.0_with_mlp",
+    "h_penalty": 3.0,
+    "glottal_penalty": 1.0,
+    "min_logprobs": {
+      "h": -1.0498221244986778,
+      "'": -1.6094379124341003
+    },
+    "total_glottal_stops": 2,
+    "total_h_aspirations": 399,
+    "total_flagged_words": 158,
+    "anomalous_verses_count": 45,
+    "mark_1_1_yihstv_flagged": true,
+    "mean_distance_score": -222222232.2494,
+    "elapsed_sec": 2.86
+  },
+  {
+    "config_name": "h_3.0_glottal_1.2_no_mlp",
+    "h_penalty": 3.0,
+    "glottal_penalty": 1.2,
+    "min_logprobs": null,
+    "total_glottal_stops": 2,
+    "total_h_aspirations": 399,
+    "total_flagged_words": 158,
+    "anomalous_verses_count": 45,
+    "mark_1_1_yihstv_flagged": true,
+    "mean_distance_score": -222222232.2494,
+    "elapsed_sec": 3.64
+  },
+  {
+    "config_name": "h_3.0_glottal_1.2_with_mlp",
+    "h_penalty": 3.0,
+    "glottal_penalty": 1.2,
+    "min_logprobs": {
+      "h": -1.0498221244986778,
+      "'": -1.6094379124341003
+    },
+    "total_glottal_stops": 2,
+    "total_h_aspirations": 399,
+    "total_flagged_words": 158,
+    "anomalous_verses_count": 45,
+    "mark_1_1_yihstv_flagged": true,
+    "mean_distance_score": -222222232.2494,
+    "elapsed_sec": 2.86
+  },
+  {
+    "config_name": "h_4.0_glottal_0.5_no_mlp",
+    "h_penalty": 4.0,
+    "glottal_penalty": 0.5,
+    "min_logprobs": null,
+    "total_glottal_stops": 2,
+    "total_h_aspirations": 399,
+    "total_flagged_words": 158,
+    "anomalous_verses_count": 45,
+    "mark_1_1_yihstv_flagged": true,
+    "mean_distance_score": -222222232.2494,
+    "elapsed_sec": 3.55
+  },
+  {
+    "config_name": "h_4.0_glottal_0.5_with_mlp",
+    "h_penalty": 4.0,
+    "glottal_penalty": 0.5,
+    "min_logprobs": {
+      "h": -1.0498221244986778,
+      "'": -1.6094379124341003
+    },
+    "total_glottal_stops": 2,
+    "total_h_aspirations": 399,
+    "total_flagged_words": 158,
+    "anomalous_verses_count": 45,
+    "mark_1_1_yihstv_flagged": true,
+    "mean_distance_score": -222222232.2494,
+    "elapsed_sec": 2.85
+  },
+  {
+    "config_name": "h_4.0_glottal_0.8_no_mlp",
+    "h_penalty": 4.0,
+    "glottal_penalty": 0.8,
+    "min_logprobs": null,
+    "total_glottal_stops": 2,
+    "total_h_aspirations": 399,
+    "total_flagged_words": 158,
+    "anomalous_verses_count": 45,
+    "mark_1_1_yihstv_flagged": true,
+    "mean_distance_score": -222222232.2494,
+    "elapsed_sec": 3.57
+  },
+  {
+    "config_name": "h_4.0_glottal_0.8_with_mlp",
+    "h_penalty": 4.0,
+    "glottal_penalty": 0.8,
+    "min_logprobs": {
+      "h": -1.0498221244986778,
+      "'": -1.6094379124341003
+    },
+    "total_glottal_stops": 2,
+    "total_h_aspirations": 399,
+    "total_flagged_words": 158,
+    "anomalous_verses_count": 45,
+    "mark_1_1_yihstv_flagged": true,
+    "mean_distance_score": -222222232.2494,
+    "elapsed_sec": 2.86
+  },
+  {
+    "config_name": "h_4.0_glottal_1.0_no_mlp",
+    "h_penalty": 4.0,
+    "glottal_penalty": 1.0,
+    "min_logprobs": null,
+    "total_glottal_stops": 2,
+    "total_h_aspirations": 399,
+    "total_flagged_words": 158,
+    "anomalous_verses_count": 45,
+    "mark_1_1_yihstv_flagged": true,
+    "mean_distance_score": -222222232.2494,
+    "elapsed_sec": 3.57
+  },
+  {
+    "config_name": "h_4.0_glottal_1.0_with_mlp",
+    "h_penalty": 4.0,
+    "glottal_penalty": 1.0,
+    "min_logprobs": {
+      "h": -1.0498221244986778,
+      "'": -1.6094379124341003
+    },
+    "total_glottal_stops": 2,
+    "total_h_aspirations": 399,
+    "total_flagged_words": 158,
+    "anomalous_verses_count": 45,
+    "mark_1_1_yihstv_flagged": true,
+    "mean_distance_score": -222222232.2494,
+    "elapsed_sec": 2.85
+  },
+  {
+    "config_name": "h_4.0_glottal_1.2_no_mlp",
+    "h_penalty": 4.0,
+    "glottal_penalty": 1.2,
+    "min_logprobs": null,
+    "total_glottal_stops": 2,
+    "total_h_aspirations": 399,
+    "total_flagged_words": 158,
+    "anomalous_verses_count": 45,
+    "mark_1_1_yihstv_flagged": true,
+    "mean_distance_score": -222222232.2494,
+    "elapsed_sec": 3.63
+  },
+  {
+    "config_name": "h_4.0_glottal_1.2_with_mlp",
+    "h_penalty": 4.0,
+    "glottal_penalty": 1.2,
+    "min_logprobs": {
+      "h": -1.0498221244986778,
+      "'": -1.6094379124341003
+    },
+    "total_glottal_stops": 2,
+    "total_h_aspirations": 399,
+    "total_flagged_words": 158,
+    "anomalous_verses_count": 45,
+    "mark_1_1_yihstv_flagged": true,
+    "mean_distance_score": -222222232.2494,
+    "elapsed_sec": 2.92
+  },
+  {
+    "config_name": "h_4.5_glottal_0.5_no_mlp",
+    "h_penalty": 4.5,
+    "glottal_penalty": 0.5,
+    "min_logprobs": null,
+    "total_glottal_stops": 2,
+    "total_h_aspirations": 399,
+    "total_flagged_words": 158,
+    "anomalous_verses_count": 45,
+    "mark_1_1_yihstv_flagged": true,
+    "mean_distance_score": -222222232.2494,
+    "elapsed_sec": 3.58
+  },
+  {
+    "config_name": "h_4.5_glottal_0.5_with_mlp",
+    "h_penalty": 4.5,
+    "glottal_penalty": 0.5,
+    "min_logprobs": {
+      "h": -1.0498221244986778,
+      "'": -1.6094379124341003
+    },
+    "total_glottal_stops": 2,
+    "total_h_aspirations": 399,
+    "total_flagged_words": 158,
+    "anomalous_verses_count": 45,
+    "mark_1_1_yihstv_flagged": true,
+    "mean_distance_score": -222222232.2494,
+    "elapsed_sec": 2.82
+  },
+  {
+    "config_name": "h_4.5_glottal_0.8_no_mlp",
+    "h_penalty": 4.5,
+    "glottal_penalty": 0.8,
+    "min_logprobs": null,
+    "total_glottal_stops": 2,
+    "total_h_aspirations": 399,
+    "total_flagged_words": 158,
+    "anomalous_verses_count": 45,
+    "mark_1_1_yihstv_flagged": true,
+    "mean_distance_score": -222222232.2494,
+    "elapsed_sec": 3.66
+  },
+  {
+    "config_name": "h_4.5_glottal_0.8_with_mlp",
+    "h_penalty": 4.5,
+    "glottal_penalty": 0.8,
+    "min_logprobs": {
+      "h": -1.0498221244986778,
+      "'": -1.6094379124341003
+    },
+    "total_glottal_stops": 2,
+    "total_h_aspirations": 399,
+    "total_flagged_words": 158,
+    "anomalous_verses_count": 45,
+    "mark_1_1_yihstv_flagged": true,
+    "mean_distance_score": -222222232.2494,
+    "elapsed_sec": 2.87
+  },
+  {
+    "config_name": "h_4.5_glottal_1.0_no_mlp",
+    "h_penalty": 4.5,
+    "glottal_penalty": 1.0,
+    "min_logprobs": null,
+    "total_glottal_stops": 2,
+    "total_h_aspirations": 399,
+    "total_flagged_words": 158,
+    "anomalous_verses_count": 45,
+    "mark_1_1_yihstv_flagged": true,
+    "mean_distance_score": -222222232.2494,
+    "elapsed_sec": 3.61
+  },
+  {
+    "config_name": "h_4.5_glottal_1.0_with_mlp",
+    "h_penalty": 4.5,
+    "glottal_penalty": 1.0,
+    "min_logprobs": {
+      "h": -1.0498221244986778,
+      "'": -1.6094379124341003
+    },
+    "total_glottal_stops": 2,
+    "total_h_aspirations": 399,
+    "total_flagged_words": 158,
+    "anomalous_verses_count": 45,
+    "mark_1_1_yihstv_flagged": true,
+    "mean_distance_score": -222222232.2494,
+    "elapsed_sec": 2.85
+  },
+  {
+    "config_name": "h_4.5_glottal_1.2_no_mlp",
+    "h_penalty": 4.5,
+    "glottal_penalty": 1.2,
+    "min_logprobs": null,
+    "total_glottal_stops": 2,
+    "total_h_aspirations": 399,
+    "total_flagged_words": 158,
+    "anomalous_verses_count": 45,
+    "mark_1_1_yihstv_flagged": true,
+    "mean_distance_score": -222222232.2494,
+    "elapsed_sec": 3.69
+  },
+  {
+    "config_name": "h_4.5_glottal_1.2_with_mlp",
+    "h_penalty": 4.5,
+    "glottal_penalty": 1.2,
+    "min_logprobs": {
+      "h": -1.0498221244986778,
+      "'": -1.6094379124341003
+    },
+    "total_glottal_stops": 2,
+    "total_h_aspirations": 399,
+    "total_flagged_words": 158,
+    "anomalous_verses_count": 45,
+    "mark_1_1_yihstv_flagged": true,
+    "mean_distance_score": -222222232.2494,
+    "elapsed_sec": 2.84
+  },
+  {
+    "config_name": "h_5.0_glottal_0.5_no_mlp",
+    "h_penalty": 5.0,
+    "glottal_penalty": 0.5,
+    "min_logprobs": null,
+    "total_glottal_stops": 2,
+    "total_h_aspirations": 397,
+    "total_flagged_words": 157,
+    "anomalous_verses_count": 45,
+    "mark_1_1_yihstv_flagged": true,
+    "mean_distance_score": -222222232.2494,
+    "elapsed_sec": 3.64
+  },
+  {
+    "config_name": "h_5.0_glottal_0.5_with_mlp",
+    "h_penalty": 5.0,
+    "glottal_penalty": 0.5,
+    "min_logprobs": {
+      "h": -1.0498221244986778,
+      "'": -1.6094379124341003
+    },
+    "total_glottal_stops": 2,
+    "total_h_aspirations": 397,
+    "total_flagged_words": 157,
+    "anomalous_verses_count": 45,
+    "mark_1_1_yihstv_flagged": true,
+    "mean_distance_score": -222222232.2494,
+    "elapsed_sec": 2.88
+  },
+  {
+    "config_name": "h_5.0_glottal_0.8_no_mlp",
+    "h_penalty": 5.0,
+    "glottal_penalty": 0.8,
+    "min_logprobs": null,
+    "total_glottal_stops": 2,
+    "total_h_aspirations": 397,
+    "total_flagged_words": 157,
+    "anomalous_verses_count": 45,
+    "mark_1_1_yihstv_flagged": true,
+    "mean_distance_score": -222222232.2494,
+    "elapsed_sec": 3.57
+  },
+  {
+    "config_name": "h_5.0_glottal_0.8_with_mlp",
+    "h_penalty": 5.0,
+    "glottal_penalty": 0.8,
+    "min_logprobs": {
+      "h": -1.0498221244986778,
+      "'": -1.6094379124341003
+    },
+    "total_glottal_stops": 2,
+    "total_h_aspirations": 397,
+    "total_flagged_words": 157,
+    "anomalous_verses_count": 45,
+    "mark_1_1_yihstv_flagged": true,
+    "mean_distance_score": -222222232.2494,
+    "elapsed_sec": 2.88
+  },
+  {
+    "config_name": "h_5.0_glottal_1.0_no_mlp",
+    "h_penalty": 5.0,
+    "glottal_penalty": 1.0,
+    "min_logprobs": null,
+    "total_glottal_stops": 2,
+    "total_h_aspirations": 397,
+    "total_flagged_words": 157,
+    "anomalous_verses_count": 45,
+    "mark_1_1_yihstv_flagged": true,
+    "mean_distance_score": -222222232.2494,
+    "elapsed_sec": 3.53
+  },
+  {
+    "config_name": "h_5.0_glottal_1.0_with_mlp",
+    "h_penalty": 5.0,
+    "glottal_penalty": 1.0,
+    "min_logprobs": {
+      "h": -1.0498221244986778,
+      "'": -1.6094379124341003
+    },
+    "total_glottal_stops": 2,
+    "total_h_aspirations": 397,
+    "total_flagged_words": 157,
+    "anomalous_verses_count": 45,
+    "mark_1_1_yihstv_flagged": true,
+    "mean_distance_score": -222222232.2494,
+    "elapsed_sec": 2.9
+  },
+  {
+    "config_name": "h_5.0_glottal_1.2_no_mlp",
+    "h_penalty": 5.0,
+    "glottal_penalty": 1.2,
+    "min_logprobs": null,
+    "total_glottal_stops": 2,
+    "total_h_aspirations": 397,
+    "total_flagged_words": 157,
+    "anomalous_verses_count": 45,
+    "mark_1_1_yihstv_flagged": true,
+    "mean_distance_score": -222222232.2494,
+    "elapsed_sec": 3.54
+  },
+  {
+    "config_name": "h_5.0_glottal_1.2_with_mlp",
+    "h_penalty": 5.0,
+    "glottal_penalty": 1.2,
+    "min_logprobs": {
+      "h": -1.0498221244986778,
+      "'": -1.6094379124341003
+    },
+    "total_glottal_stops": 2,
+    "total_h_aspirations": 397,
+    "total_flagged_words": 157,
+    "anomalous_verses_count": 45,
+    "mark_1_1_yihstv_flagged": true,
+    "mean_distance_score": -222222232.2494,
+    "elapsed_sec": 2.86
+  }
+]

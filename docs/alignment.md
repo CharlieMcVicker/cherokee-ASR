@@ -62,7 +62,7 @@ flowchart TD
 2. **Pluggable Normalization & Distance Metrics**: Word and chunk distance scoring are parameterized via the [`DistanceMetric`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/distance_metrics.py#L9-L16) protocol, allowing Character Error Rate (CER), Levenshtein edit distance with custom substitution weights, or arbitrary callables.
 3. **Multi-to-Multi DP Fusion**: The word aligner dynamically solves $1$-to-$N$ and $M$-to-$1$ ASR token-to-word grouping discrepancies with configurable fusion penalties and gap costs.
 4. **Isolated Outbound Exporters**: Exporters receive pure [`AlignmentOutput`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/models.py#L65-L73) objects and output directories, generating Praat TextGrids and JSON manifests without coupling to alignment execution.
-5. **Language-Agnostic Extraction Schemas & Protocols**: While `CherokeeASRModel` is the dedicated Cherokee acoustic model, the output schemas and alignment protocols ([`TokenEmission`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/models.py#L11-L19), [`ASRResult`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/models/asr_model.py#L21-L32), [`SlidingWindowDTWAligner`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/aligner.py#L129-L232)) are language-agnostic. Downstream Cherokee Syllabary transliteration and phonetic rule reconciliation are explicitly performed by `transcription.syllabary_enrichment` and `transcription.utils.syllabary_map`.
+5. **Language-Agnostic Extraction Schemas & Protocols**: While `CherokeeASRModel` is the dedicated Cherokee acoustic model, the output schemas and alignment protocols ([`TokenEmission`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/models.py#L11-L19), [`ASRResult`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/models/asr_model.py#L21-L32), [`SlidingWindowDTWAligner`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/aligner.py#L129-L232)) are language-agnostic. Downstream Cherokee Syllabary transliteration and phonetic rule reconciliation are explicitly performed by `transcription.cherokee.enrichment` and `transcription.cherokee.orthography`.
 
 ### Module Map
 
@@ -73,9 +73,11 @@ flowchart TD
 | Extractors | [`extractors.py`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/extractors.py) | `ASREmissionsExtractor` protocol, `CherokeeASRExtractor`, `CallbackEmissionsExtractor`, `PrecomputedEmissionsExtractor`, `prepare_audio_chunks`. |
 | Metrics | [`distance_metrics.py`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/distance_metrics.py) | `DistanceMetric` protocol, `DefaultCERDistanceMetric`, `LevenshteinDistanceMetric`, `CustomCallableDistanceMetric`, `calculate_cer`. |
 | Normalizers | [`normalizers.py`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/normalizers.py) | `normalize_syllabary_for_alignment` (aspiration stripped), `normalize_phonetics_for_alignment` (aspiration preserved), and `normalize_text_for_alignment` (compat alias). |
-| Ingestion | [`ingestion.py`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/ingestion.py) | `prepare_alignment_input` (sum-type dispatcher & normalizer resolver), `load_bible_chunks`, and `load_generic_chunks`. |
+| Ingestion | [`ingestion.py`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/ingestion.py) | `prepare_alignment_input` (sum-type dispatcher & normalizer resolver), `load_bible_chunks`, `load_generic_chunks`, `load_syllabary_transcript`, and `load_interview_transcript`. |
+| Code-Switching | [`arpabet/projector.py`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/arpabet/projector.py) | `SyntheticTargetProjector`, `get_default_projector`, O(1) static dictionary lookup (`english_loanwords_tth.json`), dynamic G2P + confusion matrix argmax mapping, and `normalize_code_switched_text`. |
 | Reconciliation | [`reconciliation.py`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/reconciliation.py) | `reconcile_word_intervals`, `reconcile_alignment_words`, `reconcile_alignment_by_chunk`. |
 | Exporters | [`exporters.py`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/exporters.py) | `export_manifest`, `export_textgrid` (multi-tier Praat), `export_debug_json`. |
+| Thresholding | [`threshold_finder.py`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/threshold_finder.py) | `AlignmentThresholdFinder`, interactive binary search CLI, and threshold metrics exporter. |
 | CLI / Pipeline | [`cli.py`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/cli.py) | `run_alignment_pipeline` orchestrator and `align-cherokee` CLI entrypoint. |
 
 ---
@@ -88,7 +90,28 @@ All domain models are implemented as pure Python dataclasses in [`transcription/
 
 ```python
 from dataclasses import dataclass, field
-from typing import List, Optional
+from pathlib import Path
+from typing import Dict, List, Optional, Tuple
+
+@dataclass(frozen=True)
+class CTCAlignerConfig:
+    """Strongly-typed configuration for syncope- and intrusion-aware CTC alignment."""
+    syncope_tokens: Tuple[str, ...] = ("a", "e", "i", "o", "u", "v")
+    intrusive_tokens: Tuple[str, ...] = ("h", "'")
+    intrusive_max_stride: int = 1
+    enforce_phonotactics: bool = True
+    flag_min_confidence: float = 0.05
+    flag_min_char_confidence: float = 0.0
+    index_duration: float = 0.02
+    min_window_size: int = 8000
+    max_window_size: int = 100000
+    buffer_trail_ms: int = 300
+    buffer_lead_ms: int = 100
+    boundary_pad_sec: float = 0.1
+    chunk_seconds: float = 30.0
+    margin_seconds: float = 1.0
+    cache: bool = True
+    cache_dir: Optional[Path] = None
 
 @dataclass(frozen=True)
 class TokenEmission:
@@ -113,6 +136,7 @@ class WordInterval:
     confidence: float = 1.0
     flagged: bool = False
     emitted_word: Optional[str] = None
+    min_char_confidence: Optional[float] = None
 
 @dataclass
 class AlignedChunk:
@@ -133,6 +157,7 @@ class AlignmentMetrics:
     mean_distance_score: float
     total_ground_truth_chars: int
     total_emitted_chars: int
+    flagged_words_count: int = 0
 
 @dataclass
 class AlignmentOutput:
@@ -305,7 +330,7 @@ Wraps [`CherokeeASRModel`](file:///Users/julietmcvicker/code/workshop-transcript
 
 ```python
 from transcription.alignment.extractors import CherokeeASRExtractor
-from transcription.models.asr_model import CherokeeASRModel
+from transcription.cherokee.models import CherokeeASRModel
 
 model = CherokeeASRModel.from_pretrained("charliemcvicker/asr-cherokee")
 extractor = CherokeeASRExtractor(model=model, skip_vad=False)
@@ -407,27 +432,37 @@ metric = CustomCallableDistanceMetric(fn=lambda hyp, ref: 0.0 if hyp == ref else
 
 ---
 
-### Representation-Aware Text Normalization (`transcription.alignment.normalizers`)
+### Representation-Aware Text Normalization & Orthography System (`transcription.alignment.normalizers`)
 
-Located in [`transcription/alignment/normalizers.py`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/normalizers.py), normalization functions prepare text for robust acoustic DTW and dynamic programming alignment. Because Cherokee Syllabary orthography does not reliably differentiate aspiration, separate normalizers are provided based on the input representation:
+Located in [`transcription/alignment/normalizers.py`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/normalizers.py) and backed by [`transcription.cherokee.orthography.Orthography`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/cherokee/orthography/orthography.py), text normalizers ensure deterministic conversions across Cherokee orthographic representations.
 
-#### 1. `normalize_syllabary_for_alignment` (Syllabary Mode)
-Used when aligning Syllabary transliterations (such as Bible verse metadata). Because Syllabary orthography cannot be trusted to mark aspiration consistently, aspiration (`h`) is normalized away:
-1. **Lowercasing and Hyphen Stripping**: `A-da-le-ni-s-gv` $\rightarrow$ `adalenisgv`.
-2. **Digraph Normalization**: Replaces `qu` with `gw`.
-3. **Consonant Respelling**: Calls [`respell_consonants`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/utils/tone_normalization.py) (`t->th`, `d->t`, `k->kh`, `g->k`, etc.).
-4. **Aspiration Stripping**: Strips `/h/` sound markers (`text.replace("h", "")`).
-5. **Punctuation Removal**: Strips standard punctuation (`.,!?;:"'()[]{}` etc.).
-6. **Whitespace Normalization**: Collapses whitespace into single spaces and strips ends.
+#### Orthography Enum System
 
-#### 2. `normalize_phonetics_for_alignment` (Phonetics Mode)
-Used when aligning phonetic transcripts against acoustic ASR token emissions (such as linguistic transcriptions or interview segments). Aspiration (`h`) is **preserved** because both the reference and the ASR emissions contain meaningful phonetic contrast:
-1. **Lowercasing and Hyphen Stripping**: `tsa-ni` $\rightarrow$ `tsani`.
-2. **Digraph Normalization**: Replaces `qu` with `gw`.
-3. **Consonant Respelling**: Applies phonetic consonant mappings without stripping `h`.
-4. **Punctuation Removal & Whitespace**: Sanitizes punctuation and normalizes spacing.
+1. **`Orthography.SYLLABARY`**: Unicode Cherokee characters (`U+13A0`–`U+13FF`, `U+AB70`–`U+ABBF`, e.g. `ᎠᏓᎴᏂᏍᎬ ᏱᏍᏛ ᎧᏃᎮᏛ`).
+2. **`Orthography.DG`**: Base Latin transliteration system (`d, t, g, k, dl, tl, hl, j, ch, qu, gw, hn, hw, hy`) used in Bible chapter transcripts (with hyphens) and dictionary datasets.
+3. **`Orthography.TTH`**: Canonical acoustic phonetic system (`t, th, k, kh, tl, tlh, lh, ts, tsh, nh, wh, yh, s, hs, a, e, i, o, u, v, '`) used in **Wav2Vec2 acoustic emissions (`CherokeeASRModel`)**, training targets (`cim-wav2vec2-*.csv`), and CTC alignment logits.
 
-*Note: [`normalize_text_for_alignment`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/normalizers.py) is retained as a backwards-compatible alias for `normalize_syllabary_for_alignment`.*
+#### Strict T/TH Consonant Inventory
+In the canonical `T/TH` acoustic system:
+- **NO `d` and NO `g`**: Voiced stops are **`t`** and **`k`**; aspirated/voiceless stops are **`th`** and **`kh`**.
+- **NO `ch` and NO `j`**: Voiced affricate is **`ts`**; voiceless/aspirated affricate is **`tsh`**.
+- **Lateral Consonants**:
+  - `dl` (voiced lateral affricate) $\rightarrow$ **`tl`**
+  - `tl` (voiceless/aspirated lateral affricate) $\rightarrow$ **`tlh`**
+  - `hl` (voiceless lateral fricative) $\rightarrow$ **`lh`**
+- **Aspirated Glides & Nasals**: `hn` $\rightarrow$ **`nh`**, `hw` $\rightarrow$ **`wh`**, `hy` $\rightarrow$ **`yh`**.
+- **Pre-aspiration**: Preconsonantal sibilants respelled as **`hs`** (e.g. `sgw` $\rightarrow$ `hskw`).
+- **NO `c`, `q`, `x`, `z`**: Labio-velars use `kw` / `kwh`.
+
+#### Normalization Functions
+
+##### 1. `normalize_phonetics_for_alignment(text: str, source: Orthography = Orthography.DG) -> str`
+Normalizes phonetic Cherokee text into canonical `Orthography.TTH` for ASR acoustic alignment. When `source == Orthography.TTH`, it short-circuits to a pure whitespace/punctuation cleanup without consonant modification.
+
+##### 2. `normalize_syllabary_for_alignment(text: str, source: Orthography = Orthography.SYLLABARY, target: Orthography = Orthography.TTH) -> str`
+Normalizes Cherokee Syllabary (or Latin transliteration) into canonical `Orthography.TTH` alignment phonetics using deterministic character mapping.
+
+*Note: [`normalize_text_for_alignment`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/normalizers.py) is retained as a backwards-compatible alias for `normalize_phonetics_for_alignment`.*
 
 ---
 
@@ -437,7 +472,7 @@ Ingestion utilities load reference text from JSON files, dictionaries, or lists 
 
 ### `prepare_alignment_input` (Sum-Type Dispatcher)
 
-The primary entrypoint for source ingestion. It accepts sum-type arguments (`bible_metadata` vs `chunk_list`), loads the chunks, and resolves the appropriate representation-aware normalizers:
+The primary entrypoint for source ingestion. It accepts sum-type arguments (`bible_metadata` vs `chunk_list`), loads the chunks, and resolves the appropriate normalizers targeting `Orthography.TTH`:
 
 ```python
 from transcription.alignment.ingestion import prepare_alignment_input
@@ -448,8 +483,8 @@ chunks, source_lookup, chunk_normalizer, emissions_normalizer = prepare_alignmen
 )
 ```
 
-- **When `bible_metadata` is supplied**: Returns `(chunks, source_lookup, normalize_syllabary_for_alignment, normalize_syllabary_for_alignment)`.
-- **When `chunk_list` is supplied**: Returns `(chunks, source_lookup, normalize_phonetics_for_alignment, normalize_phonetics_for_alignment)`.
+- **When `bible_metadata` is supplied**: Ingests verse JSON (containing `"cherokee"` in Syllabary and `"phonetic"` in hyphenated `DG`), strips hyphens, converts `DG -> TTH`, and returns `(chunks, source_lookup, normalize_phonetics_for_alignment, normalize_phonetics_for_alignment)`.
+- **When `chunk_list` is supplied**: Ingests generic chunk JSON and returns `(chunks, source_lookup, normalize_phonetics_for_alignment, normalize_phonetics_for_alignment)`.
 
 ---
 
@@ -494,15 +529,15 @@ Loads Bible verse metadata dictionaries:
 
 ```python
 from transcription.alignment.ingestion import load_bible_chunks
-from transcription.alignment.normalizers import normalize_syllabary_for_alignment
+from transcription.alignment.normalizers import normalize_phonetics_for_alignment
 
 chunks, source_lookup = load_bible_chunks(
-    source="data/book_transcripts/02_Mark/0201.json",
-    normalizer=normalize_syllabary_for_alignment,
+    source="cherokee_new_testament/book_transcripts/mark_01.json",
+    normalizer=normalize_phonetics_for_alignment,
 )
 ```
 
-#### Expected Input Format (Key-Value Dict)
+#### Expected Input Format on Disk (Key-Value Dict)
 ```json
 {
   "020101": {
@@ -512,10 +547,109 @@ chunks, source_lookup = load_bible_chunks(
   },
   "020102": {
     "english": "As it is written in the prophets...",
-    "cherokee": "ᎾᏍᎩᏯ ᏥᏂᎬᏅ ᏥᎪᏪᎳ ᎠᎾᏙᎴᎰᏍᎩᏱ...",
-    "phonetic": "Na-s-gi-ya tsi-ni-gv-nv tsi-go-we-la a-na-do-le-ho-s-gi-yi..."
+    "cherokee": "ᎾᏍᎩᏯ ᎯᎠ ᏥᏂᎬᏅ ᏥᎪᏪᎳ ᎠᎾᏙᎴᎰᏍᎩᏱ...",
+    "phonetic": "Na-s-gi-ya hi-a tsi-ni-gv-nv tsi-go-we-la a-na-do-le-ho-s-gi-yi..."
   }
 }
+```
+
+---
+
+### `load_syllabary_transcript`
+
+Ingests Cherokee Syllabary transcripts (or mixed Cherokee/English code-switched text) from plain text strings, `.txt` files, JSON files, or chunk lists into normalized [`TextChunk`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/models.py#L21-L27) lists:
+
+```python
+from transcription.alignment.ingestion import load_syllabary_transcript
+
+chunks, source_lookup = load_syllabary_transcript(
+    source="data/transcripts/elders_meeting.txt",
+    code_switched=True,  # Projects English words into synthetic TTH phonetics
+)
+```
+
+- **Cherokee Syllabary Words**: Converted to canonical Cherokee TTH (`Orthography.TTH`) via `normalize_syllabary_for_alignment`.
+- **English Code-Switched Words**: Projected into synthetic Cherokee TTH phonetics via `SyntheticTargetProjector`.
+
+---
+
+### `load_interview_transcript`
+
+Ingests dialogue and interview transcripts formatted as `'Speaker: Spoken text'`, preserving speaker identity in metadata while extracting cleaned speech turns:
+
+```python
+from transcription.alignment.ingestion import load_interview_transcript
+
+chunks, source_lookup = load_interview_transcript(
+    source="Speaker 1: ᎯᎠ coffee ᎠᎩᏚᎵ\nSpeaker 2: ᎥᎥ, hospital ᏫᏥᎦ",
+    code_switched=True,
+)
+```
+
+---
+
+### Code-Switched Ingestion & Synthetic Target Projection (`transcription.cherokee.codeswitching.projector`)
+
+When Cherokee speakers code-switch or use English loanwords (e.g., *coffee*, *hospital*, *doctor*, *car*), standard ASR and alignment pipelines fail because Latin English spellings do not match the Cherokee acoustic model's emission vocabulary.
+
+The projector module translates English text -> ARPAbet -> synthetic Cherokee TTH targets using:
+1. **O(1) Static Memoized Dictionary**: Precomputed mappings for 3,662+ high-frequency English words and loanwords serialized at `data/arpabet_alignment/dictionaries/english_loanwords_tth.json`.
+2. **Fallback Dynamic G2P**: Converts OOV English words to standardized 39-phoneme ARPAbet via `g2p_en`.
+3. **Calibrated Confusion Matrix Argmax Projection**: Maps each ARPAbet phoneme to the highest-probability Cherokee phone using an empirical `AcousticConfusionMatrix` trained via iterative Expectation-Maximization (EM).
+4. **Strict Cherokee Phonetic Invariance**: Completely eliminates non-Cherokee consonants (`d`, `g`, `ch`, `j`), enforces pre-aspiration `hs`, and formats outputs in canonical `T/TH` acoustic phonetics.
+
+#### Programmatic Example
+
+```python
+from transcription.cherokee.codeswitching import (
+    get_default_projector,
+    normalize_code_switched_text,
+    project_english_text,
+    project_english_word,
+)
+
+# 1. Project single English word
+target = project_english_word("coffee")
+print(target.projected_tth)     # "khasi"
+print(target.syllabary)         # "ᎧᏏ"
+print(target.confidence_score)   # 0.789
+
+# 2. Project full English sentence
+synth_tth = project_english_text("the hospital")
+print(synth_tth)  # "ta hahsthitaw"
+
+# 3. Normalize mixed Cherokee/English code-switched string
+mixed = "ᎯᎠ coffee ᎠᎩᏚᎵ"
+norm_tth = normalize_code_switched_text(mixed)
+print(norm_tth)  # "hi'a khasi akituli"
+```
+
+### Code-Switching Ground Truth Preparer (`transcription.cherokee.codeswitching.codeswitched_preparer`)
+
+For dialogue transcripts with mixed Syllabary, English loanwords, speaker prefixes, and compound clitics (e.g. *JayᎢ* -> English 'Jay' + Syllabary 'Ꭲ'), `create_groundtruth_for_code_switched_syllabary` performs script-level token discrimination with zero double conversion.
+
+```python
+from transcription.cherokee.codeswitching import (
+    create_groundtruth_for_code_switched_syllabary,
+    split_compound_clitic,
+    TokenType,
+)
+
+# 1. Segment compound tokens with English stems and Syllabary clitics
+stem, clitic = split_compound_clitic("JayᎢ")
+print(stem, clitic)  # ("Jay", "Ꭲ")
+
+# 2. Prepare code-switched line with speaker prefix stripping and zero double conversion
+line = "Guy: ᎯᎠ Guy Soldier ᏓᏩᏙ JayᎢ ᏂᏛᎩᎶᏒ"
+res = create_groundtruth_for_code_switched_syllabary(line, strip_speaker=True)
+
+print(res.speaker)      # "Guy"
+print(res.unified_tth)  # "hi'a ka hsowtsa tawato tsei nitvkilohsv"
+
+# 3. Access multi-tier word metadata
+print(res.syllabary_tier_tokens)   # ("ᎯᎠ", "ᏓᏩᏙ", "JayᎢ", "ᏂᏛᎩᎶᏒ")
+print(res.english_tier_tokens)     # ("Guy", "Soldier", "Jay")
+print(res.reconciled_tier_tokens)  # ("hi'a", "ka", "hsowtsa", "tawato", "tsei", "nitvkilohsv")
 ```
 
 ---
@@ -545,7 +679,7 @@ def reconcile_word_intervals(
     """Pure mapping: returns new WordIntervals with reconciled phonetics in `word`."""
 ```
 - Splits `syllabary_text` into words.
-- Uses character-syllable dynamic programming alignment ([`align_character_syllable`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/syllabary_enrichment/alignment_engine.py)) and phonetic rule merger ([`reconcile_phonetics`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/syllabary_enrichment/enrich_syllabary.py)).
+- Uses character-syllable dynamic programming alignment ([`align_character_syllable`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/cherokee/enrichment/syllable_alignment.py)) and phonetic rule merger ([`reconcile_phonetics`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/cherokee/enrichment/syllable_alignment.py)).
 - Returns new, immutable [`WordInterval`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/models.py#L30-L39) instances with reconciled word strings.
 
 #### `reconcile_alignment_words`
@@ -738,6 +872,8 @@ The `align-cherokee` command is registered in `pyproject.toml` and points to [`t
 | Audio File | `--audio` | `str` (required) | Path to input audio file (`.wav`, `.mp3`). |
 | Chunk List | `--chunk-list` | `str` (mutually exclusive) | Path to generic chunk list JSON (e.g. story chunks). |
 | Bible Metadata | `--bible-metadata` / `--metadata` | `str` (mutually exclusive) | Path to Bible metadata JSON dictionary. |
+| Transcript | `--transcript` | `str` (mutually exclusive) | Path to Cherokee Syllabary or code-switched transcript file (`.txt`, `.json`). |
+| Code-Switching | `--code-switched` | `flag` (default: `False`) | Enable code-switched English-to-Cherokee synthetic target projection. |
 | Output Directory | `--output-dir` | `str` (required) | Directory where artifacts will be saved. |
 | Praat Export | `--export-praat` | `flag` (default: `True`) | Export Praat `.TextGrid` file. |
 | Custom Model | `--model-path` | `str` (optional) | Custom Wav2Vec2 checkpoint path or Hugging Face repo ID. |
@@ -786,11 +922,56 @@ align-cherokee \
   --model-path "output_w2v2/checkpoint-800"
 ```
 
+#### 5. Align Code-Switched Transcript (`--code-switched`)
+```bash
+align-cherokee \
+  --audio "data/raw/interview_recording.wav" \
+  --transcript "data/transcripts/elders_meeting.txt" \
+  --code-switched \
+  --output-dir "output/code_switched" \
+  --reconcile
+```
+
 ---
 
 ## 10. Programmatic Python API
 
-The `transcription.alignment` package supports both high-level one-line execution and fine-grained modular pipelines.
+The `transcription.alignment` package supports turnkey syllabary interview alignment functions as well as fine-grained modular pipelines.
+
+### Syllabary Interview Alignment (`align_syllabary_greedy` vs `align_syllabary_ctc`)
+
+To align an interview transcript in Cherokee syllabary (with potential English code-switching) and export multi-tier Praat TextGrids and JSON manifests:
+
+```python
+from transcription.alignment import align_syllabary_greedy, align_syllabary_ctc
+
+# 1. Pipeline 1: Greedy ASR + DTW + Syllabary Reconciliation
+output_greedy = align_syllabary_greedy(
+    audio="path/to/interview.wav",
+    transcript="ᎣᏍᏓ ᏂᎦᎵᏍᏗᎭ\nᎭᏩ ᎰᏩ",  # Raw syllabary, .txt path, or chunk list
+    output_dir="output/interview_greedy",
+    export_praat=True,     # Generates greedy_alignment.TextGrid
+    export_manifest=True,  # Generates alignment_manifest.json
+)
+
+# 2. Pipeline 2: Guided CTC Segmentation
+output_ctc = align_syllabary_ctc(
+    audio="path/to/interview.wav",
+    transcript="ᎣᏍᏓ ᏂᎦᎵᏍᏗᎭ\nᎭᏩ ᎰᏩ",
+    output_dir="output/interview_ctc",
+    cache=True,            # Caches acoustic log-probabilities on disk
+    export_praat=True,     # Generates ctc_alignment.TextGrid
+    export_manifest=True,  # Generates alignment_manifest.json
+)
+```
+
+Both runners automatically generate multi-tier Praat TextGrids containing:
+- **`Chunks`**: Sentence / Turn chunk intervals.
+- **`Words` / `Syllabary Words`**: Aligned Cherokee Syllabary words.
+- **`Padded Words`**: Padded word intervals.
+- **`Reconciled Words`**: Reconciled phonetic representations combining Syllabary rules and ASR acoustic observations.
+
+---
 
 ### High-Level Execution (`run_alignment_pipeline`)
 
@@ -827,7 +1008,7 @@ from transcription.alignment import (
     prepare_alignment_input,
     reconcile_alignment_words,
 )
-from transcription.models.asr_model import CherokeeASRModel
+from transcription.cherokee.models import CherokeeASRModel
 
 # Step 1: Ingest ground-truth chunks & resolve representation-aware normalizers
 chunks, source_lookup, chunk_norm, emission_norm = prepare_alignment_input(
@@ -947,3 +1128,108 @@ alignment = aligner.align(emissions=emissions, chunks=chunks, source_id="in_memo
 
 print(f"Aligned chunk start: {alignment.aligned_chunks[0].start_sec}s, end: {alignment.aligned_chunks[0].end_sec}s")
 ```
+
+---
+
+## 10. Alignment Cost Thresholding (`AlignmentThresholdFinder`)
+
+The [`AlignmentThresholdFinder`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/threshold_finder.py) provides an interactive binary search tool to establish the optimal cost threshold $T^*$ over dataset alignment distributions.
+
+### Interactive CLI Usage
+
+```bash
+# Launch interactive binary search over Bible alignment manifests
+python scripts/find_alignment_threshold.py
+
+# Specify custom inputs, sample counts, and convergence tolerance
+python scripts/find_alignment_threshold.py \
+    --input output_praat/new_testament \
+    --samples 3 \
+    --tolerance 0.005 \
+    --output runs/evaluation/alignment_threshold.json
+```
+
+### Automated / Headless Usage
+
+```bash
+# Directly set a cost threshold and export distribution statistics
+python scripts/find_alignment_threshold.py --threshold 0.15
+
+# Set threshold by target dataset retention quantile (e.g. 90th percentile)
+python scripts/find_alignment_threshold.py --quantile 0.90
+```
+
+### Programmatic Python API
+
+```python
+from transcription.alignment import load_alignment_records, AlignmentThresholdFinder, find_threshold_bounds
+
+# 1. Ingest alignment records from directory, JSON manifest, or CSV
+records, source_files = load_alignment_records("output_praat/new_testament")
+
+# 2. Run interactive or callback search
+finder = AlignmentThresholdFinder(records, tolerance=0.005)
+metrics = finder.run(quantile=0.85)
+
+# 3. Export threshold summary configuration
+finder.export_results(metrics, "runs/evaluation/alignment_threshold.json")
+```
+
+---
+
+## 11. Continuous CTC Segmentation & Phonotactic Calibration (`CTCSegmentationAligner`)
+
+The [`CTCSegmentationAligner`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/ctc_aligner.py) provides syncope- and intrusion-aware CTC trellis segmentation operating directly on continuous chapter audio using Relative Contrastive Acoustic Gating (zero-hyperparameter formulation from `ctc-segmentation` PR #7).
+
+### Strongly-Typed Configuration (`CTCAlignerConfig`)
+
+All aligner configurations are consolidated into [`CTCAlignerConfig`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/models.py):
+
+```python
+from transcription.alignment import CTCSegmentationAligner, CTCAlignerConfig
+
+config = CTCAlignerConfig(
+    syncope_tokens=("a", "e", "i", "o", "u", "v"),
+    intrusive_tokens=("h", "'"),
+    intrusive_max_stride=1,
+    enforce_phonotactics=True,
+    flag_min_confidence=0.05,
+    flag_min_char_confidence=0.0,
+)
+aligner = CTCSegmentationAligner(model=asr_model, config=config)
+```
+
+### Relative Contrastive Acoustic Gating
+
+Rather than requiring manually tuned transition penalties or fixed posterior thresholds, `ctc-segmentation` dynamically evaluates relative contrastive acoustic evidence in log-probability space:
+1. **Syncope Gate**: Evaluates whether the arrival frame acoustics favor the incoming anchor token over the skipped vowel ($P(t, L_{\text{anchor}}) > P(t, L_{\text{vowel}})$).
+2. **Intrusive Detour Gate**: Evaluates whether the detour frame acoustics favor the intrusive candidate over the expected target anchor ($P(t_{\text{detour}}, j) > P(t_{\text{detour}}, L_{\text{anchor}})$).
+
+### Phonotactic Text Preparation & Site Masking
+
+Cherokee surface phonotactics govern valid sites for vocalic deletion (syncope) and laryngeal insertions (pre-aspiration, post-aspiration, glottal stops).
+
+[`prepare_cherokee_text`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/phonotactics.py) automatically generates:
+1. `config.is_syncope_token`: 1D boolean/int8 mask indicating positions eligible for vocalic syncope without violating forbidden cluster constraints (`*HH`, `*ChR`).
+2. `config.is_intrusive_site`: 1D boolean/int8 mask licensing candidate sites for intrusive `/h/` and `/'/` detours.
+
+### Parameters Summary
+
+| Parameter | Recommended Default | Purpose |
+| :--- | :--- | :--- |
+| `syncope_tokens` | `("a", "e", "i", "o", "u", "v")` | Vowels permitted for syncope deletion when acoustics favor next consonant. |
+| `intrusive_tokens` | `("h", "'")` | Laryngeal phonemes licensed for intrusive detour transitions. |
+| `intrusive_max_stride` | `1` | Max blank frame stride bridging intrusive token peaks. |
+| `flag_min_confidence` | `0.05` | Geometric mean word confidence threshold. |
+| `flag_min_char_confidence` | `0.0` | Character-level acoustic confidence threshold (0.0 disables per-character gating to avoid over-flagging natural glottal smoothing and de-aspiration). |
+| `enforce_phonotactics` | `True` | Applies Cherokee phonotactic rules and site masks. |
+
+### CLI Example
+
+```bash
+python scripts/realign_bible.py \
+    --book mark \
+    --chapter 1
+```
+
+

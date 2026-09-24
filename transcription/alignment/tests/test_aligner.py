@@ -15,7 +15,25 @@ from transcription.alignment.models import (
     TokenEmission,
     WordInterval,
 )
-from transcription.alignment.normalizers import normalize_text_for_alignment
+from transcription.cherokee.orthography import (
+    Orthography,
+    convert_orthography,
+)
+
+
+def normalize_phonetics_for_alignment(
+    text: str,
+    source: Orthography = Orthography.DG,
+    contextual_preaspiration: bool = True,
+) -> str:
+    if not text:
+        return ""
+    return convert_orthography(
+        text,
+        source=source,
+        target=Orthography.TTH,
+        contextual_preaspiration=contextual_preaspiration,
+    )
 
 
 def test_word_aligner_default_normalizers_identity():
@@ -111,8 +129,8 @@ def test_word_aligner_empty_and_gap_handling():
 
 def test_sliding_window_dtw_alignment_flow():
     word_aligner = NeedlemanWunschWordAligner(
-        chunk_normalizer=normalize_text_for_alignment,
-        emission_normalizer=normalize_text_for_alignment,
+        chunk_normalizer=normalize_phonetics_for_alignment,
+        emission_normalizer=normalize_phonetics_for_alignment,
     )
     aligner = SlidingWindowDTWAligner(word_aligner=word_aligner)
 
