@@ -840,7 +840,7 @@ def test_syncope_class_prevents_kwo_vowel_clipping():
     u_idx = vocab["u"]
     o_idx = vocab["o"]
 
-    npz_path = Path("runs/cache/ctc_emissions/mark_02_e16d242d3b719b06.npz")
+    npz_path = Path("data/runs/cache/ctc_emissions/mark_02_e16d242d3b719b06.npz")
     if npz_path.exists():
         data = np.load(npz_path)
         lpz = data["lpz"][23250:23750]  # Mark 2:28 slice

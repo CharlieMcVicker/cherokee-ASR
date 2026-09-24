@@ -344,7 +344,9 @@ class ScripturePipeline:
 def align_chapter(
     audio_path: Union[str, Path],
     transcript_path: Union[str, Path],
-    output_dir: Union[str, Path] = "output_praat/new_testament",
+    output_dir: Union[
+        str, Path
+    ] = "data/projects/cherokee_new_testament/output_praat/new_testament",
     export_praat: bool = True,
     export_manifest: bool = True,
     debug_export: bool = False,
@@ -477,11 +479,13 @@ def align_chapter(
     from digohwelisgi.alignment.distance_metrics import ConfusionMatrixCostMetric
 
     if distance_metric is None:
-        cost_matrix_path = Path("runs/evaluation/confusion_cost_matrix_prebible.json")
+        cost_matrix_path = Path(
+            "data/runs/evaluation/confusion_cost_matrix_prebible.json"
+        )
         if not cost_matrix_path.exists():
             repo_root = Path(__file__).resolve().parent.parent.parent.parent
             candidate = (
-                repo_root / "runs/evaluation/confusion_cost_matrix_prebible.json"
+                repo_root / "data/runs/evaluation/confusion_cost_matrix_prebible.json"
             )
             if candidate.exists():
                 cost_matrix_path = candidate
@@ -502,7 +506,9 @@ def align_chapter(
             token=token,
         )
         c_dir = (
-            Path(cache_dir) if cache_dir is not None else Path("runs/cache/emissions")
+            Path(cache_dir)
+            if cache_dir is not None
+            else Path("data/runs/cache/emissions")
         )
         model_out = model.infer(audio_path, cache_dir=c_dir if cache else None)
 

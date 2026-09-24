@@ -6,8 +6,8 @@ process_matthew_dataset.py
 Processes all 28 chapters of the Book of Matthew:
 1. Aligns audio and transcripts with phonological reconciliation, cached emissions, and pre-Bible confusion matrix.
 2. Extracts verse audio segments, resamples to 16kHz mono WAV, and saves as matthew_XX_YY.wav.
-3. Generates cherokee_new_testament/train_csvs/matthew.csv with columns: path, sentence.
-4. Generates cherokee_new_testament/alignments/matthew_alignment_records.json.
+3. Generates data/projects/cherokee_new_testament/train_csvs/matthew.csv with columns: path, sentence.
+4. Generates data/projects/cherokee_new_testament/alignments/matthew_alignment_records.json.
 5. Computes audio duration metrics (min, max, median, total seconds, and < 20s cutoff stats).
 """
 

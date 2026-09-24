@@ -11,9 +11,9 @@ from pathlib import Path
 from digohwelisgi.alignment.models import CTCAlignerConfig
 from digohwelisgi.pipelines.dialogue import align_dialogue
 
-AUDIO_PATH = Path("saving-the-voices/gs_mm.wav")
-TRANSCRIPT_PATH = Path("saving-the-voices/gs_mm.txt")
-OUTPUT_DIR = Path("saving-the-voices/output_ctc_no_hs")
+AUDIO_PATH = Path("data/projects/saving-the-voices/gs_mm.wav")
+TRANSCRIPT_PATH = Path("data/projects/saving-the-voices/gs_mm.txt")
+OUTPUT_DIR = Path("data/projects/saving-the-voices/output_ctc_no_hs")
 
 if __name__ == "__main__":
     config = CTCAlignerConfig(

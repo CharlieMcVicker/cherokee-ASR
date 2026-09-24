@@ -426,7 +426,7 @@ def generate_candidate_grid() -> List[Tuple[str, CTCAlignerConfig]]:
 
 def run_tuning(
     csv_path: Path = BASE_DIR
-    / "training_data"
+    / "data/training"
     / "processed"
     / "split_audio_syl_target.csv",
     split: str = "test",
@@ -578,7 +578,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--csv",
         type=Path,
-        default=BASE_DIR / "training_data" / "processed" / "split_audio_syl_target.csv",
+        default=BASE_DIR / "data/training" / "processed" / "split_audio_syl_target.csv",
         help="Path to evaluation CSV dataset.",
     )
     parser.add_argument(

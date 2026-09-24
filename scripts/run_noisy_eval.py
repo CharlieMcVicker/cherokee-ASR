@@ -140,7 +140,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--dataset-csv",
         type=str,
-        default="training_data/processed/cim-wav2vec2-test.csv",
+        default="data/training/processed/cim-wav2vec2-test.csv",
         help="Path to evaluation dataset CSV (columns: 'path', 'sentence').",
     )
     parser.add_argument(
@@ -165,7 +165,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--output-dir",
         type=str,
-        default="runs/evaluation",
+        default="data/runs/evaluation",
         help="Directory to save evaluation records, matrices, and plots.",
     )
     parser.add_argument(

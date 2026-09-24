@@ -107,5 +107,5 @@ In canonical **`T/TH`**, tones and vowel lengths are decoupled/stripped, and the
   - Backend transcribes audio to `TTH` $\rightarrow$ frontend renders native `SYLLABARY` glyphs.
 
 ## Documentation Maintenance & Freshness
-- **Keep Documentation Synchronized**: When adding new modules, refactoring subsystem architecture, changing CLI tools, or modifying testing procedures, immediately update this `AGENTS.md` and the corresponding guide in `docs/`.
+- **Keep Documentation Synchronized**: When adding new modules, refactoring subsystem architecture, changing CLI tools, or modifying testing procedures, immediately update this `AGENTS.md` and the corresponding guide in `backlog/docs/` (managed via `backlog doc` CLI).
 - **Prune Obsolete Instructions**: Actively remove superseded workflows, deprecated flags, or outdated setup instructions to prevent agent confusion.

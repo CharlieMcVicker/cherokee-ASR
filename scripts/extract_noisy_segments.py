@@ -69,8 +69,8 @@ def process_interview(args):
 
 
 def main():
-    mp3_dir = "cvcs-mp3s"
-    manifest_path = "audiofiles-to-transcribe/segmentation_manifest.csv"
+    mp3_dir = "data/projects/cvcs"
+    manifest_path = "data/projects/audiofiles-to-transcribe/segmentation_manifest.csv"
     out_base_dir = "data/processed/noisy_segments"
 
     if not os.path.exists(mp3_dir):

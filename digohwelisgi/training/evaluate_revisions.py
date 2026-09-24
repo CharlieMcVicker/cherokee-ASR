@@ -48,13 +48,13 @@ def main():
     parser.add_argument(
         "--test-csv",
         type=str,
-        default="training_data/processed/cim-wav2vec2-test.csv",
+        default="data/training/processed/cim-wav2vec2-test.csv",
         help="Path to the test CSV file.",
     )
     parser.add_argument(
         "--audio-dir",
         type=str,
-        default="training_data/processed/sentence_audio",
+        default="data/training/processed/sentence_audio",
         help="Directory containing audio files.",
     )
     parser.add_argument(

@@ -5,7 +5,7 @@ batch_cache_emissions.py
 
 Bulk batch ASR inference script to pre-populate CachedASREmissionsExtractor disk cache.
 Processes audio files in batched GPU/CPU passes with dynamic padding, saving TokenEmission
-sequences directly to runs/cache/emissions/.
+sequences directly to data/runs/cache/emissions/.
 """
 
 import argparse
@@ -24,7 +24,7 @@ from digohwelisgi.cherokee.models import CherokeeASRModel
 logger = logging.getLogger(__name__)
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-DEFAULT_AUDIO_DIR = BASE_DIR / "cherokee_new_testament" / "audio_source"
+DEFAULT_AUDIO_DIR = BASE_DIR / "data/projects/cherokee_new_testament" / "audio_source"
 DEFAULT_CACHE_DIR = BASE_DIR / "runs" / "cache" / "emissions"
 DEFAULT_MODEL_REPO = "charliemcvicker/length-only-20260704-155307-asr-cherokee-colon"
 DEFAULT_MODEL_REVISION = "76e62140955f4738abdab345ea34068b02d8d2a2"

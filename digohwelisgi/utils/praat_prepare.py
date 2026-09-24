@@ -16,7 +16,7 @@ import subprocess
 import soundfile as sf
 
 CSV_PATH = "data/results/cvcs_all_noisy.csv"
-MP3_DIR = "cvcs-mp3s"
+MP3_DIR = "data/projects/cvcs"
 OUT_DIR = "data/processed/praat"
 
 

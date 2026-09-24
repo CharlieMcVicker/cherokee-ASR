@@ -59,13 +59,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--records-jsonl",
         type=str,
-        default="runs/evaluation/eval_records.jsonl",
+        default="data/runs/evaluation/eval_records.jsonl",
         help="Path to cached eval_records.jsonl file.",
     )
     parser.add_argument(
         "--output-dir",
         type=str,
-        default="runs/evaluation",
+        default="data/runs/evaluation",
         help="Output directory for generated plots, CSVs, and cost JSON artifacts.",
     )
     parser.add_argument(

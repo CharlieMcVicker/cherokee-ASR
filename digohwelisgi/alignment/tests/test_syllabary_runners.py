@@ -176,7 +176,7 @@ def test_load_syllabary_transcript_json_file(tmp_path: Path):
 def test_load_interview_transcript_gs_mm():
     from digohwelisgi.alignment.ingestion import load_interview_transcript
 
-    file_path = Path("saving-the-voices/gs_mm.txt")
+    file_path = Path("data/projects/saving-the-voices/gs_mm.txt")
     if file_path.exists():
         chunks, source_lookup = load_interview_transcript(file_path)
         assert len(chunks) > 100

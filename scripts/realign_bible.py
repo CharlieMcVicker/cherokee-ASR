@@ -20,13 +20,15 @@ from pydub import AudioSegment
 from digohwelisgi.pipelines.scripture import align_chapter as _align_chapter_pipeline
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-NT_DIR = BASE_DIR / "cherokee_new_testament"
+NT_DIR = BASE_DIR / "data/projects/cherokee_new_testament"
 AUDIO_SRC_DIR = NT_DIR / "audio_source"
 TRANSCRIPTS_DIR = NT_DIR / "book_transcripts"
 SPLIT_AUDIO_DIR = NT_DIR / "split_audio"
 ALIGNMENTS_DIR = NT_DIR / "alignments"
 TRAIN_CSVS_DIR = NT_DIR / "train_csvs"
-PRAAT_OUT_DIR = BASE_DIR / "output_praat" / "new_testament"
+PRAAT_OUT_DIR = (
+    BASE_DIR / "data/projects/cherokee_new_testament/output_praat" / "new_testament"
+)
 DEFAULT_CACHE_DIR = BASE_DIR / "runs" / "cache" / "ctc_emissions"
 DEFAULT_MODEL_REPO = "charliemcvicker/length-only-20260704-155307-asr-cherokee-colon"
 DEFAULT_REVISION = "76e62140955f4738abdab345ea34068b02d8d2a2"

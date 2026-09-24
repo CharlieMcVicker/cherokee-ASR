@@ -75,14 +75,14 @@ def main():
     parser.add_argument(
         "--csv",
         type=str,
-        default="training_data/processed/sentence_audio.csv",
-        help="Path to the input CSV file containing metadata (default: training_data/processed/sentence_audio.csv)",
+        default="data/training/processed/sentence_audio.csv",
+        help="Path to the input CSV file containing metadata (default: data/training/processed/sentence_audio.csv)",
     )
     parser.add_argument(
         "--audio-dir",
         type=str,
-        default="training_data/processed/sentence_audio",
-        help="Path to the directory containing audio files (default: training_data/processed/sentence_audio)",
+        default="data/training/processed/sentence_audio",
+        help="Path to the directory containing audio files (default: data/training/processed/sentence_audio)",
     )
     parser.add_argument(
         "--text-col",
@@ -93,8 +93,8 @@ def main():
     parser.add_argument(
         "--output-prefix",
         type=str,
-        default="training_data/processed/cim-wav2vec2",
-        help="Prefix for the generated train/valid/test split CSV files (default: training_data/processed/cim-wav2vec2)",
+        default="data/training/processed/cim-wav2vec2",
+        help="Prefix for the generated train/valid/test split CSV files (default: data/training/processed/cim-wav2vec2)",
     )
     parser.add_argument(
         "--max-duration",

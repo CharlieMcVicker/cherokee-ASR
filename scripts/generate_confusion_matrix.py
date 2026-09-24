@@ -148,9 +148,9 @@ def main():
     print(f"Detected alphabet from vocab: {sorted(list(alphabet))}")
 
     # Load dataset files
-    test_csv = "training_data/processed/cim-wav2vec2-test.csv"
-    train_csv = "training_data/processed/cim-wav2vec2-train.csv"
-    valid_csv = "training_data/processed/cim-wav2vec2-valid.csv"
+    test_csv = "data/training/processed/cim-wav2vec2-test.csv"
+    train_csv = "data/training/processed/cim-wav2vec2-train.csv"
+    valid_csv = "data/training/processed/cim-wav2vec2-valid.csv"
 
     df_test = pd.read_csv(test_csv)
     df_train = pd.read_csv(train_csv)
@@ -171,7 +171,7 @@ def main():
                 p
                 if os.path.exists(p)
                 else os.path.join(
-                    "training_data/processed/sentence_audio", os.path.basename(p)
+                    "data/training/processed/sentence_audio", os.path.basename(p)
                 )
             )
         )

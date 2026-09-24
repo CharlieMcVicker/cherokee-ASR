@@ -34,10 +34,10 @@ logger = logging.getLogger(__name__)
 PRE_BIBLE_MODEL_REPO = "charliemcvicker/length-only-20260704-155307-asr-cherokee-colon"
 PRE_BIBLE_MODEL_REVISION = "76e62140955f4738abdab345ea34068b02d8d2a2"
 
-AUDIO_PATH = Path("saving-the-voices/gs_mm.wav")
-TRANSCRIPT_PATH = Path("saving-the-voices/gs_mm.txt")
-OUTPUT_DIR = Path("saving-the-voices/output_codeswitched")
-BASELINE_DIR = Path("saving-the-voices/output_greedy")
+AUDIO_PATH = Path("data/projects/saving-the-voices/gs_mm.wav")
+TRANSCRIPT_PATH = Path("data/projects/saving-the-voices/gs_mm.txt")
+OUTPUT_DIR = Path("data/projects/saving-the-voices/output_codeswitched")
+BASELINE_DIR = Path("data/projects/saving-the-voices/output_greedy")
 
 TEXTGRID_FILENAME = "gs_mm_codeswitched.TextGrid"
 MANIFEST_FILENAME = "gs_mm_codeswitched_manifest.json"

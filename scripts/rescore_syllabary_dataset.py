@@ -415,7 +415,7 @@ def main() -> None:
     parser.add_argument(
         "--csv-path",
         type=Path,
-        default=BASE_DIR / "training_data" / "processed" / "split_audio_syl_target.csv",
+        default=BASE_DIR / "data/training" / "processed" / "split_audio_syl_target.csv",
         help="Path to split_audio_syl_target.csv",
     )
     parser.add_argument(

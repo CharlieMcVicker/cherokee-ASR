@@ -301,7 +301,7 @@ def main():
     )
     parser.add_argument(
         "--input",
-        default="cvcs-mp3s",
+        default="data/projects/cvcs",
         help="Path to input MP3 file or directory of MP3 files.",
     )
     parser.add_argument(

@@ -27,8 +27,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Candidate default JSON files in order of priority
 DEFAULT_CANDIDATE_JSONS = [
-    BASE_DIR / "cherokee_new_testament" / "alignments" / "mark_alignment_records.json",
-    BASE_DIR / "cherokee_new_testament" / "alignments" / "bible_alignment_records.json",
+    BASE_DIR
+    / "data/projects/cherokee_new_testament"
+    / "alignments"
+    / "mark_alignment_records.json",
+    BASE_DIR
+    / "data/projects/cherokee_new_testament"
+    / "alignments"
+    / "bible_alignment_records.json",
 ]
 
 

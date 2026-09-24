@@ -50,13 +50,13 @@ def run_grid_search(
 
     audio_path = (
         BASE_DIR
-        / "cherokee_new_testament"
+        / "data/projects/cherokee_new_testament"
         / "audio_source"
         / f"{book}_{chapter:02d}.mp3"
     )
     transcript_path = (
         BASE_DIR
-        / "cherokee_new_testament"
+        / "data/projects/cherokee_new_testament"
         / "book_transcripts"
         / f"{book}_{chapter:02d}.json"
     )

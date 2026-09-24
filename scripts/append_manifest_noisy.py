@@ -4,7 +4,7 @@ import os
 
 
 def main():
-    manifest_path = "audiofiles-to-transcribe/segmentation_manifest.csv"
+    manifest_path = "data/projects/audiofiles-to-transcribe/segmentation_manifest.csv"
     if not os.path.exists(manifest_path):
         print(f"Error: {manifest_path} not found.")
         return

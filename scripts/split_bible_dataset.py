@@ -23,8 +23,8 @@ CHAPTER_SPLITS = {
     },
 }
 
-INPUT_DIR = "cherokee_new_testament/train_csvs"
-OUTPUT_DIR = "training_data/processed"
+INPUT_DIR = "data/projects/cherokee_new_testament/train_csvs"
+OUTPUT_DIR = "data/training/processed"
 
 
 def extract_chapter(path_str):

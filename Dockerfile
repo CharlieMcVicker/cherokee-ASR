@@ -27,10 +27,10 @@ WORKDIR /workspace
 # Pre-cache model checkpoint (optional: omit if using vast.ai volume storage)
 RUN python3 -c "from transformers import Wav2Vec2ForCTC; Wav2Vec2ForCTC.from_pretrained('facebook/wav2vec2-large-xlsr-53')"
 
-COPY training_data /workspace/training_data
-COPY cherokee_new_testament /workspace/cherokee_new_testament
+COPY data/training /workspace/data/training
+COPY data/projects/cherokee_new_testament /workspace/data/projects/cherokee_new_testament
 
-COPY transcription /workspace/transcription
+COPY digohwelisgi /workspace/digohwelisgi
 ENV PYTHONPATH="/workspace:${PYTHONPATH}"
 
 

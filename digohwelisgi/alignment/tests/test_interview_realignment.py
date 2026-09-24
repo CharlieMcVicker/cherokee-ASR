@@ -19,7 +19,7 @@ from digohwelisgi.alignment.tests.test_syllabary_runners import DummyASRModel
 from digohwelisgi.core.audio import AudioChunk
 from pydub import AudioSegment
 
-SAVING_THE_VOICES_DIR = Path("saving-the-voices")
+SAVING_THE_VOICES_DIR = Path("data/projects/saving-the-voices")
 OUTPUT_DIR = SAVING_THE_VOICES_DIR / "output_codeswitched"
 BASELINE_DIR = SAVING_THE_VOICES_DIR / "output_greedy"
 

@@ -6,16 +6,16 @@ A modular Python toolkit for Cherokee speech recognition, dataset preparation, p
 
 ## 📚 Documentation Index
 
-Detailed documentation for each subsystem is organized in the [`docs/`](docs/) directory:
+Detailed documentation for each subsystem and specification is organized in the [`backlog/docs/`](backlog/docs/) directory (searchable via `backlog search <query>`):
 
 | Guide | Description | Key Modules / Tools |
 |---|---|---|
-| **[Ground-Truth Alignment](docs/alignment.md)** | Sliding-Window DTW & Needleman-Wunsch word DP alignment, Praat TextGrid & JSON manifest export. | `digohwelisgi.core.alignment`, `digohwelisgi.apps.cli`, `align-cherokee` |
-| **[Models & Inference](docs/models_and_inference.md)** | `CherokeeASRModel` encapsulation, `ModelOutput` currency, tiered procedural inference, and Web Active Labeler. | `digohwelisgi.core.models`, `digohwelisgi.cherokee.models` |
-| **[Syllabary Enrichment](docs/syllabary_enrichment.md)** | Character/syllable DP alignment and rule merger engine (syncopation, aspiration transfer, glottal filtering) with diagnostic inspector. | `digohwelisgi.cherokee.enrichment`, `digohwelisgi.pipelines.enrichment` |
-| **[Audio Segmentation](docs/audio_segmentation.md)** | Hybrid VAD audio chunking (`segment_long_audio`), energy profiling, and Silero VAD soft-masking. | `digohwelisgi.core.audio` |
-| **[Training & Evaluation](docs/training_and_evaluation.md)** | Multi-domain dataset preparation, offline/remote Wav2Vec2 training, checkpoint evaluation, and HF revision benchmarks. | `digohwelisgi.training`, `digohwelisgi.evaluation` |
-| **[Desktop Transcriber App](docs/desktop_transcriber.md)** | Standalone desktop application (PyWebView + React TypeScript + FastAPI) and PyInstaller build guides for macOS and Windows. | `syllabary_transcriber` |
+| **[Ground-Truth Alignment](backlog/docs/architecture/alignment/doc-10%20-%20Ground-Truth-Alignment-Subsystem.md)** | Sliding-Window DTW & Needleman-Wunsch word DP alignment, Praat TextGrid & JSON manifest export. | `digohwelisgi.core.alignment`, `digohwelisgi.apps.cli`, `align-cherokee` |
+| **[Models & Inference](backlog/docs/architecture/models/doc-11%20-%20Models-and-Inference-Subsystem.md)** | `CherokeeASRModel` encapsulation, `ModelOutput` currency, tiered procedural inference, and Web Active Labeler. | `digohwelisgi.core.models`, `digohwelisgi.cherokee.models` |
+| **[Syllabary Enrichment](backlog/docs/architecture/enrichment/doc-12%20-%20Syllabary-Enrichment-Engine.md)** | Character/syllable DP alignment and rule merger engine (syncopation, aspiration transfer, glottal filtering) with diagnostic inspector. | `digohwelisgi.cherokee.enrichment`, `digohwelisgi.pipelines.enrichment` |
+| **[Audio Segmentation](backlog/docs/architecture/audio/doc-13%20-%20Audio-Segmentation-and-VAD-Masking.md)** | Hybrid VAD audio chunking (`segment_long_audio`), energy profiling, and Silero VAD soft-masking. | `digohwelisgi.core.audio` |
+| **[Training & Evaluation](backlog/docs/architecture/training/doc-14%20-%20Model-Training-and-Evaluation-Pipeline.md)** | Multi-domain dataset preparation, offline/remote Wav2Vec2 training, checkpoint evaluation, and HF revision benchmarks. | `digohwelisgi.training`, `digohwelisgi.evaluation` |
+| **[Desktop Transcriber App](backlog/docs/apps/desktop_transcriber/doc-9%20-%20Desktop-Transcriber-Packaging-and-Architecture.md)** | Standalone desktop application (PyWebView + React TypeScript + FastAPI) and PyInstaller build guides for macOS and Windows. | `syllabary_transcriber` |
 
 ---
 
@@ -55,16 +55,16 @@ The repository is organized into four decoupled architectural layers:
 ## Repository Structure
 
 ```
-workshop-digohwelisgi/
-├── docs/                         # Detailed modular technical documentation
-│   ├── alignment.md              # Timestamping and DTW alignment guide
-│   ├── audio_segmentation.md     # Audio preprocessing and VAD guide
-│   ├── desktop_transcriber.md    # PyWebView / React desktop app guide
-│   ├── models_and_inference.md   # CherokeeASRModel and inference guide
-│   ├── syllabary_enrichment.md   # Syllabary reconciliation rule engine guide
-│   └── training_and_evaluation.md# Wav2Vec2 training and evaluation guide
+workshop-transcription/
+├── backlog/docs/                 # Comprehensive documentation, specs & guides
+├── data/                         # Datasets, audio projects, models & training data
+│   ├── arpabet_alignment/        # Loanword alignment dictionaries & models
+│   ├── models/                   # Pretrained weights & confusion matrices
+│   ├── projects/                 # Project audio & transcript datasets (saving-the-voices, NT, cvcs)
+│   ├── runs/                     # Evaluation runs & emissions caches
+│   └── training/                 # Wav2Vec2 training datasets & splits
 │
-├── digohwelisgi/                # Core Python package (4-tier architecture)
+├── digohwelisgi/                 # Core Python package (4-tier architecture)
 │   ├── core/                     # Tier 1: Language-agnostic foundational engine
 │   │   ├── alignment/            # DP (DTW, Needleman-Wunsch), CTC trellis, models, distance
 │   │   ├── audio/                # AudioChunk, segment_long_audio, Silero VAD soft-masking
@@ -90,14 +90,11 @@ workshop-digohwelisgi/
 │   ├── evaluation/               # Model evaluation, confusion matrices, and manifold analysis
 │   └── training/                 # Wav2Vec2 dataset preparation, training, and checkpoint benchmarking
 │
-├── syllabary_transcriber/        # Desktop transcription app (PyWebView + React + FastAPI)
-│   ├── app.py                    # PyWebView desktop bridge & FastAPI server
-│   ├── packaging/                # PyInstaller spec files
-│   └── ui/                       # React 18 / TypeScript / Vite frontend
-│
-├── data/                         # Data directories (raw audio, processed splits, dictionaries)
 ├── scripts/                      # Declarative pipeline runner scripts (realign_bible.py, realign_gs_mm_ctc.py)
-└── timestamping_test_data/       # Test audio and sample ground truth inputs
+└── syllabary_transcriber/        # Desktop transcription app (PyWebView + React + FastAPI)
+    ├── app.py                    # PyWebView desktop bridge & FastAPI server
+    ├── packaging/                # PyInstaller spec files
+    └── ui/                       # React 18 / TypeScript / Vite frontend
 ```
 
 ---
@@ -135,13 +132,13 @@ Align ground-truth transcripts to long-form audio with Praat `.TextGrid` export:
 
 ```bash
 align-cherokee \
-  --audio 'timestamping_test_data/Cherokee Story-Our Fishing Trip.wav' \
-  --chunk-list 'timestamping_test_data/fishing_story.json' \
+  --audio 'data/projects/fishing_story/Cherokee Story-Our Fishing Trip.wav' \
+  --chunk-list 'data/projects/fishing_story/fishing_story.json' \
   --output-dir 'output/fishing' \
   --export-praat \
   --reconcile
 ```
-*See [docs/alignment.md](docs/alignment.md) for full options and Python API examples.*
+*See [Ground-Truth Alignment Guide](backlog/docs/architecture/alignment/doc-10%20-%20Ground-Truth-Alignment-Subsystem.md) for full options and Python API examples.*
 
 ### 2. Python Speech-to-Text Inference
 
@@ -162,7 +159,7 @@ outputs = model.infer_batch(["sample1.wav", "sample2.wav"], batch_size=16)
 for out in outputs:
     print("Batch Item:", out.decode_greedy())
 ```
-*See [docs/models_and_inference.md](docs/models_and_inference.md) for full `ModelOutput` and inference details.*
+*See [Models and Inference Subsystem](backlog/docs/architecture/models/doc-11%20-%20Models-and-Inference-Subsystem.md) for full `ModelOutput` and inference details.*
 
 ### 3. Syllabary Enrichment
 
@@ -177,7 +174,7 @@ result = align_and_enrich_syllabary(
 )
 print("Reconciled Phonetics:", result)
 ```
-*See [docs/syllabary_enrichment.md](docs/syllabary_enrichment.md) for rule engine details.*
+*See [Syllabary Enrichment Engine](backlog/docs/architecture/enrichment/doc-12%20-%20Syllabary-Enrichment-Engine.md) for rule engine details.*
 
 ### 4. Continuous Scripture & Dialogue Realignment Scripts
 
@@ -198,7 +195,7 @@ Launch the Cherokee Syllabary desktop transcriber:
 ```bash
 python3 -m syllabary_transcriber
 ```
-*See [docs/desktop_transcriber.md](docs/desktop_transcriber.md) for PyInstaller packaging guides.*
+*See [Desktop Transcriber Packaging and Architecture](backlog/docs/apps/desktop_transcriber/doc-9%20-%20Desktop-Transcriber-Packaging-and-Architecture.md) for PyInstaller packaging guides.*
 
 ---
 

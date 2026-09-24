@@ -115,7 +115,7 @@ def run_benchmark(
     # Load existing baseline alignment records
     baseline_records_path = (
         BASE_DIR
-        / "cherokee_new_testament"
+        / "data/projects/cherokee_new_testament"
         / "alignments"
         / "mark_alignment_records.json"
     )

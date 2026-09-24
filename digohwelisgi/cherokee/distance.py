@@ -20,7 +20,7 @@ from digohwelisgi.core.alignment.distance import (
 from digohwelisgi.evaluation.cost_engine import probability_to_normalized_cost
 
 # Empirical Cherokee word-internal non-glottal vowel deletion counts & frequencies
-# Gathered from 1,864 dictionary sentences in training_data/processed/sentence_audio.csv
+# Gathered from 1,864 dictionary sentences in data/training/processed/sentence_audio.csv
 # Excluding all word-final vowels and <V>'<V> glottal stop hiatus environments.
 CHEROKEE_VOWEL_DROP_COUNTS: Dict[str, Tuple[int, int]] = {
     "i": (580, 4804),  # 12.07% drop rate (primary epenthetic vowel)
@@ -45,7 +45,7 @@ DEFAULT_CALIBRATED_INSERTION_COSTS: Dict[str, float] = {
 }
 
 DEFAULT_CONFUSION_COST_MATRIX_PATH = Path(
-    "runs/evaluation/confusion_cost_matrix_prebible.json"
+    "data/runs/evaluation/confusion_cost_matrix_prebible.json"
 )
 
 try:

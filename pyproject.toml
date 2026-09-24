@@ -74,6 +74,7 @@ exclude = '''
 '''
 
 [tool.pytest.ini_options]
+pythonpath = ["."]
 testpaths = ["digohwelisgi"]
 norecursedirs = [
     "transcriber_dist",

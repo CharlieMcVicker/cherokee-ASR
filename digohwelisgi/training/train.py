@@ -48,13 +48,13 @@ chars_to_remove_regex = r"[\,\?\.\!\-\;\:\"\“\%\”\\(\)\[\]\{\}«»…]"
 
 # CONFIGURATION DICTIONARY
 CONFIG = {
-    "train_orig_csv": "training_data/processed/cim-wav2vec2-train.csv",
-    "train_bible_csv": "training_data/processed/bible-wav2vec2-train.csv",
-    "valid_orig_csv": "training_data/processed/cim-wav2vec2-valid.csv",
-    "valid_bible_csv": "training_data/processed/bible-wav2vec2-valid.csv",
-    "test_orig_csv": "training_data/processed/cim-wav2vec2-test.csv",
-    "test_bible_csv": "training_data/processed/bible-wav2vec2-test.csv",
-    "audio_dir": "training_data/processed/sentence_audio",
+    "train_orig_csv": "data/training/processed/cim-wav2vec2-train.csv",
+    "train_bible_csv": "data/training/processed/bible-wav2vec2-train.csv",
+    "valid_orig_csv": "data/training/processed/cim-wav2vec2-valid.csv",
+    "valid_bible_csv": "data/training/processed/bible-wav2vec2-valid.csv",
+    "test_orig_csv": "data/training/processed/cim-wav2vec2-test.csv",
+    "test_bible_csv": "data/training/processed/bible-wav2vec2-test.csv",
+    "audio_dir": "data/training/processed/sentence_audio",
     "output_dir": "output_w2v2",
     "base_checkpoint": "facebook/wav2vec2-large-xlsr-53",
     "asr_lang": "cim",
