@@ -14,22 +14,11 @@ from typing import List, Optional, Tuple
 
 @dataclass(frozen=True)
 class CTCAlignerConfig:
-    """Strongly-typed configuration for syncope- and intrusion-aware CTC alignment."""
+    """Strongly-typed language-agnostic configuration for CTC segmentation alignment."""
 
-    syncope_tokens: Tuple[Tuple[str, ...] | str, ...] = (
-        (
-            "a",
-            "e",
-            "i",
-            "o",
-            "u",
-            "v",
-        ),
-        "t",
-    )
-    intrusive_tokens: Tuple[str, ...] = ("h", "'")
-    intrusive_max_stride: int = 4
-    enforce_phonotactics: bool = True
+    syncope_tokens: Tuple[Tuple[str, ...] | str, ...] = ()
+    intrusive_tokens: Tuple[str, ...] = ()
+    intrusive_max_stride: int = 0
     flag_min_confidence: float = 0.05
     flag_min_char_confidence: float = 0.0
     index_duration: float = 0.02
@@ -46,7 +35,6 @@ class CTCAlignerConfig:
     vad_p_low: float = 0.15
     vad_p_high: float = 0.60
     vad_pad_ms: int = 60
-    contextual_preaspiration: bool = True
 
 
 @dataclass(frozen=True)

@@ -114,12 +114,12 @@ def test_models_instantiation():
 
 def test_ctc_aligner_config_defaults():
     from transcription.alignment.models import CTCAlignerConfig
+    from transcription.cherokee.phonotactics import create_cherokee_ctc_config
 
     cfg = CTCAlignerConfig()
-    assert cfg.syncope_tokens == (("a", "e", "i", "o", "u", "v"), "t")
-    assert cfg.intrusive_tokens == ("h", "'")
-    assert cfg.intrusive_max_stride == 4
-    assert cfg.enforce_phonotactics is True
+    assert cfg.syncope_tokens == ()
+    assert cfg.intrusive_tokens == ()
+    assert cfg.intrusive_max_stride == 0
     assert cfg.flag_min_confidence == 0.05
     assert cfg.flag_min_char_confidence == 0.0
     assert cfg.index_duration == 0.02
@@ -128,6 +128,11 @@ def test_ctc_aligner_config_defaults():
     assert cfg.buffer_trail_ms == 300
     assert cfg.buffer_lead_ms == 100
     assert cfg.chunk_seconds == 30.0
+
+    cherokee_cfg = create_cherokee_ctc_config()
+    assert cherokee_cfg.syncope_tokens == (("a", "e", "i", "o", "u", "v"), "t")
+    assert cherokee_cfg.intrusive_tokens == ("h", "'")
+    assert cherokee_cfg.intrusive_max_stride == 4
     assert cfg.margin_seconds == 1.0
     assert cfg.cache is True
     assert cfg.cache_dir is None

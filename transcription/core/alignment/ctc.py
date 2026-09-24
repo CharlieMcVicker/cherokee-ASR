@@ -56,16 +56,16 @@ class TextPreparerProtocol(Protocol):
         config: Any,
         text: Union[str, Sequence[str]],
         char_list: Optional[Sequence[str]] = None,
-        **kwargs: Any,
+        token_masks: Optional[Sequence[Tuple[Sequence[bool], Sequence[bool]]]] = None,
     ) -> Tuple[np.ndarray, List[int]]:
         """
         Prepares ground truth matrix and utterance begin indices for ctc_segmentation.
 
         Args:
             config: CtcSegmentationParameters configuration instance.
-            words: Sequence of ground-truth words.
+            text: Input text sequence or words.
             char_list: Ordered list of vocabulary character tokens.
-            **kwargs: Extra flags (e.g. enforce_phonotactics, token_masks).
+            token_masks: Optional pre-computed sequence of (syncope_mask, intrusion_mask) tuples.
 
         Returns:
             Tuple of (ground_truth_mat, utt_begin_indices).
@@ -77,7 +77,7 @@ def default_text_preparer(
     config: Any,
     text: Union[str, Sequence[str]],
     char_list: Optional[Sequence[str]] = None,
-    **kwargs: Any,
+    token_masks: Optional[Sequence[Tuple[Sequence[bool], Sequence[bool]]]] = None,
 ) -> Tuple[np.ndarray, List[int]]:
     """
     Default language-agnostic ground truth preparation for ctc_segmentation.
@@ -106,7 +106,6 @@ class CTCSegmentationAligner:
         text_preparer: Optional[TextPreparerProtocol] = None,
         char_list: Optional[Sequence[str]] = None,
         pad_id: Optional[int] = None,
-        **kwargs: Any,
     ):
         self.config = config or CTCAlignerConfig()
         self.text_preparer: TextPreparerProtocol = (
@@ -114,29 +113,6 @@ class CTCSegmentationAligner:
         )
         self._char_list = list(char_list) if char_list is not None else None
         self._pad_id = int(pad_id) if pad_id is not None else None
-
-        self.syncope_tokens = list(self.config.syncope_tokens)
-        self.intrusive_tokens = (
-            list(self.config.intrusive_tokens) if self.config.intrusive_tokens else []
-        )
-        self.intrusive_max_stride = int(self.config.intrusive_max_stride)
-        self.enforce_phonotactics = bool(self.config.enforce_phonotactics)
-        self.flag_min_confidence = float(self.config.flag_min_confidence)
-        self.flag_min_char_confidence = float(self.config.flag_min_char_confidence)
-        self.index_duration = float(self.config.index_duration)
-        self.min_window_size = int(self.config.min_window_size)
-        self.max_window_size = int(self.config.max_window_size)
-        self.buffer_trail_ms = int(self.config.buffer_trail_ms)
-        self.buffer_lead_ms = int(self.config.buffer_lead_ms)
-        self.boundary_pad_sec = float(getattr(self.config, "boundary_pad_sec", 0.1))
-        self.chunk_seconds = float(self.config.chunk_seconds)
-        self.margin_seconds = float(self.config.margin_seconds)
-        self.cache = bool(self.config.cache)
-        self.cache_dir = (
-            Path(self.config.cache_dir)
-            if self.config.cache_dir is not None
-            else DEFAULT_CACHE_DIR
-        )
 
     def _resolve_char_list_and_blank(
         self, model_output: Optional[ModelOutput] = None
@@ -197,7 +173,7 @@ class CTCSegmentationAligner:
 
             if len(w_timings) > 0:
                 raw_w_start = float(np.min(w_timings))
-                raw_w_end = float(np.max(w_timings)) + self.index_duration
+                raw_w_end = float(np.max(w_timings)) + self.config.index_duration
                 if end_idx < len(timings_arr) and timings_arr[end_idx] > 0.0:
                     raw_w_end = max(raw_w_end, float(timings_arr[end_idx]))
 
@@ -207,8 +183,8 @@ class CTCSegmentationAligner:
                 w_end = max(
                     w_start, min(dur_sec, round(raw_w_end - lead_offset_sec, 3))
                 )
-                start_f = int(round(raw_w_start / self.index_duration))
-                end_f = int(round(raw_w_end / self.index_duration))
+                start_f = int(round(raw_w_start / self.config.index_duration))
+                end_f = int(round(raw_w_end / self.config.index_duration))
                 f_stop = min(len(state_list), max(start_f + 1, end_f))
                 sub_states = (
                     state_list[start_f:f_stop] if start_f < len(state_list) else []
@@ -252,10 +228,10 @@ class CTCSegmentationAligner:
                 word_conf = 0.0
                 min_char_prob = 0.0
 
-            is_low_conf = bool(word_conf < self.flag_min_confidence)
+            is_low_conf = bool(word_conf < self.config.flag_min_confidence)
             is_low_char_conf = bool(
-                self.flag_min_char_confidence > 0.0
-                and min_char_prob < self.flag_min_char_confidence
+                self.config.flag_min_char_confidence > 0.0
+                and min_char_prob < self.config.flag_min_char_confidence
             )
             is_unaligned = bool(len(w_timings) == 0 or len(emitted_chars) == 0)
             is_flagged = bool(is_low_conf or is_low_char_conf or is_unaligned)
@@ -316,7 +292,7 @@ class CTCSegmentationAligner:
         else:
             c_list, p_id = self._resolve_char_list_and_blank(model_out)
 
-        dur_sec = float(lpz.shape[0] * self.index_duration)
+        dur_sec = float(lpz.shape[0] * self.config.index_duration)
 
         if not chunks:
             return AlignmentOutput(
@@ -334,12 +310,12 @@ class CTCSegmentationAligner:
                 ),
             )
 
-        win_size = max(self.min_window_size, min(20000, int(lpz.shape[0])))
-        max_win = max(self.max_window_size, win_size * 2)
+        win_size = max(self.config.min_window_size, min(20000, int(lpz.shape[0])))
+        max_win = max(self.config.max_window_size, win_size * 2)
 
         # Filter syncope and intrusive tokens against vocabulary to avoid KeyError in ctc_segmentation
         valid_syncope: List[Any] = []
-        for item in self.syncope_tokens:
+        for item in self.config.syncope_tokens:
             if isinstance(item, (list, tuple)):
                 filtered_sub = [tok for tok in item if tok in c_list]
                 if filtered_sub:
@@ -349,15 +325,15 @@ class CTCSegmentationAligner:
             elif isinstance(item, str) and item in c_list:
                 valid_syncope.append(item)
 
-        valid_intrusive = [tok for tok in self.intrusive_tokens if tok in c_list]
+        valid_intrusive = [tok for tok in self.config.intrusive_tokens if tok in c_list]
 
         config = CtcSegmentationParameters(
             char_list=c_list,
             blank=p_id,
             syncope_tokens=valid_syncope,
             intrusive_tokens=valid_intrusive,
-            intrusive_max_stride=self.intrusive_max_stride,
-            index_duration=self.index_duration,
+            intrusive_max_stride=self.config.intrusive_max_stride,
+            index_duration=self.config.index_duration,
             min_window_size=win_size,
             max_window_size=max_win,
             score_min_mean_over_L=2,
@@ -418,15 +394,11 @@ class CTCSegmentationAligner:
                 ),
             )
 
-        kwargs: Dict[str, Any] = {"enforce_phonotactics": self.enforce_phonotactics}
-        if has_custom_masks:
-            kwargs["token_masks"] = all_token_masks
-
         gt_mat, utt_indices = self.text_preparer(
             config,
             all_words,
             c_list,
-            **kwargs,
+            token_masks=all_token_masks if has_custom_masks else None,
         )
 
         timings, char_probs, state_list = ctc_segmentation(config, lpz, gt_mat)
@@ -498,7 +470,9 @@ class CTCSegmentationAligner:
         c_ends = [0.0] * num_chunks
 
         if num_chunks > 0:
-            c_starts[0] = max(0.0, round(core_starts[0] - self.boundary_pad_sec, 3))
+            c_starts[0] = max(
+                0.0, round(core_starts[0] - self.config.boundary_pad_sec, 3)
+            )
             for i in range(num_chunks - 1):
                 mid = (core_ends[i] + core_starts[i + 1]) / 2.0
                 mid = max(c_starts[i], min(dur_sec, mid))
@@ -506,7 +480,9 @@ class CTCSegmentationAligner:
                 c_starts[i + 1] = round(mid, 3)
             c_ends[-1] = min(
                 dur_sec,
-                round(max(c_starts[-1], core_ends[-1] + self.boundary_pad_sec), 3),
+                round(
+                    max(c_starts[-1], core_ends[-1] + self.config.boundary_pad_sec), 3
+                ),
             )
 
             # Strictly ensure boundaries cover all valid words and respect [0.0, dur_sec] monotonically

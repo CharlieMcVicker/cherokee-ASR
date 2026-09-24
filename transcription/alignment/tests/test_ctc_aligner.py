@@ -671,7 +671,7 @@ def test_ctc_aligner_min_char_confidence_flags_mark_1_1_typo(dummy_audio_file: P
 def test_ctc_aligner_parameters_forwarding(dummy_audio_file: Path):
     """
     Verify that intrusive_tokens, syncope_tokens, intrusive_max_stride,
-    and enforce_phonotactics are forwarded to CtcSegmentationParameters and prepare_cherokee_text.
+    and allow_syncope_and_intrusion are forwarded to CtcSegmentationParameters and prepare_cherokee_text.
     """
     from transcription.alignment.models import TextChunk
 
@@ -683,7 +683,6 @@ def test_ctc_aligner_parameters_forwarding(dummy_audio_file: Path):
             syncope_tokens=("a", "e"),
             intrusive_tokens=("h", "'"),
             intrusive_max_stride=2,
-            enforce_phonotactics=True,
             flag_min_char_confidence=0.008,
         ),
     )
@@ -719,7 +718,7 @@ def test_ctc_aligner_parameters_forwarding(dummy_audio_file: Path):
         assert passed_config.syncope_tokens == ["a", "e"]
         assert passed_config.intrusive_tokens == ["h", "'"]
         assert passed_config.intrusive_max_stride == 2
-        assert mock_prep.call_args[1]["enforce_phonotactics"] is True
+        assert mock_prep.call_args[1]["allow_syncope_and_intrusion"] is True
         assert hasattr(passed_config, "is_syncope_token")
         assert hasattr(passed_config, "is_intrusive_site")
 
@@ -735,7 +734,7 @@ def test_ctc_aligner_parameters_forwarding(dummy_audio_file: Path):
         assert passed_config2.syncope_tokens == ["a", "e"]
         assert passed_config2.intrusive_tokens == ["h", "'"]
         assert passed_config2.intrusive_max_stride == 2
-        assert mock_prep.call_args[1]["enforce_phonotactics"] is True
+        assert mock_prep.call_args[1]["allow_syncope_and_intrusion"] is True
 
 
 def test_ctc_aligner_padded_midpoint_boundaries():

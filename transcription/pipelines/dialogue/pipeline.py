@@ -54,7 +54,8 @@ from transcription.cherokee.models import CherokeeASRModel
 from transcription.cherokee.phonotactics import (
     PhonemeCategory,
     PhonotacticToken,
-    prepare_cherokee_text,
+    create_cherokee_ctc_config,
+    prepare_cherokee_with_intrusion,
     tokenize_phonemes,
 )
 from transcription.core.alignment.ctc import (
@@ -451,11 +452,11 @@ class DialogueAlignmentPipeline:
         strip_speaker: bool = True,
     ) -> None:
         self.asr_model = asr_model
-        self.config = aligner_config or CTCAlignerConfig()
+        self.config = aligner_config or create_cherokee_ctc_config()
         self.projector = projector or get_default_projector()
         self.preparer = CodeSwitchedPreparer(
             projector=self.projector,
-            contextual_preaspiration=self.config.contextual_preaspiration,
+            contextual_preaspiration=True,
         )
         self.code_switched = code_switched
         self.strip_speaker = strip_speaker
@@ -491,7 +492,7 @@ class DialogueAlignmentPipeline:
             projector=self.projector,
             code_switched=self.code_switched,
             strip_speaker=self.strip_speaker,
-            contextual_preaspiration=self.config.contextual_preaspiration,
+            contextual_preaspiration=True,
         )
 
     def align(
@@ -687,14 +688,7 @@ def align_syllabary_ctc(
     Turnkey syncope- and intrusion-aware CTC Segmentation runner for syllabary audio and transcripts.
     Maintains exact backwards compatibility with transcription.alignment.pipeline.align_syllabary_ctc.
     """
-    effective_contextual_preaspiration = (
-        contextual_preaspiration
-        if contextual_preaspiration is not None
-        else (config.contextual_preaspiration if config is not None else True)
-    )
-    cfg = config or CTCAlignerConfig(
-        contextual_preaspiration=effective_contextual_preaspiration
-    )
+    cfg = config or create_cherokee_ctc_config()
     asr_model = model
     if asr_model is None:
         token = os.environ.get("HF_TOKEN", None)

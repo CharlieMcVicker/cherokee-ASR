@@ -21,14 +21,20 @@ from transcription.cherokee.orthography import (
     syllabary_to_phonetics,
 )
 from transcription.cherokee.phonotactics import (
+    CHEROKEE_DEFAULT_INTRUSIVE_MAX_STRIDE,
+    CHEROKEE_DEFAULT_INTRUSIVE_TOKENS,
+    CHEROKEE_DEFAULT_SYNCOPE_TOKENS,
     PhonemeCategory,
     PhonotacticAnalysis,
     PhonotacticToken,
     analyze_phonotactics,
+    create_cherokee_ctc_config,
     get_intrusion_site_mask,
     get_syncope_mask,
     is_valid_phonotactic_sequence,
+    prepare_cherokee_direct,
     prepare_cherokee_text,
+    prepare_cherokee_with_intrusion,
     tokenize_phonemes,
 )
 from transcription.cherokee.models import (
@@ -107,7 +113,13 @@ __all__ = [
     "get_intrusion_site_mask",
     "is_valid_phonotactic_sequence",
     "analyze_phonotactics",
+    "CHEROKEE_DEFAULT_SYNCOPE_TOKENS",
+    "CHEROKEE_DEFAULT_INTRUSIVE_TOKENS",
+    "CHEROKEE_DEFAULT_INTRUSIVE_MAX_STRIDE",
+    "create_cherokee_ctc_config",
     "prepare_cherokee_text",
+    "prepare_cherokee_with_intrusion",
+    "prepare_cherokee_direct",
     # Codeswitching
     "CodeSwitchedLineResult",
     "CodeSwitchedPreparer",

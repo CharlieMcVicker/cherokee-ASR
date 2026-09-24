@@ -32,7 +32,10 @@ from transcription.alignment.models import (
     TokenEmission,
     WordInterval,
 )
-from transcription.cherokee.phonotactics import prepare_cherokee_text
+from transcription.cherokee.phonotactics import (
+    create_cherokee_ctc_config,
+    prepare_cherokee_text,
+)
 from transcription.core.audio import mask_non_speech_logits
 from transcription.cherokee.models import CherokeeASRModel
 
@@ -58,14 +61,16 @@ class CTCSegmentationAligner:
         **kwargs: Any,
     ):
         self.model = model
-        self.config = config or CTCAlignerConfig()
+        self.config = config or create_cherokee_ctc_config()
 
         self.syncope_tokens = list(self.config.syncope_tokens)
         self.intrusive_tokens = (
             list(self.config.intrusive_tokens) if self.config.intrusive_tokens else []
         )
         self.intrusive_max_stride = int(self.config.intrusive_max_stride)
-        self.enforce_phonotactics = bool(self.config.enforce_phonotactics)
+        self.allow_syncope_and_intrusion = bool(
+            getattr(self.config, "allow_syncope_and_intrusion", True)
+        )
         self.flag_min_confidence = float(self.config.flag_min_confidence)
         self.flag_min_char_confidence = float(self.config.flag_min_char_confidence)
         self.index_duration = float(self.config.index_duration)
@@ -542,7 +547,10 @@ class CTCSegmentationAligner:
         )
 
         gt_mat, utt_indices = prepare_cherokee_text(
-            config, words, char_list, enforce_phonotactics=self.enforce_phonotactics
+            config,
+            words,
+            char_list,
+            allow_syncope_and_intrusion=self.allow_syncope_and_intrusion,
         )
         timings, char_probs, state_list = ctc_segmentation(config, lpz, gt_mat)
 
@@ -705,7 +713,7 @@ class CTCSegmentationAligner:
             config,
             all_words,
             char_list,
-            enforce_phonotactics=self.enforce_phonotactics,
+            allow_syncope_and_intrusion=self.allow_syncope_and_intrusion,
             token_masks=token_masks_arg,
         )
         timings, char_probs, state_list = ctc_segmentation(config, lpz, gt_mat)

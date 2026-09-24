@@ -47,7 +47,7 @@ from transcription.core.models.output import ModelOutput
 def test_models_instantiation_and_properties():
     cfg = CTCAlignerConfig()
     assert cfg.index_duration == 0.02
-    assert "t" in cfg.syncope_tokens
+    assert cfg.syncope_tokens == ()
 
     emission = TokenEmission(word="osiyo", start_sec=0.5, end_sec=1.2, confidence=0.98)
     assert emission.word == "osiyo"
@@ -253,10 +253,10 @@ def test_ctc_segmentation_aligner_custom_preparer():
         config: Any,
         text: Union[str, Sequence[str]],
         char_list: Optional[Sequence[str]] = None,
-        **kwargs: Any,
+        token_masks: Optional[Sequence[Tuple[Sequence[bool], Sequence[bool]]]] = None,
     ) -> Tuple[np.ndarray, List[int]]:
-        call_log.append((text, kwargs))
-        return default_text_preparer(config, text, char_list, **kwargs)
+        call_log.append((text, token_masks))
+        return default_text_preparer(config, text, char_list, token_masks=token_masks)
 
     char_list = ["[PAD]", "a", "b"]
     lpz = np.zeros((20, 3), dtype=np.float32)

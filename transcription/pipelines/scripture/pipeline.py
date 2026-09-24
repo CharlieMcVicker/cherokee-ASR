@@ -20,7 +20,10 @@ import numpy as np
 from pydub import AudioSegment
 
 from transcription.cherokee.models import CherokeeASRModel
-from transcription.cherokee.phonotactics import prepare_cherokee_text
+from transcription.cherokee.phonotactics import (
+    create_cherokee_ctc_config,
+    prepare_cherokee_with_intrusion,
+)
 from transcription.core.alignment.ctc import (
     DEFAULT_CACHE_DIR,
     CTCSegmentationAligner,
@@ -95,14 +98,14 @@ class ScripturePipeline:
         ctc_aligner: Optional[Any] = None,
     ):
         self.asr_model = asr_model
-        self.config = aligner_config or CTCAlignerConfig()
+        self.config = aligner_config or create_cherokee_ctc_config()
         if ctc_aligner is not None:
             self.ctc_aligner = ctc_aligner
         else:
             # Wire Tier 1 CTCSegmentationAligner with Tier 2 Cherokee phonotactics preparer
             self.ctc_aligner = CoreCTCSegmentationAligner(
                 config=self.config,
-                text_preparer=prepare_cherokee_text,
+                text_preparer=prepare_cherokee_with_intrusion,
             )
 
     def align(
@@ -353,7 +356,7 @@ def align_chapter(
     model_revision: Optional[str] = None,
     cache_dir: Optional[Union[str, Path]] = None,
     engine: str = "ctc",
-    ctc_aligner: Optional[CoreCTCSegmentationAligner] = None,
+    ctc_aligner: Optional[Any] = None,
     asr_model: Optional[CherokeeASRModel] = None,
     cache: bool = True,
     aligner_config: Optional[CTCAlignerConfig] = None,
@@ -388,13 +391,13 @@ def align_chapter(
                 )
             if aligner_config is None:
                 c_dir = Path(cache_dir) if cache_dir is not None else DEFAULT_CACHE_DIR
-                aligner_config = CTCAlignerConfig(
+                aligner_config = create_cherokee_ctc_config(
                     cache=cache,
                     cache_dir=c_dir,
                 )
             aligner = CTCSegmentationAligner(
-                model=model,
                 config=aligner_config,
+                text_preparer=prepare_cherokee_with_intrusion,
             )
 
         # Check if aligner supports audio_input or ModelOutput

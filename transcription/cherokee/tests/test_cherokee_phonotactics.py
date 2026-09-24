@@ -23,18 +23,23 @@ from transcription.cherokee.phonotactics import (
     PhonotacticAnalysis,
     PhonotacticToken,
     analyze_phonotactics,
+    create_cherokee_ctc_config,
     get_intrusion_site_mask,
     get_syncope_mask,
     is_valid_phonotactic_sequence,
+    prepare_cherokee_direct,
     prepare_cherokee_text,
+    prepare_cherokee_with_intrusion,
     tokenize_phonemes,
 )
 from transcription.core.alignment.ctc import TextPreparerProtocol
 
 
 def test_text_preparer_protocol_conformance():
-    """Verify prepare_cherokee_text implements TextPreparerProtocol."""
+    """Verify prepare_cherokee_text, prepare_cherokee_with_intrusion, and prepare_cherokee_direct implement TextPreparerProtocol."""
     assert isinstance(prepare_cherokee_text, TextPreparerProtocol)
+    assert isinstance(prepare_cherokee_with_intrusion, TextPreparerProtocol)
+    assert isinstance(prepare_cherokee_direct, TextPreparerProtocol)
 
 
 def test_tokenize_all_canonical_digraphs_and_trigraphs():
@@ -144,7 +149,7 @@ def test_prepare_cherokee_text_conformance():
         config,
         ["atli", "skv"],
         char_list=char_list,
-        enforce_phonotactics=True,
+        allow_syncope_and_intrusion=True,
     )
 
     assert isinstance(gt_mat, np.ndarray)
@@ -153,3 +158,26 @@ def test_prepare_cherokee_text_conformance():
     assert config.is_syncope_token is not None
     assert config.is_intrusive_site is not None
     assert len(config.is_syncope_token) == len(gt_mat)
+
+
+def test_prepare_cherokee_direct_and_with_intrusion():
+    """Verify prepare_cherokee_with_intrusion and prepare_cherokee_direct behave correctly."""
+
+    class DummyConfig:
+        space = " "
+        blank = 0
+        is_syncope_token: Any = None
+        is_intrusive_site: Any = None
+
+    char_list = ["<blank>", " ", "a", "t", "l", "i", "s", "k", "v"]
+
+    cfg1 = DummyConfig()
+    gt_mat1, _ = prepare_cherokee_with_intrusion(
+        cfg1, ["atli", "skv"], char_list=char_list
+    )
+    assert np.any(cfg1.is_syncope_token > 0)
+
+    cfg2 = DummyConfig()
+    gt_mat2, _ = prepare_cherokee_direct(cfg2, ["atli", "skv"], char_list=char_list)
+    assert np.all(cfg2.is_syncope_token == 0)
+    assert np.all(cfg2.is_intrusive_site == 0)

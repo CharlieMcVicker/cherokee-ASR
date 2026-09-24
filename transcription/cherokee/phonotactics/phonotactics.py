@@ -440,12 +440,47 @@ def analyze_phonotactics(text: str) -> PhonotacticAnalysis:
     )
 
 
+from transcription.core.alignment.models import CTCAlignerConfig
+
+CHEROKEE_DEFAULT_SYNCOPE_TOKENS: Tuple[Tuple[str, ...] | str, ...] = (
+    (
+        "a",
+        "e",
+        "i",
+        "o",
+        "u",
+        "v",
+    ),
+    "t",
+)
+CHEROKEE_DEFAULT_INTRUSIVE_TOKENS: Tuple[str, ...] = ("h", "'")
+CHEROKEE_DEFAULT_INTRUSIVE_MAX_STRIDE: int = 4
+
+
+def create_cherokee_ctc_config(**overrides: Any) -> CTCAlignerConfig:
+    """
+    Creates a CTCAlignerConfig instance with calibrated Cherokee defaults.
+
+    Defaults include:
+        - syncope_tokens: (("a", "e", "i", "o", "u", "v"), "t")
+        - intrusive_tokens: ("h", "'")
+        - intrusive_max_stride: 4
+    """
+    params: dict[str, Any] = {
+        "syncope_tokens": CHEROKEE_DEFAULT_SYNCOPE_TOKENS,
+        "intrusive_tokens": CHEROKEE_DEFAULT_INTRUSIVE_TOKENS,
+        "intrusive_max_stride": CHEROKEE_DEFAULT_INTRUSIVE_MAX_STRIDE,
+    }
+    params.update(overrides)
+    return CTCAlignerConfig(**params)
+
+
 def prepare_cherokee_text(
     config: Any,
     text: Union[str, Sequence[str]],
     char_list: Optional[Sequence[str]] = None,
-    enforce_phonotactics: bool = True,
     token_masks: Optional[Sequence[Tuple[Sequence[bool], Sequence[bool]]]] = None,
+    allow_syncope_and_intrusion: bool = True,
     **kwargs: Any,
 ) -> Tuple[np.ndarray, List[int]]:
     """
@@ -459,9 +494,9 @@ def prepare_cherokee_text(
         config: An instance of CtcSegmentationParameters (or compatible configuration object).
         text: Input text as a single string, list of words, or list of utterances.
         char_list: Sequence of vocabulary characters/tokens from the ASR model.
-        enforce_phonotactics: If True, generates phonotactically accurate syncope and intrusive masks.
         token_masks: Optional pre-computed sequence of (syncope_mask, intrusion_mask) tuples per word
                      (e.g., from CodeSwitchedToken to strictly isolate English loanwords from Cherokee phonotactics).
+        allow_syncope_and_intrusion: If True, generates phonotactically accurate syncope and intrusive masks.
 
     Returns:
         Tuple[np.ndarray, List[int]]:
@@ -507,20 +542,24 @@ def prepare_cherokee_text(
                 custom_sync, custom_intrus = token_masks[word_mask_idx]
                 word_mask_idx += 1
                 word_syncope = (
-                    list(custom_sync) if enforce_phonotactics else [False] * len(word)
+                    list(custom_sync)
+                    if allow_syncope_and_intrusion
+                    else [False] * len(word)
                 )
                 word_intrusion = (
-                    list(custom_intrus) if enforce_phonotactics else [False] * len(word)
+                    list(custom_intrus)
+                    if allow_syncope_and_intrusion
+                    else [False] * len(word)
                 )
             else:
                 word_syncope = (
                     get_syncope_mask(word, return_char_mask=True)
-                    if enforce_phonotactics
+                    if allow_syncope_and_intrusion
                     else [False] * len(word)
                 )
                 word_intrusion = (
                     get_intrusion_site_mask(word, return_char_mask=True)
-                    if enforce_phonotactics
+                    if allow_syncope_and_intrusion
                     else [False] * len(word)
                 )
 
@@ -572,6 +611,44 @@ def prepare_cherokee_text(
     return ground_truth_mat, utt_begin_indices
 
 
+def prepare_cherokee_with_intrusion(
+    config: Any,
+    text: Union[str, Sequence[str]],
+    char_list: Optional[Sequence[str]] = None,
+    token_masks: Optional[Sequence[Tuple[Sequence[bool], Sequence[bool]]]] = None,
+) -> Tuple[np.ndarray, List[int]]:
+    """
+    Prepares Cherokee text with full syncope and intrusive laryngeal masks enabled.
+    Directly satisfies TextPreparerProtocol.
+    """
+    return prepare_cherokee_text(
+        config=config,
+        text=text,
+        char_list=char_list,
+        token_masks=token_masks,
+        allow_syncope_and_intrusion=True,
+    )
+
+
+def prepare_cherokee_direct(
+    config: Any,
+    text: Union[str, Sequence[str]],
+    char_list: Optional[Sequence[str]] = None,
+    token_masks: Optional[Sequence[Tuple[Sequence[bool], Sequence[bool]]]] = None,
+) -> Tuple[np.ndarray, List[int]]:
+    """
+    Prepares Cherokee text directly with zero syncope/intrusion masks.
+    Directly satisfies TextPreparerProtocol.
+    """
+    return prepare_cherokee_text(
+        config=config,
+        text=text,
+        char_list=char_list,
+        token_masks=token_masks,
+        allow_syncope_and_intrusion=False,
+    )
+
+
 __all__ = [
     "PhonemeCategory",
     "PhonotacticToken",
@@ -589,5 +666,11 @@ __all__ = [
     "get_intrusion_site_mask",
     "is_valid_phonotactic_sequence",
     "analyze_phonotactics",
+    "CHEROKEE_DEFAULT_SYNCOPE_TOKENS",
+    "CHEROKEE_DEFAULT_INTRUSIVE_TOKENS",
+    "CHEROKEE_DEFAULT_INTRUSIVE_MAX_STRIDE",
+    "create_cherokee_ctc_config",
     "prepare_cherokee_text",
+    "prepare_cherokee_with_intrusion",
+    "prepare_cherokee_direct",
 ]

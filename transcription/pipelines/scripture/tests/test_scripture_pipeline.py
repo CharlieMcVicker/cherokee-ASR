@@ -19,6 +19,9 @@ from pydub import AudioSegment
 import pytest
 import torch
 
+from transcription.alignment.ctc_aligner import (
+    CTCSegmentationAligner as LegacyCTCSegmentationAligner,
+)
 from transcription.core.alignment.ctc import CTCSegmentationAligner
 from transcription.alignment.distance_metrics import (
     ConfusionMatrixCostMetric,
@@ -409,7 +412,7 @@ def test_align_chapter_ctc_segmentation_with_mock_aligner(
     tmp_path: Path, dummy_audio_path: Path, dummy_json_transcript: Path
 ):
     mock_model = MockASRModel()
-    ctc_aligner = CTCSegmentationAligner(
+    ctc_aligner = LegacyCTCSegmentationAligner(
         model=cast(Any, mock_model),
         config=CTCAlignerConfig(cache=True, cache_dir=tmp_path / "ctc_cache"),
     )
@@ -485,7 +488,7 @@ def test_realign_book_single_chapter(tmp_path: Path, monkeypatch):
     import scripts.realign_bible as rb
 
     mock_model = MockASRModel()
-    ctc_aligner = CTCSegmentationAligner(
+    ctc_aligner = LegacyCTCSegmentationAligner(
         model=cast(Any, mock_model),
         config=CTCAlignerConfig(cache=False),
     )
@@ -835,7 +838,6 @@ def test_align_chapter_forwards_intrusive_and_phonotactic_parameters(
     aligner_cfg = CTCAlignerConfig(
         intrusive_tokens=("h", "'"),
         intrusive_max_stride=2,
-        enforce_phonotactics=True,
         flag_min_confidence=0.02,
         flag_min_char_confidence=0.006,
     )

@@ -241,8 +241,8 @@ def test_prepare_cherokee_text_with_token_masks():
         config, text, char_list=char_list, token_masks=token_masks
     )
 
-    # In ground_truth: ["", " ", "h", "s", "o", "w", "t", "s", "a", " ", "a", "d", "a", "l", "e", "n", "i", "s", "g", "v", " "]
-    # Indices 2..8 correspond to 'hsowtsa'
+    assert config.is_syncope_token is not None
+    assert config.is_intrusive_site is not None
     for idx in range(2, 9):
         assert config.is_syncope_token[idx] == 0
         assert config.is_intrusive_site[idx] == 0
