@@ -503,3 +503,150 @@ def infer_emissions_batch(
             torch.mps.empty_cache()
 
     return [o for o in outputs if o is not None]
+
+
+def infer_emissions_sliding_window(
+    model: Any,
+    processor: Any,
+    audio_input: Union[
+        str, Path, bytes, Sequence[float], np.ndarray, torch.Tensor, Any
+    ],
+    chunk_seconds: float = 30.0,
+    margin_seconds: float = 1.0,
+    sample_rate: int = TARGET_SAMPLE_RATE,
+    device: Optional[Union[str, torch.device]] = None,
+    cache_dir: Optional[Union[str, Path]] = None,
+    model_identifier: Optional[str] = None,
+) -> ModelOutput:
+    """
+    Standalone procedure: Executes forward inference using overlapping sliding windows with margin trimming.
+    Slices long audio into chunks, trims boundary margins to prevent CTC edge artifacts, concatenates
+    log probabilities along the temporal axis, and returns a unified ModelOutput instance.
+    If cache_dir is specified, checks for and writes to an on-disk .npz cache file.
+
+    Args:
+        model: Wav2Vec2ForCTC or compatible model.
+        processor: Wav2Vec2Processor or compatible processor.
+        audio_input: File path, PCM array, tensor, bytes, or AudioSegment.
+        chunk_seconds: Length of each window in seconds (default: 30.0).
+        margin_seconds: Overlap margin trimmed from boundaries in seconds (default: 1.0).
+        sample_rate: Input sample rate (default: 16000).
+        device: PyTorch device ('cpu', 'cuda', 'mps', or torch.device).
+        cache_dir: Optional directory to cache and retrieve ModelOutput .npz files.
+        model_identifier: Optional identifier for cache key generation.
+
+    Returns:
+        ModelOutput containing stitched log probabilities (lpz), vocabulary mapping, and decoding methods.
+    """
+    resolved_model_id = model_identifier or getattr(model, "name_or_path", "model")
+    cache_path: Optional[Path] = None
+
+    if cache_dir is not None:
+        c_dir = Path(cache_dir)
+        c_dir.mkdir(parents=True, exist_ok=True)
+        # Note: Include chunking params in cache key identifier if sliding window params differ from default
+        sliding_id = f"{resolved_model_id}_sw_c{chunk_seconds}_m{margin_seconds}"
+        key = compute_audio_cache_key(audio_input, model_identifier=sliding_id)
+        cache_path = c_dir / f"{key}.npz"
+        if cache_path.exists():
+            try:
+                return ModelOutput.load(cache_path)
+            except Exception as e:
+                logger.warning(
+                    "Failed to load cached ModelOutput from %s (%s). Recomputing...",
+                    cache_path,
+                    e,
+                )
+
+    speech = preprocess_audio(audio_input, sample_rate=sample_rate)
+    chunk_samples = int(TARGET_SAMPLE_RATE * chunk_seconds)
+    margin_samples = int(TARGET_SAMPLE_RATE * margin_seconds)
+
+    if len(speech) <= chunk_samples or margin_seconds <= 0:
+        out = infer_emissions(
+            model=model,
+            processor=processor,
+            audio_input=speech,
+            sample_rate=TARGET_SAMPLE_RATE,
+            device=device,
+            cache_dir=None,  # We handle sliding window cache at this outer function level
+            model_identifier=model_identifier,
+        )
+        if cache_path is not None:
+            try:
+                out.save(cache_path)
+            except Exception as e:
+                logger.warning(
+                    "Failed to save ModelOutput cache to %s (%s)", cache_path, e
+                )
+        return out
+
+    step_samples = chunk_samples - 2 * margin_samples
+    if step_samples <= 0:
+        raise ValueError(
+            f"chunk_seconds ({chunk_seconds}) must be strictly greater than 2 * margin_seconds ({2 * margin_seconds})."
+        )
+
+    margin_frames = int(round(margin_seconds / FRAME_DURATION_SEC))
+    cur_start = 0
+    total_samples = len(speech)
+    lpz_list: List[np.ndarray] = []
+    target_device = _resolve_device(device, model)
+    vocab, metadata = extract_vocab_and_metadata(processor)
+
+    while cur_start < total_samples:
+        cur_end = min(cur_start + chunk_samples, total_samples)
+        chunk = speech[cur_start:cur_end]
+
+        chunk_out = infer_emissions(
+            model=model,
+            processor=processor,
+            audio_input=chunk,
+            sample_rate=TARGET_SAMPLE_RATE,
+            device=target_device,
+            cache_dir=None,
+            model_identifier=model_identifier,
+        )
+        chunk_lpz = chunk_out.lpz
+        if chunk_lpz.ndim == 3:
+            chunk_lpz = chunk_lpz[0]
+
+        T_chunk = chunk_lpz.shape[0]
+        is_first = cur_start == 0
+        is_last = cur_end >= total_samples
+
+        left_trim = 0 if is_first else margin_frames
+        right_trim = 0 if is_last else margin_frames
+
+        left_idx = min(left_trim, T_chunk)
+        right_idx = max(left_idx, T_chunk - right_trim)
+
+        trimmed_lpz = chunk_lpz[left_idx:right_idx]
+        lpz_list.append(trimmed_lpz)
+
+        if is_last:
+            break
+        cur_start += step_samples
+
+    if not lpz_list:
+        stitched_lpz = np.zeros((0, len(vocab)), dtype=np.float32)
+    else:
+        stitched_lpz = np.concatenate(lpz_list, axis=0)
+
+    metadata["sample_rate"] = TARGET_SAMPLE_RATE
+    metadata["duration_sec"] = round(len(speech) / TARGET_SAMPLE_RATE, 4)
+
+    output = ModelOutput(
+        lpz=stitched_lpz,
+        vocab=vocab,
+        frame_duration_sec=FRAME_DURATION_SEC,
+        metadata=metadata,
+    )
+
+    if cache_path is not None:
+        try:
+            output.save(cache_path)
+        except Exception as e:
+            logger.warning("Failed to save ModelOutput cache to %s (%s)", cache_path, e)
+
+    return output

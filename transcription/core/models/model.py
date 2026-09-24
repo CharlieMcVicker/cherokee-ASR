@@ -19,6 +19,7 @@ from transcription.core.models.inference import (
     TARGET_SAMPLE_RATE,
     infer_emissions,
     infer_emissions_batch,
+    infer_emissions_sliding_window,
     preprocess_audio,
 )
 from transcription.core.models.output import ModelOutput
@@ -119,6 +120,42 @@ class ASRModel:
             sample_rate=sample_rate,
             device=self.device,
             batch_size=batch_size,
+            cache_dir=effective_cache_dir,
+            model_identifier=self.model_name,
+        )
+
+    def infer_sliding_window(
+        self,
+        audio_input: Union[
+            str, Path, bytes, Sequence[float], np.ndarray, torch.Tensor, Any
+        ],
+        chunk_seconds: float = 30.0,
+        margin_seconds: float = 1.0,
+        sample_rate: int = TARGET_SAMPLE_RATE,
+        cache_dir: Optional[Union[str, Path]] = None,
+    ) -> ModelOutput:
+        """
+        Execute overlapping sliding-window inference with margin trimming for long-form audio.
+
+        Args:
+            audio_input: Audio path, PCM array, tensor, bytes, or AudioSegment.
+            chunk_seconds: Chunk duration in seconds (default: 30.0).
+            margin_seconds: Boundary trim margin in seconds (default: 1.0).
+            sample_rate: Input sampling rate (default: 16000).
+            cache_dir: Optional directory for .npz emission caching (overrides instance cache_dir).
+
+        Returns:
+            ModelOutput instance containing stitched lpz, vocab, and decoding projections.
+        """
+        effective_cache_dir = cache_dir if cache_dir is not None else self.cache_dir
+        return infer_emissions_sliding_window(
+            model=self.model,
+            processor=self.processor,
+            audio_input=audio_input,
+            chunk_seconds=chunk_seconds,
+            margin_seconds=margin_seconds,
+            sample_rate=sample_rate,
+            device=self.device,
             cache_dir=effective_cache_dir,
             model_identifier=self.model_name,
         )

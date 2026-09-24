@@ -263,54 +263,15 @@ class CherokeeASRModel(ASRModel):
         """
         Extracts raw logits tensor [sequence_length, vocab_size] using overlapping
         sliding-window inference with margin trimming to eliminate boundary artifacts.
+        Delegates to Tier 1 core infer_sliding_window.
         """
-        speech = self.preprocess_audio(pcm_audio, sample_rate=sample_rate)
-        chunk_samples = int(TARGET_SAMPLE_RATE * chunk_seconds)
-        margin_samples = int(TARGET_SAMPLE_RATE * margin_seconds)
-
-        if len(speech) <= chunk_samples or margin_seconds <= 0:
-            return self.get_logits(speech, sample_rate=TARGET_SAMPLE_RATE)
-
-        step_samples = chunk_samples - 2 * margin_samples
-        if step_samples <= 0:
-            raise ValueError(
-                f"chunk_seconds ({chunk_seconds}) must be strictly greater than 2 * margin_seconds ({2 * margin_seconds})."
-            )
-
-        margin_frames = int(round(margin_seconds / FRAME_DURATION_SEC))
-
-        cur_start = 0
-        total_samples = len(speech)
-        logits_list: List[torch.Tensor] = []
-
-        while cur_start < total_samples:
-            cur_end = min(cur_start + chunk_samples, total_samples)
-            chunk = speech[cur_start:cur_end]
-            chunk_logits = self.get_logits(chunk, sample_rate=TARGET_SAMPLE_RATE)
-            if chunk_logits.ndim == 3:
-                chunk_logits = chunk_logits.squeeze(0)
-
-            T_chunk = chunk_logits.shape[0]
-            is_first = cur_start == 0
-            is_last = cur_end >= total_samples
-
-            left_trim = 0 if is_first else margin_frames
-            right_trim = 0 if is_last else margin_frames
-
-            left_idx = min(left_trim, T_chunk)
-            right_idx = max(left_idx, T_chunk - right_trim)
-
-            trimmed = chunk_logits[left_idx:right_idx]
-            logits_list.append(trimmed)
-
-            if is_last:
-                break
-            cur_start += step_samples
-
-        if not logits_list:
-            return self.get_logits(speech, sample_rate=TARGET_SAMPLE_RATE)
-
-        return torch.cat(logits_list, dim=0)
+        output = self.infer_sliding_window(
+            audio_input=pcm_audio,
+            chunk_seconds=chunk_seconds,
+            margin_seconds=margin_seconds,
+            sample_rate=sample_rate,
+        )
+        return torch.tensor(output.lpz, dtype=torch.float32, device=self.device)
 
     def get_logits_batch(
         self,

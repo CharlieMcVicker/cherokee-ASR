@@ -6,11 +6,13 @@ import torch
 
 from transcription.core.models.output import ModelOutput
 from transcription.core.models.inference import (
+    compute_audio_cache_key,
     infer_emissions,
     infer_emissions_batch,
+    infer_emissions_sliding_window,
     preprocess_audio,
-    compute_audio_cache_key,
 )
+
 from transcription.core.models.model import ASRModel
 from transcription.cherokee.models import CherokeeASRModel
 
@@ -226,6 +228,134 @@ class TestASRModelWrapper(unittest.TestCase):
         out = cherokee_model.infer(pcm)
         self.assertIsInstance(out, ModelOutput)
         self.assertEqual(out.decode_greedy(), "ad l")
+
+    def test_infer_sliding_window_delegation(self):
+        asr_model = ASRModel(
+            model=self.mock_model,
+            processor=self.mock_proc,
+            device="cpu",
+            model_name="clean_model",
+        )
+        pcm = np.zeros(16000 * 2, dtype=np.float32)
+        out = asr_model.infer_sliding_window(pcm, chunk_seconds=5.0, margin_seconds=0.5)
+        self.assertIsInstance(out, ModelOutput)
+        self.assertEqual(out.decode_greedy(), "ad l")
+
+
+class TestSlidingWindowInference(unittest.TestCase):
+    def setUp(self):
+        self.mock_model = MagicMock()
+        self.mock_proc = MagicMock()
+        self.mock_proc.tokenizer.pad_token_id = 0
+        self.mock_proc.tokenizer.word_delimiter_token_id = 4
+        self.mock_proc.tokenizer.vocab = {"[PAD]": 0, "a": 1, "d": 2, "l": 3, "|": 4}
+
+        def mock_proc_call(speech, **kwargs):
+            inputs = MagicMock()
+            inputs.input_values = [np.array(speech, dtype=np.float32)]
+            return inputs
+
+        self.mock_proc.side_effect = mock_proc_call
+
+        def mock_model_call(input_tensor):
+            # 16000 samples -> 50 frames (320 samples per frame)
+            n_samples = input_tensor.shape[1]
+            n_frames = max(1, n_samples // 320)
+            logits = torch.full((1, n_frames, 5), -10.0)
+            logits[0, :, 1] = 10.0  # 'a' on all frames
+            out = MagicMock()
+            out.logits = logits
+            return out
+
+        self.mock_model.side_effect = mock_model_call
+
+    def test_short_audio_single_pass(self):
+        # Audio length 2s <= chunk_seconds 5s
+        pcm = np.zeros(16000 * 2, dtype=np.float32)
+        out = infer_emissions_sliding_window(
+            model=self.mock_model,
+            processor=self.mock_proc,
+            audio_input=pcm,
+            chunk_seconds=5.0,
+            margin_seconds=1.0,
+            model_identifier="test_sw_short",
+        )
+        self.assertIsInstance(out, ModelOutput)
+        self.assertEqual(self.mock_model.call_count, 1)
+        self.assertEqual(out.decode_greedy(), "a")
+        self.assertEqual(out.lpz.shape[0], 100)  # 2s * 50 fps = 100 frames
+
+    def test_long_audio_multi_chunk_margin_trimming(self):
+        # Audio length 6s with chunk_seconds=3s, margin_seconds=0.5s
+        # step = 3 - 2*0.5 = 2s
+        # Chunk 1: [0s, 3s] -> 150 frames. is_first: left_trim=0, right_trim=25 -> frames [0, 125] (125 frames, covers 0s-2.5s)
+        # Chunk 2: [2s, 5s] -> 150 frames. is_mid: left_trim=25, right_trim=25 -> frames [25, 125] (100 frames, covers 2.5s-4.5s)
+        # Chunk 3: [4s, 6s] -> 100 frames. is_last: left_trim=25, right_trim=0 -> frames [25, 100] (75 frames, covers 4.5s-6.0s)
+        # Total frames = 125 + 100 + 75 = 300 frames (6s * 50 fps)
+        pcm = np.zeros(16000 * 6, dtype=np.float32)
+        out = infer_emissions_sliding_window(
+            model=self.mock_model,
+            processor=self.mock_proc,
+            audio_input=pcm,
+            chunk_seconds=3.0,
+            margin_seconds=0.5,
+            model_identifier="test_sw_long",
+        )
+        self.assertIsInstance(out, ModelOutput)
+        self.assertEqual(self.mock_model.call_count, 3)
+        self.assertEqual(out.lpz.shape[0], 300)
+        self.assertEqual(out.metadata["duration_sec"], 6.0)
+
+    def test_invalid_chunk_margin_raises(self):
+        pcm = np.zeros(16000 * 10, dtype=np.float32)
+        with self.assertRaises(ValueError):
+            infer_emissions_sliding_window(
+                model=self.mock_model,
+                processor=self.mock_proc,
+                audio_input=pcm,
+                chunk_seconds=2.0,
+                margin_seconds=1.0,  # 2.0 <= 2 * 1.0 -> raises ValueError
+            )
+
+        with self.assertRaises(ValueError):
+            infer_emissions_sliding_window(
+                model=self.mock_model,
+                processor=self.mock_proc,
+                audio_input=pcm,
+                chunk_seconds=2.0,
+                margin_seconds=1.5,  # 2.0 < 2 * 1.5 -> raises ValueError
+            )
+
+    def test_sliding_window_caching(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            pcm = np.zeros(16000 * 4, dtype=np.float32)
+            out1 = infer_emissions_sliding_window(
+                model=self.mock_model,
+                processor=self.mock_proc,
+                audio_input=pcm,
+                chunk_seconds=2.0,
+                margin_seconds=0.5,
+                cache_dir=tmp_dir,
+                model_identifier="test_sw_cache",
+            )
+            self.assertIsInstance(out1, ModelOutput)
+            call_count_after_first = self.mock_model.call_count
+            self.assertGreater(call_count_after_first, 0)
+
+            # Second call should load from cache and make 0 new model calls
+            out2 = infer_emissions_sliding_window(
+                model=self.mock_model,
+                processor=self.mock_proc,
+                audio_input=pcm,
+                chunk_seconds=2.0,
+                margin_seconds=0.5,
+                cache_dir=tmp_dir,
+                model_identifier="test_sw_cache",
+            )
+            self.assertEqual(self.mock_model.call_count, call_count_after_first)
+            np.testing.assert_allclose(out1.lpz, out2.lpz)
 
 
 if __name__ == "__main__":
