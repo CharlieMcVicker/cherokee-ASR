@@ -19,9 +19,13 @@ from typing import (
     List,
     Optional,
     Tuple,
+    Union,
 )
 
-from transcription.cherokee.arpabet.types import SyntheticTargetProjectorProtocol
+from transcription.core.codeswitching.types import (
+    GenericSyntheticTargetProjectorProtocol,
+)
+from transcription.cherokee.codeswitching.types import SyntheticTargetProjectorProtocol
 from transcription.cherokee.orthography import Orthography, convert_orthography
 from transcription.cherokee.phonotactics import (
     get_intrusion_site_mask,
@@ -53,6 +57,10 @@ class TokenType(str, Enum):
 
     PUNCTUATION = "punctuation"
     """Punctuation-only token or boundary symbol (e.g. ?, ,, ..., :)."""
+
+
+# Alias for callers expecting TokenClassification
+TokenClassification = TokenType
 
 
 @dataclass(frozen=True)
@@ -263,29 +271,41 @@ def classify_token(token: str) -> TokenType:
         return TokenType.ENGLISH
 
 
+def _get_projected_tth_from_target(target: Any) -> str:
+    """Helper extract string projected tth from either SyntheticCherokeeTarget or ProjectedTarget."""
+    if hasattr(target, "projected_tth"):
+        return str(target.projected_tth)
+    elif hasattr(target, "projected_text"):
+        return str(target.projected_text)
+    return str(target)
+
+
 def prepare_code_switched_token(
     token: str,
-    projector: Optional[SyntheticTargetProjectorProtocol] = None,
+    projector: Optional[
+        Union[SyntheticTargetProjectorProtocol, GenericSyntheticTargetProjectorProtocol]
+    ] = None,
     contextual_preaspiration: bool = True,
 ) -> CodeSwitchedToken:
     """
     Parses and projects an individual token into a CodeSwitchedToken with canonical TTH phonetics.
 
     Ensures ZERO double-conversion:
-    - Pure Cherokee Syllabary is converted directly via normalize_syllabary_for_alignment.
+    - Pure Cherokee Syllabary is converted directly via convert_orthography.
     - Pure English words are projected strictly via projector.project_word (never Cherokee DG-to-TTH).
     - Compound tokens (English stem + Syllabary clitic) are cleanly segmented, with the English
       stem projected via projector and the clitic converted directly from Syllabary to TTH.
     - Punctuation emits empty canonical TTH.
     """
     if projector is not None:
-        active_projector: SyntheticTargetProjectorProtocol = projector
+        active_projector = projector
     else:
         from transcription.cherokee.codeswitching.projector import (
-            get_default_projector,
+            make_cherokee_projector,
         )
 
-        active_projector = get_default_projector()
+        active_projector = make_cherokee_projector()
+
     stripped = token.strip()
     tok_type = classify_token(stripped)
 
@@ -297,7 +317,7 @@ def prepare_code_switched_token(
 
         # Project English stem strictly via projector (zero DG-to-TTH mutation)
         stem_target = active_projector.project_word(stem)
-        stem_tth = stem_target.projected_tth
+        stem_tth = _get_projected_tth_from_target(stem_target)
 
         # Convert Cherokee Syllabary clitic directly to canonical TTH
         clitic_tth = (
@@ -341,16 +361,18 @@ def prepare_code_switched_token(
         clean_word = strip_boundary_punctuation(stripped)
         # Project English word strictly via projector (zero DG-to-TTH mutation)
         target = active_projector.project_word(clean_word)
+        target_tth = _get_projected_tth_from_target(target)
+
         # English words receive strictly ZERO Cherokee syncope and ZERO intrusion
-        zero_syncope = (False,) * len(target.projected_tth)
-        zero_intrusion = (False,) * len(target.projected_tth)
+        zero_syncope = (False,) * len(target_tth)
+        zero_intrusion = (False,) * len(target_tth)
 
         return CodeSwitchedToken(
             raw_token=token,
             token_type=TokenType.ENGLISH,
             english_stem=clean_word,
             syllabary_clitic=None,
-            canonical_tth=target.projected_tth,
+            canonical_tth=target_tth,
             source_display=stripped,
             syncope_mask=zero_syncope,
             intrusion_mask=zero_intrusion,
@@ -410,7 +432,9 @@ def extract_speaker_prefix(text: str) -> Tuple[Optional[str], str]:
 
 def create_groundtruth_for_code_switched_syllabary(
     text: str,
-    projector: Optional[SyntheticTargetProjectorProtocol] = None,
+    projector: Optional[
+        Union[SyntheticTargetProjectorProtocol, GenericSyntheticTargetProjectorProtocol]
+    ] = None,
     strip_speaker: bool = False,
     contextual_preaspiration: bool = True,
 ) -> CodeSwitchedLineResult:
@@ -434,13 +458,13 @@ def create_groundtruth_for_code_switched_syllabary(
         )
 
     if projector is not None:
-        active_projector: SyntheticTargetProjectorProtocol = projector
+        active_projector = projector
     else:
         from transcription.cherokee.codeswitching.projector import (
-            get_default_projector,
+            make_cherokee_projector,
         )
 
-        active_projector = get_default_projector()
+        active_projector = make_cherokee_projector()
 
     speaker: Optional[str] = None
     text_to_process = text.strip()
@@ -471,7 +495,6 @@ def create_groundtruth_for_code_switched_syllabary(
     )
 
 
-# Alias CodeSwitchedPreparer for callers/AC consistency
 class CodeSwitchedPreparer:
     """
     Class-based wrapper around create_groundtruth_for_code_switched_syllabary and
@@ -480,17 +503,22 @@ class CodeSwitchedPreparer:
 
     def __init__(
         self,
-        projector: Optional[SyntheticTargetProjectorProtocol] = None,
+        projector: Optional[
+            Union[
+                SyntheticTargetProjectorProtocol,
+                GenericSyntheticTargetProjectorProtocol,
+            ]
+        ] = None,
         contextual_preaspiration: bool = True,
     ) -> None:
         if projector is not None:
-            self.projector: SyntheticTargetProjectorProtocol = projector
+            self.projector = projector
         else:
             from transcription.cherokee.codeswitching.projector import (
-                get_default_projector,
+                make_cherokee_projector,
             )
 
-            self.projector = get_default_projector()
+            self.projector = make_cherokee_projector()
         self.contextual_preaspiration = contextual_preaspiration
 
     def prepare_line(
@@ -515,6 +543,7 @@ __all__ = [
     "CodeSwitchedLineResult",
     "CodeSwitchedPreparer",
     "CodeSwitchedToken",
+    "TokenClassification",
     "TokenType",
     "classify_token",
     "create_groundtruth_for_code_switched_syllabary",

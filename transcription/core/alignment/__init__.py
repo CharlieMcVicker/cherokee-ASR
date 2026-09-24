@@ -28,11 +28,18 @@ from transcription.core.alignment.distance import (
 from transcription.core.alignment.dp import (
     NeedlemanWunschWordAligner,
     SlidingWindowDTWAligner,
+    WagnerFischerAligner,
 )
 from transcription.core.alignment.ctc import (
     CTCSegmentationAligner,
     TextPreparerProtocol,
     default_text_preparer,
+)
+from transcription.core.alignment.forced_aligner import (
+    AlignedWordSpan,
+    ForcedAlignerProtocol,
+    MMSForcedAligner,
+    get_default_forced_aligner,
 )
 
 __all__ = [
@@ -56,8 +63,14 @@ __all__ = [
     # DP
     "NeedlemanWunschWordAligner",
     "SlidingWindowDTWAligner",
+    "WagnerFischerAligner",
     # CTC
     "CTCSegmentationAligner",
     "TextPreparerProtocol",
     "default_text_preparer",
+    # Forced Aligner
+    "AlignedWordSpan",
+    "ForcedAlignerProtocol",
+    "MMSForcedAligner",
+    "get_default_forced_aligner",
 ]

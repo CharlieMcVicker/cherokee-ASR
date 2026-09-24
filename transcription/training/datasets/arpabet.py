@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-transcription.cherokee.arpabet.dataset
+transcription.training.datasets.arpabet
 
 Dataset extraction, phonetic balancing, audio waveform slicing, and manifest
 generation for English speech corpora (LibriSpeech).
@@ -24,20 +24,20 @@ import soundfile as sf
 import torch
 import torchaudio
 
-from transcription.cherokee.arpabet.forced_aligner import (
-    AlignedWordSpan,
-    MMSForcedAligner,
-    get_default_forced_aligner,
-)
-from transcription.cherokee.arpabet.g2p import (
+from transcription.core.codeswitching.g2p import (
     G2pExtractor,
     extract_arpabet,
     get_default_g2p,
 )
-from transcription.cherokee.arpabet.types import (
+from transcription.core.codeswitching.types import (
     STANDARD_ARPABET_PHONEMES,
     ArpabetToken,
     WordManifestEntry,
+)
+from transcription.core.alignment.forced_aligner import (
+    AlignedWordSpan,
+    MMSForcedAligner,
+    get_default_forced_aligner,
 )
 
 logger = logging.getLogger(__name__)

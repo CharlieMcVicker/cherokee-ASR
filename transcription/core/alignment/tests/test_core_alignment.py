@@ -277,3 +277,31 @@ def test_ctc_segmentation_aligner_custom_preparer():
     assert len(call_log) == 1
     assert call_log[0][0] == ["a"]
     assert len(res.aligned_chunks) == 1
+
+
+def test_wagner_fischer_aligner():
+    from transcription.core.alignment.dp import WagnerFischerAligner
+
+    aligner = WagnerFischerAligner()
+    cost = aligner.align(["a", "b"], ["a", "b"])
+    assert cost == 0.0
+    cost_diff = aligner.align(["a", "b"], ["a", "c"])
+    assert cost_diff > 0.0
+
+
+def test_forced_aligner_word_span():
+    from transcription.core.alignment.forced_aligner import AlignedWordSpan
+
+    span = AlignedWordSpan(
+        word="hello",
+        start_sec=0.1,
+        end_sec=0.6,
+        duration=0.5,
+        score=0.98,
+        token_count=5,
+    )
+    assert span.word == "hello"
+    assert span.start_sec == 0.1
+    assert span.end_sec == 0.6
+    assert span.duration == 0.5
+    assert span.score == 0.98

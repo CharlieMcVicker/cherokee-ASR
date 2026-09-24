@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-transcription.cherokee.arpabet.g2p
+transcription.core.codeswitching.g2p
 
 Grapheme-to-Phoneme (G2P) extraction for English text using g2p_en.
 Normalizes text, strips punctuation, and maps words to standardized stress-stripped
@@ -13,9 +13,9 @@ import re
 from typing import Optional, Sequence, Tuple
 import g2p_en
 
-from transcription.cherokee.arpabet.types import (
+from transcription.core.codeswitching.types import (
     STANDARD_ARPABET_PHONEMES,
-    ArpabetToken,
+    ARPAbetPhone,
     EnglishToArpabetProtocol,
 )
 
@@ -23,35 +23,35 @@ from transcription.cherokee.arpabet.types import (
 _ARPABET_PHONE_RE = re.compile(r"^([A-Za-z]+)(\d)?$")
 
 
-class G2pExtractor:
+class G2PEngine:
     """
-    G2P extractor implementing EnglishToArpabetProtocol using g2p_en.G2p.
+    G2P engine implementing EnglishToArpabetProtocol using g2p_en.G2p.
 
     Normalizes input text, filters whitespace and punctuation tokens, and returns
-    immutable ArpabetToken instances conforming to the standard 39-phoneme inventory.
+    immutable ARPAbetPhone instances conforming to the standard 39-phoneme inventory.
     """
 
     def __init__(self, g2p: Optional[g2p_en.G2p] = None) -> None:
         self._g2p = g2p if g2p is not None else g2p_en.G2p()
 
-    def extract(self, text: str, strip_stress: bool = True) -> Tuple[ArpabetToken, ...]:
+    def extract(self, text: str, strip_stress: bool = True) -> Tuple[ARPAbetPhone, ...]:
         """
         Extract standardized ARPAbet tokens from English text.
 
         Args:
             text: Input English word, phrase, or sentence.
             strip_stress: If True, stress markers (0, 1, 2) are stripped (stress=None).
-                          If False, stress markers are retained on the ArpabetToken.
+                          If False, stress markers are retained on the ARPAbetPhone.
 
         Returns:
-            Tuple of ArpabetToken instances.
+            Tuple of ARPAbetPhone instances.
         """
         cleaned = text.strip()
         if not cleaned:
             return ()
 
         raw_tokens: Sequence[str] = self._g2p(cleaned)
-        extracted: list[ArpabetToken] = []
+        extracted: list[ARPAbetPhone] = []
 
         for raw in raw_tokens:
             token_str = str(raw).strip()
@@ -71,30 +71,33 @@ class G2pExtractor:
                 continue
 
             if strip_stress:
-                extracted.append(ArpabetToken(phone=phone, stress=None))
+                extracted.append(ARPAbetPhone(phone=phone, stress=None))
             else:
-                extracted.append(ArpabetToken(phone=phone, stress=stress_digit))
+                extracted.append(ARPAbetPhone(phone=phone, stress=stress_digit))
 
         return tuple(extracted)
 
     def __call__(
         self, text: str, strip_stress: bool = True
-    ) -> Tuple[ArpabetToken, ...]:
+    ) -> Tuple[ARPAbetPhone, ...]:
         """Callable alias satisfying EnglishToArpabetProtocol."""
         return self.extract(text, strip_stress=strip_stress)
 
     extract_arpabet = extract
 
 
+# Alias for compatibility
+G2pExtractor = G2PEngine
+
 # Global singleton instance for efficient reuse across the pipeline
-_DEFAULT_EXTRACTOR: Optional[G2pExtractor] = None
+_DEFAULT_EXTRACTOR: Optional[G2PEngine] = None
 
 
-def get_default_g2p() -> G2pExtractor:
-    """Return or lazily initialize the default global G2pExtractor instance."""
+def get_default_g2p() -> G2PEngine:
+    """Return or lazily initialize the default global G2PEngine instance."""
     global _DEFAULT_EXTRACTOR
     if _DEFAULT_EXTRACTOR is None:
-        _DEFAULT_EXTRACTOR = G2pExtractor()
+        _DEFAULT_EXTRACTOR = G2PEngine()
     return _DEFAULT_EXTRACTOR
 
 
@@ -102,7 +105,7 @@ def extract_arpabet(
     text: str,
     strip_stress: bool = True,
     extractor: Optional[EnglishToArpabetProtocol] = None,
-) -> Tuple[ArpabetToken, ...]:
+) -> Tuple[ARPAbetPhone, ...]:
     """
     Convenience function to extract ARPAbet tokens from text.
 
@@ -113,3 +116,11 @@ def extract_arpabet(
     """
     g2p = extractor if extractor is not None else get_default_g2p()
     return g2p.extract(text, strip_stress=strip_stress)
+
+
+__all__ = [
+    "G2PEngine",
+    "G2pExtractor",
+    "extract_arpabet",
+    "get_default_g2p",
+]

@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-transcription.cherokee.arpabet.forced_aligner
+transcription.core.alignment.forced_aligner
 
-Word-level forced alignment for English audio using torchaudio's MMS_FA pipeline.
-Aligns speech audio waveforms against sentence transcripts to produce precise
+Word-level forced alignment for audio using torchaudio's MMS_FA pipeline.
+Aligns speech audio waveforms against transcript words to produce precise
 start and end timestamps for each word.
 """
 
@@ -275,3 +275,11 @@ def get_default_forced_aligner() -> MMSForcedAligner:
     if _DEFAULT_ALIGNER is None:
         _DEFAULT_ALIGNER = MMSForcedAligner()
     return _DEFAULT_ALIGNER
+
+
+__all__ = [
+    "AlignedWordSpan",
+    "ForcedAlignerProtocol",
+    "MMSForcedAligner",
+    "get_default_forced_aligner",
+]

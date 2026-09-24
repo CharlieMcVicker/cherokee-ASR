@@ -9,7 +9,7 @@ from pathlib import Path
 import tempfile
 import pytest
 
-from transcription.cherokee.arpabet.types import (
+from transcription.cherokee.codeswitching.types import (
     ArpabetToken,
     CherokeeToken,
     SyntheticCherokeeTarget,
@@ -259,10 +259,8 @@ def test_prepare_alignment_input_code_switched(default_projector):
 
 def test_project_arpabet_multigram_viterbi():
     """Verify 1,2-gram Viterbi projection selects multi-phone cluster targets."""
-    from transcription.cherokee.arpabet.types import (
-        AcousticConfusionMatrix,
-        ArpabetToken,
-    )
+    from transcription.core.codeswitching import AcousticConfusionMatrix
+    from transcription.cherokee.codeswitching.types import ArpabetToken
 
     # Matrix with 1-gram and 2-gram transitions
     probs = {

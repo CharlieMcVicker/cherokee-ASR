@@ -22,7 +22,7 @@ from transcription.alignment.aligner import (
     NeedlemanWunschWordAligner,
     SlidingWindowDTWAligner,
 )
-from transcription.cherokee.arpabet.types import SyntheticTargetProjectorProtocol
+from transcription.cherokee.codeswitching.types import SyntheticTargetProjectorProtocol
 from transcription.alignment.exporters import (
     export_debug_json,
     export_manifest as export_manifest_file,

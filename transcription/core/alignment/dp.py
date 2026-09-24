@@ -9,7 +9,7 @@ configured cleanly by pluggable DistanceMetric strategy implementations.
 
 from __future__ import annotations
 
-from typing import Callable, List, Optional, Sequence, Tuple, Union
+from typing import Any, Callable, List, Optional, Sequence, Tuple, Union
 import numpy as np
 
 from transcription.core.alignment.distance import (
@@ -493,7 +493,57 @@ class SlidingWindowDTWAligner:
         )
 
 
+class WagnerFischerAligner:
+    """
+    Pure dynamic programming string and phoneme alignment service using Wagner-Fischer algorithm.
+    Supports 1-to-1, 1-to-2, 2-to-1, and 2-to-2 multi-gram transitions.
+    """
+
+    def __init__(self, cost_metric: Optional[DistanceMetric] = None):
+        self.cost_metric = cost_metric or DefaultCERDistanceMetric()
+
+    def align(
+        self,
+        source_tokens: Sequence[Union[str, Any]],
+        target_tokens: Sequence[Union[str, Any]],
+        matrix: Optional[Any] = None,
+        token_confidences: Optional[Sequence[float]] = None,
+    ) -> Any:
+        """Aligns source and target token sequences via Wagner-Fischer DP."""
+        if matrix is not None and hasattr(matrix, "get_substitution_cost"):
+            from transcription.core.codeswitching.trainer import (
+                align_word_pair_generic,
+            )
+
+            return align_word_pair_generic(
+                source_tokens=source_tokens,
+                target_tokens=target_tokens,
+                matrix=matrix,
+                token_confidences=token_confidences,
+            )
+
+        # Fallback to basic string edit alignment if no confusion matrix
+        src_strs = [str(s) for s in source_tokens]
+        tgt_strs = [str(t) for t in target_tokens]
+        N, M = len(src_strs), len(tgt_strs)
+        dp = np.zeros((N + 1, M + 1), dtype=np.float32)
+        for i in range(1, N + 1):
+            dp[i, 0] = dp[i - 1, 0] + 1.0
+        for j in range(1, M + 1):
+            dp[0, j] = dp[0, j - 1] + 1.0
+        for i in range(1, N + 1):
+            for j in range(1, M + 1):
+                cost_sub = dp[i - 1, j - 1] + float(
+                    self.cost_metric.compute_cost(src_strs[i - 1], tgt_strs[j - 1])
+                )
+                cost_del = dp[i - 1, j] + 1.0
+                cost_ins = dp[i, j - 1] + 1.0
+                dp[i, j] = min(cost_sub, cost_del, cost_ins)
+        return float(dp[N, M])
+
+
 __all__ = [
     "NeedlemanWunschWordAligner",
     "SlidingWindowDTWAligner",
+    "WagnerFischerAligner",
 ]
