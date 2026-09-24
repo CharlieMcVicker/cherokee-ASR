@@ -3,9 +3,11 @@ id: TASK-369
 title: >-
   Modularize ARPAbet cross-lingual loanword projection into Tier 1 generic
   engine and Tier 2 Cherokee factory
-status: To Do
-assignee: []
+status: In Progress
+assignee:
+  - '@supervisor'
 created_date: '2026-09-24 14:52'
+updated_date: '2026-09-24 14:55'
 labels: []
 dependencies: []
 ordinal: 399300
