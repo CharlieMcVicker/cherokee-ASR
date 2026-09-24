@@ -36,16 +36,16 @@ from ctc_segmentation import (  # type: ignore
     CtcSegmentationParameters,
     ctc_segmentation,
 )
-from transcription.alignment.ctc_aligner import CTCSegmentationAligner
-from transcription.alignment.models import CTCAlignerConfig, TextChunk, WordInterval
-from transcription.alignment.normalizers import (
+from digohwelisgi.alignment.ctc_aligner import CTCSegmentationAligner
+from digohwelisgi.alignment.models import CTCAlignerConfig, TextChunk, WordInterval
+from digohwelisgi.alignment.normalizers import (
     normalize_phonetics_for_alignment,
     normalize_syllabary_for_alignment,
 )
-from transcription.alignment.phonotactics import prepare_cherokee_text
-from transcription.evaluation.perturbations import AdditiveNoise
-from transcription.cherokee.models import CherokeeASRModel
-from transcription.cherokee.orthography import syllabary_to_phonetics
+from digohwelisgi.alignment.phonotactics import prepare_cherokee_text
+from digohwelisgi.evaluation.perturbations import AdditiveNoise
+from digohwelisgi.cherokee.models import CherokeeASRModel
+from digohwelisgi.cherokee.orthography import syllabary_to_phonetics
 
 logging.basicConfig(
     level=logging.INFO,

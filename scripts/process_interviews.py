@@ -12,7 +12,7 @@ from scipy.signal import stft, istft
 # Add root directory to path to import local modules
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from transcription.core.audio import (
+from digohwelisgi.core.audio import (
     get_energy_profile,
     segment_audio_from_profile,
     compute_metrics,

@@ -21,9 +21,9 @@ from typing import Any, Dict, List, Set
 
 import torch
 
-from transcription.cherokee.codeswitching import get_default_projector
-from transcription.alignment.pipeline import align_syllabary_greedy
-from transcription.cherokee.models import CherokeeASRModel
+from digohwelisgi.cherokee.codeswitching import get_default_projector
+from digohwelisgi.alignment.pipeline import align_syllabary_greedy
+from digohwelisgi.cherokee.models import CherokeeASRModel
 
 logging.basicConfig(
     level=logging.INFO,

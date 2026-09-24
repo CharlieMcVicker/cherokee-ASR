@@ -22,10 +22,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 if str(BASE_DIR) not in sys.path:
     sys.path.insert(0, str(BASE_DIR))
 
-from transcription.alignment.ctc_aligner import CTCSegmentationAligner
-from transcription.alignment.models import CTCAlignerConfig, TextChunk
-from transcription.cherokee.models import CherokeeASRModel
-from transcription.pipelines.scripture import load_chapter_transcript
+from digohwelisgi.alignment.ctc_aligner import CTCSegmentationAligner
+from digohwelisgi.alignment.models import CTCAlignerConfig, TextChunk
+from digohwelisgi.cherokee.models import CherokeeASRModel
+from digohwelisgi.pipelines.scripture import load_chapter_transcript
 
 DEFAULT_MODEL_REPO = "charliemcvicker/length-only-20260704-155307-asr-cherokee-colon"
 DEFAULT_REVISION = "76e62140955f4738abdab345ea34068b02d8d2a2"

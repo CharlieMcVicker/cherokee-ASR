@@ -15,11 +15,11 @@ import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Union
 
-from transcription.core.models.inference import (
+from digohwelisgi.core.models.inference import (
     compute_audio_cache_key,
     infer_emissions_batch,
 )
-from transcription.cherokee.models import CherokeeASRModel
+from digohwelisgi.cherokee.models import CherokeeASRModel
 
 logger = logging.getLogger(__name__)
 

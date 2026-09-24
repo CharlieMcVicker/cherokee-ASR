@@ -1,6 +1,6 @@
 # Wav2Vec2 Training, Dataset Preparation, and Evaluation Guide
 
-This guide provides a comprehensive reference for preparing datasets, training acoustic Wav2Vec2 models, and running disaggregated model evaluations in `transcription.training`.
+This guide provides a comprehensive reference for preparing datasets, training acoustic Wav2Vec2 models, and running disaggregated model evaluations in `digohwelisgi.training`.
 
 ---
 
@@ -68,11 +68,11 @@ The Cherokee ASR model architecture is built on **Hugging Face Wav2Vec2** (`face
 
 ## 2. Dataset Preparation (`prepare_csv.py`)
 
-The script [`transcription.training.prepare_csv`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/training/prepare_csv.py) transforms raw metadata CSV files and directories of audio files into shuffled, filtered, duration-bounded Train, Validation, and Test CSV splits.
+The script [`digohwelisgi.training.prepare_csv`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/training/prepare_csv.py) transforms raw metadata CSV files and directories of audio files into shuffled, filtered, duration-bounded Train, Validation, and Test CSV splits.
 
 ### Phonetic Text Normalization
 
-Audio transcripts undergo thorough phonetic normalization via [`clean_transcription()`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/training/prepare_csv.py#L18-L53) and [`remove_tones_and_double_vowels()`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/utils/tone_normalization.py):
+Audio transcripts undergo thorough phonetic normalization via [`clean_transcription()`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/training/prepare_csv.py#L18-L53) and [`remove_tones_and_double_vowels()`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/utils/tone_normalization.py):
 1. **Semicolon Handling:** Word-final semicolons `;` are stripped; word-medial semicolons are converted to `:` (representing vowel length).
 2. **Glottal Stop Standardization:** Unifies glottal variations (`ʔ`, `ʼ`, `‚`) to standard single quote `'`.
 3. **Tone Stripping:** Strips tone diacritics and rare tone markers; drops samples with corrupt tone marks.
@@ -95,7 +95,7 @@ Audio transcripts undergo thorough phonetic normalization via [`clean_transcript
 ### CLI Reference
 
 ```bash
-python -m transcription.training.prepare_csv \
+python -m digohwelisgi.training.prepare_csv \
     --csv training_data/processed/sentence_audio.csv \
     --audio-dir training_data/processed/sentence_audio \
     --text-col phonetic \
@@ -118,7 +118,7 @@ python -m transcription.training.prepare_csv \
 
 ## 3. Model Training (`train.py`)
 
-Implemented in [`transcription.training.train`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/training/train.py).
+Implemented in [`digohwelisgi.training.train`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/training/train.py).
 
 ### Multi-Domain 6-way Split Handling
 
@@ -156,7 +156,7 @@ The script automatically:
 
 ### Hyperparameters & Optimization
 
-Key `TrainingArguments` configured in [`initialize_model_and_trainer()`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/training/train.py#L476-L545):
+Key `TrainingArguments` configured in [`initialize_model_and_trainer()`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/training/train.py#L476-L545):
 
 | Hyperparameter | Value | Description |
 | :--- | :--- | :--- |
@@ -178,27 +178,27 @@ Key `TrainingArguments` configured in [`initialize_model_and_trainer()`](file://
 
 ### Resuming Training & Checkpoint Promotion
 
-`train.py` supports multiple resumption workflows via [`resolve_resume_checkpoint()`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/training/train.py#L548-L618):
+`train.py` supports multiple resumption workflows via [`resolve_resume_checkpoint()`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/training/train.py#L548-L618):
 - **Local Checkpoint:** `--resume-from-checkpoint path/to/checkpoint-800` or `--resume-from-checkpoint latest` (automatically finds the highest numbered step).
 - **Hugging Face Hub Revision:** `--resume-from-repo username/model_name --resume-from-revision <commit_hash>`. Downloads the remote snapshot and resumes optimizer/scheduler state if available.
 
 #### Automatic Post-Training Promotion:
-Upon completion, [`evaluate_checkpoints_dual()`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/training/train.py#L628-L710) evaluates all saved checkpoints against both test sets, selects the top-performing checkpoint, and promotes its weights into `output_w2v2/wav2vec2-large-xlsr/`.
+Upon completion, [`evaluate_checkpoints_dual()`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/training/train.py#L628-L710) evaluates all saved checkpoints against both test sets, selects the top-performing checkpoint, and promotes its weights into `output_w2v2/wav2vec2-large-xlsr/`.
 
 ### CLI Reference
 
 ```bash
 # Basic local training run
-python -m transcription.training.train \
+python -m digohwelisgi.training.train \
     --epochs 50 \
     --output-dir output_w2v2
 
 # Resume from latest local checkpoint
-python -m transcription.training.train \
+python -m digohwelisgi.training.train \
     --resume-from-checkpoint latest
 
 # Train and push checkpoints directly to Hugging Face Hub
-python -m transcription.training.train \
+python -m digohwelisgi.training.train \
     --epochs 50 \
     --push-to-hub \
     --hub-model-id charliemcvicker/cherokee-wav2vec2 \
@@ -211,17 +211,17 @@ python -m transcription.training.train \
 
 ### Local Checkpoint Evaluator (`evaluate_checkpoint.py`)
 
-[`transcription.training.evaluate_checkpoint`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/training/evaluate_checkpoint.py) evaluates a single checkpoint (local folder or Hugging Face Hub ID) against a specified test CSV split.
+[`digohwelisgi.training.evaluate_checkpoint`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/training/evaluate_checkpoint.py) evaluates a single checkpoint (local folder or Hugging Face Hub ID) against a specified test CSV split.
 
 ```bash
 # Evaluate a local checkpoint
-python -m transcription.training.evaluate_checkpoint \
+python -m digohwelisgi.training.evaluate_checkpoint \
     --checkpoint output_w2v2/wav2vec2-large-xlsr/checkpoint-1200 \
     --test-csv training_data/processed/cim-wav2vec2-test.csv \
     --audio-dir training_data/processed/sentence_audio
 
 # Evaluate a remote Hugging Face model at a specific commit hash
-python -m transcription.training.evaluate_checkpoint \
+python -m digohwelisgi.training.evaluate_checkpoint \
     --checkpoint charliemcvicker/length-only-20260702-173608-asr-cherokee \
     --revision 3a1b2c4 \
     --test-csv training_data/processed/cim-wav2vec2-test.csv
@@ -235,7 +235,7 @@ python -m transcription.training.evaluate_checkpoint \
 
 ### Hugging Face Revisions Evaluator (`evaluate_revisions.py`)
 
-[`transcription.training.evaluate_revisions`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/training/evaluate_revisions.py) performs automated benchmarking across multiple model revisions listed in a TSV or CSV file.
+[`digohwelisgi.training.evaluate_revisions`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/training/evaluate_revisions.py) performs automated benchmarking across multiple model revisions listed in a TSV or CSV file.
 
 #### Example `data/results/revisions_to_test.tsv`:
 ```tsv
@@ -248,7 +248,7 @@ Final-Promoted	1a2b3c4
 
 #### Running the Multi-Revision Sweep:
 ```bash
-python -m transcription.training.evaluate_revisions \
+python -m digohwelisgi.training.evaluate_revisions \
     --revisions-csv data/results/revisions_to_test.tsv \
     --checkpoint charliemcvicker/length-only-20260702-173608-asr-cherokee \
     --test-csv training_data/processed/cim-wav2vec2-test.csv \
@@ -268,14 +268,14 @@ Final-Promoted,1a2b3c4,0.1980,0.0650,0.1620,0.0490
 
 ### Shared Evaluation Framework & Masked Metrics
 
-Evaluation logic is unified across all tools via [`transcription.utils.evaluation.run_evaluation`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/utils/evaluation.py#L129-L312) and [`CherokeeASRModel`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/models/asr_model.py#L42-L188).
+Evaluation logic is unified across all tools via [`digohwelisgi.utils.evaluation.run_evaluation`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/utils/evaluation.py#L129-L312) and [`CherokeeASRModel`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/models/asr_model.py#L42-L188).
 
 For each evaluated sample, four distinct metric variations are computed to isolate specific acoustic error categories:
 
 1. **Raw (Unmasked) WER/CER:** Direct string comparison against reference phonetics.
-2. **Vowel-Length Masked WER/CER:** Evaluated with [`strip_length()`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/inference/infer.py) (collapses long vowels `V:` to short `V`), measuring transcription accuracy independent of vowel duration ambiguities.
-3. **Tone Masked WER/CER:** Evaluated with [`strip_tones()`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/inference/infer.py) (removes pitch/tone contours).
-4. **Both Masked WER/CER:** Evaluated with [`strip_both()`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/inference/infer.py) (removes both tone and vowel length markers).
+2. **Vowel-Length Masked WER/CER:** Evaluated with [`strip_length()`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/inference/infer.py) (collapses long vowels `V:` to short `V`), measuring transcription accuracy independent of vowel duration ambiguities.
+3. **Tone Masked WER/CER:** Evaluated with [`strip_tones()`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/inference/infer.py) (removes pitch/tone contours).
+4. **Both Masked WER/CER:** Evaluated with [`strip_both()`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/inference/infer.py) (removes both tone and vowel length markers).
 
 ---
 
@@ -288,7 +288,7 @@ For each evaluated sample, four distinct metric variations are computed to isola
 conda activate cherokee-asr
 
 # 2. Prepare Conversational / Sentence Dataset Splits
-python -m transcription.training.prepare_csv \
+python -m digohwelisgi.training.prepare_csv \
     --csv training_data/processed/sentence_audio.csv \
     --audio-dir training_data/processed/sentence_audio \
     --text-col phonetic \
@@ -297,7 +297,7 @@ python -m transcription.training.prepare_csv \
     --split 80.0 10.0 10.0
 
 # 3. Launch Fine-Tuning with 6-way Multi-Domain Splits
-python -m transcription.training.train \
+python -m digohwelisgi.training.train \
     --train-orig-csv training_data/processed/cim-wav2vec2-train.csv \
     --train-bible-csv training_data/processed/bible-wav2vec2-train.csv \
     --valid-orig-csv training_data/processed/cim-wav2vec2-valid.csv \
@@ -308,7 +308,7 @@ python -m transcription.training.train \
     --epochs 50
 
 # 4. Evaluate Promoted Model on Test Split
-python -m transcription.training.evaluate_checkpoint \
+python -m digohwelisgi.training.evaluate_checkpoint \
     --checkpoint output_w2v2/wav2vec2-large-xlsr \
     --test-csv training_data/processed/cim-wav2vec2-test.csv \
     --audio-dir training_data/processed/sentence_audio

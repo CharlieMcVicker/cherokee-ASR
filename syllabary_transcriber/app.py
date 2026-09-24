@@ -15,7 +15,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from transcription.cherokee.models import CherokeeASRModel
+from digohwelisgi.cherokee.models import CherokeeASRModel
 
 
 import logging

@@ -25,11 +25,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 if str(BASE_DIR) not in sys.path:
     sys.path.insert(0, str(BASE_DIR))
 
-from transcription.alignment.ctc_aligner import CTCSegmentationAligner
-from transcription.alignment.models import CTCAlignerConfig
-from transcription.alignment.normalizers import normalize_phonetics_for_alignment
-from transcription.cherokee.models import CherokeeASRModel
-from transcription.pipelines.scripture import (
+from digohwelisgi.alignment.ctc_aligner import CTCSegmentationAligner
+from digohwelisgi.alignment.models import CTCAlignerConfig
+from digohwelisgi.alignment.normalizers import normalize_phonetics_for_alignment
+from digohwelisgi.cherokee.models import CherokeeASRModel
+from digohwelisgi.pipelines.scripture import (
     load_chapter_transcript,
 )
 

@@ -8,8 +8,8 @@ using DialogueAlignmentPipeline with calibrated code-switching English projectio
 """
 
 from pathlib import Path
-from transcription.alignment.models import CTCAlignerConfig
-from transcription.pipelines.dialogue import align_dialogue
+from digohwelisgi.alignment.models import CTCAlignerConfig
+from digohwelisgi.pipelines.dialogue import align_dialogue
 
 AUDIO_PATH = Path("saving-the-voices/gs_mm.wav")
 TRANSCRIPT_PATH = Path("saving-the-voices/gs_mm.txt")

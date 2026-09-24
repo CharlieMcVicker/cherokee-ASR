@@ -17,7 +17,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from pydub import AudioSegment
 
-from transcription.pipelines.scripture import align_chapter as _align_chapter_pipeline
+from digohwelisgi.pipelines.scripture import align_chapter as _align_chapter_pipeline
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 NT_DIR = BASE_DIR / "cherokee_new_testament"
@@ -69,7 +69,7 @@ def realign_book(
     aligner_config: Optional[Any] = None,
 ) -> Tuple[List[Dict[str, Any]], List[Dict[str, str]]]:
     """Align one or all chapters of a NT book, writing records and training CSV rows."""
-    from transcription.alignment.models import CTCAlignerConfig
+    from digohwelisgi.alignment.models import CTCAlignerConfig
 
     book_key = book.lower().strip()
     if book_key not in BOOK_CONFIGS:
@@ -173,7 +173,7 @@ def main() -> None:
     parser.add_argument("--no-cache", action="store_true", default=False)
     args = parser.parse_args()
 
-    from transcription.alignment.models import CTCAlignerConfig
+    from digohwelisgi.alignment.models import CTCAlignerConfig
 
     config = CTCAlignerConfig(cache=not args.no_cache, cache_dir=args.cache_dir)
     books = BOOK_CONFIGS if args.book == "all" else {args.book: BOOK_CONFIGS[args.book]}

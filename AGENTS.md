@@ -11,16 +11,16 @@ The codebase is modularized into four distinct architectural layers:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│ Tier 4: Applications & Entrypoints (transcription.apps)     │
+│ Tier 4: Applications & Entrypoints (digohwelisgi.apps)     │
 │   • CLI (align-cherokee)                                    │
 │   • Desktop Transcriber (syllabary_transcriber)             │
 ├─────────────────────────────────────────────────────────────┤
-│ Tier 3: Domain Pipelines (transcription.pipelines)          │
+│ Tier 3: Domain Pipelines (digohwelisgi.pipelines)          │
 │   • scripture: Continuous chapter alignment & verse slicing │
 │   • dialogue: Code-switched interview alignment             │
 │   • enrichment: Phonetic syllabary enrichment & alignment   │
 ├─────────────────────────────────────────────────────────────┤
-│ Tier 2: Cherokee Domain (transcription.cherokee)            │
+│ Tier 2: Cherokee Domain (digohwelisgi.cherokee)            │
 │   • orthography: Syllabary, DG, TTH conversion & tables     │
 │   • phonotactics: Intrusions, syncope, surface constraints  │
 │   • distance: Phonological confusion cost metrics           │
@@ -28,7 +28,7 @@ The codebase is modularized into four distinct architectural layers:
 │   • enrichment: Syllable reconciliation engine              │
 │   • models: CherokeeASRModel factory & weights              │
 ├─────────────────────────────────────────────────────────────┤
-│ Tier 1: Core Engine (transcription.core)                    │
+│ Tier 1: Core Engine (digohwelisgi.core)                    │
 │   • audio: Segmenting & Silero VAD soft-masking             │
 │   • models: ModelOutput currency, inference & ASRModel      │
 │   • alignment: DP (DTW, Needleman-Wunsch) & CTC trellis     │
@@ -37,34 +37,34 @@ The codebase is modularized into four distinct architectural layers:
 ```
 
 ### Module Paths
-- **`transcription.core`**: Language-agnostic foundational engine.
-  - `transcription.core.audio`: `AudioChunk`, `segment_long_audio`, `SileroVADDetector`, `mask_non_speech_logits`.
-  - `transcription.core.models`: `ModelOutput` (universal currency with `.npz` caching), standalone inference (`infer_emissions`, `infer_emissions_batch`), and `ASRModel`.
-  - `transcription.core.alignment`: Pure domain models (`TextChunk`, `TokenEmission`, `WordInterval`, `AlignedChunk`, `AlignmentOutput`), DP aligners (`NeedlemanWunschWordAligner`, `SlidingWindowDTWAligner`), CTC segmentation aligner (`CTCSegmentationAligner`), and generic distance protocols (`DistanceMetric`, `DefaultCERDistanceMetric`).
-  - `transcription.core.exporters`: `TextGridBuilder`, `export_textgrid`, `export_manifest`, `export_debug_json`.
-- **`transcription.cherokee`**: Cherokee phonetic, phonotactic, and linguistic domain logic.
-  - `transcription.cherokee.orthography`: `Orthography` enum, `convert_orthography`, syllabary lookup dictionaries, and tone stripping.
-  - `transcription.cherokee.phonotactics`: Surface phonotactic rules, transition masks, syncope/intrusion masks, and `prepare_cherokee_text`.
-  - `transcription.cherokee.distance`: `PhonologicalConfusionCostMetric`, `ConfusionMatrixCostMetric`.
-  - `transcription.cherokee.codeswitching`: `SyntheticTargetProjector`, `CodeSwitchedPreparer`, compound clitic segmentation.
-  - `transcription.cherokee.enrichment`: `SyllableAlignmentEngine`, `reconcile_phonetics`, `reconcile_alignment_words`.
-  - `transcription.cherokee.models`: `CherokeeASRModel` loader.
-- **`transcription.pipelines`**: End-to-end domain orchestration pipelines.
-  - `transcription.pipelines.scripture`: `ScripturePipeline`, `align_chapter`.
-  - `transcription.pipelines.dialogue`: `DialogueAlignmentPipeline`, `align_dialogue`.
-  - `transcription.pipelines.enrichment`: `EnrichmentPipeline`.
-- **`transcription.apps`**: High-level application drivers and CLI interfaces.
-  - `transcription.apps.cli`: `align-cherokee` CLI entrypoint.
+- **`digohwelisgi.core`**: Language-agnostic foundational engine.
+  - `digohwelisgi.core.audio`: `AudioChunk`, `segment_long_audio`, `SileroVADDetector`, `mask_non_speech_logits`.
+  - `digohwelisgi.core.models`: `ModelOutput` (universal currency with `.npz` caching), standalone inference (`infer_emissions`, `infer_emissions_batch`), and `ASRModel`.
+  - `digohwelisgi.core.alignment`: Pure domain models (`TextChunk`, `TokenEmission`, `WordInterval`, `AlignedChunk`, `AlignmentOutput`), DP aligners (`NeedlemanWunschWordAligner`, `SlidingWindowDTWAligner`), CTC segmentation aligner (`CTCSegmentationAligner`), and generic distance protocols (`DistanceMetric`, `DefaultCERDistanceMetric`).
+  - `digohwelisgi.core.exporters`: `TextGridBuilder`, `export_textgrid`, `export_manifest`, `export_debug_json`.
+- **`digohwelisgi.cherokee`**: Cherokee phonetic, phonotactic, and linguistic domain logic.
+  - `digohwelisgi.cherokee.orthography`: `Orthography` enum, `convert_orthography`, syllabary lookup dictionaries, and tone stripping.
+  - `digohwelisgi.cherokee.phonotactics`: Surface phonotactic rules, transition masks, syncope/intrusion masks, and `prepare_cherokee_text`.
+  - `digohwelisgi.cherokee.distance`: `PhonologicalConfusionCostMetric`, `ConfusionMatrixCostMetric`.
+  - `digohwelisgi.cherokee.codeswitching`: `SyntheticTargetProjector`, `CodeSwitchedPreparer`, compound clitic segmentation.
+  - `digohwelisgi.cherokee.enrichment`: `SyllableAlignmentEngine`, `reconcile_phonetics`, `reconcile_alignment_words`.
+  - `digohwelisgi.cherokee.models`: `CherokeeASRModel` loader.
+- **`digohwelisgi.pipelines`**: End-to-end domain orchestration pipelines.
+  - `digohwelisgi.pipelines.scripture`: `ScripturePipeline`, `align_chapter`.
+  - `digohwelisgi.pipelines.dialogue`: `DialogueAlignmentPipeline`, `align_dialogue`.
+  - `digohwelisgi.pipelines.enrichment`: `EnrichmentPipeline`.
+- **`digohwelisgi.apps`**: High-level application drivers and CLI interfaces.
+  - `digohwelisgi.apps.cli`: `align-cherokee` CLI entrypoint.
   - `syllabary_transcriber`: Standalone desktop application (PyWebView + FastAPI + React/TS).
-- **`transcription.evaluation`** & **`transcription.training`**: Wav2Vec2 fine-tuning, dataset split preparation, manifold analysis, and checkpoint evaluation.
+- **`digohwelisgi.evaluation`** & **`digohwelisgi.training`**: Wav2Vec2 fine-tuning, dataset split preparation, manifold analysis, and checkpoint evaluation.
 
 ## Testing & Quality Assurance
 - Run tests: `pytest`
-- Run static type checker: `pyright transcription`
+- Run static type checker: `pyright digohwelisgi`
 
 ## Cherokee Orthographies & Phonetic Conventions
 
-Cherokee text in this codebase exists across three primary orthographic representations (`transcription.cherokee.orthography.Orthography` enum).
+Cherokee text in this codebase exists across three primary orthographic representations (`digohwelisgi.cherokee.orthography.Orthography` enum).
 
 | Orthography Enum | Format & Character Set | Key Usages in Codebase |
 | :--- | :--- | :--- |
@@ -85,21 +85,21 @@ In canonical **`T/TH`**, tones and vowel lengths are decoupled/stripped, and the
 - **NO `c`, `q`, `x`, `z`**: Labio-velars use `kw` / `kwh`.
 
 ### Pipeline Ingestion & Emission Mapping
-- **Bible Ingestion (`transcription.pipelines.scripture` / `load_bible_chunks`)**:
+- **Bible Ingestion (`digohwelisgi.pipelines.scripture` / `load_bible_chunks`)**:
   - Bible on disk contains `SYLLABARY` (`"cherokee"`) and hyphenated `DG` (`"phonetic"`: e.g. `A-da-le-ni-s-gv yi-s-dv ka-no-he-dv, Tsi-sa Ga-lo-ne-dv`).
   - Ingestion strips hyphens and converts `DG -> TTH` (`convert_orthography(source=DG, target=TTH)`), yielding `adalenisgv yihstv khanohetv, tsisa kalonetv`.
-- **Acoustic Emissions (`transcription.core.models` / `CherokeeASRModel`)**:
+- **Acoustic Emissions (`digohwelisgi.core.models` / `CherokeeASRModel`)**:
   - Emits tokens strictly in `TTH` (`athaleniskv`, `hahswanko`, `atil`).
-- **Code-Switched Ingestion & Loanword Projection (`transcription.cherokee.codeswitching:SyntheticTargetProjector`)**:
+- **Code-Switched Ingestion & Loanword Projection (`digohwelisgi.cherokee.codeswitching:SyntheticTargetProjector`)**:
   - Input: Mixed Cherokee Syllabary and English code-switched transcripts (e.g., `ᎯᎠ coffee ᎠᎩᏚᎵ`).
   - Projector: O(1) static memoized dictionary lookup (`data/arpabet_alignment/dictionaries/english_loanwords_tth.json`, 3,662+ words) with fallback dynamic G2P (`g2p_en`) mapped via calibrated acoustic confusion matrix argmax substitutions.
   - Output: Reconciled canonical `TTH` phonetic targets (`hi'a khasi akituli`) aligning seamlessly against Cherokee ASR emissions.
-- **Code-Switched Ground Truth Preparation & Compound Clitic Segmentation (`transcription.cherokee.codeswitching:create_groundtruth_for_code_switched_syllabary`)**:
+- **Code-Switched Ground Truth Preparation & Compound Clitic Segmentation (`digohwelisgi.cherokee.codeswitching:create_groundtruth_for_code_switched_syllabary`)**:
   - Script-level token discrimination: Pure Cherokee Syllabary (`TokenType.CHEROKEE_SYLLABARY`), Pure English (`TokenType.ENGLISH`), Compound Latin Stem + Syllabary Clitic (`TokenType.COMPOUND_CLITIC`, e.g. `JayᎢ` -> `Jay` + `Ꭲ`, `WellingᏛ` -> `Welling` + `Ꮫ`), and Punctuation (`TokenType.PUNCTUATION`).
   - Strict isolation: English tokens pass strictly through `SyntheticTargetProjector` (zero Cherokee DG-to-TTH consonant mutation), eliminating double conversion corruption (`Soldier` -> `hsowtsa`, `Jay` -> `tse`).
   - Compound clitic projection: English stem projected via confusion matrix, syllabary clitic directly normalized, fused into unified canonical TTH (`JayᎢ` -> `tsei`, `WellingᏛ` -> `wawintv`).
   - Preserves multi-tier word metadata (Syllabary, English, Reconciled) and speaker labels (`extract_speaker_prefix`).
-- **Syllabary Enrichment (`transcription.cherokee.enrichment` / `transcription.pipelines.enrichment`)**:
+- **Syllabary Enrichment (`digohwelisgi.cherokee.enrichment` / `digohwelisgi.pipelines.enrichment`)**:
   - Anchor: `SYLLABARY` (`ᎠᏓᎴᏂᏍᎬ`).
   - Acoustic Observation: `TTH` emissions (`athaleniskv`).
   - Output: Reconciled `TTH` phonetic representation (`athaleniskv`).

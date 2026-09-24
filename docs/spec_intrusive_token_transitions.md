@@ -177,6 +177,6 @@ table[t, c] = max(max(max(switch_prob, stay_prob), syncope_skip_prob), intrusive
 
 ## 8. Summary of Benefits
 
-1. **True Reconciled Phonetics:** Eliminates the need for post-hoc heuristic regexes or secondary string reconciliation passes. The backtracked CTC path **is** the reconciled phonetic transcription.
+1. **True Reconciled Phonetics:** Eliminates the need for post-hoc heuristic regexes or secondary string reconciliation passes. The backtracked CTC path **is** the reconciled phonetic digohwelisgi.
 2. **Robust to Imperfect Transcripts:** Canonical transliterations lacking underlying phonological markers (`h`, `'`) are automatically enriched directly from the speech audio.
 3. **Purely Data-Driven & Generic:** Works across any CTC acoustic model and language simply by supplying the token IDs of intrusive candidates.

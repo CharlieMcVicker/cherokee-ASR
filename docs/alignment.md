@@ -1,8 +1,8 @@
-# Cherokee Audio-Text Alignment Engine (`transcription.alignment`)
+# Cherokee Audio-Text Alignment Engine (`digohwelisgi.alignment`)
 
-The `transcription.alignment` package provides a high-performance, modular alignment and timestamping pipeline designed to align ground-truth Cherokee transcripts (such as story chunk lists, Bible verses, and conversational texts) against spoken audio recordings.
+The `digohwelisgi.alignment` package provides a high-performance, modular alignment and timestamping pipeline designed to align ground-truth Cherokee transcripts (such as story chunk lists, Bible verses, and conversational texts) against spoken audio recordings.
 
-It combines Voice Activity Detection (VAD) audio pre-segmentation, acoustic CTC token emission extraction via [CherokeeASRModel](file:///Users/julietmcvicker/code/workshop-transcription/transcription/models/asr_model.py), 2D Sliding-Window Dynamic Time Warping (DTW) chunk alignment, and Needleman-Wunsch Dynamic Programming (DP) word-level fusion to calculate exact word- and chunk-level boundary timestamps.
+It combines Voice Activity Detection (VAD) audio pre-segmentation, acoustic CTC token emission extraction via [CherokeeASRModel](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/models/asr_model.py), 2D Sliding-Window Dynamic Time Warping (DTW) chunk alignment, and Needleman-Wunsch Dynamic Programming (DP) word-level fusion to calculate exact word- and chunk-level boundary timestamps.
 
 ---
 
@@ -58,33 +58,33 @@ flowchart TD
 
 ### Key Architectural Strengths
 
-1. **Pure Domain Models**: Core algorithms operate on [`TextChunk`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/models.py#L21-L27) and [`TokenEmission`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/models.py#L11-L19) models, completely agnostic to dataset-specific metadata structures (e.g. verse numbers, book chapters, story speaker tags).
-2. **Pluggable Normalization & Distance Metrics**: Word and chunk distance scoring are parameterized via the [`DistanceMetric`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/distance_metrics.py#L9-L16) protocol, allowing Character Error Rate (CER), Levenshtein edit distance with custom substitution weights, or arbitrary callables.
+1. **Pure Domain Models**: Core algorithms operate on [`TextChunk`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/alignment/models.py#L21-L27) and [`TokenEmission`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/alignment/models.py#L11-L19) models, completely agnostic to dataset-specific metadata structures (e.g. verse numbers, book chapters, story speaker tags).
+2. **Pluggable Normalization & Distance Metrics**: Word and chunk distance scoring are parameterized via the [`DistanceMetric`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/alignment/distance_metrics.py#L9-L16) protocol, allowing Character Error Rate (CER), Levenshtein edit distance with custom substitution weights, or arbitrary callables.
 3. **Multi-to-Multi DP Fusion**: The word aligner dynamically solves $1$-to-$N$ and $M$-to-$1$ ASR token-to-word grouping discrepancies with configurable fusion penalties and gap costs.
-4. **Isolated Outbound Exporters**: Exporters receive pure [`AlignmentOutput`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/models.py#L65-L73) objects and output directories, generating Praat TextGrids and JSON manifests without coupling to alignment execution.
-5. **Language-Agnostic Extraction Schemas & Protocols**: While `CherokeeASRModel` is the dedicated Cherokee acoustic model, the output schemas and alignment protocols ([`TokenEmission`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/models.py#L11-L19), [`ASRResult`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/models/asr_model.py#L21-L32), [`SlidingWindowDTWAligner`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/aligner.py#L129-L232)) are language-agnostic. Downstream Cherokee Syllabary transliteration and phonetic rule reconciliation are explicitly performed by `transcription.cherokee.enrichment` and `transcription.cherokee.orthography`.
+4. **Isolated Outbound Exporters**: Exporters receive pure [`AlignmentOutput`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/alignment/models.py#L65-L73) objects and output directories, generating Praat TextGrids and JSON manifests without coupling to alignment execution.
+5. **Language-Agnostic Extraction Schemas & Protocols**: While `CherokeeASRModel` is the dedicated Cherokee acoustic model, the output schemas and alignment protocols ([`TokenEmission`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/alignment/models.py#L11-L19), [`ASRResult`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/models/asr_model.py#L21-L32), [`SlidingWindowDTWAligner`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/alignment/aligner.py#L129-L232)) are language-agnostic. Downstream Cherokee Syllabary transliteration and phonetic rule reconciliation are explicitly performed by `digohwelisgi.cherokee.enrichment` and `digohwelisgi.cherokee.orthography`.
 
 ### Module Map
 
 | Module | File | Purpose |
 | --- | --- | --- |
-| Models | [`models.py`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/models.py) | Pure dataclasses: `TextChunk`, `TokenEmission`, `WordInterval`, `AlignedChunk`, `AlignmentMetrics`, `AlignmentOutput`. |
-| Aligners | [`aligner.py`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/aligner.py) | `NeedlemanWunschWordAligner` (word DP) and `SlidingWindowDTWAligner` (chunk DTW). |
-| Extractors | [`extractors.py`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/extractors.py) | `ASREmissionsExtractor` protocol, `CherokeeASRExtractor`, `CallbackEmissionsExtractor`, `PrecomputedEmissionsExtractor`, `prepare_audio_chunks`. |
-| Metrics | [`distance_metrics.py`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/distance_metrics.py) | `DistanceMetric` protocol, `DefaultCERDistanceMetric`, `LevenshteinDistanceMetric`, `CustomCallableDistanceMetric`, `calculate_cer`. |
-| Normalizers | [`normalizers.py`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/normalizers.py) | `normalize_syllabary_for_alignment` (aspiration stripped), `normalize_phonetics_for_alignment` (aspiration preserved), and `normalize_text_for_alignment` (compat alias). |
-| Ingestion | [`ingestion.py`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/ingestion.py) | `prepare_alignment_input` (sum-type dispatcher & normalizer resolver), `load_bible_chunks`, `load_generic_chunks`, `load_syllabary_transcript`, and `load_interview_transcript`. |
-| Code-Switching | [`arpabet/projector.py`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/arpabet/projector.py) | `SyntheticTargetProjector`, `get_default_projector`, O(1) static dictionary lookup (`english_loanwords_tth.json`), dynamic G2P + confusion matrix argmax mapping, and `normalize_code_switched_text`. |
-| Reconciliation | [`reconciliation.py`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/reconciliation.py) | `reconcile_word_intervals`, `reconcile_alignment_words`, `reconcile_alignment_by_chunk`. |
-| Exporters | [`exporters.py`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/exporters.py) | `export_manifest`, `export_textgrid` (multi-tier Praat), `export_debug_json`. |
-| Thresholding | [`threshold_finder.py`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/threshold_finder.py) | `AlignmentThresholdFinder`, interactive binary search CLI, and threshold metrics exporter. |
-| CLI / Pipeline | [`cli.py`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/cli.py) | `run_alignment_pipeline` orchestrator and `align-cherokee` CLI entrypoint. |
+| Models | [`models.py`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/alignment/models.py) | Pure dataclasses: `TextChunk`, `TokenEmission`, `WordInterval`, `AlignedChunk`, `AlignmentMetrics`, `AlignmentOutput`. |
+| Aligners | [`aligner.py`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/alignment/aligner.py) | `NeedlemanWunschWordAligner` (word DP) and `SlidingWindowDTWAligner` (chunk DTW). |
+| Extractors | [`extractors.py`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/alignment/extractors.py) | `ASREmissionsExtractor` protocol, `CherokeeASRExtractor`, `CallbackEmissionsExtractor`, `PrecomputedEmissionsExtractor`, `prepare_audio_chunks`. |
+| Metrics | [`distance_metrics.py`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/alignment/distance_metrics.py) | `DistanceMetric` protocol, `DefaultCERDistanceMetric`, `LevenshteinDistanceMetric`, `CustomCallableDistanceMetric`, `calculate_cer`. |
+| Normalizers | [`normalizers.py`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/alignment/normalizers.py) | `normalize_syllabary_for_alignment` (aspiration stripped), `normalize_phonetics_for_alignment` (aspiration preserved), and `normalize_text_for_alignment` (compat alias). |
+| Ingestion | [`ingestion.py`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/alignment/ingestion.py) | `prepare_alignment_input` (sum-type dispatcher & normalizer resolver), `load_bible_chunks`, `load_generic_chunks`, `load_syllabary_transcript`, and `load_interview_transcript`. |
+| Code-Switching | [`arpabet/projector.py`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/alignment/arpabet/projector.py) | `SyntheticTargetProjector`, `get_default_projector`, O(1) static dictionary lookup (`english_loanwords_tth.json`), dynamic G2P + confusion matrix argmax mapping, and `normalize_code_switched_text`. |
+| Reconciliation | [`reconciliation.py`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/alignment/reconciliation.py) | `reconcile_word_intervals`, `reconcile_alignment_words`, `reconcile_alignment_by_chunk`. |
+| Exporters | [`exporters.py`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/alignment/exporters.py) | `export_manifest`, `export_textgrid` (multi-tier Praat), `export_debug_json`. |
+| Thresholding | [`threshold_finder.py`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/alignment/threshold_finder.py) | `AlignmentThresholdFinder`, interactive binary search CLI, and threshold metrics exporter. |
+| CLI / Pipeline | [`cli.py`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/alignment/cli.py) | `run_alignment_pipeline` orchestrator and `align-cherokee` CLI entrypoint. |
 
 ---
 
-## 2. Core Domain Models (`transcription.alignment.models`)
+## 2. Core Domain Models (`digohwelisgi.alignment.models`)
 
-All domain models are implemented as pure Python dataclasses in [`transcription/alignment/models.py`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/models.py).
+All domain models are implemented as pure Python dataclasses in [`digohwelisgi/alignment/models.py`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/alignment/models.py).
 
 ### Model Definitions
 
@@ -203,7 +203,7 @@ class AlignmentOutput:
 
 ---
 
-## 3. Alignment Engines (`transcription.alignment.aligner`)
+## 3. Alignment Engines (`digohwelisgi.alignment.aligner`)
 
 The alignment engine implements a two-stage hierarchical alignment:
 1. **Chunk-Level Dynamic Time Warping (`SlidingWindowDTWAligner`)**: Finds optimal temporal boundaries for multi-word phrases or sentences within long audio.
@@ -214,9 +214,9 @@ The alignment engine implements a two-stage hierarchical alignment:
 Aligns ground-truth words to matched emission tokens using an enhanced Needleman-Wunsch string edit DP matrix with $1$-to-$N$ and $M$-to-$1$ fusion.
 
 ```python
-from transcription.alignment.aligner import NeedlemanWunschWordAligner
-from transcription.alignment.distance_metrics import DefaultCERDistanceMetric
-from transcription.alignment.normalizers import normalize_text_for_alignment
+from digohwelisgi.alignment.aligner import NeedlemanWunschWordAligner
+from digohwelisgi.alignment.distance_metrics import DefaultCERDistanceMetric
+from digohwelisgi.alignment.normalizers import normalize_text_for_alignment
 
 word_aligner = NeedlemanWunschWordAligner(
     distance_metric=DefaultCERDistanceMetric(),
@@ -251,7 +251,7 @@ The aligner constructs a 2D dynamic programming grid `dp[N+1, M+1]` where $N$ is
    - Result: Discarded as extraneous acoustic noise / insertion.
 3. **Multi-to-Multi Match & Fusion (`match_fuse_k_m`)**:
    - Transition: `(i, j) -> (i + k, j + m)` with cost `dp[i, j] + edit_cost + penalty`.
-   - Result: Creates a [`WordInterval`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/models.py#L30-L39) spanning from `matched_tokens[j].start_sec` to `matched_tokens[j + m - 1].end_sec`. Confidence is computed as the mean confidence across the $m$ tokens.
+   - Result: Creates a [`WordInterval`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/alignment/models.py#L30-L39) spanning from `matched_tokens[j].start_sec` to `matched_tokens[j + m - 1].end_sec`. Confidence is computed as the mean confidence across the $m$ tokens.
 
 #### Methods
 
@@ -262,10 +262,10 @@ The aligner constructs a 2D dynamic programming grid `dp[N+1, M+1]` where $N$ is
 
 ### `SlidingWindowDTWAligner`
 
-The chunk-level aligner maps sequential [`TextChunk`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/models.py#L21-L27)s to an emission stream using a 2D sliding window search.
+The chunk-level aligner maps sequential [`TextChunk`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/alignment/models.py#L21-L27)s to an emission stream using a 2D sliding window search.
 
 ```python
-from transcription.alignment.aligner import SlidingWindowDTWAligner
+from digohwelisgi.alignment.aligner import SlidingWindowDTWAligner
 
 aligner = SlidingWindowDTWAligner(
     word_aligner=word_aligner,
@@ -291,7 +291,7 @@ aligner = SlidingWindowDTWAligner(
    - Selects window $[start\_idx, end\_idx]$ minimizing distance cost.
    - Delegates token slice to `word_aligner.align_words(raw_words, matched_tokens)`.
    - Advances `token_idx = best_end_idx`.
-3. Computes summary metrics across all chunks and returns [`AlignmentOutput`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/models.py#L65-L73).
+3. Computes summary metrics across all chunks and returns [`AlignmentOutput`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/alignment/models.py#L65-L73).
 
 #### Methods
 
@@ -299,15 +299,15 @@ aligner = SlidingWindowDTWAligner(
 
 ---
 
-## 4. Emission Extractors (`transcription.alignment.extractors`)
+## 4. Emission Extractors (`digohwelisgi.alignment.extractors`)
 
-Emission extractors convert audio inputs into sequences of timestamped [`TokenEmission`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/models.py#L11-L19) objects.
+Emission extractors convert audio inputs into sequences of timestamped [`TokenEmission`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/alignment/models.py#L11-L19) objects.
 
 ### `ASREmissionsExtractor` Protocol
 
 ```python
 from typing import Any, List, Protocol, runtime_checkable
-from transcription.alignment.models import TokenEmission
+from digohwelisgi.alignment.models import TokenEmission
 
 @runtime_checkable
 class ASREmissionsExtractor(Protocol):
@@ -318,19 +318,19 @@ class ASREmissionsExtractor(Protocol):
 
 ### Audio Chunk Preparation (`prepare_audio_chunks`)
 
-[`prepare_audio_chunks(audio_input: Any, skip_vad: bool = False) -> List[AudioChunk]`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/extractors.py#L27-L62) is a utility supporting string file paths, `pydub.AudioSegment`, and `numpy.ndarray` audio inputs.
+[`prepare_audio_chunks(audio_input: Any, skip_vad: bool = False) -> List[AudioChunk]`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/alignment/extractors.py#L27-L62) is a utility supporting string file paths, `pydub.AudioSegment`, and `numpy.ndarray` audio inputs.
 
-- **`skip_vad=False`**: Uses [`segment_long_audio`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/audio/segment.py) VAD to segment audio into speech chunks separated by non-speech intervals.
+- **`skip_vad=False`**: Uses [`segment_long_audio`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/audio/segment.py) VAD to segment audio into speech chunks separated by non-speech intervals.
 - **`skip_vad=True`**: Wraps the entire audio into a single `AudioChunk(chunk_index=0, start_sec=0.0, end_sec=...)`, bypassing VAD segmentation. Ideal for short pre-cut audio clips.
 
 ### Concrete Extractors
 
 #### 1. `CherokeeASRExtractor`
-Wraps [`CherokeeASRModel`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/models/asr_model.py) for direct model inference:
+Wraps [`CherokeeASRModel`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/models/asr_model.py) for direct model inference:
 
 ```python
-from transcription.alignment.extractors import CherokeeASRExtractor
-from transcription.cherokee.models import CherokeeASRModel
+from digohwelisgi.alignment.extractors import CherokeeASRExtractor
+from digohwelisgi.cherokee.models import CherokeeASRModel
 
 model = CherokeeASRModel.from_pretrained("charliemcvicker/asr-cherokee")
 extractor = CherokeeASRExtractor(model=model, skip_vad=False)
@@ -341,7 +341,7 @@ emissions = extractor.extract("audio/recording.wav")
 Wraps any callable `(samples: np.ndarray, sample_rate: int) -> List[TokenEmission | dict | Any]`:
 
 ```python
-from transcription.alignment.extractors import CallbackEmissionsExtractor
+from digohwelisgi.alignment.extractors import CallbackEmissionsExtractor
 
 def custom_infer_callback(samples, sample_rate):
     # Run custom inference logic
@@ -355,8 +355,8 @@ emissions = extractor.extract("audio/recording.wav")
 Loads precomputed tokens or dicts without performing audio inference (ideal for unit testing and offline workflows):
 
 ```python
-from transcription.alignment.extractors import PrecomputedEmissionsExtractor
-from transcription.alignment.models import TokenEmission
+from digohwelisgi.alignment.extractors import PrecomputedEmissionsExtractor
+from digohwelisgi.alignment.models import TokenEmission
 
 tokens = [
     TokenEmission(word="osiyo", start_sec=0.2, end_sec=0.8, confidence=0.95),
@@ -372,7 +372,7 @@ emissions = extractor.extract()
 
 ### `DistanceMetric` Protocol
 
-Located in [`transcription/alignment/distance_metrics.py`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/distance_metrics.py):
+Located in [`digohwelisgi/alignment/distance_metrics.py`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/alignment/distance_metrics.py):
 
 ```python
 from typing import Protocol, runtime_checkable
@@ -390,7 +390,7 @@ class DistanceMetric(Protocol):
 Computes Character Error Rate using `jiwer.cer(reference, hypothesis)`.
 
 ```python
-from transcription.alignment.distance_metrics import DefaultCERDistanceMetric, calculate_cer
+from digohwelisgi.alignment.distance_metrics import DefaultCERDistanceMetric, calculate_cer
 
 metric = DefaultCERDistanceMetric()
 cost = metric.compute_cost(hypothesis="osyo", reference="osiyo")  # ~0.20
@@ -406,7 +406,7 @@ raw_cer = calculate_cer("osyo", "osiyo")
 Implements weighted dynamic programming edit distance normalized by reference length:
 
 ```python
-from transcription.alignment.distance_metrics import LevenshteinDistanceMetric
+from digohwelisgi.alignment.distance_metrics import LevenshteinDistanceMetric
 
 custom_metric = LevenshteinDistanceMetric(
     substitution_weights={
@@ -425,16 +425,16 @@ cost = custom_metric.compute_cost(hypothesis="ga", reference="ka")  # 0.1
 Adapts any standard `(hypothesis: str, reference: str) -> float` callable:
 
 ```python
-from transcription.alignment.distance_metrics import CustomCallableDistanceMetric
+from digohwelisgi.alignment.distance_metrics import CustomCallableDistanceMetric
 
 metric = CustomCallableDistanceMetric(fn=lambda hyp, ref: 0.0 if hyp == ref else 0.5)
 ```
 
 ---
 
-### Representation-Aware Text Normalization & Orthography System (`transcription.alignment.normalizers`)
+### Representation-Aware Text Normalization & Orthography System (`digohwelisgi.alignment.normalizers`)
 
-Located in [`transcription/alignment/normalizers.py`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/normalizers.py) and backed by [`transcription.cherokee.orthography.Orthography`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/cherokee/orthography/orthography.py), text normalizers ensure deterministic conversions across Cherokee orthographic representations.
+Located in [`digohwelisgi/alignment/normalizers.py`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/alignment/normalizers.py) and backed by [`digohwelisgi.cherokee.orthography.Orthography`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/cherokee/orthography/orthography.py), text normalizers ensure deterministic conversions across Cherokee orthographic representations.
 
 #### Orthography Enum System
 
@@ -462,20 +462,20 @@ Normalizes phonetic Cherokee text into canonical `Orthography.TTH` for ASR acous
 ##### 2. `normalize_syllabary_for_alignment(text: str, source: Orthography = Orthography.SYLLABARY, target: Orthography = Orthography.TTH) -> str`
 Normalizes Cherokee Syllabary (or Latin transliteration) into canonical `Orthography.TTH` alignment phonetics using deterministic character mapping.
 
-*Note: [`normalize_text_for_alignment`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/normalizers.py) is retained as a backwards-compatible alias for `normalize_phonetics_for_alignment`.*
+*Note: [`normalize_text_for_alignment`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/alignment/normalizers.py) is retained as a backwards-compatible alias for `normalize_phonetics_for_alignment`.*
 
 ---
 
-## 6. Ground-Truth Ingestion (`transcription.alignment.ingestion`)
+## 6. Ground-Truth Ingestion (`digohwelisgi.alignment.ingestion`)
 
-Ingestion utilities load reference text from JSON files, dictionaries, or lists into standardized [`TextChunk`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/models.py#L21-L27) lists and source metadata lookup maps.
+Ingestion utilities load reference text from JSON files, dictionaries, or lists into standardized [`TextChunk`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/alignment/models.py#L21-L27) lists and source metadata lookup maps.
 
 ### `prepare_alignment_input` (Sum-Type Dispatcher)
 
 The primary entrypoint for source ingestion. It accepts sum-type arguments (`bible_metadata` vs `chunk_list`), loads the chunks, and resolves the appropriate normalizers targeting `Orthography.TTH`:
 
 ```python
-from transcription.alignment.ingestion import prepare_alignment_input
+from digohwelisgi.alignment.ingestion import prepare_alignment_input
 
 chunks, source_lookup, chunk_normalizer, emissions_normalizer = prepare_alignment_input(
     bible_metadata="data/book_transcripts/02_Mark/0201.json",
@@ -493,8 +493,8 @@ chunks, source_lookup, chunk_normalizer, emissions_normalizer = prepare_alignmen
 Loads generic chunk lists (story segments, dialogues, sentences):
 
 ```python
-from transcription.alignment.ingestion import load_generic_chunks
-from transcription.alignment.normalizers import normalize_phonetics_for_alignment
+from digohwelisgi.alignment.ingestion import load_generic_chunks
+from digohwelisgi.alignment.normalizers import normalize_phonetics_for_alignment
 
 chunks, source_lookup = load_generic_chunks(
     source="timestamping_test_data/fishing_story.json",
@@ -528,8 +528,8 @@ chunks, source_lookup = load_generic_chunks(
 Loads Bible verse metadata dictionaries:
 
 ```python
-from transcription.alignment.ingestion import load_bible_chunks
-from transcription.alignment.normalizers import normalize_phonetics_for_alignment
+from digohwelisgi.alignment.ingestion import load_bible_chunks
+from digohwelisgi.alignment.normalizers import normalize_phonetics_for_alignment
 
 chunks, source_lookup = load_bible_chunks(
     source="cherokee_new_testament/book_transcripts/mark_01.json",
@@ -557,10 +557,10 @@ chunks, source_lookup = load_bible_chunks(
 
 ### `load_syllabary_transcript`
 
-Ingests Cherokee Syllabary transcripts (or mixed Cherokee/English code-switched text) from plain text strings, `.txt` files, JSON files, or chunk lists into normalized [`TextChunk`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/models.py#L21-L27) lists:
+Ingests Cherokee Syllabary transcripts (or mixed Cherokee/English code-switched text) from plain text strings, `.txt` files, JSON files, or chunk lists into normalized [`TextChunk`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/alignment/models.py#L21-L27) lists:
 
 ```python
-from transcription.alignment.ingestion import load_syllabary_transcript
+from digohwelisgi.alignment.ingestion import load_syllabary_transcript
 
 chunks, source_lookup = load_syllabary_transcript(
     source="data/transcripts/elders_meeting.txt",
@@ -578,7 +578,7 @@ chunks, source_lookup = load_syllabary_transcript(
 Ingests dialogue and interview transcripts formatted as `'Speaker: Spoken text'`, preserving speaker identity in metadata while extracting cleaned speech turns:
 
 ```python
-from transcription.alignment.ingestion import load_interview_transcript
+from digohwelisgi.alignment.ingestion import load_interview_transcript
 
 chunks, source_lookup = load_interview_transcript(
     source="Speaker 1: ᎯᎠ coffee ᎠᎩᏚᎵ\nSpeaker 2: ᎥᎥ, hospital ᏫᏥᎦ",
@@ -588,7 +588,7 @@ chunks, source_lookup = load_interview_transcript(
 
 ---
 
-### Code-Switched Ingestion & Synthetic Target Projection (`transcription.cherokee.codeswitching.projector`)
+### Code-Switched Ingestion & Synthetic Target Projection (`digohwelisgi.cherokee.codeswitching.projector`)
 
 When Cherokee speakers code-switch or use English loanwords (e.g., *coffee*, *hospital*, *doctor*, *car*), standard ASR and alignment pipelines fail because Latin English spellings do not match the Cherokee acoustic model's emission vocabulary.
 
@@ -601,7 +601,7 @@ The projector module translates English text -> ARPAbet -> synthetic Cherokee TT
 #### Programmatic Example
 
 ```python
-from transcription.cherokee.codeswitching import (
+from digohwelisgi.cherokee.codeswitching import (
     get_default_projector,
     normalize_code_switched_text,
     project_english_text,
@@ -624,12 +624,12 @@ norm_tth = normalize_code_switched_text(mixed)
 print(norm_tth)  # "hi'a khasi akituli"
 ```
 
-### Code-Switching Ground Truth Preparer (`transcription.cherokee.codeswitching.codeswitched_preparer`)
+### Code-Switching Ground Truth Preparer (`digohwelisgi.cherokee.codeswitching.codeswitched_preparer`)
 
 For dialogue transcripts with mixed Syllabary, English loanwords, speaker prefixes, and compound clitics (e.g. *JayᎢ* -> English 'Jay' + Syllabary 'Ꭲ'), `create_groundtruth_for_code_switched_syllabary` performs script-level token discrimination with zero double conversion.
 
 ```python
-from transcription.cherokee.codeswitching import (
+from digohwelisgi.cherokee.codeswitching import (
     create_groundtruth_for_code_switched_syllabary,
     split_compound_clitic,
     TokenType,
@@ -654,7 +654,7 @@ print(res.reconciled_tier_tokens)  # ("hi'a", "ka", "hsowtsa", "tawato", "tsei",
 
 ---
 
-## 7. Syllabary Phonetic Reconciliation (`transcription.alignment.reconciliation`)
+## 7. Syllabary Phonetic Reconciliation (`digohwelisgi.alignment.reconciliation`)
 
 Spoken Cherokee frequently undergoes phonological processes (vowel syncopation, pre-aspiration, post-vocalic aspiration) that cause acoustic pronunciations to diverge from base transliterations.
 
@@ -663,7 +663,7 @@ The reconciliation module maps ground-truth Cherokee Syllabary against aligned w
 ### Reconciliation Functions
 
 ```python
-from transcription.alignment.reconciliation import (
+from digohwelisgi.alignment.reconciliation import (
     reconcile_word_intervals,
     reconcile_alignment_words,
     reconcile_alignment_by_chunk,
@@ -679,8 +679,8 @@ def reconcile_word_intervals(
     """Pure mapping: returns new WordIntervals with reconciled phonetics in `word`."""
 ```
 - Splits `syllabary_text` into words.
-- Uses character-syllable dynamic programming alignment ([`align_character_syllable`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/cherokee/enrichment/syllable_alignment.py)) and phonetic rule merger ([`reconcile_phonetics`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/cherokee/enrichment/syllable_alignment.py)).
-- Returns new, immutable [`WordInterval`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/models.py#L30-L39) instances with reconciled word strings.
+- Uses character-syllable dynamic programming alignment ([`align_character_syllable`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/cherokee/enrichment/syllable_alignment.py)) and phonetic rule merger ([`reconcile_phonetics`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/cherokee/enrichment/syllable_alignment.py)).
+- Returns new, immutable [`WordInterval`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/alignment/models.py#L30-L39) instances with reconciled word strings.
 
 #### `reconcile_alignment_words`
 ```python
@@ -702,12 +702,12 @@ def reconcile_alignment_by_chunk(
 
 ---
 
-## 8. Outbound Exporters (`transcription.alignment.exporters`)
+## 8. Outbound Exporters (`digohwelisgi.alignment.exporters`)
 
-Outbound exporters generate structured outputs from an [`AlignmentOutput`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/models.py#L65-L73) object.
+Outbound exporters generate structured outputs from an [`AlignmentOutput`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/alignment/models.py#L65-L73) object.
 
 ```python
-from transcription.alignment.exporters import (
+from digohwelisgi.alignment.exporters import (
     export_manifest,
     export_textgrid,
     export_debug_json,
@@ -863,7 +863,7 @@ debug_path = export_debug_json(
 
 ## 9. CLI Reference (`align-cherokee`)
 
-The `align-cherokee` command is registered in `pyproject.toml` and points to [`transcription.alignment.cli:main`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/cli.py).
+The `align-cherokee` command is registered in `pyproject.toml` and points to [`digohwelisgi.alignment.cli:main`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/alignment/cli.py).
 
 ### Flag Reference Table
 
@@ -936,14 +936,14 @@ align-cherokee \
 
 ## 10. Programmatic Python API
 
-The `transcription.alignment` package supports turnkey syllabary interview alignment functions as well as fine-grained modular pipelines.
+The `digohwelisgi.alignment` package supports turnkey syllabary interview alignment functions as well as fine-grained modular pipelines.
 
 ### Syllabary Interview Alignment (`align_syllabary_greedy` vs `align_syllabary_ctc`)
 
 To align an interview transcript in Cherokee syllabary (with potential English code-switching) and export multi-tier Praat TextGrids and JSON manifests:
 
 ```python
-from transcription.alignment import align_syllabary_greedy, align_syllabary_ctc
+from digohwelisgi.alignment import align_syllabary_greedy, align_syllabary_ctc
 
 # 1. Pipeline 1: Greedy ASR + DTW + Syllabary Reconciliation
 output_greedy = align_syllabary_greedy(
@@ -976,7 +976,7 @@ Both runners automatically generate multi-tier Praat TextGrids containing:
 ### High-Level Execution (`run_alignment_pipeline`)
 
 ```python
-from transcription.alignment import run_alignment_pipeline
+from digohwelisgi.alignment import run_alignment_pipeline
 
 alignment = run_alignment_pipeline(
     audio_path="timestamping_test_data/Cherokee Story-Our Fishing Trip.wav",
@@ -999,7 +999,7 @@ if alignment.metrics:
 ### Low-Level Modular Execution
 
 ```python
-from transcription.alignment import (
+from digohwelisgi.alignment import (
     CherokeeASRExtractor,
     NeedlemanWunschWordAligner,
     SlidingWindowDTWAligner,
@@ -1008,7 +1008,7 @@ from transcription.alignment import (
     prepare_alignment_input,
     reconcile_alignment_words,
 )
-from transcription.cherokee.models import CherokeeASRModel
+from digohwelisgi.cherokee.models import CherokeeASRModel
 
 # Step 1: Ingest ground-truth chunks & resolve representation-aware normalizers
 chunks, source_lookup, chunk_norm, emission_norm = prepare_alignment_input(
@@ -1071,7 +1071,7 @@ print(f"Alignment exported successfully to {output_dir}/")
 You can inject custom distance metrics, such as a phonologically weighted edit distance:
 
 ```python
-from transcription.alignment import (
+from digohwelisgi.alignment import (
     LevenshteinDistanceMetric,
     NeedlemanWunschWordAligner,
     SlidingWindowDTWAligner,
@@ -1100,10 +1100,10 @@ aligner = SlidingWindowDTWAligner(word_aligner=word_aligner)
 
 ### In-Memory / Precomputed Token Alignment
 
-For offline testing, batch caching, or non-audio pipelines, bypass acoustic extraction using [`PrecomputedEmissionsExtractor`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/extractors.py#L204-L244):
+For offline testing, batch caching, or non-audio pipelines, bypass acoustic extraction using [`PrecomputedEmissionsExtractor`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/alignment/extractors.py#L204-L244):
 
 ```python
-from transcription.alignment import (
+from digohwelisgi.alignment import (
     NeedlemanWunschWordAligner,
     PrecomputedEmissionsExtractor,
     SlidingWindowDTWAligner,
@@ -1133,7 +1133,7 @@ print(f"Aligned chunk start: {alignment.aligned_chunks[0].start_sec}s, end: {ali
 
 ## 10. Alignment Cost Thresholding (`AlignmentThresholdFinder`)
 
-The [`AlignmentThresholdFinder`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/threshold_finder.py) provides an interactive binary search tool to establish the optimal cost threshold $T^*$ over dataset alignment distributions.
+The [`AlignmentThresholdFinder`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/alignment/threshold_finder.py) provides an interactive binary search tool to establish the optimal cost threshold $T^*$ over dataset alignment distributions.
 
 ### Interactive CLI Usage
 
@@ -1162,7 +1162,7 @@ python scripts/find_alignment_threshold.py --quantile 0.90
 ### Programmatic Python API
 
 ```python
-from transcription.alignment import load_alignment_records, AlignmentThresholdFinder, find_threshold_bounds
+from digohwelisgi.alignment import load_alignment_records, AlignmentThresholdFinder, find_threshold_bounds
 
 # 1. Ingest alignment records from directory, JSON manifest, or CSV
 records, source_files = load_alignment_records("output_praat/new_testament")
@@ -1179,14 +1179,14 @@ finder.export_results(metrics, "runs/evaluation/alignment_threshold.json")
 
 ## 11. Continuous CTC Segmentation & Phonotactic Calibration (`CTCSegmentationAligner`)
 
-The [`CTCSegmentationAligner`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/ctc_aligner.py) provides syncope- and intrusion-aware CTC trellis segmentation operating directly on continuous chapter audio using Relative Contrastive Acoustic Gating (zero-hyperparameter formulation from `ctc-segmentation` PR #7).
+The [`CTCSegmentationAligner`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/alignment/ctc_aligner.py) provides syncope- and intrusion-aware CTC trellis segmentation operating directly on continuous chapter audio using Relative Contrastive Acoustic Gating (zero-hyperparameter formulation from `ctc-segmentation` PR #7).
 
 ### Strongly-Typed Configuration (`CTCAlignerConfig`)
 
-All aligner configurations are consolidated into [`CTCAlignerConfig`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/models.py):
+All aligner configurations are consolidated into [`CTCAlignerConfig`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/alignment/models.py):
 
 ```python
-from transcription.alignment import CTCSegmentationAligner, CTCAlignerConfig
+from digohwelisgi.alignment import CTCSegmentationAligner, CTCAlignerConfig
 
 config = CTCAlignerConfig(
     syncope_tokens=("a", "e", "i", "o", "u", "v"),
@@ -1209,7 +1209,7 @@ Rather than requiring manually tuned transition penalties or fixed posterior thr
 
 Cherokee surface phonotactics govern valid sites for vocalic deletion (syncope) and laryngeal insertions (pre-aspiration, post-aspiration, glottal stops).
 
-[`prepare_cherokee_text`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/alignment/phonotactics.py) automatically generates:
+[`prepare_cherokee_text`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/alignment/phonotactics.py) automatically generates:
 1. `config.is_syncope_token`: 1D boolean/int8 mask indicating positions eligible for vocalic syncope without violating forbidden cluster constraints (`*HH`, `*ChR`).
 2. `config.is_intrusive_site`: 1D boolean/int8 mask licensing candidate sites for intrusive `/h/` and `/'/` detours.
 

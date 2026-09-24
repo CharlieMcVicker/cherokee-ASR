@@ -33,17 +33,17 @@ import logging
 from pathlib import Path
 from typing import Any, List, Optional, Sequence, Tuple
 
-from transcription.evaluation.confusion import (
+from digohwelisgi.evaluation.confusion import (
     ConfusionAccumulator,
     character_levenshtein_align,
 )
-from transcription.evaluation.cost_engine import ConfusionCostEngine
-from transcription.evaluation.evaluator import EvaluationRecord, NoisyEvaluator
-from transcription.evaluation.manifold import PhoneticManifoldAnalyzer
-from transcription.evaluation.perturbations import AdditiveNoise, AudioTransform
-from transcription.evaluation.visualizer import ManifoldVisualizer
-from transcription.cherokee.orthography import normalize_text
-from transcription.cherokee.models import CherokeeASRModel
+from digohwelisgi.evaluation.cost_engine import ConfusionCostEngine
+from digohwelisgi.evaluation.evaluator import EvaluationRecord, NoisyEvaluator
+from digohwelisgi.evaluation.manifold import PhoneticManifoldAnalyzer
+from digohwelisgi.evaluation.perturbations import AdditiveNoise, AudioTransform
+from digohwelisgi.evaluation.visualizer import ManifoldVisualizer
+from digohwelisgi.cherokee.orthography import normalize_text
+from digohwelisgi.cherokee.models import CherokeeASRModel
 
 logging.basicConfig(
     level=logging.INFO,

@@ -1,5 +1,5 @@
 import json
-from transcription.cherokee.orthography import syllabary_to_phonetics
+from digohwelisgi.cherokee.orthography import syllabary_to_phonetics
 
 
 def syl_to_bad_phonetic(s):

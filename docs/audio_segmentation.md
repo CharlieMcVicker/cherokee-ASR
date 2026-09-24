@@ -1,6 +1,6 @@
 # Audio Segmentation and Voice Activity Detection (VAD)
 
-This guide documents the **Voice Activity Detection (VAD) audio segmentation engine** and **audio extraction pipeline** in `transcription.core.audio`.
+This guide documents the **Voice Activity Detection (VAD) audio segmentation engine** and **audio extraction pipeline** in `digohwelisgi.core.audio`.
 
 ---
 
@@ -18,11 +18,11 @@ This guide documents the **Voice Activity Detection (VAD) audio segmentation eng
 ## 1. Overview
 
 Long continuous Cherokee audio recordings (e.g., historical interviews, conversational workshops, multi-minute New Testament Bible chapters) must be segmented into shorter, coherent speech segments ($\le 10$ seconds) before feeding into:
-- Acoustic model training (`transcription.training.train`)
-- Character and word timestamping (`transcription.alignment`)
+- Acoustic model training (`digohwelisgi.training.train`)
+- Character and word timestamping (`digohwelisgi.alignment`)
 - Active learning and Praat TextGrid generation
 
-The segmentation engine in [`transcription.core.audio.segment`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/core/audio/segment.py) employs a **two-phase hybrid VAD algorithm**:
+The segmentation engine in [`digohwelisgi.core.audio.segment`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/core/audio/segment.py) employs a **two-phase hybrid VAD algorithm**:
 1. **Vectorized Energy Profiling:** Computes exact decibels relative to full scale (dBFS) energy curves over 10ms windows.
 2. **Dynamic Parameter Selection & Smart Recursive Splitting:** Automatically selects optimal silence thresholds to maximize speech coverage without exceeding target duration limits, using quiet-window fallbacks to avoid cutting in the middle of words.
 
@@ -30,7 +30,7 @@ The segmentation engine in [`transcription.core.audio.segment`](file:///Users/ju
 
 ## 2. Key Functions & Classes
 
-The primary module is [`transcription.core.audio.segment`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/core/audio/segment.py).
+The primary module is [`digohwelisgi.core.audio.segment`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/core/audio/segment.py).
 
 ### `AudioChunk`
 
@@ -106,9 +106,9 @@ Recursively subdivides any segment exceeding `max_duration_ms`:
 
 The top-level orchestrator for audio chunking:
 1. Loads audio (from file path or existing `AudioSegment`), applies peak volume normalization, and resamples to 16,000 Hz.
-2. Computes the dBFS energy profile and runs [`get_best_parameters()`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/audio/segment.py#L305-L385).
-3. Applies [`split_long_segments_smart()`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/audio/segment.py#L387-L472) to partition segments into $\le 10\text{s}$ slices.
-4. Returns a list of [`AudioChunk`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/audio/segment.py#L14-L23) objects with start and end timestamps.
+2. Computes the dBFS energy profile and runs [`get_best_parameters()`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/audio/segment.py#L305-L385).
+3. Applies [`split_long_segments_smart()`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/audio/segment.py#L387-L472) to partition segments into $\le 10\text{s}$ slices.
+4. Returns a list of [`AudioChunk`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/audio/segment.py#L14-L23) objects with start and end timestamps.
 
 ---
 
@@ -165,14 +165,14 @@ The top-level orchestrator for audio chunking:
 
 ### Hyperparameter Sweep Evaluation
 
-Run [`transcription.core.audio.segment`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/core/audio/segment.py) directly from the command line to evaluate VAD thresholds or run a hyperparameter sweep over a target audio file.
+Run [`digohwelisgi.core.audio.segment`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/core/audio/segment.py) directly from the command line to evaluate VAD thresholds or run a hyperparameter sweep over a target audio file.
 
 ```bash
 # Perform an exhaustive hyperparameter sweep across threshold combinations
-python -m transcription.core.audio.segment path/to/interview.wav --sweep
+python -m digohwelisgi.core.audio.segment path/to/interview.wav --sweep
 
 # Evaluate segmentation with specific manual parameters
-python -m transcription.core.audio.segment path/to/interview.wav \
+python -m digohwelisgi.core.audio.segment path/to/interview.wav \
     --thresh -35 \
     --min-silence 400 \
     --keep-silence 150
@@ -198,7 +198,7 @@ python -m transcription.core.audio.segment path/to/interview.wav \
 ### Example 1: In-Memory Long Audio Segmentation
 
 ```python
-from transcription.core.audio import segment_long_audio
+from digohwelisgi.core.audio import segment_long_audio
 
 audio_path = "data/raw_audio/cherokee_interview_01.wav"
 
@@ -224,7 +224,7 @@ for chunk in chunks[:5]:
 ```python
 from pydub import AudioSegment
 from pydub.effects import normalize
-from transcription.core.audio import (
+from digohwelisgi.core.audio import (
     get_energy_profile,
     get_best_parameters,
     segment_audio_from_profile,
@@ -263,7 +263,7 @@ print(f"Max Length:        {metrics['max_len']:.2f}s")
 
 ```python
 import os
-from transcription.core.audio import segment_long_audio
+from digohwelisgi.core.audio import segment_long_audio
 
 output_dir = "data/processed/exported_chunks"
 os.makedirs(output_dir, exist_ok=True)

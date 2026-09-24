@@ -35,14 +35,14 @@ import logging
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-from transcription.evaluation.confusion import (
+from digohwelisgi.evaluation.confusion import (
     ConfusionAccumulator,
     character_levenshtein_align,
 )
-from transcription.evaluation.cost_engine import ConfusionCostEngine
-from transcription.evaluation.evaluator import EvaluationRecord
-from transcription.evaluation.manifold import PhoneticManifoldAnalyzer
-from transcription.evaluation.visualizer import ManifoldVisualizer
+from digohwelisgi.evaluation.cost_engine import ConfusionCostEngine
+from digohwelisgi.evaluation.evaluator import EvaluationRecord
+from digohwelisgi.evaluation.manifold import PhoneticManifoldAnalyzer
+from digohwelisgi.evaluation.visualizer import ManifoldVisualizer
 
 logging.basicConfig(
     level=logging.INFO,

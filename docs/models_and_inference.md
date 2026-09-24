@@ -76,7 +76,7 @@ The Cherokee ASR system is built on fine-tuned [Wav2Vec 2.0](https://huggingface
        └─────────────────────────┘
 ```
 
-The system is encapsulated in `CherokeeASRModel` (`transcription.cherokee.models.loader`), providing a tiered, decoupled architecture where each layer can be invoked independently or as part of a high-level end-to-end pipeline. The core model and `ASRResult` abstractions remain strictly language-agnostic (producing phonetic hypotheses), leaving Cherokee syllabary conversion and reconciliation to Tier 2 Cherokee domain modules (`transcription.cherokee.enrichment` and `transcription.cherokee.orthography`).
+The system is encapsulated in `CherokeeASRModel` (`digohwelisgi.cherokee.models.loader`), providing a tiered, decoupled architecture where each layer can be invoked independently or as part of a high-level end-to-end pipeline. The core model and `ASRResult` abstractions remain strictly language-agnostic (producing phonetic hypotheses), leaving Cherokee syllabary conversion and reconciliation to Tier 2 Cherokee domain modules (`digohwelisgi.cherokee.enrichment` and `digohwelisgi.cherokee.orthography`).
 
 ---
 
@@ -169,7 +169,7 @@ def get_best_model(
 ) -> CherokeeASRModel
 ```
 
-The underlying loader (`get_best_model_config` in `transcription/utils/model_utils.py`) searches upward through directory hierarchies to find `best_model.json`. If no file is found, it falls back to default checkpoint configuration: `{"repo": "charliemcvicker/asr-cherokee", "revision": "5464d15"}`.
+The underlying loader (`get_best_model_config` in `digohwelisgi/utils/model_utils.py`) searches upward through directory hierarchies to find `best_model.json`. If no file is found, it falls back to default checkpoint configuration: `{"repo": "charliemcvicker/asr-cherokee", "revision": "5464d15"}`.
 
 #### 4. `CherokeeASRModel.from_pretrained_or_best`
 Unified factory method that resolves checkpoints dynamically and provides automatic graceful fallback to public baseline models (default `facebook/wav2vec2-base-960h`).
@@ -234,7 +234,7 @@ To prevent redundant weight loading and VRAM bloat, `model_utils.py` maintains a
 
 ### Data Structures: WordConfidence & ASRResult
 
-All structured outputs are strongly typed dataclasses defined in `transcription.cherokee.models.loader`.
+All structured outputs are strongly typed dataclasses defined in `digohwelisgi.cherokee.models.loader`.
 
 #### `WordConfidence`
 Encapsulates word-level alignment, start/end timestamps, confidence score, and per-character breakdown.
@@ -282,7 +282,7 @@ class ASRResult:
 
 > **Note**: `ASRResult` implements `__getitem__` and `.get()`, enabling backwards-compatible dictionary-style indexing (`result["transcription"]`, `result["confidence"]`) as well as attribute access (`result.transcription`).
 
-> **Language-Agnostic Abstraction**: `ASRResult` purposefully does not contain language-specific fields such as `syllabary`. The acoustic CTC decoder produces phonetic text hypotheses. Transliteration to Cherokee Syllabary and phonetic reconciliation are explicitly performed downstream by `transcription.cherokee.orthography.convert_orthography` or `transcription.cherokee.enrichment`.
+> **Language-Agnostic Abstraction**: `ASRResult` purposefully does not contain language-specific fields such as `syllabary`. The acoustic CTC decoder produces phonetic text hypotheses. Transliteration to Cherokee Syllabary and phonetic reconciliation are explicitly performed downstream by `digohwelisgi.cherokee.orthography.convert_orthography` or `digohwelisgi.cherokee.enrichment`.
 
 ---
 
@@ -402,7 +402,7 @@ The system provides streamlined procedural inference and unified container model
 Transcribes a single audio file and returns the universal `ModelOutput` currency containing logits, vocab mapping, and greedy decode projections.
 
 ```python
-from transcription.cherokee.models.loader import CherokeeASRModel
+from digohwelisgi.cherokee.models.loader import CherokeeASRModel
 
 model = CherokeeASRModel.from_pretrained_or_best()
 output = model.infer("data/raw/Bessie-Summerfield-2.wav")
@@ -417,7 +417,7 @@ print("Transcription:", output.decode_greedy())
 Processes multiple audio files with batched tensor execution:
 
 ```python
-from transcription.cherokee.models.loader import CherokeeASRModel
+from digohwelisgi.cherokee.models.loader import CherokeeASRModel
 
 model = CherokeeASRModel.from_pretrained_or_best()
 audio_paths = ["audio1.wav", "audio2.wav", "audio3.wav"]
@@ -433,7 +433,7 @@ for path, out in zip(audio_paths, outputs):
 
 ## 5. Web-Based Active Labeler
 
-`transcription/inference/labeler.py` provides a lightweight, interactive web application for human-in-the-loop active learning.
+`digohwelisgi/inference/labeler.py` provides a lightweight, interactive web application for human-in-the-loop active learning.
 
 ```
    ┌─────────────────────────────────────────┐
@@ -473,7 +473,7 @@ for path, out in zip(audio_paths, outputs):
 ### Running the Labeler Server
 
 ```bash
-python3 -m transcription.inference.labeler --port 8000
+python3 -m digohwelisgi.inference.labeler --port 8000
 ```
 
 Open `http://localhost:8000` in your web browser.
@@ -482,19 +482,19 @@ Open `http://localhost:8000` in your web browser.
 
 1. Run batch inference across uncurated audio recordings using `CherokeeASRModel.infer_batch()`:
    ```python
-   from transcription.cherokee.models.loader import CherokeeASRModel
+   from digohwelisgi.cherokee.models.loader import CherokeeASRModel
 
    model = CherokeeASRModel.from_pretrained_or_best()
    # Process recordings to produce batch_inference_results.csv
    ```
 2. Start the labeling server:
    ```bash
-   python3 -m transcription.inference.labeler --port 8000
+   python3 -m digohwelisgi.inference.labeler --port 8000
    ```
 3. In the UI, review and correct the low-confidence entries. Click **Save CSV** to write out `data/processed/train_labeled.csv`.
 4. Incorporate newly labeled samples into training splits:
    ```bash
-   python3 -m transcription.training.prepare_csv \
+   python3 -m digohwelisgi.training.prepare_csv \
      --csv data/processed/train_labeled.csv \
      --audio-dir data/raw/new_interviews \
      --output-prefix data/processed/active_learning_split
@@ -509,8 +509,8 @@ Open `http://localhost:8000` in your web browser.
 Transcribing an audio file to phonetic text and performing optional downstream Cherokee Syllabary transliteration:
 
 ```python
-from transcription.cherokee.models.loader import CherokeeASRModel
-from transcription.cherokee.orthography import convert_orthography, Orthography
+from digohwelisgi.cherokee.models.loader import CherokeeASRModel
+from digohwelisgi.cherokee.orthography import convert_orthography, Orthography
 
 # 1. Load the recommended model checkpoint
 asr = CherokeeASRModel.get_best_model()
@@ -534,7 +534,7 @@ Transcribing live PCM audio arrays or raw bytes directly in memory (e.g., from a
 
 ```python
 import numpy as np
-from transcription.cherokee.models.loader import CherokeeASRModel
+from digohwelisgi.cherokee.models.loader import CherokeeASRModel
 
 asr = CherokeeASRModel.get_best_model()
 
@@ -553,7 +553,7 @@ print("Transcription:", result.transcription)
 Extracting word boundaries, timestamps, and character-level alternatives:
 
 ```python
-from transcription.cherokee.models.loader import CherokeeASRModel
+from digohwelisgi.cherokee.models.loader import CherokeeASRModel
 
 asr = CherokeeASRModel.get_best_model()
 
@@ -577,7 +577,7 @@ for w in words:
 Performing batched inference over a list of file paths with custom batch sizing:
 
 ```python
-from transcription.cherokee.models.loader import CherokeeASRModel
+from digohwelisgi.cherokee.models.loader import CherokeeASRModel
 
 asr = CherokeeASRModel.get_best_model(device="cuda")
 

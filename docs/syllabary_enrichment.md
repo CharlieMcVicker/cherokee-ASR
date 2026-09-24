@@ -1,6 +1,6 @@
 # Cherokee Syllabary Phonetic Enrichment Documentation
 
-This guide provides a comprehensive technical reference for the **Cherokee Syllabary Phonetic Enrichment and Reconciliation Pipeline** in `transcription.cherokee.enrichment` (Tier 2 domain logic) and `transcription.pipelines.enrichment` (Tier 3 orchestration pipeline).
+This guide provides a comprehensive technical reference for the **Cherokee Syllabary Phonetic Enrichment and Reconciliation Pipeline** in `digohwelisgi.cherokee.enrichment` (Tier 2 domain logic) and `digohwelisgi.pipelines.enrichment` (Tier 3 orchestration pipeline).
 
 ---
 
@@ -36,7 +36,7 @@ Conversely, acoustic Automatic Speech Recognition (ASR) acoustic models output f
                          v
        +-----------------+------------------+
        |   Fine-Grained Dynamic             |
-       |   Programming Alignment            |  (transcription.cherokee.enrichment.syllable_alignment)
+       |   Programming Alignment            |  (digohwelisgi.cherokee.enrichment.syllable_alignment)
        +-----------------+------------------+
                          ^
                          |
@@ -47,7 +47,7 @@ Conversely, acoustic Automatic Speech Recognition (ASR) acoustic models output f
                          |
                          v
        +-----------------+------------------+
-       |   Phonetic Rule Merger Engine      |  (transcription.cherokee.enrichment.syllable_alignment)
+       |   Phonetic Rule Merger Engine      |  (digohwelisgi.cherokee.enrichment.syllable_alignment)
        +-----------------+------------------+
                          |
                          v
@@ -59,7 +59,7 @@ Conversely, acoustic Automatic Speech Recognition (ASR) acoustic models output f
 ### The Solution: Cherokee Syllabary as Immutable Anchor
 
 The reconciliation engine treats the **Cherokee Syllabary as the immutable structural ground truth**. The pipeline:
-1. Translates the syllabary into its base phonetic representation using [`CHEROKEE_SYLLABARY_MAP`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/utils/syllabary_map.py#L104-L106).
+1. Translates the syllabary into its base phonetic representation using [`CHEROKEE_SYLLABARY_MAP`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/utils/syllabary_map.py#L104-L106).
 2. Uses dynamic programming (Needleman-Wunsch / DTW block alignment) to align each syllabary character directly against the corresponding ASR emitted acoustic time window.
 3. Applies phonological merge rules syllable-by-syllable, enriching the base transliteration with verified acoustic features (aspiration, syncopation, glottal stops) while rejecting hallucinated or out-of-order ASR errors.
 
@@ -67,18 +67,18 @@ The reconciliation engine treats the **Cherokee Syllabary as the immutable struc
 
 ## 2. Phonetic Rules Engine
 
-The phonetic reconciliation logic is implemented in [`transcription.cherokee.enrichment.syllable_alignment`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/cherokee/enrichment/syllable_alignment.py).
+The phonetic reconciliation logic is implemented in [`digohwelisgi.cherokee.enrichment.syllable_alignment`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/cherokee/enrichment/syllable_alignment.py).
 
 ### Syllabary Character Map
 
-Centralized transliterations are defined in [`transcription.cherokee.orthography.syllabary_map`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/cherokee/orthography/syllabary_map.py):
+Centralized transliterations are defined in [`digohwelisgi.cherokee.orthography.syllabary_map`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/cherokee/orthography/syllabary_map.py):
 - Maps all 85 syllabary characters (Unicode `U+13A0`--`U+13F5` and `U+AB70`--`U+ABBF`).
 - Reflects unified phonetic respellings (e.g., `Ꮏ` $\rightarrow$ `nha` instead of `hna`).
-- Provides reverse lookup [`phonetics_to_syllabary()`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/cherokee/orthography/syllabary_map.py#L152-L214) with pre-aspiration and cluster fallback handling (`hska` $\rightarrow$ `ᏍᎦ`, `thv` $\rightarrow$ `Ꮫ`).
+- Provides reverse lookup [`phonetics_to_syllabary()`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/cherokee/orthography/syllabary_map.py#L152-L214) with pre-aspiration and cluster fallback handling (`hska` $\rightarrow$ `ᏍᎦ`, `thv` $\rightarrow$ `Ꮫ`).
 
 ### Phonetic Rules Overview
 
-Each aligned pair `(syllabary_char, emitted_slice)` is evaluated by [`_enrich_single_syllable(base, emitted)`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/cherokee/enrichment/syllable_alignment.py):
+Each aligned pair `(syllabary_char, emitted_slice)` is evaluated by [`_enrich_single_syllable(base, emitted)`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/cherokee/enrichment/syllable_alignment.py):
 
 #### 1. Rule 1: Vowel Syncopation / Deletion
 When ASR emits a consonant without a vowel for a CV (consonant-vowel) syllable, the vowel is dropped:
@@ -114,7 +114,7 @@ ASR-detected aspiration shifts are systematically mapped onto base consonants:
 
 ## 3. Alignment Engine
 
-Implemented in [`transcription.cherokee.enrichment.syllable_alignment`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/cherokee/enrichment/syllable_alignment.py).
+Implemented in [`digohwelisgi.cherokee.enrichment.syllable_alignment`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/cherokee/enrichment/syllable_alignment.py).
 
 ### Data Structures
 
@@ -132,7 +132,7 @@ class SyllableAlignment:
 
 ### Dynamic Programming Algorithm
 
-[`align_character_syllable_detailed(syllabary_text, emitted_text)`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/cherokee/enrichment/syllable_alignment.py) maps $M$ syllabary units (characters + whitespace + punctuation) to $N$ emitted ASR characters using a customized 2D DP cost matrix:
+[`align_character_syllable_detailed(syllabary_text, emitted_text)`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/cherokee/enrichment/syllable_alignment.py) maps $M$ syllabary units (characters + whitespace + punctuation) to $N$ emitted ASR characters using a customized 2D DP cost matrix:
 
 1. **Deletion Option:** Syllable mapped to empty slice (cost $1.5$, or $0.5$ for whitespace/punctuation).
 2. **Expansion Option:** Syllable mapped to $k$ emitted characters ($1 \le k \le \text{len}(\text{base}) + 3$).
@@ -148,7 +148,7 @@ class SyllableAlignment:
 
 ## 4. Domain Pipeline
 
-Implemented in [`transcription.pipelines.enrichment`](file:///Users/julietmcvicker/code/workshop-transcription/transcription/pipelines/enrichment/pipeline.py).
+Implemented in [`digohwelisgi.pipelines.enrichment`](file:///Users/julietmcvicker/code/workshop-digohwelisgi/digohwelisgi/pipelines/enrichment/pipeline.py).
 
 The `EnrichmentPipeline` class orchestrates:
 - `enrich_syllabary(syllabary_text, emitted_text)`
@@ -162,7 +162,7 @@ The `EnrichmentPipeline` class orchestrates:
 ### Example 1: Reconciling Syllabary with ASR Emissions
 
 ```python
-from transcription.cherokee.enrichment import (
+from digohwelisgi.cherokee.enrichment import (
     align_character_syllable,
     get_base_transliteration,
     reconcile_phonetics,
@@ -192,7 +192,7 @@ print(f"Reconciled Phonetics: {reconciled}")  # "athaleniskv"
 ### Example 2: Inspecting Detailed Alignments with Indices
 
 ```python
-from transcription.cherokee.enrichment import (
+from digohwelisgi.cherokee.enrichment import (
     align_character_syllable_detailed,
 )
 
@@ -212,7 +212,7 @@ for align in detailed:
 ### Example 3: Converting Phonetic Transcriptions Back to Syllabary
 
 ```python
-from transcription.cherokee.orthography import (
+from digohwelisgi.cherokee.orthography import (
     Orthography,
     convert_orthography,
 )

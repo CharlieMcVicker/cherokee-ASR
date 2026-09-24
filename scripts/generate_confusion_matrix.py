@@ -9,10 +9,10 @@ from tqdm import tqdm
 import matplotlib.pyplot as plt
 
 # Import normalization helpers from our codebase
-from transcription.cherokee.models import CherokeeASRModel
-from transcription.core.audio import TARGET_SAMPLE_RATE
-from transcription.cherokee.orthography import normalize_text
-from transcription.utils.evaluation import strip_tones
+from digohwelisgi.cherokee.models import CherokeeASRModel
+from digohwelisgi.core.audio import TARGET_SAMPLE_RATE
+from digohwelisgi.cherokee.orthography import normalize_text
+from digohwelisgi.utils.evaluation import strip_tones
 
 
 def align_strings(target, hypothesis):

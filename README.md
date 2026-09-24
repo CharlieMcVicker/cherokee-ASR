@@ -1,6 +1,6 @@
 # Cherokee Speech Recognition (ASR) & Transcription Toolkit
 
-A modular Python toolkit for Cherokee speech recognition, dataset preparation, phonetic syllabary enrichment, audio segmentation, ground-truth timestamp alignment, and real-time desktop transcription.
+A modular Python toolkit for Cherokee speech recognition, dataset preparation, phonetic syllabary enrichment, audio segmentation, ground-truth timestamp alignment, and real-time desktop digohwelisgi.
 
 ---
 
@@ -10,11 +10,11 @@ Detailed documentation for each subsystem is organized in the [`docs/`](docs/) d
 
 | Guide | Description | Key Modules / Tools |
 |---|---|---|
-| **[Ground-Truth Alignment](docs/alignment.md)** | Sliding-Window DTW & Needleman-Wunsch word DP alignment, Praat TextGrid & JSON manifest export. | `transcription.core.alignment`, `transcription.apps.cli`, `align-cherokee` |
-| **[Models & Inference](docs/models_and_inference.md)** | `CherokeeASRModel` encapsulation, `ModelOutput` currency, tiered procedural inference, and Web Active Labeler. | `transcription.core.models`, `transcription.cherokee.models` |
-| **[Syllabary Enrichment](docs/syllabary_enrichment.md)** | Character/syllable DP alignment and rule merger engine (syncopation, aspiration transfer, glottal filtering) with diagnostic inspector. | `transcription.cherokee.enrichment`, `transcription.pipelines.enrichment` |
-| **[Audio Segmentation](docs/audio_segmentation.md)** | Hybrid VAD audio chunking (`segment_long_audio`), energy profiling, and Silero VAD soft-masking. | `transcription.core.audio` |
-| **[Training & Evaluation](docs/training_and_evaluation.md)** | Multi-domain dataset preparation, offline/remote Wav2Vec2 training, checkpoint evaluation, and HF revision benchmarks. | `transcription.training`, `transcription.evaluation` |
+| **[Ground-Truth Alignment](docs/alignment.md)** | Sliding-Window DTW & Needleman-Wunsch word DP alignment, Praat TextGrid & JSON manifest export. | `digohwelisgi.core.alignment`, `digohwelisgi.apps.cli`, `align-cherokee` |
+| **[Models & Inference](docs/models_and_inference.md)** | `CherokeeASRModel` encapsulation, `ModelOutput` currency, tiered procedural inference, and Web Active Labeler. | `digohwelisgi.core.models`, `digohwelisgi.cherokee.models` |
+| **[Syllabary Enrichment](docs/syllabary_enrichment.md)** | Character/syllable DP alignment and rule merger engine (syncopation, aspiration transfer, glottal filtering) with diagnostic inspector. | `digohwelisgi.cherokee.enrichment`, `digohwelisgi.pipelines.enrichment` |
+| **[Audio Segmentation](docs/audio_segmentation.md)** | Hybrid VAD audio chunking (`segment_long_audio`), energy profiling, and Silero VAD soft-masking. | `digohwelisgi.core.audio` |
+| **[Training & Evaluation](docs/training_and_evaluation.md)** | Multi-domain dataset preparation, offline/remote Wav2Vec2 training, checkpoint evaluation, and HF revision benchmarks. | `digohwelisgi.training`, `digohwelisgi.evaluation` |
 | **[Desktop Transcriber App](docs/desktop_transcriber.md)** | Standalone desktop application (PyWebView + React TypeScript + FastAPI) and PyInstaller build guides for macOS and Windows. | `syllabary_transcriber` |
 
 ---
@@ -25,16 +25,16 @@ The repository is organized into four decoupled architectural layers:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│ Tier 4: Applications & Entrypoints (transcription.apps)     │
+│ Tier 4: Applications & Entrypoints (digohwelisgi.apps)     │
 │   • CLI (align-cherokee)                                    │
 │   • Desktop Transcriber (syllabary_transcriber)             │
 ├─────────────────────────────────────────────────────────────┤
-│ Tier 3: Domain Pipelines (transcription.pipelines)          │
+│ Tier 3: Domain Pipelines (digohwelisgi.pipelines)          │
 │   • scripture: Continuous chapter alignment & verse slicing │
 │   • dialogue: Code-switched interview alignment             │
 │   • enrichment: Phonetic syllabary enrichment & alignment   │
 ├─────────────────────────────────────────────────────────────┤
-│ Tier 2: Cherokee Domain (transcription.cherokee)            │
+│ Tier 2: Cherokee Domain (digohwelisgi.cherokee)            │
 │   • orthography: Syllabary, DG, TTH conversion & tables     │
 │   • phonotactics: Intrusions, syncope, surface constraints  │
 │   • distance: Phonological confusion cost metrics           │
@@ -42,7 +42,7 @@ The repository is organized into four decoupled architectural layers:
 │   • enrichment: Syllable reconciliation engine              │
 │   • models: CherokeeASRModel factory & weights              │
 ├─────────────────────────────────────────────────────────────┤
-│ Tier 1: Core Engine (transcription.core)                    │
+│ Tier 1: Core Engine (digohwelisgi.core)                    │
 │   • audio: Segmenting & Silero VAD soft-masking             │
 │   • models: ModelOutput currency, inference & ASRModel      │
 │   • alignment: DP (DTW, Needleman-Wunsch) & CTC trellis     │
@@ -55,7 +55,7 @@ The repository is organized into four decoupled architectural layers:
 ## Repository Structure
 
 ```
-workshop-transcription/
+workshop-digohwelisgi/
 ├── docs/                         # Detailed modular technical documentation
 │   ├── alignment.md              # Timestamping and DTW alignment guide
 │   ├── audio_segmentation.md     # Audio preprocessing and VAD guide
@@ -64,7 +64,7 @@ workshop-transcription/
 │   ├── syllabary_enrichment.md   # Syllabary reconciliation rule engine guide
 │   └── training_and_evaluation.md# Wav2Vec2 training and evaluation guide
 │
-├── transcription/                # Core Python package (4-tier architecture)
+├── digohwelisgi/                # Core Python package (4-tier architecture)
 │   ├── core/                     # Tier 1: Language-agnostic foundational engine
 │   │   ├── alignment/            # DP (DTW, Needleman-Wunsch), CTC trellis, models, distance
 │   │   ├── audio/                # AudioChunk, segment_long_audio, Silero VAD soft-masking
@@ -148,7 +148,7 @@ align-cherokee \
 Run inference programmatically using `CherokeeASRModel` and `ModelOutput`:
 
 ```python
-from transcription.cherokee.models.loader import CherokeeASRModel
+from digohwelisgi.cherokee.models.loader import CherokeeASRModel
 
 # Load model checkpoint
 model = CherokeeASRModel.from_pretrained_or_best()
@@ -169,7 +169,7 @@ for out in outputs:
 Reconcile native Cherokee Syllabary against acoustic ASR emissions:
 
 ```python
-from transcription.pipelines.enrichment import align_and_enrich_syllabary
+from digohwelisgi.pipelines.enrichment import align_and_enrich_syllabary
 
 result = align_and_enrich_syllabary(
     audio="data/raw/sample.wav",
@@ -208,5 +208,5 @@ Run the test suite and static type checker:
 
 ```bash
 pytest
-pyright transcription
+pyright digohwelisgi
 ```

@@ -3,7 +3,7 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "workshop-transcription"
+name = "digohwelisgi"
 version = "0.1.0"
 description = "Cherokee Speech-to-Text ASR model training, timestamping, syllabary enrichment, and transcription tools"
 readme = "README.md"
@@ -44,11 +44,11 @@ dev = [
 ]
 
 [project.scripts]
-align-cherokee = "transcription.apps.cli:main"
+align-cherokee = "digohwelisgi.apps.cli:main"
 syllabary-transcriber = "syllabary_transcriber.__main__:main"
 
 [tool.setuptools.packages.find]
-include = ["transcription*", "syllabary_transcriber*"]
+include = ["digohwelisgi*", "syllabary_transcriber*"]
 
 [tool.black]
 line-length = 88
@@ -68,15 +68,13 @@ exclude = '''
     | build
     | dist
     | data
-    | colab-script-rips
     | archive
   )/
-  | scripts/from_elan_to_wav_and_gsheet\.py
 )
 '''
 
 [tool.pytest.ini_options]
-testpaths = ["transcription"]
+testpaths = ["digohwelisgi"]
 norecursedirs = [
     "transcriber_dist",
     "transcriber_build",
