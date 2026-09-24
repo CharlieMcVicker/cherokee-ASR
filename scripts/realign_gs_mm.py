@@ -21,7 +21,7 @@ from typing import Any, Dict, List, Set
 
 import torch
 
-from transcription.cherokee.arpabet.projector import get_default_projector
+from transcription.cherokee.codeswitching import get_default_projector
 from transcription.alignment.pipeline import align_syllabary_greedy
 from transcription.cherokee.models import CherokeeASRModel
 

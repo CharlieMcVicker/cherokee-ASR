@@ -26,6 +26,7 @@ from transcription.core.codeswitching.types import (
     SubstitutionMapping,
     TargetPhone,
     TracebackResult,
+    WordManifestEntry,
 )
 from transcription.core.codeswitching.g2p import (
     G2PEngine,

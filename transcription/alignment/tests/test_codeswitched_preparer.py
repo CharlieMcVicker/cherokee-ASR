@@ -20,7 +20,7 @@ from transcription.alignment.ingestion import (
     load_interview_transcript,
     load_syllabary_transcript,
 )
-from transcription.cherokee.arpabet.types import SyntheticTargetProjectorProtocol
+from transcription.cherokee.codeswitching.types import SyntheticTargetProjectorProtocol
 from transcription.cherokee.codeswitching import (
     CodeSwitchedLineResult,
     CodeSwitchedToken,

@@ -4,8 +4,9 @@ test_cherokee_codeswitching.py
 
 Unit tests for transcription.cherokee.codeswitching module:
 - SyntheticTargetProjector with static dictionary and dynamic fallback
-- CodeSwitchedPreparer, CodeSwitchedToken, TokenType
-- Compound clitic segmentation and zero double-conversion verification
+- make_cherokee_projector factory and default path resolution
+- CodeSwitchedPreparer, CodeSwitchedToken, TokenType, TokenClassification
+- Compound clitic segmentation and zero double-conversion verification (e.g. coffee -> khasi, JayᎢ -> tsei)
 - Dictionary path resolution relative to repo root data/arpabet_alignment/dictionaries/english_loanwords_tth.json
 """
 
@@ -14,19 +15,22 @@ from pathlib import Path
 import tempfile
 import pytest
 
-from transcription.cherokee.arpabet.types import (
+from transcription.cherokee.codeswitching.types import (
     ArpabetToken,
     CherokeeToken,
     SyntheticCherokeeTarget,
     SyntheticTargetProjectorProtocol,
 )
 from transcription.cherokee.codeswitching import (
+    CHEROKEE_TTH_TARGET_PHONEMES,
     DEFAULT_CONFUSION_MATRIX_PATH,
     DEFAULT_STATIC_DICTIONARY_PATH,
+    CherokeeSyntheticTargetProjector,
     CodeSwitchedLineResult,
     CodeSwitchedPreparer,
     CodeSwitchedToken,
     SyntheticTargetProjector,
+    TokenClassification,
     TokenType,
     classify_token,
     create_groundtruth_for_code_switched_syllabary,
@@ -36,6 +40,7 @@ from transcription.cherokee.codeswitching import (
     get_english_loanwords_tth_dict,
     is_english_word,
     load_default_confusion_matrix,
+    make_cherokee_projector,
     normalize_code_switched_text,
     prepare_code_switched_token,
     project_english_text,
@@ -69,6 +74,16 @@ def test_projector_protocol_compliance(default_projector):
     assert isinstance(default_projector, SyntheticTargetProjectorProtocol)
 
 
+def test_make_cherokee_projector_factory():
+    projector = make_cherokee_projector()
+    assert isinstance(projector, CherokeeSyntheticTargetProjector)
+    assert isinstance(projector, SyntheticTargetProjector)
+    assert len(projector.dictionary) > 0
+    assert "coffee" in projector.dictionary
+    assert CHEROKEE_TTH_TARGET_PHONEMES is not None
+    assert len(CHEROKEE_TTH_TARGET_PHONEMES) > 0
+
+
 def test_is_english_word():
     assert not is_english_word("ᏣᎳᎩ")
     assert not is_english_word("ᎯᎠ")
@@ -80,12 +95,13 @@ def test_is_english_word():
 
 
 def test_project_word_static_and_dynamic(default_projector):
-    # 'coffee' is in static dictionary
+    # 'coffee' is in static dictionary -> 'khasi'
     target_coffee = default_projector.project_word("coffee")
     assert isinstance(target_coffee, SyntheticCherokeeTarget)
     assert target_coffee.source_word == "coffee"
     assert target_coffee.projected_tth == "khasi"
     assert target_coffee.confidence_score > 0.0
+    assert target_coffee.syllabary == "ᎧᏏ"
 
     # Dynamic fallback word
     target_unknown = default_projector.project_word("superconductor")
@@ -109,6 +125,7 @@ def test_classify_token():
     assert classify_token("Soldier") == TokenType.ENGLISH
     assert classify_token("JayᎢ") == TokenType.COMPOUND_CLITIC
     assert classify_token("...") == TokenType.PUNCTUATION
+    assert TokenClassification == TokenType
 
 
 def test_prepare_code_switched_token_zero_double_conversion(default_projector):

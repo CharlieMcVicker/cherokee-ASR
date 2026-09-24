@@ -135,10 +135,18 @@ class ARPAbetPhone:
         return d
 
     @classmethod
-    def from_dict(cls, data: Union[Dict[str, Any], str]) -> ARPAbetPhone:
+    def from_dict(cls, data: Union[Dict[str, Any], str, ARPAbetPhone]) -> ARPAbetPhone:
+        if isinstance(data, ARPAbetPhone):
+            return data
         if isinstance(data, str):
             return cls(phone=data)
-        return cls(phone=str(data["phone"]), stress=data.get("stress"))
+        if isinstance(data, dict):
+            return cls(phone=str(data["phone"]), stress=data.get("stress"))
+        if hasattr(data, "phone"):
+            return cls(
+                phone=str(getattr(data, "phone")), stress=getattr(data, "stress", None)
+            )
+        raise ValueError(f"Cannot construct ARPAbetPhone from {data}")
 
     def to_json(self) -> str:
         return json.dumps(self.to_dict())
@@ -153,6 +161,81 @@ class ARPAbetPhone:
 
 # Alias for backward compatibility / naming preference
 ArpabetToken = ARPAbetPhone
+
+
+@dataclass(frozen=True)
+class WordManifestEntry:
+    """
+    Immutable manifest record for a single-word audio clip (LibriSpeech or similar).
+    """
+
+    clip_id: str
+    audio_path: str
+    word: str
+    duration: float
+    arpabet: Tuple[ARPAbetPhone, ...]
+    start_sec: Optional[float] = None
+    end_sec: Optional[float] = None
+    speaker_id: Optional[str] = None
+
+    @property
+    def arpabet_phones(self) -> Tuple[str, ...]:
+        return tuple(tok.phone for tok in self.arpabet)
+
+    def to_dict(self) -> Dict[str, Any]:
+        d: Dict[str, Any] = {
+            "clip_id": self.clip_id,
+            "audio_path": self.audio_path,
+            "word": self.word,
+            "duration": self.duration,
+            "arpabet": [t.to_dict() for t in self.arpabet],
+        }
+        if self.start_sec is not None:
+            d["start_sec"] = self.start_sec
+        if self.end_sec is not None:
+            d["end_sec"] = self.end_sec
+        if self.speaker_id is not None:
+            d["speaker_id"] = self.speaker_id
+        return d
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> WordManifestEntry:
+        raw_arpabet = data.get("arpabet", [])
+        arpabet_tokens: List[ARPAbetPhone] = []
+        for item in raw_arpabet:
+            if isinstance(item, ARPAbetPhone):
+                arpabet_tokens.append(item)
+            else:
+                arpabet_tokens.append(ARPAbetPhone.from_dict(item))
+        return cls(
+            clip_id=str(data["clip_id"]),
+            audio_path=str(data["audio_path"]),
+            word=str(data["word"]),
+            duration=float(data["duration"]),
+            arpabet=tuple(arpabet_tokens),
+            start_sec=(
+                float(data["start_sec"])
+                if "start_sec" in data and data["start_sec"] is not None
+                else None
+            ),
+            end_sec=(
+                float(data["end_sec"])
+                if "end_sec" in data and data["end_sec"] is not None
+                else None
+            ),
+            speaker_id=(
+                str(data["speaker_id"])
+                if "speaker_id" in data and data["speaker_id"] is not None
+                else None
+            ),
+        )
+
+    def to_json(self, indent: Optional[int] = None) -> str:
+        return json.dumps(self.to_dict(), indent=indent)
+
+    @classmethod
+    def from_json(cls, s: str) -> WordManifestEntry:
+        return cls.from_dict(json.loads(s))
 
 
 @dataclass(frozen=True)
@@ -323,12 +406,18 @@ class ProjectedTarget:
     per_token_probabilities: Tuple[float, ...] = field(default_factory=tuple)
     metadata: Dict[str, Any] = field(default_factory=dict)
 
+    @property
+    def projected_tth(self) -> str:
+        """Alias for projected_text for Cherokee / alignment consumers."""
+        return self.projected_text
+
     def to_dict(self) -> Dict[str, Any]:
         d: Dict[str, Any] = {
             "source_word": self.source_word,
             "arpabet_tokens": [t.to_dict() for t in self.arpabet_tokens],
             "target_tokens": list(self.target_tokens),
             "projected_text": self.projected_text,
+            "projected_tth": self.projected_text,
             "confidence_score": self.confidence_score,
             "per_token_probabilities": list(self.per_token_probabilities),
             "metadata": dict(self.metadata),
@@ -342,13 +431,28 @@ class ProjectedTarget:
             t if isinstance(t, ARPAbetPhone) else ARPAbetPhone.from_dict(t)
             for t in raw_arpabet
         )
+
+        raw_targets = data.get("target_tokens")
+        if raw_targets is None:
+            raw_cherokee = data.get("cherokee_tokens", [])
+            target_tokens = tuple(
+                (
+                    str(t["phone"])
+                    if isinstance(t, dict) and "phone" in t
+                    else (getattr(t, "phone", str(t)))
+                )
+                for t in raw_cherokee
+            )
+        else:
+            target_tokens = tuple(str(t) for t in raw_targets)
+
+        projected = str(data.get("projected_text", data.get("projected_tth", "")))
+
         return cls(
             source_word=str(data["source_word"]),
             arpabet_tokens=arp_tokens,
-            target_tokens=tuple(str(t) for t in data.get("target_tokens", [])),
-            projected_text=str(
-                data.get("projected_text", data.get("projected_tth", ""))
-            ),
+            target_tokens=target_tokens,
+            projected_text=projected,
             confidence_score=float(data.get("confidence_score", 1.0)),
             per_token_probabilities=tuple(
                 float(p) for p in data.get("per_token_probabilities", [])
@@ -441,14 +545,14 @@ class GenericSyntheticTargetProjectorProtocol(Protocol):
         self,
         word: str,
         matrix: Optional[GenericConfusionMatrixProtocol] = None,
-    ) -> ProjectedTarget: ...
+    ) -> Any: ...
 
     def project_arpabet(
         self,
         arpabet_tokens: Sequence[ARPAbetPhone],
         matrix: Optional[GenericConfusionMatrixProtocol] = None,
         source_word: str = "",
-    ) -> ProjectedTarget: ...
+    ) -> Any: ...
 
     def project_english_text(
         self,
@@ -465,6 +569,7 @@ __all__ = [
     "StressPattern",
     "ARPAbetPhone",
     "ArpabetToken",
+    "WordManifestEntry",
     "TargetPhone",
     "ConfusionEntry",
     "SubstitutionMapping",
