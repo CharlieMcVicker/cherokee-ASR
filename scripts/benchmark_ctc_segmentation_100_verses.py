@@ -27,8 +27,8 @@ if str(BASE_DIR) not in sys.path:
 
 from digohwelisgi.alignment.ctc_aligner import CTCSegmentationAligner
 from digohwelisgi.alignment.models import CTCAlignerConfig
-from digohwelisgi.alignment.normalizers import normalize_phonetics_for_alignment
 from digohwelisgi.cherokee.models import CherokeeASRModel
+from digohwelisgi.cherokee.phonotactics import create_cherokee_ctc_config
 from digohwelisgi.pipelines.scripture import (
     load_chapter_transcript,
 )
@@ -105,7 +105,7 @@ def run_benchmark(
         token=token,
     )
 
-    aligner_config = config or CTCAlignerConfig(flag_min_char_confidence=0.0)
+    aligner_config = config or create_cherokee_ctc_config(flag_min_char_confidence=0.0)
 
     aligner = CTCSegmentationAligner(
         model=asr_model,
@@ -333,7 +333,7 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    aligner_config = CTCAlignerConfig(
+    aligner_config = create_cherokee_ctc_config(
         cache=args.cache,
         cache_dir=args.cache_dir,
         flag_min_char_confidence=0.0,

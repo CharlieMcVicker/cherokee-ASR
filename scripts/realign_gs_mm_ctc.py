@@ -8,7 +8,7 @@ using DialogueAlignmentPipeline with calibrated code-switching English projectio
 """
 
 from pathlib import Path
-from digohwelisgi.alignment.models import CTCAlignerConfig
+from digohwelisgi.cherokee.phonotactics import create_cherokee_ctc_config
 from digohwelisgi.pipelines.dialogue import align_dialogue
 
 AUDIO_PATH = Path("data/projects/saving-the-voices/gs_mm.wav")
@@ -16,8 +16,7 @@ TRANSCRIPT_PATH = Path("data/projects/saving-the-voices/gs_mm.txt")
 OUTPUT_DIR = Path("data/projects/saving-the-voices/output_ctc_no_hs")
 
 if __name__ == "__main__":
-    config = CTCAlignerConfig(
-        enforce_phonotactics=True,
+    config = create_cherokee_ctc_config(
         cache=True,
         enable_vad_soft_masking=True,
         vad_p_low=0.30,

@@ -17,6 +17,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from pydub import AudioSegment
 
+from digohwelisgi.cherokee.phonotactics import create_cherokee_ctc_config
 from digohwelisgi.pipelines.scripture import align_chapter as _align_chapter_pipeline
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -71,8 +72,6 @@ def realign_book(
     aligner_config: Optional[Any] = None,
 ) -> Tuple[List[Dict[str, Any]], List[Dict[str, str]]]:
     """Align one or all chapters of a NT book, writing records and training CSV rows."""
-    from digohwelisgi.alignment.models import CTCAlignerConfig
-
     book_key = book.lower().strip()
     if book_key not in BOOK_CONFIGS:
         raise ValueError(
@@ -81,7 +80,7 @@ def realign_book(
 
     num_chapters = BOOK_CONFIGS[book_key]["chapters"]
     if aligner_config is None:
-        aligner_config = CTCAlignerConfig(cache_dir=DEFAULT_CACHE_DIR)
+        aligner_config = create_cherokee_ctc_config(cache_dir=DEFAULT_CACHE_DIR)
 
     chapters = [chapter] if chapter is not None else range(1, num_chapters + 1)
     all_records: List[Dict[str, Any]] = []
@@ -175,9 +174,9 @@ def main() -> None:
     parser.add_argument("--no-cache", action="store_true", default=False)
     args = parser.parse_args()
 
-    from digohwelisgi.alignment.models import CTCAlignerConfig
-
-    config = CTCAlignerConfig(cache=not args.no_cache, cache_dir=args.cache_dir)
+    config = create_cherokee_ctc_config(
+        cache=not args.no_cache, cache_dir=args.cache_dir
+    )
     books = BOOK_CONFIGS if args.book == "all" else {args.book: BOOK_CONFIGS[args.book]}
     for book in books:
         realign_book(
