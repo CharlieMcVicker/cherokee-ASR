@@ -54,22 +54,27 @@ If you push your Docker image to a private repository on Docker Hub, GitHub Cont
 
 ---
 
-## 4. Preparing and Transferring Data
+## 4. Fetching Training Data from Hugging Face Hub 🚀
 
-Before copying the dataset, ensure the relative paths in your local folder match what the script expects. You will transfer the local CSV files and the audio directory to `/workspace/` inside the vast.ai instance.
+Instead of manually transferring gigabytes of audio files via `scp` or baking them into the Docker image, the training dataset is hosted on Hugging Face Hub (`charliemcvicker/cherokee-asr-data`).
 
-Run the following command from your local machine (within this project root):
+Inside your remote vast.ai instance (`/workspace`), fetch the dataset using the automated, idempotent fetch script:
 
 ```bash
-# Transfer the CSV splits, audio files, and training module to the vast.ai workspace
-scp -P [PORT] -r \
-  cim-wav2vec2-train.csv \
-  cim-wav2vec2-valid.csv \
-  cim-wav2vec2-test.csv \
-  sentence_audio/ \
-  transcription/ \
-  root@[IP]:/workspace/
+# If the Hugging Face repository is private, export your token first:
+export HF_TOKEN="hf_your_hugging_face_token_here"
+
+# Fetch all training splits and referenced audio (462 MB, ~10 seconds):
+python3 scripts/fetch_training_data.py
 ```
+
+The script automatically downloads and unpacks the exact directory structure into `/workspace/data`:
+- `data/training/processed/chr-wav2vec2-*.csv`
+- `data/training/processed/bible-wav2vec2-*.csv`
+- `data/training/processed/sentence_audio/`
+- `data/projects/cherokee_new_testament/split_audio/`
+
+*(Note: The fetch script is idempotent—if the dataset is already present on a persistent volume mount, it immediately skips downloading).*
 
 ---
 

@@ -17,7 +17,7 @@ import logging
 import os
 from pathlib import Path
 import shutil
-from typing import Dict, List, Optional, Sequence, Set, Tuple
+from typing import Callable, Dict, List, Optional, Sequence, Set, Tuple
 
 import soundfile as sf
 
@@ -80,6 +80,7 @@ def package_audio_dataset(
     splits: Sequence[DatasetSplit],
     config: PackagingConfig,
     resolver: Optional[AudioResolver] = None,
+    target_rel_mapper: Optional[Callable[[str, Path], Path]] = None,
 ) -> PackagingResult:
     """
     Pure procedure to stage an audio dataset containing only referenced files.
@@ -126,12 +127,15 @@ def package_audio_dataset(
                 else:
                     if resolved not in unique_sources:
                         # Determine target relative path
-                        # If raw_audio is relative and doesn't start with root /, preserve its relative structure
-                        raw_path_obj = Path(raw_audio)
-                        if not raw_path_obj.is_absolute():
-                            target_rel = raw_path_obj
+                        if target_rel_mapper is not None:
+                            target_rel = target_rel_mapper(raw_audio, resolved)
                         else:
-                            target_rel = Path("audio") / raw_path_obj.name
+                            # If raw_audio is relative and doesn't start with root /, preserve its relative structure
+                            raw_path_obj = Path(raw_audio)
+                            if not raw_path_obj.is_absolute():
+                                target_rel = raw_path_obj
+                            else:
+                                target_rel = Path("audio") / raw_path_obj.name
                         unique_sources[resolved] = target_rel
 
         split_counts[split.name] = count
