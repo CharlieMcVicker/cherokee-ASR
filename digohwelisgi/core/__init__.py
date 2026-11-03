@@ -28,6 +28,19 @@ from digohwelisgi.core.alignment import (
     TokenEmission,
     WordInterval,
 )
+from digohwelisgi.core.datasets import (
+    AudioResolver,
+    DatasetSplit,
+    PackagedAudioRecord,
+    PackagingConfig,
+    PackagingManifest,
+    PackagingResult,
+    compute_file_sha256,
+    default_audio_resolver,
+    inspect_audio_file,
+    package_audio_dataset,
+    upload_to_huggingface_hub,
+)
 
 __all__ = [
     "ModelOutput",
@@ -53,4 +66,15 @@ __all__ = [
     "SlidingWindowDTWAligner",
     "CTCSegmentationAligner",
     "TextPreparerProtocol",
+    "AudioResolver",
+    "DatasetSplit",
+    "PackagedAudioRecord",
+    "PackagingConfig",
+    "PackagingManifest",
+    "PackagingResult",
+    "compute_file_sha256",
+    "default_audio_resolver",
+    "inspect_audio_file",
+    "package_audio_dataset",
+    "upload_to_huggingface_hub",
 ]
