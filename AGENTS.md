@@ -38,7 +38,7 @@ The codebase is modularized into four distinct architectural layers:
 
 ### Module Paths
 - **`digohwelisgi.core`**: Language-agnostic foundational engine.
-  - `digohwelisgi.core.audio`: `AudioChunk`, `segment_long_audio`, `SileroVADDetector`, `mask_non_speech_logits`.
+  - `digohwelisgi.core.audio`: `AudioChunk`, `segment_long_audio`, `SileroVADDetector`, `mask_non_speech_logits`, `AudioAugmenter`, `AudioAugmentationConfig`, `create_audio_augmenter`.
   - `digohwelisgi.core.models`: `ModelOutput` (universal currency with `.npz` caching), standalone inference (`infer_emissions`, `infer_emissions_batch`), and `ASRModel`.
   - `digohwelisgi.core.alignment`: Pure domain models (`TextChunk`, `TokenEmission`, `WordInterval`, `AlignedChunk`, `AlignmentOutput`), DP aligners (`NeedlemanWunschWordAligner`, `SlidingWindowDTWAligner`), CTC segmentation aligner (`CTCSegmentationAligner`), and generic distance protocols (`DistanceMetric`, `DefaultCERDistanceMetric`).
   - `digohwelisgi.core.exporters`: `TextGridBuilder`, `export_textgrid`, `export_manifest`, `export_debug_json`.

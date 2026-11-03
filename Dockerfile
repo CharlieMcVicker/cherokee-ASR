@@ -8,6 +8,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ffmpeg \
     git \
     curl \
+    cmake \
+    build-essential \
     && rm -rf /var/lib/apt/lists/*
   
 # Install Python requirements
@@ -20,7 +22,15 @@ RUN pip install --no-cache-dir \
     jiwer==3.0.4 \
     evaluate==0.4.2 \
     soundfile \
-    librosa==0.10.2.post1
+    librosa==0.10.2.post1 \
+    pydub \
+    audiomentations \
+    pydantic \
+    matplotlib \
+    pygtrie \
+    openpyxl \
+    g2p_en \
+    git+https://github.com/CharlieMcVicker/ctc-segmentation.git
 
 WORKDIR /workspace
 

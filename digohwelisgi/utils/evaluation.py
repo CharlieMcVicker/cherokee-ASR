@@ -289,6 +289,17 @@ def run_evaluation(
                 "checkpoint": label,
                 "path": path,
                 "median_wer_greedy": float(np.median(df["wer_greedy"])),
+                "median_cer_greedy": float(np.median(df["cer_greedy"])),
+                "median_wer_greedy_masked": (
+                    float(np.median(df["wer_greedy_masked"]))
+                    if "wer_greedy_masked" in df
+                    else float(np.median(df["wer_greedy"]))
+                ),
+                "median_cer_greedy_masked": (
+                    float(np.median(df["cer_greedy_masked"]))
+                    if "cer_greedy_masked" in df
+                    else float(np.median(df["cer_greedy"]))
+                ),
                 **agg_metrics,
                 "agg_wer_greedy": agg_metrics["agg_wer_raw"],
                 "agg_cer_greedy": agg_metrics["agg_cer_raw"],

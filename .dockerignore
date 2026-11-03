@@ -1,0 +1,17 @@
+.git
+.venv
+.cache
+archive
+output_*
+backlog
+data/arpabet_alignment
+data/librispeech
+data/models
+data/processed
+data/raw
+data/results
+data/runs
+data/projects/audiofiles-to-transcribe
+data/projects/cvcs
+data/projects/fishing_story
+data/projects/saving-the-voices

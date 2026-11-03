@@ -23,8 +23,37 @@ import numpy as np
 import pandas as pd
 import soundfile as sf
 import torch
+
+# Configure safe globals for torch.load weights_only=True compatibility in PyTorch 2.6+
+if hasattr(torch, "serialization") and hasattr(torch.serialization, "add_safe_globals"):
+    import numpy as np
+
+    globals_to_add = [
+        np.ndarray,
+        np.dtype,
+    ]
+    multiarray_mod = getattr(np, "_core", getattr(np, "core", None))
+    if multiarray_mod and hasattr(multiarray_mod, "multiarray"):
+        globals_to_add.append(multiarray_mod.multiarray._reconstruct)
+    try:
+        import numpy.random._pickle
+
+        globals_to_add.append(numpy.random._pickle.__randomstate_ctor)
+    except (ImportError, AttributeError):
+        pass
+    if hasattr(np, "dtypes") and hasattr(np.dtypes, "UInt32DType"):
+        globals_to_add.append(np.dtypes.UInt32DType)
+    torch.serialization.add_safe_globals(globals_to_add)
+
 import torchaudio
-from datasets import Audio, Dataset, Features, Value, interleave_datasets
+from datasets import (
+    Audio,
+    Dataset,
+    Features,
+    Value,
+    concatenate_datasets,
+    interleave_datasets,
+)
 from huggingface_hub import snapshot_download
 from jiwer import cer as jiwer_cer, wer as jiwer_wer
 from transformers import (
@@ -36,6 +65,11 @@ from transformers import (
     Wav2Vec2Processor,
 )
 
+from digohwelisgi.core.audio import (
+    AudioAugmentationConfig,
+    AudioAugmenter,
+    create_audio_augmenter,
+)
 from digohwelisgi.utils.evaluation import (
     run_evaluation,
     strip_length,
@@ -65,7 +99,24 @@ CONFIG = {
     "audio_column": None,  # Auto-detects columns like 'path', 'wav'
     "text_column": None,  # Auto-detects columns like 'sentence', 'text'
     "max_steps": -1,
-    "eval_batch_size": 16,
+    "batch_size": 8,
+    "eval_batch_size": 8,
+    "gradient_accumulation_steps": 2,
+    "eval_strategy": "steps",
+    "save_strategy": "steps",
+    "eval_steps": 100,
+    "save_steps": 400,
+    "gradient_checkpointing": False,
+    "augment": True,
+    "time_stretch_min_rate": 0.9,
+    "time_stretch_max_rate": 1.1,
+    "time_stretch_p": 0.5,
+    "pitch_shift_min_semitones": -2.0,
+    "pitch_shift_max_semitones": 2.0,
+    "pitch_shift_p": 0.5,
+    "gaussian_noise_min_amplitude": 0.001,
+    "gaussian_noise_max_amplitude": 0.01,
+    "gaussian_noise_p": 0.3,
 }
 
 
@@ -133,17 +184,37 @@ def _detect_columns(df, audio_col_override=None, text_col_override=None):
 
 def _resolve_audio_path(p, dataset_path):
     p = str(p).strip()
-    if os.path.isabs(p) and os.path.exists(p):
+    if os.path.exists(p):
         return p
-    # Try direct relative to CSV parent directory / dataset path
+
+    # Direct candidate inside dataset_path
     cand = os.path.join(dataset_path, p)
     if os.path.exists(cand):
         return cand
-    # try a 'clips' or 'wavs' subfolder fallback
-    for sub in ["wavs", "clips", "audio", "data"]:
-        cand2 = os.path.join(dataset_path, sub, os.path.basename(p))
-        if os.path.exists(cand2):
-            return cand2
+
+    # Basename directly inside dataset_path
+    cand_base = os.path.join(dataset_path, os.path.basename(p))
+    if os.path.exists(cand_base):
+        return cand_base
+
+    # Subfolders inside dataset_path
+    for sub in ["wavs", "clips", "audio", "data", "sentence_audio", "conrad_wavs"]:
+        cand_sub = os.path.join(dataset_path, sub, os.path.basename(p))
+        if os.path.exists(cand_sub):
+            return cand_sub
+
+    # Common repository root data directories (supporting Bible and related audio)
+    for root_prefix in ["data", "data/projects", "data/training"]:
+        cand_root = os.path.join(root_prefix, p)
+        if os.path.exists(cand_root):
+            return cand_root
+
+    # Remap legacy training_data -> data/training paths
+    if p.startswith("training_data/"):
+        migrated = os.path.join("data/training", p[len("training_data/") :])
+        if os.path.exists(migrated):
+            return migrated
+
     return p
 
 
@@ -151,12 +222,23 @@ def _resolve_audio_path(p, dataset_path):
 class DataCollatorCTCWithPadding:
     processor: Wav2Vec2Processor
     padding: Union[bool, str] = True
+    augmenter: Optional[AudioAugmenter] = None
+    augment: bool = False
 
     def __call__(
         self, features: List[Dict[str, Union[List[int], torch.Tensor]]]
     ) -> Dict[str, torch.Tensor]:
         input_features = [{"input_values": f["input_values"]} for f in features]
         label_features = [{"input_ids": f["labels"]} for f in features]
+
+        # Apply raw audio augmentation LIVE if enabled
+        if self.augment and self.augmenter is not None:
+            for feature in input_features:
+                audio_array = np.array(feature["input_values"], dtype=np.float32)
+                augmented_audio = self.augmenter(
+                    samples=audio_array, sample_rate=TARGET_SAMPLE_RATE
+                )
+                feature["input_values"] = augmented_audio.tolist()
 
         batch = self.processor.pad(
             input_features, padding=self.padding, return_tensors="pt"
@@ -172,6 +254,20 @@ class DataCollatorCTCWithPadding:
         )
         batch["labels"] = labels
         return batch  # type: ignore
+
+
+class CTCTrainer(Trainer):
+    """Custom Trainer subclass to toggle live audio augmentation on data collator."""
+
+    def get_train_dataloader(self):
+        if hasattr(self.data_collator, "augment"):
+            setattr(self.data_collator, "augment", bool(CONFIG.get("augment", True)))
+        return super().get_train_dataloader()
+
+    def get_eval_dataloader(self, eval_dataset=None):
+        if hasattr(self.data_collator, "augment"):
+            setattr(self.data_collator, "augment", False)
+        return super().get_eval_dataloader(eval_dataset)
 
 
 def parse_args():
@@ -245,6 +341,54 @@ def parse_args():
         help="Max training steps (-1 for unlimited).",
     )
     parser.add_argument(
+        "--batch-size",
+        type=int,
+        default=CONFIG["batch_size"],
+        help="Per device train batch size (default: 8).",
+    )
+    parser.add_argument(
+        "--eval-batch-size",
+        type=int,
+        default=CONFIG["eval_batch_size"],
+        help="Per device eval batch size (default: 8).",
+    )
+    parser.add_argument(
+        "--gradient-accumulation-steps",
+        type=int,
+        default=CONFIG["gradient_accumulation_steps"],
+        help="Gradient accumulation steps (default: 2).",
+    )
+    parser.add_argument(
+        "--eval-strategy",
+        type=str,
+        default=CONFIG["eval_strategy"],
+        help="Evaluation strategy ('steps' or 'epoch', default: 'steps').",
+    )
+    parser.add_argument(
+        "--save-strategy",
+        type=str,
+        default=CONFIG["save_strategy"],
+        help="Save strategy ('steps' or 'epoch', default: 'steps').",
+    )
+    parser.add_argument(
+        "--eval-steps",
+        type=int,
+        default=CONFIG["eval_steps"],
+        help="Evaluation step interval when eval_strategy='steps' (default: 100).",
+    )
+    parser.add_argument(
+        "--save-steps",
+        type=int,
+        default=CONFIG["save_steps"],
+        help="Save step interval when save_strategy='steps' (default: 400).",
+    )
+    parser.add_argument(
+        "--gradient-checkpointing",
+        action="store_true",
+        default=CONFIG["gradient_checkpointing"],
+        help="Enable gradient checkpointing to reduce memory usage during training (default: False).",
+    )
+    parser.add_argument(
         "--push-to-hub",
         action="store_true",
         help="Push checkpoints to Hugging Face Hub.",
@@ -279,6 +423,66 @@ def parse_args():
         default=None,
         help="Path to local checkpoint or 'latest' to resume from the latest local checkpoint.",
     )
+    parser.add_argument(
+        "--augment",
+        action=argparse.BooleanOptionalAction,
+        default=CONFIG["augment"],
+        help="Enable live audio data augmentation during training (default: True).",
+    )
+    parser.add_argument(
+        "--time-stretch-p",
+        type=float,
+        default=CONFIG["time_stretch_p"],
+        help="Probability of applying TimeStretch augmentation (default: 0.5).",
+    )
+    parser.add_argument(
+        "--time-stretch-min-rate",
+        type=float,
+        default=CONFIG["time_stretch_min_rate"],
+        help="Minimum rate for TimeStretch (default: 0.9).",
+    )
+    parser.add_argument(
+        "--time-stretch-max-rate",
+        type=float,
+        default=CONFIG["time_stretch_max_rate"],
+        help="Maximum rate for TimeStretch (default: 1.1).",
+    )
+    parser.add_argument(
+        "--pitch-shift-p",
+        type=float,
+        default=CONFIG["pitch_shift_p"],
+        help="Probability of applying PitchShift augmentation (default: 0.5).",
+    )
+    parser.add_argument(
+        "--pitch-shift-min-semitones",
+        type=float,
+        default=CONFIG["pitch_shift_min_semitones"],
+        help="Minimum semitones for PitchShift (default: -2.0).",
+    )
+    parser.add_argument(
+        "--pitch-shift-max-semitones",
+        type=float,
+        default=CONFIG["pitch_shift_max_semitones"],
+        help="Maximum semitones for PitchShift (default: 2.0).",
+    )
+    parser.add_argument(
+        "--gaussian-noise-p",
+        type=float,
+        default=CONFIG["gaussian_noise_p"],
+        help="Probability of applying AddGaussianNoise augmentation (default: 0.3).",
+    )
+    parser.add_argument(
+        "--gaussian-noise-min-amplitude",
+        type=float,
+        default=CONFIG["gaussian_noise_min_amplitude"],
+        help="Minimum amplitude for AddGaussianNoise (default: 0.001).",
+    )
+    parser.add_argument(
+        "--gaussian-noise-max-amplitude",
+        type=float,
+        default=CONFIG["gaussian_noise_max_amplitude"],
+        help="Maximum amplitude for AddGaussianNoise (default: 0.01).",
+    )
     args = parser.parse_args()
 
     CONFIG["train_orig_csv"] = args.train_orig_csv
@@ -292,6 +496,14 @@ def parse_args():
     CONFIG["epochs"] = args.epochs
     CONFIG["lmplz_path"] = args.lmplz_path
     CONFIG["max_steps"] = args.max_steps
+    CONFIG["batch_size"] = args.batch_size
+    CONFIG["eval_batch_size"] = args.eval_batch_size
+    CONFIG["gradient_accumulation_steps"] = args.gradient_accumulation_steps
+    CONFIG["eval_strategy"] = args.eval_strategy
+    CONFIG["save_strategy"] = args.save_strategy
+    CONFIG["eval_steps"] = args.eval_steps
+    CONFIG["save_steps"] = args.save_steps
+    CONFIG["gradient_checkpointing"] = args.gradient_checkpointing
     CONFIG["push_to_hub"] = args.push_to_hub
     CONFIG["hub_model_id"] = args.hub_model_id
     CONFIG["hub_token"] = (
@@ -299,6 +511,16 @@ def parse_args():
         or os.environ.get("HF_TOKEN")
         or os.environ.get("HUGGING_FACE_HUB_TOKEN")
     )
+    CONFIG["augment"] = args.augment
+    CONFIG["time_stretch_p"] = args.time_stretch_p
+    CONFIG["time_stretch_min_rate"] = args.time_stretch_min_rate
+    CONFIG["time_stretch_max_rate"] = args.time_stretch_max_rate
+    CONFIG["pitch_shift_p"] = args.pitch_shift_p
+    CONFIG["pitch_shift_min_semitones"] = args.pitch_shift_min_semitones
+    CONFIG["pitch_shift_max_semitones"] = args.pitch_shift_max_semitones
+    CONFIG["gaussian_noise_p"] = args.gaussian_noise_p
+    CONFIG["gaussian_noise_min_amplitude"] = args.gaussian_noise_min_amplitude
+    CONFIG["gaussian_noise_max_amplitude"] = args.gaussian_noise_max_amplitude
 
     if CONFIG["push_to_hub"]:
         run_start_time = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
@@ -464,8 +686,11 @@ def prepare_datasets(dfs, audio_col, text_col, processor):
         lambda x: x < MAX_INPUT_LENGTH, input_columns=["input_length"]
     )
 
-    # 2. Validation set strategy: Anchor on original domain for early stopping
-    valid_ds = ds_valid_orig
+    # 2. Merged Validation Set (Original + Bible domains)
+    valid_ds = concatenate_datasets([ds_valid_orig, ds_valid_bible])
+    valid_ds = valid_ds.filter(
+        lambda x: x < MAX_INPUT_LENGTH, input_columns=["input_length"]
+    )
 
     return train_ds, valid_ds, ds_test_orig, ds_test_bible
 
@@ -501,13 +726,13 @@ def initialize_model_and_trainer(processor, train_ds, valid_ds, folder_model_fil
 
     training_args = TrainingArguments(
         output_dir=folder_model_files,
-        per_device_train_batch_size=8,
-        per_device_eval_batch_size=8,
-        gradient_accumulation_steps=2,
-        eval_strategy="steps",
-        save_strategy="steps",
-        eval_steps=100,
-        save_steps=400,
+        per_device_train_batch_size=CONFIG.get("batch_size", 8),
+        per_device_eval_batch_size=CONFIG.get("eval_batch_size", 8),
+        gradient_accumulation_steps=CONFIG.get("gradient_accumulation_steps", 2),
+        eval_strategy=CONFIG.get("eval_strategy", "steps"),
+        save_strategy=CONFIG.get("save_strategy", "steps"),
+        eval_steps=CONFIG.get("eval_steps", 100),
+        save_steps=CONFIG.get("save_steps", 400),
         num_train_epochs=CONFIG["epochs"],
         fp16=torch.cuda.is_available(),
         learning_rate=3e-4,
@@ -521,15 +746,41 @@ def initialize_model_and_trainer(processor, train_ds, valid_ds, folder_model_fil
         length_column_name="input_length",
         report_to="none",
         max_steps=CONFIG["max_steps"],
+        gradient_checkpointing=CONFIG.get("gradient_checkpointing", False),
+        gradient_checkpointing_kwargs=(
+            {"use_reentrant": False}
+            if CONFIG.get("gradient_checkpointing", False)
+            else None
+        ),
         push_to_hub=CONFIG["push_to_hub"],
         hub_model_id=CONFIG["hub_model_id"],
         hub_token=CONFIG["hub_token"],
         hub_private_repo=True,
     )
 
-    data_collator = DataCollatorCTCWithPadding(processor=processor, padding=True)
+    augmenter = None
+    if CONFIG.get("augment", True):
+        aug_config = AudioAugmentationConfig(
+            time_stretch_min_rate=CONFIG["time_stretch_min_rate"],
+            time_stretch_max_rate=CONFIG["time_stretch_max_rate"],
+            time_stretch_p=CONFIG["time_stretch_p"],
+            pitch_shift_min_semitones=CONFIG["pitch_shift_min_semitones"],
+            pitch_shift_max_semitones=CONFIG["pitch_shift_max_semitones"],
+            pitch_shift_p=CONFIG["pitch_shift_p"],
+            gaussian_noise_min_amplitude=CONFIG["gaussian_noise_min_amplitude"],
+            gaussian_noise_max_amplitude=CONFIG["gaussian_noise_max_amplitude"],
+            gaussian_noise_p=CONFIG["gaussian_noise_p"],
+        )
+        augmenter = create_audio_augmenter(aug_config)
 
-    trainer = Trainer(
+    data_collator = DataCollatorCTCWithPadding(
+        processor=processor,
+        padding=True,
+        augmenter=augmenter,
+        augment=False,
+    )
+
+    trainer = CTCTrainer(
         model=model,
         args=training_args,
         data_collator=data_collator,
@@ -621,6 +872,10 @@ def evaluate_checkpoints_dual(
     print("STARTING DISAGGREGATED POST-TRAINING EVALUATION")
     print("==========================================\n")
 
+    # Ensure data collator live augmentation is disabled during post-training evaluation
+    if hasattr(data_collator, "augment"):
+        setattr(data_collator, "augment", False)
+
     # Pass 1: Original Test Set (Baseline Progress & Forgetfulness Anchor)
     print("Evaluating checkpoints on ORIGINAL Test Set...")
     gen_orig = yield_local_checkpoints(
@@ -646,25 +901,35 @@ def evaluate_checkpoints_dual(
     )
 
     # Summarize best checkpoints on original test set
-    ranking_unmasked = ranking_orig.sort_values(
-        by=[
+    sort_cols_unmasked = [
+        c
+        for c in [
             "median_wer_greedy",
             "median_cer_greedy",
             "agg_wer_greedy",
             "agg_cer_greedy",
-        ],
+        ]
+        if c in ranking_orig.columns
+    ]
+    ranking_unmasked = ranking_orig.sort_values(
+        by=sort_cols_unmasked,
         ascending=True,
     ).reset_index(drop=True)
     best_unmasked_ckpt = ranking_unmasked.iloc[0]["checkpoint"]
     best_unmasked_wer = ranking_unmasked.iloc[0]["agg_wer_greedy"]
 
-    ranking_masked = ranking_orig.sort_values(
-        by=[
+    sort_cols_masked = [
+        c
+        for c in [
             "median_wer_greedy_masked",
             "median_cer_greedy_masked",
             "agg_wer_greedy_masked",
             "agg_cer_greedy_masked",
-        ],
+        ]
+        if c in ranking_orig.columns
+    ]
+    ranking_masked = ranking_orig.sort_values(
+        by=sort_cols_masked,
         ascending=True,
     ).reset_index(drop=True)
     best_masked_ckpt = ranking_masked.iloc[0]["checkpoint"]

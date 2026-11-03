@@ -14,6 +14,11 @@ from digohwelisgi.core.audio.masking import (
     apply_vad_soft_masking,
     extract_vad_intervals,
 )
+from digohwelisgi.core.audio.augmentation import (
+    AudioAugmentationConfig,
+    AudioAugmenter,
+    create_audio_augmenter,
+)
 
 TARGET_SAMPLE_RATE = 16000
 
@@ -30,4 +35,7 @@ __all__ = [
     "mask_non_speech_logits",
     "apply_vad_soft_masking",
     "extract_vad_intervals",
+    "AudioAugmentationConfig",
+    "AudioAugmenter",
+    "create_audio_augmenter",
 ]
