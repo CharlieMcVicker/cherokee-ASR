@@ -1,95 +1,197 @@
 #!/usr/bin/env python3
 """
-Preprocessing script to split Bible audio transcripts (Mark & Matthew)
-into train, validation, and test CSV splits based on chapter boundaries.
+Preprocessing script to filter and split Bible audio transcripts (Mark & Matthew)
+into train, validation, and test CSV splits based on word-level alignment confidence
+and chapter boundaries.
+
+Pipeline stage:
+  align -> confidences (bible_alignment_records.json) -> filtered list & splits
 """
 
+import argparse
+import csv
+import json
 import os
 import re
-import pandas as pd
+import statistics
+from pathlib import Path
+from typing import Any, Dict, List
 
-# Define Chapter allocations (0-indexed or 1-indexed integers matching file names)
-# Target ~80% Train, ~10% Valid, ~10% Test per book without leaking chapters.
+# Define Chapter allocations per book
+# Target ~80% Train, ~10% Valid, ~10% Test without leaking chapters.
 CHAPTER_SPLITS = {
-    "mark.csv": {
-        "valid_chapters": [4, 11],  # 41 + 33 = 74 samples (~10.9%)
-        "test_chapters": [7, 16],  # 37 + 20 = 57 samples (~8.4%)
-        # train_chapters: [1, 2, 3, 5, 6, 8, 9, 10, 12, 13, 14, 15] (547 samples, ~80.7%)
+    "mark": {
+        "valid_chapters": [4, 11],
+        "test_chapters": [7, 16],
     },
-    "matthew.csv": {
-        "valid_chapters": [3, 6, 17, 19],  # 17 + 34 + 27 + 30 = 108 samples (~10.1%)
-        "test_chapters": [2, 9, 20, 28],  # 23 + 38 + 34 + 20 = 115 samples (~10.7%)
-        # train_chapters: remaining 20 chapters (848 samples, ~79.2%)
+    "matthew": {
+        "valid_chapters": [3, 6, 17, 19],
+        "test_chapters": [2, 9, 20, 28],
     },
 }
 
-INPUT_DIR = "data/projects/cherokee_new_testament/train_csvs"
-OUTPUT_DIR = "data/training/processed"
+DEFAULT_RECORDS_PATH = (
+    "data/projects/cherokee_new_testament/alignments/bible_alignment_records.json"
+)
+DEFAULT_TRAIN_CSVS_DIR = "data/projects/cherokee_new_testament/train_csvs"
+DEFAULT_OUTPUT_DIR = "data/training/processed"
 
 
-def extract_chapter(path_str):
-    """Extract chapter number from file path, e.g. mark_01_05.wav -> 1"""
-    match = re.search(r"_(\d+)_(\d+)\.wav$", str(path_str))
-    if match:
-        return int(match.group(1))
-    raise ValueError(f"Could not parse chapter from path: {path_str}")
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Filter Bible alignment records by minimum word confidence and generate train/valid/test splits."
+    )
+    parser.add_argument(
+        "--min-word-confidence",
+        type=float,
+        default=0.15,
+        help="Minimum confidence threshold for all words in a verse (default: 0.15).",
+    )
+    parser.add_argument(
+        "--records-path",
+        type=str,
+        default=DEFAULT_RECORDS_PATH,
+        help="Path to bible_alignment_records.json containing alignments and word confidences.",
+    )
+    parser.add_argument(
+        "--train-csvs-dir",
+        type=str,
+        default=DEFAULT_TRAIN_CSVS_DIR,
+        help="Directory to save per-book training CSVs (mark.csv, matthew.csv).",
+    )
+    parser.add_argument(
+        "--output-dir",
+        type=str,
+        default=DEFAULT_OUTPUT_DIR,
+        help="Directory to save final training splits (bible-wav2vec2-*.csv).",
+    )
+    return parser.parse_args()
+
+
+def is_accepted_verse(record: Dict[str, Any], min_word_conf: float) -> bool:
+    """A verse is accepted if it has aligned words, emitted text, and all word confidences > min_word_conf."""
+    words = record.get("words", [])
+    emitted = (
+        record.get("greedy_hypothesis") or record.get("emitted_text") or ""
+    ).strip()
+    if not words or not emitted:
+        return False
+
+    confs = [w.get("confidence") for w in words]
+    if any(c is None or c <= min_word_conf for c in confs):
+        return False
+
+    return True
 
 
 def main():
-    os.makedirs(OUTPUT_DIR, exist_ok=True)
+    args = parse_args()
+    min_word_conf = args.min_word_confidence
 
-    train_dfs = []
-    valid_dfs = []
-    test_dfs = []
+    records_file = Path(args.records_path)
+    if not records_file.exists():
+        raise FileNotFoundError(f"Alignment records not found: {records_file}")
 
-    for filename, splits in CHAPTER_SPLITS.items():
-        file_path = os.path.join(INPUT_DIR, filename)
-        if not os.path.exists(file_path):
-            print(f"Warning: File not found {file_path}, skipping.")
-            continue
+    with open(records_file, "r", encoding="utf-8") as f:
+        records: List[Dict[str, Any]] = json.load(f)
 
-        df = pd.read_csv(file_path)
-        df["chapter"] = df["path"].apply(extract_chapter)
+    os.makedirs(args.train_csvs_dir, exist_ok=True)
+    os.makedirs(args.output_dir, exist_ok=True)
 
-        valid_ch = set(splits["valid_chapters"])
-        test_ch = set(splits["test_chapters"])
+    print(f"Loaded {len(records)} alignment records from {records_file}")
+    print(f"Filtering with minimum word confidence > {min_word_conf}...")
 
-        valid_mask = df["chapter"].isin(valid_ch)
-        test_mask = df["chapter"].isin(test_ch)
-        train_mask = ~(valid_mask | test_mask)
-
-        df_train = df[train_mask].drop(columns=["chapter"])
-        df_valid = df[valid_mask].drop(columns=["chapter"])
-        df_test = df[test_mask].drop(columns=["chapter"])
-
-        print(f"Book: {filename}")
-        print(
-            f"  Total: {len(df)} | Train: {len(df_train)} | Valid: {len(df_valid)} | Test: {len(df_test)}"
-        )
-
-        train_dfs.append(df_train)
-        valid_dfs.append(df_valid)
-        test_dfs.append(df_test)
-
-    full_train = pd.concat(train_dfs, ignore_index=True)
-    full_valid = pd.concat(valid_dfs, ignore_index=True)
-    full_test = pd.concat(test_dfs, ignore_index=True)
-
-    train_out = os.path.join(OUTPUT_DIR, "bible-wav2vec2-train.csv")
-    valid_out = os.path.join(OUTPUT_DIR, "bible-wav2vec2-valid.csv")
-    test_out = os.path.join(OUTPUT_DIR, "bible-wav2vec2-test.csv")
-
-    full_train.to_csv(train_out, index=False)
-    full_valid.to_csv(valid_out, index=False)
-    full_test.to_csv(test_out, index=False)
-
-    print("\n--- Summary ---")
-    print(f"Saved {train_out}: {len(full_train)} rows")
-    print(f"Saved {valid_out}: {len(full_valid)} rows")
-    print(f"Saved {test_out}: {len(full_test)} rows")
+    # Filter records
+    accepted_records = [r for r in records if is_accepted_verse(r, min_word_conf)]
     print(
-        f"Total Bible Processed: {len(full_train) + len(full_valid) + len(full_test)} rows"
+        f"Accepted verses: {len(accepted_records)} / {len(records)} "
+        f"({len(accepted_records) / len(records) * 100:.1f}%)"
     )
+
+    # Group by book and partition by chapter
+    book_rows: Dict[str, List[Dict[str, str]]] = {"mark": [], "matthew": []}
+    train_rows: List[Dict[str, str]] = []
+    valid_rows: List[Dict[str, str]] = []
+    test_rows: List[Dict[str, str]] = []
+
+    phrase_confs = []
+    worst_word_confs = []
+
+    for r in accepted_records:
+        book = str(r.get("book", "")).lower().strip()
+        ch = int(r.get("chapter", 0))
+        idx = int(r.get("verse_idx", 0))
+        wav_path = f"cherokee_new_testament/split_audio/{book}_{ch:02d}_{idx:02d}.wav"
+        emitted = (r.get("greedy_hypothesis") or r.get("emitted_text") or "").strip()
+        sentence = (r.get("reconciled_phonetics") or emitted).strip()
+
+        row = {"path": wav_path, "sentence": sentence}
+        if book in book_rows:
+            book_rows[book].append(row)
+
+        splits = CHAPTER_SPLITS.get(book, {})
+        valid_ch = set(splits.get("valid_chapters", []))
+        test_ch = set(splits.get("test_chapters", []))
+
+        if ch in valid_ch:
+            valid_rows.append(row)
+        elif ch in test_ch:
+            test_rows.append(row)
+        else:
+            train_rows.append(row)
+
+        if r.get("greedy_confidence") is not None:
+            phrase_confs.append(float(r["greedy_confidence"]))
+        word_scores = [
+            w["confidence"]
+            for w in r.get("words", [])
+            if w.get("confidence") is not None
+        ]
+        if word_scores:
+            worst_word_confs.append(min(word_scores))
+
+    # Save per-book train_csvs
+    for book, rows in book_rows.items():
+        csv_path = Path(args.train_csvs_dir) / f"{book}.csv"
+        with open(csv_path, "w", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(f, fieldnames=["path", "sentence"])
+            writer.writeheader()
+            writer.writerows(rows)
+        print(f"Saved {csv_path}: {len(rows)} verses")
+
+    # Save training splits
+    train_out = Path(args.output_dir) / "bible-wav2vec2-train.csv"
+    valid_out = Path(args.output_dir) / "bible-wav2vec2-valid.csv"
+    test_out = Path(args.output_dir) / "bible-wav2vec2-test.csv"
+
+    for path, rows in [
+        (train_out, train_rows),
+        (valid_out, valid_rows),
+        (test_out, test_rows),
+    ]:
+        with open(path, "w", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(f, fieldnames=["path", "sentence"])
+            writer.writeheader()
+            writer.writerows(rows)
+        pct = len(rows) / len(accepted_records) * 100 if accepted_records else 0
+        print(f"Saved {path}: {len(rows)} verses ({pct:.1f}%)")
+
+    # Confidence summary
+    if phrase_confs:
+        print("\n--- Confidence Statistics (Accepted Phrases) ---")
+        print(
+            f"Phrase Mean Conf:  Min: {min(phrase_confs):.4f} | "
+            f"Median: {statistics.median(phrase_confs):.4f} | "
+            f"Mean: {statistics.mean(phrase_confs):.4f} | "
+            f"Max: {max(phrase_confs):.4f}"
+        )
+    if worst_word_confs:
+        print(
+            f"Worst Word in Verse: Min: {min(worst_word_confs):.4f} | "
+            f"Median: {statistics.median(worst_word_confs):.4f} | "
+            f"Mean: {statistics.mean(worst_word_confs):.4f} | "
+            f"Max: {max(worst_word_confs):.4f}"
+        )
 
 
 if __name__ == "__main__":
