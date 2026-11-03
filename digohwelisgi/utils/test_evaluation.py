@@ -127,9 +127,10 @@ class TestEvaluationUtils(unittest.TestCase):
             self.assertEqual(len(rows_by_ckpt["test_ckpt"]), 2)
             self.assertFalse(ranking_df.empty)
             self.assertEqual(ranking_df.iloc[0]["checkpoint"], "test_ckpt")
-            self.assertEqual(ranking_df.iloc[0]["median_wer_greedy"], 0.0)
-            self.assertEqual(ranking_df.iloc[0]["agg_wer_greedy"], 0.0)
-            self.assertEqual(ranking_df.iloc[0]["agg_wer_greedy_masked"], 0.0)
+            self.assertEqual(ranking_df.iloc[0]["wer"], 0.0)
+            self.assertEqual(ranking_df.iloc[0]["cer"], 0.0)
+            self.assertEqual(ranking_df.iloc[0]["median_wer"], 0.0)
+            self.assertEqual(ranking_df.iloc[0]["median_cer"], 0.0)
 
 
 if __name__ == "__main__":

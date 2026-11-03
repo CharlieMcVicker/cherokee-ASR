@@ -190,6 +190,9 @@ def test_prepare_datasets_merges_bible_and_orig():
             dfs, "path", "sentence", processor
         )
 
+        # Force evaluation of lazy interleaved generator while soundfile.read is patched
+        _ = list(train_ds)
+
         # valid_orig (2) + valid_bible (1) = 3 total merged validation samples
         assert len(valid_ds) == 3
         # test splits are kept separate for disaggregated evaluation
@@ -212,3 +215,91 @@ def test_parse_args_gradient_checkpointing(monkeypatch):
     args = parse_args()
     assert args.gradient_checkpointing is True
     assert CONFIG["gradient_checkpointing"] is True
+
+
+def test_evaluate_checkpoints_dual_ranking(monkeypatch):
+    import pandas as pd
+    from digohwelisgi.training.train import evaluate_checkpoints_dual
+
+    ranking_df_orig = pd.DataFrame(
+        [
+            {
+                "checkpoint": "ckpt-100",
+                "path": "/models/ckpt-100",
+                "wer": 0.25,
+                "cer": 0.10,
+                "median_wer": 0.20,
+                "median_cer": 0.08,
+            },
+            {
+                "checkpoint": "ckpt-200",
+                "path": "/models/ckpt-200",
+                "wer": 0.15,
+                "cer": 0.05,
+                "median_wer": 0.10,
+                "median_cer": 0.04,
+            },
+        ]
+    )
+    ranking_df_bible = pd.DataFrame(
+        [
+            {
+                "checkpoint": "ckpt-100",
+                "path": "/models/ckpt-100",
+                "wer": 0.30,
+                "cer": 0.15,
+                "median_wer": 0.28,
+                "median_cer": 0.12,
+            },
+            {
+                "checkpoint": "ckpt-200",
+                "path": "/models/ckpt-200",
+                "wer": 0.20,
+                "cer": 0.08,
+                "median_wer": 0.18,
+                "median_cer": 0.07,
+            },
+        ]
+    )
+
+    rows_orig_mock = {"ckpt-100": [], "ckpt-200": []}
+    rows_bible_mock = {"ckpt-100": [], "ckpt-200": []}
+
+    call_count = 0
+
+    def mock_run_evaluation(gen, ds, data_collator=None, batch_size=16):
+        nonlocal call_count
+        call_count += 1
+        if call_count == 1:
+            return rows_orig_mock, ranking_df_orig.copy()
+        return rows_bible_mock, ranking_df_bible.copy()
+
+    monkeypatch.setattr(
+        "digohwelisgi.training.train.yield_local_checkpoints",
+        lambda *args, **kwargs: [("mock", None, None, "/path")],
+    )
+    monkeypatch.setattr(
+        "digohwelisgi.training.train.run_evaluation", mock_run_evaluation
+    )
+
+    dummy_collator = MagicMock()
+    dummy_proc = MagicMock()
+
+    (
+        best_ckpt_label,
+        best_wer,
+        best_cer,
+        best_ckpt_path,
+        rows_orig,
+        ranking_orig,
+        rows_bible,
+        ranking_bible,
+    ) = evaluate_checkpoints_dual("/models", [], [], dummy_collator, dummy_proc)
+
+    # ckpt-200 had lower WER (0.15 vs 0.25)
+    assert best_ckpt_label == "ckpt-200"
+    assert best_wer == 0.15
+    assert best_cer == 0.05
+    assert best_ckpt_path == "/models/ckpt-200"
+    assert ranking_orig.iloc[0]["checkpoint"] == "ckpt-200"
+    assert ranking_bible.iloc[0]["checkpoint"] == "ckpt-200"

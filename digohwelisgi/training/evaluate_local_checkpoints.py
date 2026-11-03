@@ -25,9 +25,6 @@ from digohwelisgi.core.audio import TARGET_SAMPLE_RATE
 from digohwelisgi.cherokee.orthography import normalize_text
 from digohwelisgi.utils.evaluation import (
     run_evaluation,
-    strip_both,
-    strip_length,
-    strip_tones,
     yield_local_checkpoints,
 )
 
@@ -199,33 +196,24 @@ def main():
         print("\nNo checkpoints were successfully evaluated.")
         return
 
-    # Map the output ranking columns to match evaluate_local_checkpoints expected output
-    scores_df = ranking_df.rename(
-        columns={
-            "agg_wer_greedy": "greedy_wer",
-            "agg_cer_greedy": "greedy_cer",
-            "agg_wer_greedy_masked": "greedy_vowel_masked_wer",
-            "agg_cer_greedy_masked": "greedy_vowel_masked_cer",
-            "agg_wer_tone_masked": "greedy_tone_masked_wer",
-            "agg_cer_tone_masked": "greedy_tone_masked_cer",
-            "agg_wer_both_masked": "greedy_both_masked_wer",
-            "agg_cer_both_masked": "greedy_both_masked_cer",
-        }
+    # Map the output ranking columns
+    scores_df = ranking_df.sort_values(by=["wer", "cer"], ascending=True).reset_index(
+        drop=True
     )
 
     # Save scores to CSV
     os.makedirs(os.path.dirname(args.output_csv), exist_ok=True)
     scores_df.to_csv(args.output_csv, index=False)
     print(f"\nSuccessfully saved scoring results to {args.output_csv}")
-    print("\nRanking table (ordered by greedy_wer):")
+    print("\nRanking table (ordered by wer):")
     print(
         scores_df[
             [
                 "checkpoint",
-                "greedy_wer",
-                "greedy_cer",
-                "greedy_vowel_masked_wer",
-                "greedy_vowel_masked_cer",
+                "wer",
+                "cer",
+                "median_wer",
+                "median_cer",
             ]
         ].to_string(index=False)
     )

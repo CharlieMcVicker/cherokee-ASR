@@ -72,7 +72,6 @@ from digohwelisgi.core.audio import (
 )
 from digohwelisgi.utils.evaluation import (
     run_evaluation,
-    strip_length,
     yield_local_checkpoints,
 )
 
@@ -869,7 +868,7 @@ def evaluate_checkpoints_dual(
     folder_model_files, test_orig_ds, test_bible_ds, data_collator, processor
 ):
     print("\n==========================================")
-    print("STARTING DISAGGREGATED POST-TRAINING EVALUATION")
+    print("STARTING DUAL-DOMAIN POST-TRAINING EVALUATION")
     print("==========================================\n")
 
     # Ensure data collator live augmentation is disabled during post-training evaluation
@@ -901,59 +900,33 @@ def evaluate_checkpoints_dual(
     )
 
     # Summarize best checkpoints on original test set
-    sort_cols_unmasked = [
-        c
-        for c in [
-            "median_wer_greedy",
-            "median_cer_greedy",
-            "agg_wer_greedy",
-            "agg_cer_greedy",
-        ]
-        if c in ranking_orig.columns
-    ]
-    ranking_unmasked = ranking_orig.sort_values(
-        by=sort_cols_unmasked,
+    ranking_orig = ranking_orig.sort_values(
+        by=["wer", "cer", "median_wer", "median_cer"],
         ascending=True,
     ).reset_index(drop=True)
-    best_unmasked_ckpt = ranking_unmasked.iloc[0]["checkpoint"]
-    best_unmasked_wer = ranking_unmasked.iloc[0]["agg_wer_greedy"]
+    best_ckpt_label = str(ranking_orig.iloc[0]["checkpoint"])
+    best_wer = float(ranking_orig.iloc[0]["wer"])
+    best_cer = float(ranking_orig.iloc[0]["cer"])
+    best_ckpt_path = str(
+        ranking_orig[ranking_orig["checkpoint"] == best_ckpt_label].iloc[0]["path"]
+    )
 
-    sort_cols_masked = [
-        c
-        for c in [
-            "median_wer_greedy_masked",
-            "median_cer_greedy_masked",
-            "agg_wer_greedy_masked",
-            "agg_cer_greedy_masked",
-        ]
-        if c in ranking_orig.columns
-    ]
-    ranking_masked = ranking_orig.sort_values(
-        by=sort_cols_masked,
+    ranking_bible = ranking_bible.sort_values(
+        by=["wer", "cer", "median_wer", "median_cer"],
         ascending=True,
     ).reset_index(drop=True)
-    best_masked_ckpt = ranking_masked.iloc[0]["checkpoint"]
-    best_masked_wer = ranking_masked.iloc[0]["agg_wer_greedy_masked"]
 
     print(f"\n==========================================")
     print(f"ORIGINAL TEST SET EVALUATION SUMMARY:")
     print(
-        f"Best Unmasked Checkpoint: {best_unmasked_ckpt} (WER: {best_unmasked_wer:.4f})"
+        f"Best Checkpoint: {best_ckpt_label} (WER: {best_wer:.4f}, CER: {best_cer:.4f})"
     )
-    print(f"Best Masked Checkpoint:   {best_masked_ckpt} (WER: {best_masked_wer:.4f})")
     print(f"==========================================\n")
 
-    best_ckpt_label = best_unmasked_ckpt
-    best_ckpt_path = ranking_orig[ranking_orig["checkpoint"] == best_ckpt_label].iloc[
-        0
-    ]["path"]
-
     return (
-        best_unmasked_ckpt,
-        best_unmasked_wer,
-        best_masked_ckpt,
-        best_masked_wer,
         best_ckpt_label,
+        best_wer,
+        best_cer,
         best_ckpt_path,
         rows_orig,
         ranking_orig,
@@ -989,11 +962,9 @@ def save_results_summary(
     ranking_orig,
     rows_bible,
     ranking_bible,
-    best_unmasked_ckpt,
-    best_unmasked_wer,
-    best_masked_ckpt,
-    best_masked_wer,
     best_ckpt_label,
+    best_wer,
+    best_cer,
     folder_log_files,
 ):
     output_prefix = f"{CONFIG['asr_lang']}-wav2vec2"
@@ -1026,10 +997,7 @@ def save_results_summary(
     with open(summary_txt, "w", encoding="utf-8") as f:
         f.write(f"ASR Language: {CONFIG['asr_lang']}\nRun ID: {CONFIG['run_id']}\n")
         f.write(
-            f"Best Unmasked Checkpoint (Orig): {best_unmasked_ckpt} (WER: {best_unmasked_wer:.4f})\n"
-        )
-        f.write(
-            f"Best Masked Checkpoint (Orig):   {best_masked_ckpt} (WER: {best_masked_wer:.4f})\n"
+            f"Best Checkpoint (Orig): {best_ckpt_label} (WER: {best_wer:.4f}, CER: {best_cer:.4f})\n"
         )
         f.write(f"Promoted checkpoint: {best_ckpt_label}\n\n")
         f.write(f"ORIGINAL TEST SET RANKING:\n{ranking_orig.to_string()}\n\n")
@@ -1052,11 +1020,9 @@ def main():
     train_model(trainer, resume_checkpoint, folder_model_files, processor)
 
     (
-        best_unmasked_ckpt,
-        best_unmasked_wer,
-        best_masked_ckpt,
-        best_masked_wer,
         best_ckpt_label,
+        best_wer,
+        best_cer,
         best_ckpt_path,
         rows_orig,
         ranking_orig,
@@ -1075,11 +1041,9 @@ def main():
         ranking_orig,
         rows_bible,
         ranking_bible,
-        best_unmasked_ckpt,
-        best_unmasked_wer,
-        best_masked_ckpt,
-        best_masked_wer,
         best_ckpt_label,
+        best_wer,
+        best_cer,
         folder_log_files,
     )
 

@@ -11,7 +11,6 @@ from digohwelisgi.core.audio import TARGET_SAMPLE_RATE
 from digohwelisgi.cherokee.orthography import normalize_text
 from digohwelisgi.utils.evaluation import (
     run_evaluation,
-    strip_tones,
     yield_single_checkpoint,
 )
 from transformers import Wav2Vec2ForCTC, Wav2Vec2Processor
@@ -198,23 +197,12 @@ def main():
         )
 
         row = ranking_df.iloc[0]
-        overall_wer_greedy = row["agg_wer_greedy"]
-        overall_cer_greedy = row["agg_cer_greedy"]
-        overall_wer_greedy_masked = row["agg_wer_greedy_masked"]
-        overall_cer_greedy_masked = row["agg_cer_greedy_masked"]
+        overall_wer = row["wer"]
+        overall_cer = row["cer"]
 
         print("\n" + "=" * 50)
-        print("OVERALL RAW METRICS ON TEST SET (WITH TONES & ORIGINAL TRANSC):")
-        print(
-            f"Greedy: WER = {overall_wer_greedy:.4f} | CER = {overall_cer_greedy:.4f}"
-        )
-        print("=" * 50 + "\n")
-
-        print("=" * 50)
-        print("OVERALL METRICS ON TEST SET WITH VOWEL LENGTHS MASKED (COLLAPSED):")
-        print(
-            f"Greedy (Vowel-Length Masked): WER = {overall_wer_greedy_masked:.4f} | CER = {overall_cer_greedy_masked:.4f}"
-        )
+        print("OVERALL METRICS ON TEST SET:")
+        print(f"Greedy: WER = {overall_wer:.4f} | CER = {overall_cer:.4f}")
         print("=" * 50 + "\n")
 
         # Save output to a file

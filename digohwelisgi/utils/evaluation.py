@@ -12,29 +12,6 @@ from digohwelisgi.cherokee.models import CherokeeASRModel
 from jiwer import wer as jiwer_wer, cer as jiwer_cer
 
 
-from digohwelisgi.cherokee.orthography import (
-    strip_tones_and_colons,
-)
-
-
-def strip_tones(text: str) -> str:
-    """Remove tone digits."""
-    return re.sub(r"\d", "", str(text)).strip()
-
-
-def strip_length(text: str) -> str:
-    """Collapse any sequence of 2 or more of the same vowel or vowel-colon into a single vowel."""
-    if not isinstance(text, str):
-        return ""
-    t = re.sub(r"([aeiouv]):", r"\1", text)
-    return re.sub(r"([aeiouv])\1+", r"\1", t)
-
-
-def strip_both(text: str) -> str:
-    """Remove both tones and collapse vowel lengths."""
-    return strip_length(strip_tones(text))
-
-
 def get_eval_device():
     if torch.backends.mps.is_available():
         return "mps"
@@ -237,76 +214,45 @@ def run_evaluation(
 
         all_gold = [ex["sentence"] for ex in test_ds_prepared]
 
-        transforms = [
-            ("raw", lambda x: x),
-            ("len_masked", strip_length),
-            ("tone_masked", strip_tones),
-            ("both_masked", strip_both),
-        ]
-
         ckpt_rows = []
         for idx, logits in enumerate(all_logits):
             ref = all_gold[idx]
             res = asr_model.decode(logits, compute_word_confidences=False)
             hyp = res.text
 
+            safe_ref = safe(ref)
+            safe_hyp = safe(hyp)
+            wer_val = float(jiwer_wer(safe_ref, safe_hyp))
+            cer_val = float(jiwer_cer(safe_ref, safe_hyp))
+
             row = {
                 "checkpoint": label,
                 "index": idx,
                 "gold": ref,
                 "hyp_greedy": hyp,
+                "wer": wer_val,
+                "cer": cer_val,
             }
-            for name, transform_fn in transforms:
-                ref_t = safe(transform_fn(ref))
-                hyp_t = safe(transform_fn(hyp))
-                wer_val = jiwer_wer(ref_t, hyp_t)
-                cer_val = jiwer_cer(ref_t, hyp_t)
-                row[f"wer_{name}"] = wer_val
-                row[f"cer_{name}"] = cer_val
-                if name == "raw":
-                    row["wer_greedy"] = wer_val
-                    row["cer_greedy"] = cer_val
-                elif name == "len_masked":
-                    row["wer_greedy_masked"] = wer_val
-                    row["cer_greedy_masked"] = cer_val
-
             ckpt_rows.append(row)
 
         rows_by_ckpt[label] = ckpt_rows
 
         df = pd.DataFrame(ckpt_rows)
         greedies = list(df["hyp_greedy"])
+        ref_list = [safe(g) for g in all_gold]
+        hyp_list = [safe(h) for h in greedies]
 
-        agg_metrics = {}
-        for name, transform_fn in transforms:
-            ref_list = [safe(transform_fn(g)) for g in all_gold]
-            hyp_list = [safe(transform_fn(h)) for h in greedies]
-            agg_metrics[f"agg_wer_{name}"] = jiwer_wer(ref_list, hyp_list)
-            agg_metrics[f"agg_cer_{name}"] = jiwer_cer(ref_list, hyp_list)
+        agg_wer = float(jiwer_wer(ref_list, hyp_list))
+        agg_cer = float(jiwer_cer(ref_list, hyp_list))
 
         ranking.append(
             {
                 "checkpoint": label,
                 "path": path,
-                "median_wer_greedy": float(np.median(df["wer_greedy"])),
-                "median_cer_greedy": float(np.median(df["cer_greedy"])),
-                "median_wer_greedy_masked": (
-                    float(np.median(df["wer_greedy_masked"]))
-                    if "wer_greedy_masked" in df
-                    else float(np.median(df["wer_greedy"]))
-                ),
-                "median_cer_greedy_masked": (
-                    float(np.median(df["cer_greedy_masked"]))
-                    if "cer_greedy_masked" in df
-                    else float(np.median(df["cer_greedy"]))
-                ),
-                **agg_metrics,
-                "agg_wer_greedy": agg_metrics["agg_wer_raw"],
-                "agg_cer_greedy": agg_metrics["agg_cer_raw"],
-                "agg_wer_length_masked": agg_metrics["agg_wer_len_masked"],
-                "agg_cer_length_masked": agg_metrics["agg_cer_len_masked"],
-                "agg_wer_greedy_masked": agg_metrics["agg_wer_len_masked"],
-                "agg_cer_greedy_masked": agg_metrics["agg_cer_len_masked"],
+                "wer": agg_wer,
+                "cer": agg_cer,
+                "median_wer": float(np.median(df["wer"])),
+                "median_cer": float(np.median(df["cer"])),
             }
         )
 

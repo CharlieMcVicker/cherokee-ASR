@@ -25,8 +25,6 @@ from digohwelisgi.training.evaluate_checkpoint import (
 )
 from digohwelisgi.utils.evaluation import (
     run_evaluation,
-    strip_length,
-    strip_tones,
     yield_hf_revisions,
 )
 
@@ -161,10 +159,10 @@ def main():
             {
                 "name": name,
                 "revision": rev_hash,
-                "greedy_wer": row["agg_wer_greedy"],
-                "greedy_cer": row["agg_cer_greedy"],
-                "greedy_masked_wer": row["agg_wer_greedy_masked"],
-                "greedy_masked_cer": row["agg_cer_greedy_masked"],
+                "wer": row["wer"],
+                "cer": row["cer"],
+                "median_wer": row["median_wer"],
+                "median_cer": row["median_cer"],
             }
         )
 

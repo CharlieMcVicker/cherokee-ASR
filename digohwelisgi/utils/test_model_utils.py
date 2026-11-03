@@ -89,7 +89,7 @@ class TestModelUtils(unittest.TestCase):
         mock_proc_load.assert_called_with("custom/processor")
         mock_model_load.assert_called_with("custom/model")
 
-    @patch.dict(os.environ, {"HF_TOKEN": "token_from_env"}, clear=True)
+    @patch.dict("os.environ", {"HF_TOKEN": "token_from_env"}, clear=True)
     @patch("transformers.Wav2Vec2ForCTC.from_pretrained")
     @patch("transformers.Wav2Vec2Processor.from_pretrained")
     def test_token_resolution_from_env(self, mock_proc_load, mock_model_load):
