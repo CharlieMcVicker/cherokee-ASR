@@ -92,7 +92,7 @@ CONFIG = {
     "base_checkpoint": "facebook/wav2vec2-large-xlsr-53",
     "asr_lang": "chr",
     "run_id": "01",
-    "epochs": 50,
+    "epochs": 30,
     "ngrams": 4,
     "lmplz_path": "lmplz",  # Expected in system PATH, or specify full local path (e.g. /usr/local/bin/lmplz)
     "audio_column": None,  # Auto-detects columns like 'path', 'wav'
@@ -103,8 +103,10 @@ CONFIG = {
     "gradient_accumulation_steps": 2,
     "eval_strategy": "steps",
     "save_strategy": "steps",
-    "eval_steps": 100,
+    "eval_steps": 200,
     "save_steps": 400,
+    "hub_strategy": "all_checkpoints",
+    "hub_prefix": "length-only",
     "gradient_checkpointing": False,
     "augment": True,
     "time_stretch_min_rate": 0.9,
@@ -237,6 +239,12 @@ class DataCollatorCTCWithPadding:
                 augmented_audio = self.augmenter(
                     samples=audio_array, sample_rate=TARGET_SAMPLE_RATE
                 )
+                mean = np.mean(augmented_audio)
+                var = np.var(augmented_audio)
+                if var > 0:
+                    augmented_audio = (augmented_audio - mean) / float(
+                        np.sqrt(var + 1e-7)
+                    )
                 feature["input_values"] = augmented_audio.tolist()
 
         batch = self.processor.pad(
@@ -405,6 +413,19 @@ def parse_args():
         help="Hugging Face Hub Authentication Token.",
     )
     parser.add_argument(
+        "--hub-strategy",
+        type=str,
+        default=CONFIG["hub_strategy"],
+        choices=["all_checkpoints", "every_save", "end", "checkpoint"],
+        help="Strategy to use when pushing to Hugging Face Hub (default: 'all_checkpoints').",
+    )
+    parser.add_argument(
+        "--hub-prefix",
+        type=str,
+        default=CONFIG["hub_prefix"],
+        help="Prefix prepended to Hub model ID before run timestamp (default: 'length-only').",
+    )
+    parser.add_argument(
         "--resume-from-repo",
         type=str,
         default=None,
@@ -504,6 +525,8 @@ def parse_args():
     CONFIG["save_steps"] = args.save_steps
     CONFIG["gradient_checkpointing"] = args.gradient_checkpointing
     CONFIG["push_to_hub"] = args.push_to_hub
+    CONFIG["hub_strategy"] = args.hub_strategy
+    CONFIG["hub_prefix"] = args.hub_prefix
     CONFIG["hub_model_id"] = args.hub_model_id
     CONFIG["hub_token"] = (
         args.hub_token
@@ -523,7 +546,8 @@ def parse_args():
 
     if CONFIG["push_to_hub"]:
         run_start_time = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-        prefix = f"length-only-{run_start_time}"
+        hub_pfx = str(CONFIG.get("hub_prefix", "")).strip()
+        prefix = f"{hub_pfx}-{run_start_time}" if hub_pfx else run_start_time
         base_name = (
             CONFIG["hub_model_id"] if CONFIG["hub_model_id"] else "wav2vec2-large-xlsr"
         )
@@ -730,7 +754,7 @@ def initialize_model_and_trainer(processor, train_ds, valid_ds, folder_model_fil
         gradient_accumulation_steps=CONFIG.get("gradient_accumulation_steps", 2),
         eval_strategy=CONFIG.get("eval_strategy", "steps"),
         save_strategy=CONFIG.get("save_strategy", "steps"),
-        eval_steps=CONFIG.get("eval_steps", 100),
+        eval_steps=CONFIG.get("eval_steps", 200),
         save_steps=CONFIG.get("save_steps", 400),
         num_train_epochs=CONFIG["epochs"],
         fp16=torch.cuda.is_available(),
@@ -752,6 +776,7 @@ def initialize_model_and_trainer(processor, train_ds, valid_ds, folder_model_fil
             else None
         ),
         push_to_hub=CONFIG["push_to_hub"],
+        hub_strategy=CONFIG.get("hub_strategy", "all_checkpoints"),
         hub_model_id=CONFIG["hub_model_id"],
         hub_token=CONFIG["hub_token"],
         hub_private_repo=True,
@@ -861,7 +886,30 @@ def train_model(trainer, resume_checkpoint, folder_model_files, processor):
     trainer.train(resume_from_checkpoint=resume_checkpoint)
     trainer.save_model(folder_model_files)
     processor.save_pretrained(folder_model_files)
-    print("Training complete. Base model saved.")
+    print("Training complete. Best combined-validation model saved locally.")
+
+    if CONFIG["push_to_hub"]:
+        print("Pushing best combined-validation model to Hugging Face Hub...")
+        trainer.push_to_hub(
+            commit_message="Best checkpoint on combined validation set (load_best_model_at_end)"
+        )
+        if CONFIG["hub_model_id"]:
+            from huggingface_hub import HfApi
+
+            api = HfApi(token=CONFIG["hub_token"])
+            try:
+                api.create_tag(
+                    repo_id=CONFIG["hub_model_id"],
+                    tag="best-combined-valid",
+                    tag_message="Best checkpoint on combined validation set (load_best_model_at_end)",
+                    repo_type="model",
+                    exist_ok=True,
+                )
+                print(
+                    "Tagged best combined-validation model as 'best-combined-valid' on Hub."
+                )
+            except Exception as e:
+                print(f"Warning: Failed to create Hub tag 'best-combined-valid': {e}")
 
 
 def evaluate_checkpoints_dual(
@@ -939,19 +987,22 @@ def promote_best_checkpoint(
     best_ckpt_label, best_ckpt_path, folder_model_files, processor
 ):
     print(f"\nBest checkpoint identified (for promotion): {best_ckpt_label}")
-    for fname in os.listdir(best_ckpt_path):
-        if fname in (
-            "optimizer.pt",
-            "scheduler.pt",
-            "rng_state.pth",
-            "trainer_state.json",
-            "training_args.bin",
-            "scaler.pt",
-        ):
-            continue
-        src = os.path.join(best_ckpt_path, fname)
-        if os.path.isfile(src):
-            shutil.copy2(src, os.path.join(folder_model_files, fname))
+    if os.path.abspath(best_ckpt_path) != os.path.abspath(folder_model_files):
+        for fname in os.listdir(best_ckpt_path):
+            if fname in (
+                "optimizer.pt",
+                "scheduler.pt",
+                "rng_state.pth",
+                "trainer_state.json",
+                "training_args.bin",
+                "scaler.pt",
+            ):
+                continue
+            src = os.path.join(best_ckpt_path, fname)
+            if os.path.isfile(src):
+                shutil.copy2(src, os.path.join(folder_model_files, fname))
+    else:
+        print("Promoted checkpoint is already the root model directory.")
 
     processor.save_pretrained(folder_model_files)
     print(f"Promoted {best_ckpt_label} to final model directory.")
@@ -1046,6 +1097,29 @@ def main():
         best_cer,
         folder_log_files,
     )
+
+    if CONFIG["push_to_hub"] and CONFIG["hub_model_id"]:
+        from huggingface_hub import HfApi
+
+        api = HfApi(token=CONFIG["hub_token"])
+        print(
+            f"Uploading promoted test_orig checkpoint ({best_ckpt_label}) and evaluation logs to Hub..."
+        )
+        api.upload_folder(
+            folder_path=folder_model_files,
+            repo_id=CONFIG["hub_model_id"],
+            repo_type="model",
+            commit_message=f"Promote {best_ckpt_label} (best on orig test: WER {best_wer:.4f}, CER {best_cer:.4f})",
+            ignore_patterns=["checkpoint-*/**", "checkpoint-*/*", "checkpoint-*"],
+        )
+        api.upload_folder(
+            folder_path=folder_log_files,
+            path_in_repo="eval_logs",
+            repo_id=CONFIG["hub_model_id"],
+            repo_type="model",
+            commit_message=f"Add dual-domain evaluation results and summary for {best_ckpt_label}",
+        )
+        print("Final model and evaluation logs pushed to Hugging Face Hub.")
 
 
 if __name__ == "__main__":

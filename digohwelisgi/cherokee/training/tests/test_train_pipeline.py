@@ -96,6 +96,15 @@ def test_data_collator_with_augmentation():
     assert not torch.all(batch_aug["input_values"] == 0.0)
     assert batch_aug["labels"].shape[0] == 2
 
+    # Verify zero-mean and unit-variance re-normalization after augmentation
+    # Note: Pad zeros outside the valid slice are padding, check the active slice (length 800)
+    feat_0 = batch_aug["input_values"][0, :1000].numpy()
+    feat_1 = batch_aug["input_values"][1, :800].numpy()
+    assert np.isclose(np.mean(feat_0), 0.0, atol=1e-5)
+    assert np.isclose(np.var(feat_0), 1.0, atol=1e-3)
+    assert np.isclose(np.mean(feat_1), 0.0, atol=1e-5)
+    assert np.isclose(np.var(feat_1), 1.0, atol=1e-3)
+
 
 def test_ctc_trainer_dataloader_toggle():
     mock_collator = MagicMock()
@@ -303,3 +312,97 @@ def test_evaluate_checkpoints_dual_ranking(monkeypatch):
     assert best_ckpt_path == "/models/ckpt-200"
     assert ranking_orig.iloc[0]["checkpoint"] == "ckpt-200"
     assert ranking_bible.iloc[0]["checkpoint"] == "ckpt-200"
+
+
+def test_parse_args_hub_and_step_defaults(monkeypatch):
+    import sys
+    from digohwelisgi.cherokee.training.train import parse_args
+
+    monkeypatch.setattr(sys, "argv", ["train.py"])
+    args = parse_args()
+    assert args.epochs == 30
+    assert args.eval_steps == 200
+    assert args.save_steps == 400
+    assert args.hub_strategy == "all_checkpoints"
+    assert args.hub_prefix == "length-only"
+    assert CONFIG["epochs"] == 30
+    assert CONFIG["eval_steps"] == 200
+    assert CONFIG["save_steps"] == 400
+    assert CONFIG["hub_strategy"] == "all_checkpoints"
+    assert CONFIG["hub_prefix"] == "length-only"
+
+    # Custom override
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "train.py",
+            "--epochs",
+            "25",
+            "--eval-steps",
+            "300",
+            "--save-steps",
+            "500",
+            "--hub-strategy",
+            "every_save",
+            "--hub-prefix",
+            "custom-exp",
+            "--push-to-hub",
+            "--hub-model-id",
+            "user/my-model",
+        ],
+    )
+    args = parse_args()
+    assert args.epochs == 25
+    assert args.eval_steps == 300
+    assert args.save_steps == 500
+    assert args.hub_strategy == "every_save"
+    assert args.hub_prefix == "custom-exp"
+    assert CONFIG["hub_strategy"] == "every_save"
+    assert CONFIG["hub_prefix"] == "custom-exp"
+    assert "user/custom-exp-" in CONFIG["hub_model_id"]
+
+
+def test_promote_best_checkpoint_guards_same_file(tmp_path):
+    from digohwelisgi.cherokee.training.train import promote_best_checkpoint
+
+    model_dir = tmp_path / "model_dir"
+    model_dir.mkdir()
+    dummy_file = model_dir / "pytorch_model.bin"
+    dummy_file.write_text("weights")
+
+    mock_proc = MagicMock()
+    # Promoting "final" where best_ckpt_path == folder_model_files
+    promote_best_checkpoint("final", str(model_dir), str(model_dir), mock_proc)
+    mock_proc.save_pretrained.assert_called_once_with(str(model_dir))
+    assert dummy_file.read_text() == "weights"
+
+
+def test_train_model_pushes_and_tags_hub(monkeypatch):
+    from digohwelisgi.cherokee.training.train import train_model
+
+    mock_trainer = MagicMock()
+    mock_processor = MagicMock()
+    mock_api_instance = MagicMock()
+
+    monkeypatch.setitem(CONFIG, "push_to_hub", True)
+    monkeypatch.setitem(CONFIG, "hub_model_id", "test-user/test-repo")
+    monkeypatch.setitem(CONFIG, "hub_token", "fake_token")
+
+    monkeypatch.setattr("huggingface_hub.HfApi", lambda token=None: mock_api_instance)
+
+    train_model(mock_trainer, None, "/dummy/folder", mock_processor)
+
+    mock_trainer.train.assert_called_once_with(resume_from_checkpoint=None)
+    mock_trainer.save_model.assert_called_once_with("/dummy/folder")
+    mock_processor.save_pretrained.assert_called_once_with("/dummy/folder")
+    mock_trainer.push_to_hub.assert_called_once_with(
+        commit_message="Best checkpoint on combined validation set (load_best_model_at_end)"
+    )
+    mock_api_instance.create_tag.assert_called_once_with(
+        repo_id="test-user/test-repo",
+        tag="best-combined-valid",
+        tag_message="Best checkpoint on combined validation set (load_best_model_at_end)",
+        repo_type="model",
+        exist_ok=True,
+    )
