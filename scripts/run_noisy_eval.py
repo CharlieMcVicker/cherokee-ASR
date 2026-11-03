@@ -140,7 +140,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--dataset-csv",
         type=str,
-        default="data/training/processed/cim-wav2vec2-test.csv",
+        default="data/training/processed/chr-wav2vec2-test.csv",
         help="Path to evaluation dataset CSV (columns: 'path', 'sentence').",
     )
     parser.add_argument(

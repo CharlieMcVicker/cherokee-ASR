@@ -70,7 +70,7 @@ Cherokee text in this codebase exists across three primary orthographic represen
 | :--- | :--- | :--- |
 | **`Orthography.SYLLABARY`** | Native Cherokee Unicode glyphs (`U+13A0`–`U+13FF`, `U+AB70`–`U+ABBF`, e.g., `ᎠᏓᎴᏂᏍᎬ ᏱᏍᏛ ᎧᏃᎮᏛ`). | Syllabary transcripts, UI canvas in `Syllabary Transcriber`, immutable structural anchor in syllabary enrichment. |
 | **`Orthography.DG`** | Base $d/g$ Latin transliteration (`d, t, g, k, dl, tl, hl, j, ch, qu, gw, hn, hw, hy`). | Raw Bible chapter JSON imports (`"phonetic"` key with hyphen-separated syllables), 1975 Durbin Feeling dictionary metadata, Conrad transcripts. |
-| **`Orthography.TTH`** | Canonical $t/th$ acoustic phonetics (`t, th, k, kh, tl, tlh, lh, ts, tsh, nh, wh, yh, s, hs, a, e, i, o, u, v, '`). | **Acoustic model vocabulary (`CherokeeASRModel`)**, training targets (`cim-wav2vec2-*.csv`), CTC logits, ASR emissions, and alignment targets. |
+| **`Orthography.TTH`** | Canonical $t/th$ acoustic phonetics (`t, th, k, kh, tl, tlh, lh, ts, tsh, nh, wh, yh, s, hs, a, e, i, o, u, v, '`). | **Acoustic model vocabulary (`CherokeeASRModel`)**, training targets (`chr-wav2vec2-*.csv`), CTC logits, ASR emissions, and alignment targets. |
 
 ### Strict T/TH Consonant Inventory Rules
 In canonical **`T/TH`**, tones and vowel lengths are decoupled/stripped, and the consonant inventory strictly enforces:

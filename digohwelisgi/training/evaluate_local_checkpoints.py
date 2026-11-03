@@ -102,7 +102,7 @@ def main():
     parser.add_argument(
         "--test-csv",
         type=str,
-        default="data/training/processed/cim-wav2vec2-test.csv",
+        default="data/training/processed/chr-wav2vec2-test.csv",
         help="Path to the test CSV file.",
     )
     parser.add_argument(

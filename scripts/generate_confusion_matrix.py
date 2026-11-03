@@ -148,9 +148,9 @@ def main():
     print(f"Detected alphabet from vocab: {sorted(list(alphabet))}")
 
     # Load dataset files
-    test_csv = "data/training/processed/cim-wav2vec2-test.csv"
-    train_csv = "data/training/processed/cim-wav2vec2-train.csv"
-    valid_csv = "data/training/processed/cim-wav2vec2-valid.csv"
+    test_csv = "data/training/processed/chr-wav2vec2-test.csv"
+    train_csv = "data/training/processed/chr-wav2vec2-train.csv"
+    valid_csv = "data/training/processed/chr-wav2vec2-valid.csv"
 
     df_test = pd.read_csv(test_csv)
     df_train = pd.read_csv(train_csv)

@@ -93,8 +93,14 @@ def main():
     parser.add_argument(
         "--output-prefix",
         type=str,
-        default="data/training/processed/cim-wav2vec2",
-        help="Prefix for the generated train/valid/test split CSV files (default: data/training/processed/cim-wav2vec2)",
+        default="data/training/processed/chr-wav2vec2",
+        help="Prefix for the generated train/valid/test split CSV files (default: data/training/processed/chr-wav2vec2)",
+    )
+    parser.add_argument(
+        "--strip-colons",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Whether to strip vowel-length colons from the output text (default: True).",
     )
     parser.add_argument(
         "--max-duration",
@@ -202,11 +208,12 @@ def main():
             dropped_tone_count += 1
             continue
 
-        # Final step: remove all colons (those that weren't placed by vowels, remaining after tone normalizer)
+        # Clean colons
         norm_text = norm_text.replace(":", "")
-        # Replace doubled vowels VV with V: for long vowels
-        for v in ["a", "e", "i", "o", "u", "v"]:
-            norm_text = norm_text.replace(v + v, v + ":")
+        if not args.strip_colons:
+            # Replace doubled vowels VV with V: for long vowels when colons requested
+            for v in ["a", "e", "i", "o", "u", "v"]:
+                norm_text = norm_text.replace(v + v, v + ":")
         cleaned_text = clean_transcription(norm_text)
 
         if cleaned_text == "":

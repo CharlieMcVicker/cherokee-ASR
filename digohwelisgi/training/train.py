@@ -81,16 +81,16 @@ chars_to_remove_regex = r"[\,\?\.\!\-\;\:\"\“\%\”\\(\)\[\]\{\}«»…]"
 
 # CONFIGURATION DICTIONARY
 CONFIG = {
-    "train_orig_csv": "data/training/processed/cim-wav2vec2-train.csv",
+    "train_orig_csv": "data/training/processed/chr-wav2vec2-train.csv",
     "train_bible_csv": "data/training/processed/bible-wav2vec2-train.csv",
-    "valid_orig_csv": "data/training/processed/cim-wav2vec2-valid.csv",
+    "valid_orig_csv": "data/training/processed/chr-wav2vec2-valid.csv",
     "valid_bible_csv": "data/training/processed/bible-wav2vec2-valid.csv",
-    "test_orig_csv": "data/training/processed/cim-wav2vec2-test.csv",
+    "test_orig_csv": "data/training/processed/chr-wav2vec2-test.csv",
     "test_bible_csv": "data/training/processed/bible-wav2vec2-test.csv",
     "audio_dir": "data/training/processed/sentence_audio",
     "output_dir": "output_w2v2",
     "base_checkpoint": "facebook/wav2vec2-large-xlsr-53",
-    "asr_lang": "cim",
+    "asr_lang": "chr",
     "run_id": "01",
     "epochs": 50,
     "ngrams": 4,

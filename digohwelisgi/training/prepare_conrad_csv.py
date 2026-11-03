@@ -13,7 +13,7 @@ from digohwelisgi.training.prepare_csv import clean_transcription
 
 def main():
     conrad_csv = "data/training/processed/conrad-wavs-all.csv"
-    train_csv = "data/training/processed/cim-wav2vec2-train.csv"
+    train_csv = "data/training/processed/chr-wav2vec2-train.csv"
 
     if not os.path.exists(conrad_csv):
         print(f"Error: Conrad CSV '{conrad_csv}' not found.")
