@@ -8,7 +8,7 @@ Converts transcription column to length-only format (normalizing, removing accen
 import os
 import csv
 from digohwelisgi.cherokee.orthography import remove_tones_and_double_vowels
-from digohwelisgi.training.prepare_csv import clean_transcription
+from digohwelisgi.cherokee.training.prepare_csv import clean_transcription
 
 
 def main():

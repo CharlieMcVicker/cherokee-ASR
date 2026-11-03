@@ -501,7 +501,7 @@ Open `http://localhost:8000` in your web browser.
 3. In the UI, review and correct the low-confidence entries. Click **Save CSV** to write out `data/processed/train_labeled.csv`.
 4. Incorporate newly labeled samples into training splits:
    ```bash
-   python3 -m digohwelisgi.training.prepare_csv \
+   python3 -m digohwelisgi.cherokee.training.prepare_csv \
      --csv data/processed/train_labeled.csv \
      --audio-dir data/raw/new_interviews \
      --output-prefix data/processed/active_learning_split

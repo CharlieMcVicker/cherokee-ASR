@@ -5,7 +5,7 @@ import torch
 from unittest.mock import MagicMock
 
 from digohwelisgi.core.audio import AudioAugmentationConfig, AudioAugmenter
-from digohwelisgi.training.train import (
+from digohwelisgi.cherokee.training.train import (
     CONFIG,
     CTCTrainer,
     DataCollatorCTCWithPadding,
@@ -125,7 +125,7 @@ def test_ctc_trainer_dataloader_toggle():
 
 
 def test_parse_args_augmentation_flags():
-    from digohwelisgi.training.train import parse_args
+    from digohwelisgi.cherokee.training.train import parse_args
 
     test_args = [
         "train.py",
@@ -149,7 +149,7 @@ def test_parse_args_augmentation_flags():
 
 def test_prepare_datasets_merges_bible_and_orig():
     import pandas as pd
-    from digohwelisgi.training.train import prepare_datasets
+    from digohwelisgi.cherokee.training.train import prepare_datasets
 
     # Mock audio read so prepare_batch does not touch disk
     dummy_audio = np.zeros(16000, dtype=np.float32)
@@ -202,7 +202,7 @@ def test_prepare_datasets_merges_bible_and_orig():
 
 def test_parse_args_gradient_checkpointing(monkeypatch):
     import sys
-    from digohwelisgi.training.train import parse_args
+    from digohwelisgi.cherokee.training.train import parse_args
 
     # Default is False
     monkeypatch.setattr(sys, "argv", ["train.py"])
@@ -219,7 +219,7 @@ def test_parse_args_gradient_checkpointing(monkeypatch):
 
 def test_evaluate_checkpoints_dual_ranking(monkeypatch):
     import pandas as pd
-    from digohwelisgi.training.train import evaluate_checkpoints_dual
+    from digohwelisgi.cherokee.training.train import evaluate_checkpoints_dual
 
     ranking_df_orig = pd.DataFrame(
         [
@@ -275,11 +275,11 @@ def test_evaluate_checkpoints_dual_ranking(monkeypatch):
         return rows_bible_mock, ranking_df_bible.copy()
 
     monkeypatch.setattr(
-        "digohwelisgi.training.train.yield_local_checkpoints",
+        "digohwelisgi.cherokee.training.train.yield_local_checkpoints",
         lambda *args, **kwargs: [("mock", None, None, "/path")],
     )
     monkeypatch.setattr(
-        "digohwelisgi.training.train.run_evaluation", mock_run_evaluation
+        "digohwelisgi.cherokee.training.train.run_evaluation", mock_run_evaluation
     )
 
     dummy_collator = MagicMock()

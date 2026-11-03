@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-digohwelisgi.training.datasets.arpabet
+digohwelisgi.cherokee.training.datasets.arpabet
 
 Dataset extraction, phonetic balancing, audio waveform slicing, and manifest
 generation for English speech corpora (LibriSpeech).

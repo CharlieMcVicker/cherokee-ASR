@@ -27,6 +27,7 @@ The codebase is modularized into four distinct architectural layers:
 │   • codeswitching: Synthetic loanword target projection     │
 │   • enrichment: Syllable reconciliation engine              │
 │   • models: CherokeeASRModel factory & weights              │
+│   • training: Wav2Vec2 fine-tuning, datasets & checkpoints  │
 ├─────────────────────────────────────────────────────────────┤
 │ Tier 1: Core Engine (digohwelisgi.core)                    │
 │   • audio: Segmenting & Silero VAD soft-masking             │
@@ -49,6 +50,7 @@ The codebase is modularized into four distinct architectural layers:
   - `digohwelisgi.cherokee.codeswitching`: `SyntheticTargetProjector`, `CodeSwitchedPreparer`, compound clitic segmentation.
   - `digohwelisgi.cherokee.enrichment`: `SyllableAlignmentEngine`, `reconcile_phonetics`, `reconcile_alignment_words`.
   - `digohwelisgi.cherokee.models`: `CherokeeASRModel` loader.
+  - `digohwelisgi.cherokee.training`: Wav2Vec2 fine-tuning, dataset split preparation, and checkpoint evaluation.
 - **`digohwelisgi.pipelines`**: End-to-end domain orchestration pipelines.
   - `digohwelisgi.pipelines.scripture`: `ScripturePipeline`, `align_chapter`.
   - `digohwelisgi.pipelines.dialogue`: `DialogueAlignmentPipeline`, `align_dialogue`.
@@ -56,7 +58,7 @@ The codebase is modularized into four distinct architectural layers:
 - **`digohwelisgi.apps`**: High-level application drivers and CLI interfaces.
   - `digohwelisgi.apps.cli`: `align-cherokee` CLI entrypoint.
   - `syllabary_transcriber`: Standalone desktop application (PyWebView + FastAPI + React/TS).
-- **`digohwelisgi.evaluation`** & **`digohwelisgi.training`**: Wav2Vec2 fine-tuning, dataset split preparation, manifold analysis, and checkpoint evaluation.
+- **`digohwelisgi.evaluation`**: Checkpoint evaluation and manifold analysis.
 
 ## Testing & Quality Assurance
 - Run tests: `pytest`

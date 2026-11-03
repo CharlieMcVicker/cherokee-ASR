@@ -25,7 +25,7 @@ This guide documents the **Voice Activity Detection (VAD) audio segmentation eng
 ## 1. Overview
 
 Long continuous Cherokee audio recordings (e.g., historical interviews, conversational workshops, multi-minute New Testament Bible chapters) must be segmented into shorter, coherent speech segments ($\le 10$ seconds) before feeding into:
-- Acoustic model training (`digohwelisgi.training.train`)
+- Acoustic model training (`digohwelisgi.cherokee.training.train`)
 - Character and word timestamping (`digohwelisgi.alignment`)
 - Active learning and Praat TextGrid generation
 

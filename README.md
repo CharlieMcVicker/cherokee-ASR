@@ -14,7 +14,7 @@ Detailed documentation for each subsystem and specification is organized in the 
 | **[Models & Inference](backlog/docs/architecture/models/doc-11%20-%20Models-and-Inference-Subsystem.md)** | `CherokeeASRModel` encapsulation, `ModelOutput` currency, tiered procedural inference, and Web Active Labeler. | `digohwelisgi.core.models`, `digohwelisgi.cherokee.models` |
 | **[Syllabary Enrichment](backlog/docs/architecture/enrichment/doc-12%20-%20Syllabary-Enrichment-Engine.md)** | Character/syllable DP alignment and rule merger engine (syncopation, aspiration transfer, glottal filtering) with diagnostic inspector. | `digohwelisgi.cherokee.enrichment`, `digohwelisgi.pipelines.enrichment` |
 | **[Audio Segmentation](backlog/docs/architecture/audio/doc-13%20-%20Audio-Segmentation-and-VAD-Masking.md)** | Hybrid VAD audio chunking (`segment_long_audio`), energy profiling, and Silero VAD soft-masking. | `digohwelisgi.core.audio` |
-| **[Training & Evaluation](backlog/docs/architecture/training/doc-14%20-%20Model-Training-and-Evaluation-Pipeline.md)** | Multi-domain dataset preparation, offline/remote Wav2Vec2 training, checkpoint evaluation, and HF revision benchmarks. | `digohwelisgi.training`, `digohwelisgi.evaluation` |
+| **[Training & Evaluation](backlog/docs/architecture/training/doc-14%20-%20Model-Training-and-Evaluation-Pipeline.md)** | Multi-domain dataset preparation, offline/remote Wav2Vec2 training, checkpoint evaluation, and HF revision benchmarks. | `digohwelisgi.cherokee.training`, `digohwelisgi.evaluation` |
 | **[Desktop Transcriber App](backlog/docs/apps/desktop_transcriber/doc-9%20-%20Desktop-Transcriber-Packaging-and-Architecture.md)** | Standalone desktop application (PyWebView + React TypeScript + FastAPI) and PyInstaller build guides for macOS and Windows. | `syllabary_transcriber` |
 
 ---
@@ -41,6 +41,7 @@ The repository is organized into four decoupled architectural layers:
 │   • codeswitching: Synthetic loanword target projection     │
 │   • enrichment: Syllable reconciliation engine              │
 │   • models: CherokeeASRModel factory & weights              │
+│   • training: Wav2Vec2 fine-tuning, datasets & checkpoints  │
 ├─────────────────────────────────────────────────────────────┤
 │ Tier 1: Core Engine (digohwelisgi.core)                    │
 │   • audio: Segmenting & Silero VAD soft-masking             │

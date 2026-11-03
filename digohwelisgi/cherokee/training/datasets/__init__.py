@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-digohwelisgi.training.datasets package.
+digohwelisgi.cherokee.training.datasets package.
 """
 
-from digohwelisgi.training.datasets.arpabet import (
+from digohwelisgi.cherokee.training.datasets.arpabet import (
     PhoneticWordBalancer,
     WordCandidate,
     collect_utterance_candidates,
