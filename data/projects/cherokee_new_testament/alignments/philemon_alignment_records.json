@@ -1,0 +1,2886 @@
+[
+  {
+    "verse_id": "180101",
+    "book": "philemon",
+    "chapter": 1,
+    "verse_idx": 1,
+    "audio_path": "split_audio/philemon_01_01.wav",
+    "start_sec": 6.84,
+    "end_sec": 22.44,
+    "duration_sec": 15.6,
+    "reference_sentence": "ᎠᏴ, ᏉᎳ, ᏥᏴᎩ ᏥᏌ ᎦᎶᏁᏛ ᎠᎩᏍᏛᏗᏍᎬᎢ, ᎠᎴ ᏗᎹᏗ ᎢᎩᏅᏟ, ᏫᏍᏛᏲᏪᎳᏏ ᏆᎵᎹᏂ ᎤᏣᏘ ᎢᏍᏛᎨᏳᎢ, ᎠᎴ ᎤᏠᏱ ᏗᎩᎸᏫᏍᏓᏁᎯ,",
+    "cherokee_syllabary": "ᎠᏴ, ᏉᎳ, ᏥᏴᎩ ᏥᏌ ᎦᎶᏁᏛ ᎠᎩᏍᏛᏗᏍᎬᎢ, ᎠᎴ ᏗᎹᏗ ᎢᎩᏅᏟ, ᏫᏍᏛᏲᏪᎳᏏ ᏆᎵᎹᏂ ᎤᏣᏘ ᎢᏍᏛᎨᏳᎢ, ᎠᎴ ᎤᏠᏱ ᏗᎩᎸᏫᏍᏓᏁᎯ,",
+    "emitted_text": "ayv kwola tsiyvkhi tsihsa kalonetv akhstvtihskv'i ale thimathi ikinhvlhi whstvywelahsi kwalmani utsathi ihstvkeyu'i ale utlhoyi tikilvwhstanehi",
+    "greedy_hypothesis": "ayv kwola tsiyvkhi tsihsa kalonetv akhstvtihskv'i ale thimathi ikinhvlhi whstvywelahsi kwalmani utsathi ihstvkeyu'i ale utlhoyi tikilvwhstanehi",
+    "greedy_confidence": 0.943344,
+    "guided_hypothesis": "ayv kwola tsiyvkhi tsihsa kalonetv akhstvtihskv'i ale thimathi ikinhvlhi whstvywelahsi kwalmani utsathi ihstvkeyu'i ale utlhoyi tikilvwhstanehi",
+    "reconciled_phonetics": "ayv kwola tsiyvkhi tsihsa kalonetv akhstvtihskv'i ale thimathi ikinhvlhi whstvywelahsi kwalmani utsathi ihstvkeyu'i ale utlhoyi tikilvwhstanehi",
+    "has_anomalies": false,
+    "words": [
+      {
+        "word": "ayv",
+        "start_sec": 6.94,
+        "end_sec": 7.1,
+        "confidence": 0.999926,
+        "flagged": false,
+        "emitted_word": "ayv"
+      },
+      {
+        "word": "kwola",
+        "start_sec": 7.32,
+        "end_sec": 7.7,
+        "confidence": 0.943052,
+        "flagged": false,
+        "emitted_word": "kwola"
+      },
+      {
+        "word": "tsiyvki",
+        "start_sec": 7.92,
+        "end_sec": 8.52,
+        "confidence": 0.991794,
+        "flagged": false,
+        "emitted_word": "tsiyvkhi"
+      },
+      {
+        "word": "tsihsa",
+        "start_sec": 8.64,
+        "end_sec": 8.94,
+        "confidence": 0.999946,
+        "flagged": false,
+        "emitted_word": "tsihsa"
+      },
+      {
+        "word": "kalonetv",
+        "start_sec": 9.0,
+        "end_sec": 9.58,
+        "confidence": 0.936915,
+        "flagged": false,
+        "emitted_word": "kalonetv"
+      },
+      {
+        "word": "akihstvtihskv'i",
+        "start_sec": 9.72,
+        "end_sec": 10.7,
+        "confidence": 0.994858,
+        "flagged": false,
+        "emitted_word": "akhstvtihskv'i"
+      },
+      {
+        "word": "ale",
+        "start_sec": 11.36,
+        "end_sec": 11.5,
+        "confidence": 0.99994,
+        "flagged": false,
+        "emitted_word": "ale"
+      },
+      {
+        "word": "timati",
+        "start_sec": 11.62,
+        "end_sec": 12.0,
+        "confidence": 0.536194,
+        "flagged": false,
+        "emitted_word": "thimathi"
+      },
+      {
+        "word": "ikinvtli",
+        "start_sec": 12.08,
+        "end_sec": 13.0,
+        "confidence": 0.998991,
+        "flagged": false,
+        "emitted_word": "ikinhvlhi"
+      },
+      {
+        "word": "wihstvyowelahsi",
+        "start_sec": 13.88,
+        "end_sec": 14.92,
+        "confidence": 0.871817,
+        "flagged": false,
+        "emitted_word": "whstvywelahsi"
+      },
+      {
+        "word": "kwalimani",
+        "start_sec": 15.62,
+        "end_sec": 16.42,
+        "confidence": 0.999757,
+        "flagged": false,
+        "emitted_word": "kwalmani"
+      },
+      {
+        "word": "utsathi",
+        "start_sec": 16.68,
+        "end_sec": 17.14,
+        "confidence": 0.976108,
+        "flagged": false,
+        "emitted_word": "utsathi"
+      },
+      {
+        "word": "ihstvkeyu'i",
+        "start_sec": 18.0,
+        "end_sec": 18.9,
+        "confidence": 0.996811,
+        "flagged": false,
+        "emitted_word": "ihstvkeyu'i"
+      },
+      {
+        "word": "ale",
+        "start_sec": 19.74,
+        "end_sec": 19.9,
+        "confidence": 0.999938,
+        "flagged": false,
+        "emitted_word": "ale"
+      },
+      {
+        "word": "utloyi",
+        "start_sec": 20.24,
+        "end_sec": 20.9,
+        "confidence": 0.863106,
+        "flagged": false,
+        "emitted_word": "utlhoyi"
+      },
+      {
+        "word": "tikilvwihstanehi",
+        "start_sec": 21.1,
+        "end_sec": 22.22,
+        "confidence": 0.984347,
+        "flagged": false,
+        "emitted_word": "tikilvwhstanehi"
+      }
+    ]
+  },
+  {
+    "verse_id": "180102",
+    "book": "philemon",
+    "chapter": 1,
+    "verse_idx": 2,
+    "audio_path": "split_audio/philemon_01_02.wav",
+    "start_sec": 22.44,
+    "end_sec": 36.88,
+    "duration_sec": 14.44,
+    "reference_sentence": "ᎠᎴ ᎢᏍᏛᎨᏳᎢ ᎠᏈᏯ, ᎠᎴ ᎠᎩᏆ, ᎢᏧᎳᎭ ᎢᏗᏩᏫᏍᎩ, ᎠᎴ ᏧᎾᏁᎶᏗᎤᎾᏓᏈᎬ ᎯᏁᎸᎢ;",
+    "cherokee_syllabary": "ᎠᎴ ᎢᏍᏛᎨᏳᎢ ᎠᏈᏯ, ᎠᎴ ᎠᎩᏆ, ᎢᏧᎳᎭ ᎢᏗᏩᏫᏍᎩ, ᎠᎴ ᏧᎾᏁᎶᏗᎤᎾᏓᏈᎬ ᎯᏁᎸᎢ;",
+    "emitted_text": "ale ihstvkeyu'i akwiya ale akikwa itsulaha itiwawhski ale tsunanelhohti'unatakwihkv hinelv'i",
+    "greedy_hypothesis": "ale ihstvkeyu'i akwiya ale akikwa itsulaha itiwawhski ale tsunanelhohti'unatakwihkv hinelv'i",
+    "greedy_confidence": 0.794988,
+    "guided_hypothesis": "ale ihstvkeyu'i akwiya ale akikwa itsulaha itiwawhski ale tsunanelhohti'unatakwihkv hinelv'i",
+    "reconciled_phonetics": "ale ihstvkeyu'i akwiya ale akikwa itsulaha itiwawhski ale tsunanelhohti'unatakwihkv hinelv'i",
+    "has_anomalies": true,
+    "words": [
+      {
+        "word": "ale",
+        "start_sec": 23.16,
+        "end_sec": 23.3,
+        "confidence": 0.999533,
+        "flagged": false,
+        "emitted_word": "ale"
+      },
+      {
+        "word": "ihstvkeyu'i",
+        "start_sec": 24.44,
+        "end_sec": 25.4,
+        "confidence": 0.999547,
+        "flagged": false,
+        "emitted_word": "ihstvkeyu'i"
+      },
+      {
+        "word": "akwiya",
+        "start_sec": 26.48,
+        "end_sec": 27.0,
+        "confidence": 0.999606,
+        "flagged": false,
+        "emitted_word": "akwiya"
+      },
+      {
+        "word": "ale",
+        "start_sec": 28.06,
+        "end_sec": 28.22,
+        "confidence": 0.999972,
+        "flagged": false,
+        "emitted_word": "ale"
+      },
+      {
+        "word": "akikwa",
+        "start_sec": 28.46,
+        "end_sec": 28.98,
+        "confidence": 0.997649,
+        "flagged": false,
+        "emitted_word": "akikwa"
+      },
+      {
+        "word": "itsulaha",
+        "start_sec": 30.08,
+        "end_sec": 30.98,
+        "confidence": 0.999231,
+        "flagged": false,
+        "emitted_word": "itsulaha"
+      },
+      {
+        "word": "itiwawihski",
+        "start_sec": 31.74,
+        "end_sec": 32.58,
+        "confidence": 0.013662,
+        "flagged": true,
+        "emitted_word": "itiwawhski"
+      },
+      {
+        "word": "ale",
+        "start_sec": 33.22,
+        "end_sec": 33.34,
+        "confidence": 0.797357,
+        "flagged": false,
+        "emitted_word": "ale"
+      },
+      {
+        "word": "tsunaneloti'unatakwikv",
+        "start_sec": 33.42,
+        "end_sec": 35.2,
+        "confidence": 0.185489,
+        "flagged": false,
+        "emitted_word": "tsunanelhohti'unatakwihkv"
+      },
+      {
+        "word": "hinelv'i",
+        "start_sec": 36.04,
+        "end_sec": 36.72,
+        "confidence": 0.957838,
+        "flagged": false,
+        "emitted_word": "hinelv'i"
+      }
+    ]
+  },
+  {
+    "verse_id": "180103",
+    "book": "philemon",
+    "chapter": 1,
+    "verse_idx": 3,
+    "audio_path": "split_audio/philemon_01_03.wav",
+    "start_sec": 36.88,
+    "end_sec": 51.43,
+    "duration_sec": 14.55,
+    "reference_sentence": "ᎬᏩᎦᏘᏯ ᎤᏓᏙᎵᏍᏗ ᎨᏒ ᎠᎴ ᏅᏩᏙᎯᏯᏛ ᏕᏥᎧᎿᎭᏩᏗᏙᎮᏍᏗ ᏅᏓᏳᎾᎵᏍᎪᎸᏔᏅᎯ ᎤᏁᎳᏅᎯ ᎢᎩᏙᏓ ᎠᎴ ᎤᎬᏫᏳᎯ ᏥᏌ ᎦᎶᏁᏛ.",
+    "cherokee_syllabary": "ᎬᏩᎦᏘᏯ ᎤᏓᏙᎵᏍᏗ ᎨᏒ ᎠᎴ ᏅᏩᏙᎯᏯᏛ ᏕᏥᎧᎿᎭᏩᏗᏙᎮᏍᏗ ᏅᏓᏳᎾᎵᏍᎪᎸᏔᏅᎯ ᎤᏁᎳᏅᎯ ᎢᎩᏙᏓ ᎠᎴ ᎤᎬᏫᏳᎯ ᏥᏌ ᎦᎶᏁᏛ.",
+    "emitted_text": "kvwakthiya utatolihsti kehsv ale nvhwtohiytv tetsikhanhawatitohehsti nvtayunalhskolvhthanvhi unelanvhi ikitota ale ukvwiyuhi tsihsa kalonetv",
+    "greedy_hypothesis": "kvwakthiya utatolihsti kehsv ale nvhwtohiytv tetsikhanhawatitohehsti nvtayunalhskolvhthanvhi unelanvhi ikitota ale ukvwiyuhi tsihsa kalonetv",
+    "greedy_confidence": 0.77174,
+    "guided_hypothesis": "kvwakthiya utatolihsti kehsv ale nvhwtohiytv tetsikhanhawatitohehsti nvtayunalhskolvhthanvhi unelanvhi ikitota ale ukvwiyuhi tsihsa kalonetv",
+    "reconciled_phonetics": "kvwakthiya utatolihsti kehsv ale nvhwtohiytv tetsikhanhawatitohehsti nvtayunalhskolvhthanvhi unelanvhi ikitota ale ukvwiyuhi tsihsa kalonetv",
+    "has_anomalies": false,
+    "words": [
+      {
+        "word": "kvwakathiya",
+        "start_sec": 37.54,
+        "end_sec": 38.06,
+        "confidence": 0.379697,
+        "flagged": false,
+        "emitted_word": "kvwakthiya"
+      },
+      {
+        "word": "utatolihsti",
+        "start_sec": 38.14,
+        "end_sec": 39.1,
+        "confidence": 0.444722,
+        "flagged": false,
+        "emitted_word": "utatolihsti"
+      },
+      {
+        "word": "kehsv",
+        "start_sec": 39.28,
+        "end_sec": 39.64,
+        "confidence": 0.982935,
+        "flagged": false,
+        "emitted_word": "kehsv"
+      },
+      {
+        "word": "ale",
+        "start_sec": 39.78,
+        "end_sec": 39.98,
+        "confidence": 0.994911,
+        "flagged": false,
+        "emitted_word": "ale"
+      },
+      {
+        "word": "nvwatohiyatv",
+        "start_sec": 40.74,
+        "end_sec": 41.64,
+        "confidence": 0.090419,
+        "flagged": false,
+        "emitted_word": "nvhwtohiytv"
+      },
+      {
+        "word": "tetsikhanhawatitohehsti",
+        "start_sec": 41.96,
+        "end_sec": 43.56,
+        "confidence": 0.980577,
+        "flagged": false,
+        "emitted_word": "tetsikhanhawatitohehsti"
+      },
+      {
+        "word": "nvtayunalihskolvthanvhi",
+        "start_sec": 44.16,
+        "end_sec": 45.76,
+        "confidence": 0.96008,
+        "flagged": false,
+        "emitted_word": "nvtayunalhskolvhthanvhi"
+      },
+      {
+        "word": "unelanvhi",
+        "start_sec": 46.6,
+        "end_sec": 47.36,
+        "confidence": 0.996224,
+        "flagged": false,
+        "emitted_word": "unelanvhi"
+      },
+      {
+        "word": "ikitota",
+        "start_sec": 47.48,
+        "end_sec": 48.32,
+        "confidence": 0.999947,
+        "flagged": false,
+        "emitted_word": "ikitota"
+      },
+      {
+        "word": "ale",
+        "start_sec": 48.58,
+        "end_sec": 48.74,
+        "confidence": 0.999947,
+        "flagged": false,
+        "emitted_word": "ale"
+      },
+      {
+        "word": "ukvwiyuhi",
+        "start_sec": 49.2,
+        "end_sec": 49.96,
+        "confidence": 0.999903,
+        "flagged": false,
+        "emitted_word": "ukvwiyuhi"
+      },
+      {
+        "word": "tsihsa",
+        "start_sec": 50.18,
+        "end_sec": 50.54,
+        "confidence": 0.999711,
+        "flagged": false,
+        "emitted_word": "tsihsa"
+      },
+      {
+        "word": "kalonetv",
+        "start_sec": 50.58,
+        "end_sec": 51.3,
+        "confidence": 0.203542,
+        "flagged": false,
+        "emitted_word": "kalonetv"
+      }
+    ]
+  },
+  {
+    "verse_id": "180104",
+    "book": "philemon",
+    "chapter": 1,
+    "verse_idx": 4,
+    "audio_path": "split_audio/philemon_01_04.wav",
+    "start_sec": 51.43,
+    "end_sec": 59.48,
+    "duration_sec": 8.05,
+    "reference_sentence": "ᏥᏯᎵᎡᎵᏤᎰ ᎠᏆᏁᎳᏅᎯ ᎬᏁᎢᏍᏗᏍᎪ ᏂᎪᎯᎸ ᎦᏓᏙᎵᏍᏗᏍᎬᎢ,",
+    "cherokee_syllabary": "ᏥᏯᎵᎡᎵᏤᎰ ᎠᏆᏁᎳᏅᎯ ᎬᏁᎢᏍᏗᏍᎪ ᏂᎪᎯᎸ ᎦᏓᏙᎵᏍᏗᏍᎬᎢ,",
+    "emitted_text": "tsiyali'elitseho akwanelhanvhi kvne'ihstihsko nikohilv katatolihstihskv'i",
+    "greedy_hypothesis": "tsiyali'elitseho akwanelhanvhi kvne'ihstihsko nikohilv katatolihstihskv'i",
+    "greedy_confidence": 0.829626,
+    "guided_hypothesis": "tsiyali'elitseho akwanelhanvhi kvne'ihstihsko nikohilv katatolihstihskv'i",
+    "reconciled_phonetics": "tsiyali'elitseho akwanelhanvhi kvne'ihstihsko nikohilv katatolihstihskv'i",
+    "has_anomalies": false,
+    "words": [
+      {
+        "word": "tsiyali'elitseho",
+        "start_sec": 52.06,
+        "end_sec": 53.42,
+        "confidence": 0.269368,
+        "flagged": false,
+        "emitted_word": "tsiyali'elitseho"
+      },
+      {
+        "word": "akwanelanvhi",
+        "start_sec": 53.56,
+        "end_sec": 54.72,
+        "confidence": 0.975448,
+        "flagged": false,
+        "emitted_word": "akwanelhanvhi"
+      },
+      {
+        "word": "kvne'ihstihsko",
+        "start_sec": 55.46,
+        "end_sec": 56.4,
+        "confidence": 0.99875,
+        "flagged": false,
+        "emitted_word": "kvne'ihstihsko"
+      },
+      {
+        "word": "nikohilv",
+        "start_sec": 56.5,
+        "end_sec": 57.1,
+        "confidence": 0.905554,
+        "flagged": false,
+        "emitted_word": "nikohilv"
+      },
+      {
+        "word": "katatolihstihskv'i",
+        "start_sec": 57.86,
+        "end_sec": 59.24,
+        "confidence": 0.999011,
+        "flagged": false,
+        "emitted_word": "katatolihstihskv'i"
+      }
+    ]
+  },
+  {
+    "verse_id": "180105",
+    "book": "philemon",
+    "chapter": 1,
+    "verse_idx": 5,
+    "audio_path": "split_audio/philemon_01_05.wav",
+    "start_sec": 59.48,
+    "end_sec": 75.22,
+    "duration_sec": 15.74,
+    "reference_sentence": "ᎦᏛᎩᏍᎬ ᏣᏓᎨᏳᏒ ᎠᎴ ᏦᎯᏳᏒᎢ, ᎾᏍᎩ ᏥᎨᏳᎭ ᎤᎬᏫᏳᎯ ᏥᏌ, ᎠᎴ ᎾᏂᎥ ᎤᎾᏓᏅᏘ ᏥᏕᎯᎨᏳᎭ;",
+    "cherokee_syllabary": "ᎦᏛᎩᏍᎬ ᏣᏓᎨᏳᏒ ᎠᎴ ᏦᎯᏳᏒᎢ, ᎾᏍᎩ ᏥᎨᏳᎭ ᎤᎬᏫᏳᎯ ᏥᏌ, ᎠᎴ ᎾᏂᎥ ᎤᎾᏓᏅᏘ ᏥᏕᎯᎨᏳᎭ;",
+    "emitted_text": "kathvkihskv tsatakeyuhsv ale tsohiyuhsv'i nahski tsikeyuha ukvwiyhi tsihsa ale nani'v unatanhvhthi tsitehikeyuha",
+    "greedy_hypothesis": "kathvkihskv tsatakeyuhsv ale tsohiyuhsv'i nahski tsikeyuha ukvwiyhi tsihsa ale nani'v unatanhvhthi tsitehikeyuha",
+    "greedy_confidence": 0.860462,
+    "guided_hypothesis": "kathvkihskv tsatakeyuhsv ale tsohiyuhsv'i nahski tsikeyuha ukvwiyhi tsihsa ale nani'v unatanhvhthi tsitehikeyuha",
+    "reconciled_phonetics": "kathvkihskv tsatakeyuhsv ale tsohiyuhsv'i nahski tsikeyuha ukvwiyhi tsihsa ale nani'v unatanhvhthi tsitehikeyuha",
+    "has_anomalies": false,
+    "words": [
+      {
+        "word": "katvkihskv",
+        "start_sec": 60.22,
+        "end_sec": 61.1,
+        "confidence": 0.999944,
+        "flagged": false,
+        "emitted_word": "kathvkihskv"
+      },
+      {
+        "word": "tsatakeyuhsv",
+        "start_sec": 62.22,
+        "end_sec": 63.3,
+        "confidence": 0.980833,
+        "flagged": false,
+        "emitted_word": "tsatakeyuhsv"
+      },
+      {
+        "word": "ale",
+        "start_sec": 63.4,
+        "end_sec": 63.56,
+        "confidence": 0.999817,
+        "flagged": false,
+        "emitted_word": "ale"
+      },
+      {
+        "word": "tsohiyuhsv'i",
+        "start_sec": 64.32,
+        "end_sec": 65.22,
+        "confidence": 0.96046,
+        "flagged": false,
+        "emitted_word": "tsohiyuhsv'i"
+      },
+      {
+        "word": "nahski",
+        "start_sec": 66.22,
+        "end_sec": 66.54,
+        "confidence": 0.277488,
+        "flagged": false,
+        "emitted_word": "nahski"
+      },
+      {
+        "word": "tsikeyuha",
+        "start_sec": 66.7,
+        "end_sec": 67.54,
+        "confidence": 0.919239,
+        "flagged": false,
+        "emitted_word": "tsikeyuha"
+      },
+      {
+        "word": "ukvwiyuhi",
+        "start_sec": 68.6,
+        "end_sec": 69.24,
+        "confidence": 0.999454,
+        "flagged": false,
+        "emitted_word": "ukvwiyhi"
+      },
+      {
+        "word": "tsihsa",
+        "start_sec": 69.32,
+        "end_sec": 69.74,
+        "confidence": 0.247178,
+        "flagged": false,
+        "emitted_word": "tsihsa"
+      },
+      {
+        "word": "ale",
+        "start_sec": 70.48,
+        "end_sec": 70.64,
+        "confidence": 0.999596,
+        "flagged": false,
+        "emitted_word": "ale"
+      },
+      {
+        "word": "nani'v",
+        "start_sec": 70.76,
+        "end_sec": 71.3,
+        "confidence": 0.951548,
+        "flagged": false,
+        "emitted_word": "nani'v"
+      },
+      {
+        "word": "unatanvthi",
+        "start_sec": 72.26,
+        "end_sec": 73.06,
+        "confidence": 0.994011,
+        "flagged": false,
+        "emitted_word": "unatanhvhthi"
+      },
+      {
+        "word": "tsitehikeyuha",
+        "start_sec": 73.64,
+        "end_sec": 74.8,
+        "confidence": 0.995971,
+        "flagged": false,
+        "emitted_word": "tsitehikeyuha"
+      }
+    ]
+  },
+  {
+    "verse_id": "180106",
+    "book": "philemon",
+    "chapter": 1,
+    "verse_idx": 6,
+    "audio_path": "split_audio/philemon_01_06.wav",
+    "start_sec": 75.22,
+    "end_sec": 92.81,
+    "duration_sec": 17.59,
+    "reference_sentence": "ᎾᏍᎩ Ꮎ ᏦᎯᏳᏒ ᏤᎳᏗᏍᏗᏍᎬᎢ ᎾᏍᎩ ᏱᏂᎬᏂᏒ ᎬᏂᎨᏒ ᏱᏂᎦᎵᏍᏓ ᏂᎦᎥ ᎣᏍᏛ ᎨᏒ ᎢᏥᏯᎥᎢ ᏥᏌ ᎦᎶᏁᏛ ᏅᏗᎦᎵᏍᏙᏗᏍᎬᎢ.",
+    "cherokee_syllabary": "ᎾᏍᎩ Ꮎ ᏦᎯᏳᏒ ᏤᎳᏗᏍᏗᏍᎬᎢ ᎾᏍᎩ ᏱᏂᎬᏂᏒ ᎬᏂᎨᏒ ᏱᏂᎦᎵᏍᏓ ᏂᎦᎥ ᎣᏍᏛ ᎨᏒ ᎢᏥᏯᎥᎢ ᏥᏌ ᎦᎶᏁᏛ ᏅᏗᎦᎵᏍᏙᏗᏍᎬᎢ.",
+    "emitted_text": "nahski n tsohiyuhsv tshelatihstihskv'i nahski yinikvnhihsv kvnikehsv yinikalhsta nika'v ohstv kehsv itsiya'v'i tsihsa kalonetv nvtikalhstohtihskv'i",
+    "greedy_hypothesis": "nahski n tsohiyuhsv tshelatihstihskv'i nahski yinikvnhihsv kvnikehsv yinikalhsta nika'v ohstv kehsv itsiya'v'i tsihsa kalonetv nvtikalhstohtihskv'i",
+    "greedy_confidence": 0.889082,
+    "guided_hypothesis": "nahski n tsohiyuhsv tshelatihstihskv'i nahski yinikvnhihsv kvnikehsv yinikalhsta nika'v ohstv kehsv itsiya'v'i tsihsa kalonetv nvtikalhstohtihskv'i",
+    "reconciled_phonetics": "nahski n tsohiyuhsv tshelatihstihskv'i nahski yinikvnhihsv kvnikehsv yinikalhsta nika'v ohstv kehsv itsiya'v'i tsihsa kalonetv nvtikalhstohtihskv'i",
+    "has_anomalies": false,
+    "words": [
+      {
+        "word": "nahski",
+        "start_sec": 76.14,
+        "end_sec": 76.5,
+        "confidence": 0.999796,
+        "flagged": false,
+        "emitted_word": "nahski"
+      },
+      {
+        "word": "na",
+        "start_sec": 76.6,
+        "end_sec": 76.62,
+        "confidence": 0.7216,
+        "flagged": false,
+        "emitted_word": "n"
+      },
+      {
+        "word": "tsohiyuhsv",
+        "start_sec": 76.78,
+        "end_sec": 77.62,
+        "confidence": 0.968963,
+        "flagged": false,
+        "emitted_word": "tsohiyuhsv"
+      },
+      {
+        "word": "tselatihstihskv'i",
+        "start_sec": 78.28,
+        "end_sec": 79.56,
+        "confidence": 0.517816,
+        "flagged": false,
+        "emitted_word": "tshelatihstihskv'i"
+      },
+      {
+        "word": "nahski",
+        "start_sec": 79.68,
+        "end_sec": 80.06,
+        "confidence": 0.980673,
+        "flagged": false,
+        "emitted_word": "nahski"
+      },
+      {
+        "word": "yinikvnihsv",
+        "start_sec": 81.1,
+        "end_sec": 82.06,
+        "confidence": 0.990047,
+        "flagged": false,
+        "emitted_word": "yinikvnhihsv"
+      },
+      {
+        "word": "kvnikehsv",
+        "start_sec": 82.9,
+        "end_sec": 83.66,
+        "confidence": 0.887853,
+        "flagged": false,
+        "emitted_word": "kvnikehsv"
+      },
+      {
+        "word": "yinikalihsta",
+        "start_sec": 84.88,
+        "end_sec": 85.58,
+        "confidence": 0.866937,
+        "flagged": false,
+        "emitted_word": "yinikalhsta"
+      },
+      {
+        "word": "nika'v",
+        "start_sec": 85.78,
+        "end_sec": 86.22,
+        "confidence": 0.999332,
+        "flagged": false,
+        "emitted_word": "nika'v"
+      },
+      {
+        "word": "ohstv",
+        "start_sec": 86.38,
+        "end_sec": 86.68,
+        "confidence": 0.999883,
+        "flagged": false,
+        "emitted_word": "ohstv"
+      },
+      {
+        "word": "kehsv",
+        "start_sec": 86.74,
+        "end_sec": 87.06,
+        "confidence": 0.986317,
+        "flagged": false,
+        "emitted_word": "kehsv"
+      },
+      {
+        "word": "itsiya'v'i",
+        "start_sec": 88.04,
+        "end_sec": 89.04,
+        "confidence": 0.999799,
+        "flagged": false,
+        "emitted_word": "itsiya'v'i"
+      },
+      {
+        "word": "tsihsa",
+        "start_sec": 89.8,
+        "end_sec": 90.06,
+        "confidence": 0.499325,
+        "flagged": false,
+        "emitted_word": "tsihsa"
+      },
+      {
+        "word": "kalonetv",
+        "start_sec": 90.1,
+        "end_sec": 90.72,
+        "confidence": 0.925697,
+        "flagged": false,
+        "emitted_word": "kalonetv"
+      },
+      {
+        "word": "nvtikalihstotihskv'i",
+        "start_sec": 91.26,
+        "end_sec": 92.54,
+        "confidence": 0.992191,
+        "flagged": false,
+        "emitted_word": "nvtikalhstohtihskv'i"
+      }
+    ]
+  },
+  {
+    "verse_id": "180107",
+    "book": "philemon",
+    "chapter": 1,
+    "verse_idx": 7,
+    "audio_path": "split_audio/philemon_01_07.wav",
+    "start_sec": 92.81,
+    "end_sec": 111.09,
+    "duration_sec": 18.28,
+    "reference_sentence": "ᎤᏣᏘᏰᏃ ᎤᎵᎮᎵᏍᏗ ᎣᎨᎭ ᎠᎴ ᎤᎦᎵᏍᏗ ᎠᏓᏅᏓᏗᏍᏗ ᎨᏒ ᏣᏓᎨᏳᏒ ᎢᏳᏍᏗ, ᏛᏗᎦᎵᏍᏙᏗᎭ ᎤᎾᏓᏅᏘ ᏧᏂᎾᏫ ᏕᎯᎦᎵᏍᏓᏕᎲᎢ, ᎥᎩᏅᏟ.",
+    "cherokee_syllabary": "ᎤᏣᏘᏰᏃ ᎤᎵᎮᎵᏍᏗ ᎣᎨᎭ ᎠᎴ ᎤᎦᎵᏍᏗ ᎠᏓᏅᏓᏗᏍᏗ ᎨᏒ ᏣᏓᎨᏳᏒ ᎢᏳᏍᏗ, ᏛᏗᎦᎵᏍᏙᏗᎭ ᎤᎾᏓᏅᏘ ᏧᏂᎾᏫ ᏕᎯᎦᎵᏍᏓᏕᎲᎢ, ᎥᎩᏅᏟ.",
+    "emitted_text": "utsathiyhenho ulihelihsti okeha ale ukalhsti atanvhtatihsti kehsv tstakeyuhsv iyuhsti tvtikalhstohtiha unatanvthi tsuninawhi tehikalhstatehv'i vkhinvlhi",
+    "greedy_hypothesis": "utsathiyhenho ulihelihsti okeha ale ukalhsti atanvhtatihsti kehsv tstakeyuhsv iyuhsti tvtikalhstohtiha unatanvthi tsuninawhi tehikalhstatehv'i vkhinvlhi",
+    "greedy_confidence": 0.915137,
+    "guided_hypothesis": "utsathiyhenho ulihelihsti okeha ale ukalhsti atanvhtatihsti kehsv tstakeyuhsv iyuhsti tvtikalhstohtiha unatanvthi tsuninawhi tehikalhstatehv'i vkhinvlhi",
+    "reconciled_phonetics": "utsathiyhenho ulihelihsti okeha ale ukalhsti atanvhtatihsti kehsv tstakeyuhsv iyuhsti tvtikalhstohtiha unatanvthi tsuninawhi tehikalhstatehv'i vkhinvlhi",
+    "has_anomalies": false,
+    "words": [
+      {
+        "word": "utsathiyeno",
+        "start_sec": 93.58,
+        "end_sec": 94.4,
+        "confidence": 0.994349,
+        "flagged": false,
+        "emitted_word": "utsathiyhenho"
+      },
+      {
+        "word": "ulihelihsti",
+        "start_sec": 94.54,
+        "end_sec": 95.5,
+        "confidence": 0.973309,
+        "flagged": false,
+        "emitted_word": "ulihelihsti"
+      },
+      {
+        "word": "okeha",
+        "start_sec": 95.86,
+        "end_sec": 96.42,
+        "confidence": 0.999765,
+        "flagged": false,
+        "emitted_word": "okeha"
+      },
+      {
+        "word": "ale",
+        "start_sec": 96.62,
+        "end_sec": 96.82,
+        "confidence": 0.9998,
+        "flagged": false,
+        "emitted_word": "ale"
+      },
+      {
+        "word": "ukalihsti",
+        "start_sec": 97.54,
+        "end_sec": 98.2,
+        "confidence": 0.99982,
+        "flagged": false,
+        "emitted_word": "ukalhsti"
+      },
+      {
+        "word": "atanvtatihsti",
+        "start_sec": 99.04,
+        "end_sec": 99.84,
+        "confidence": 0.699764,
+        "flagged": false,
+        "emitted_word": "atanvhtatihsti"
+      },
+      {
+        "word": "kehsv",
+        "start_sec": 99.9,
+        "end_sec": 100.24,
+        "confidence": 0.995082,
+        "flagged": false,
+        "emitted_word": "kehsv"
+      },
+      {
+        "word": "tsatakeyuhsv",
+        "start_sec": 101.04,
+        "end_sec": 101.98,
+        "confidence": 0.996137,
+        "flagged": false,
+        "emitted_word": "tstakeyuhsv"
+      },
+      {
+        "word": "iyuhsti",
+        "start_sec": 102.1,
+        "end_sec": 102.58,
+        "confidence": 0.999975,
+        "flagged": false,
+        "emitted_word": "iyuhsti"
+      },
+      {
+        "word": "tvtikalihstotiha",
+        "start_sec": 103.44,
+        "end_sec": 104.48,
+        "confidence": 0.415159,
+        "flagged": false,
+        "emitted_word": "tvtikalhstohtiha"
+      },
+      {
+        "word": "unatanvthi",
+        "start_sec": 105.32,
+        "end_sec": 106.18,
+        "confidence": 0.823308,
+        "flagged": false,
+        "emitted_word": "unatanvthi"
+      },
+      {
+        "word": "tsuninawi",
+        "start_sec": 106.34,
+        "end_sec": 107.1,
+        "confidence": 0.965266,
+        "flagged": false,
+        "emitted_word": "tsuninawhi"
+      },
+      {
+        "word": "tehikalihstatehv'i",
+        "start_sec": 107.84,
+        "end_sec": 109.16,
+        "confidence": 0.954121,
+        "flagged": false,
+        "emitted_word": "tehikalhstatehv'i"
+      },
+      {
+        "word": "vkinvtli",
+        "start_sec": 110.04,
+        "end_sec": 110.8,
+        "confidence": 0.996062,
+        "flagged": false,
+        "emitted_word": "vkhinvlhi"
+      }
+    ]
+  },
+  {
+    "verse_id": "180108",
+    "book": "philemon",
+    "chapter": 1,
+    "verse_idx": 8,
+    "audio_path": "split_audio/philemon_01_08.wav",
+    "start_sec": 111.09,
+    "end_sec": 124.08,
+    "duration_sec": 12.99,
+    "reference_sentence": "ᎤᏙᎯᏳᎯᏍᎩᏂᏃᏅ ᎤᏣᏘ ᎠᎩᎭ ᎦᎶᏁᏛ ᎠᎩᏁᎸᎢ, ᎾᏍᎩ ᎬᏁᏤᎲ ᏥᏚᏳᎪᏗ ᎢᏣᏛᏁᏗᏱ;",
+    "cherokee_syllabary": "ᎤᏙᎯᏳᎯᏍᎩᏂᏃᏅ ᎤᏣᏘ ᎠᎩᎭ ᎦᎶᏁᏛ ᎠᎩᏁᎸᎢ, ᎾᏍᎩ ᎬᏁᏤᎲ ᏥᏚᏳᎪᏗ ᎢᏣᏛᏁᏗᏱ;",
+    "emitted_text": "utohiyuhihskininonv utsathi akiha kalonetv akhinelv'i nahski kvnetsehv tsituyukhohti itsatvnehtiyi",
+    "greedy_hypothesis": "utohiyuhihskininonv utsathi akiha kalonetv akhinelv'i nahski kvnetsehv tsituyukhohti itsatvnehtiyi",
+    "greedy_confidence": 0.902735,
+    "guided_hypothesis": "utohiyuhihskininonv utsathi akiha kalonetv akhinelv'i nahski kvnetsehv tsituyukhohti itsatvnehtiyi",
+    "reconciled_phonetics": "utohiyuhihskininonv utsathi akiha kalonetv akhinelv'i nahski kvnetsehv tsituyukhohti itsatvnehtiyi",
+    "has_anomalies": false,
+    "words": [
+      {
+        "word": "utohiyuhihskininonv",
+        "start_sec": 111.88,
+        "end_sec": 113.58,
+        "confidence": 0.806073,
+        "flagged": false,
+        "emitted_word": "utohiyuhihskininonv"
+      },
+      {
+        "word": "utsathi",
+        "start_sec": 114.34,
+        "end_sec": 114.84,
+        "confidence": 0.876338,
+        "flagged": false,
+        "emitted_word": "utsathi"
+      },
+      {
+        "word": "akiha",
+        "start_sec": 114.92,
+        "end_sec": 115.4,
+        "confidence": 0.988185,
+        "flagged": false,
+        "emitted_word": "akiha"
+      },
+      {
+        "word": "kalonetv",
+        "start_sec": 115.98,
+        "end_sec": 116.62,
+        "confidence": 0.954769,
+        "flagged": false,
+        "emitted_word": "kalonetv"
+      },
+      {
+        "word": "akinelv'i",
+        "start_sec": 117.4,
+        "end_sec": 118.24,
+        "confidence": 0.999849,
+        "flagged": false,
+        "emitted_word": "akhinelv'i"
+      },
+      {
+        "word": "nahski",
+        "start_sec": 119.14,
+        "end_sec": 119.44,
+        "confidence": 0.997439,
+        "flagged": false,
+        "emitted_word": "nahski"
+      },
+      {
+        "word": "kvnetsehv",
+        "start_sec": 119.6,
+        "end_sec": 120.4,
+        "confidence": 0.955047,
+        "flagged": false,
+        "emitted_word": "kvnetsehv"
+      },
+      {
+        "word": "tsituyukoti",
+        "start_sec": 121.56,
+        "end_sec": 122.58,
+        "confidence": 0.998646,
+        "flagged": false,
+        "emitted_word": "tsituyukhohti"
+      },
+      {
+        "word": "itsatvnetiyi",
+        "start_sec": 122.9,
+        "end_sec": 123.74,
+        "confidence": 0.548272,
+        "flagged": false,
+        "emitted_word": "itsatvnehtiyi"
+      }
+    ]
+  },
+  {
+    "verse_id": "180109",
+    "book": "philemon",
+    "chapter": 1,
+    "verse_idx": 9,
+    "audio_path": "split_audio/philemon_01_09.wav",
+    "start_sec": 124.08,
+    "end_sec": 145.1,
+    "duration_sec": 21.02,
+    "reference_sentence": "ᎠᏎᏃ ᏍᎩᎨᏳᎯᏳ ᎨᏒ ᏅᏗᎦᎵᏍᏙᏗᎭ ᎤᏟ ᏥᏰᎸᏍᎦ ᎬᏍᏗᏰᏙᏗᏱ, ᏉᎳ ᎤᏛᏐᏅᎯ ᎢᏯᏆᏍᏗ ᏥᎩ, ᎠᎴ ᎪᎯ ᎨᏒ ᎠᏴᎩ, ᏥᏌ ᎦᎶᏁᏛ ᎠᎩᏍᏛᏗᏍᎬᎢ.",
+    "cherokee_syllabary": "ᎠᏎᏃ ᏍᎩᎨᏳᎯᏳ ᎨᏒ ᏅᏗᎦᎵᏍᏙᏗᎭ ᎤᏟ ᏥᏰᎸᏍᎦ ᎬᏍᏗᏰᏙᏗᏱ, ᏉᎳ ᎤᏛᏐᏅᎯ ᎢᏯᏆᏍᏗ ᏥᎩ, ᎠᎴ ᎪᎯ ᎨᏒ ᎠᏴᎩ, ᏥᏌ ᎦᎶᏁᏛ ᎠᎩᏍᏛᏗᏍᎬᎢ.",
+    "emitted_text": "ahsenho hskikyhiyu kehsv nvtikalhstohtiha utli tsiyelvhska kvhstiyetohtiyi kwola uthvhsonhvhi iyakwahsti tsiki al khohi kehsv ayhvki tsihsa kalonetv akhstvtihskv'i",
+    "greedy_hypothesis": "ahsenho hskikyhiyu kehsv nvtikalhstohtiha utli tsiyelvhska kvhstiyetohtiyi kwola uthvhsonhvhi iyakwahsti tsiki al khohi kehsv ayhvki tsihsa kalonetv akhstvtihskv'i",
+    "greedy_confidence": 0.903168,
+    "guided_hypothesis": "ahsenho hskikyhiyu kehsv nvtikalhstohtiha utli tsiyelvhska kvhstiyetohtiyi kwola uthvhsonhvhi iyakwahsti tsiki al khohi kehsv ayhvki tsihsa kalonetv akhstvtihskv'i",
+    "reconciled_phonetics": "ahsenho hskikyhiyu kehsv nvtikalhstohtiha utli tsiyelvhska kvhstiyetohtiyi kwola uthvhsonhvhi iyakwahsti tsiki al khohi kehsv ayhvki tsihsa kalonetv akhstvtihskv'i",
+    "has_anomalies": false,
+    "words": [
+      {
+        "word": "ahseno",
+        "start_sec": 124.92,
+        "end_sec": 125.34,
+        "confidence": 0.997438,
+        "flagged": false,
+        "emitted_word": "ahsenho"
+      },
+      {
+        "word": "hskikeyuhiyu",
+        "start_sec": 125.6,
+        "end_sec": 126.54,
+        "confidence": 0.334562,
+        "flagged": false,
+        "emitted_word": "hskikyhiyu"
+      },
+      {
+        "word": "kehsv",
+        "start_sec": 126.62,
+        "end_sec": 127.0,
+        "confidence": 0.999222,
+        "flagged": false,
+        "emitted_word": "kehsv"
+      },
+      {
+        "word": "nvtikalihstotiha",
+        "start_sec": 128.16,
+        "end_sec": 129.26,
+        "confidence": 0.584522,
+        "flagged": false,
+        "emitted_word": "nvtikalhstohtiha"
+      },
+      {
+        "word": "utli",
+        "start_sec": 129.54,
+        "end_sec": 129.78,
+        "confidence": 0.999726,
+        "flagged": false,
+        "emitted_word": "utli"
+      },
+      {
+        "word": "tsiyelvhska",
+        "start_sec": 131.28,
+        "end_sec": 132.14,
+        "confidence": 0.993952,
+        "flagged": false,
+        "emitted_word": "tsiyelvhska"
+      },
+      {
+        "word": "kvhstiyetotiyi",
+        "start_sec": 133.2,
+        "end_sec": 134.3,
+        "confidence": 0.748316,
+        "flagged": false,
+        "emitted_word": "kvhstiyetohtiyi"
+      },
+      {
+        "word": "kwola",
+        "start_sec": 135.44,
+        "end_sec": 135.84,
+        "confidence": 0.930651,
+        "flagged": false,
+        "emitted_word": "kwola"
+      },
+      {
+        "word": "utvhsonvhi",
+        "start_sec": 136.94,
+        "end_sec": 137.76,
+        "confidence": 0.99425,
+        "flagged": false,
+        "emitted_word": "uthvhsonhvhi"
+      },
+      {
+        "word": "iyakwahsti",
+        "start_sec": 138.48,
+        "end_sec": 139.1,
+        "confidence": 0.948318,
+        "flagged": false,
+        "emitted_word": "iyakwahsti"
+      },
+      {
+        "word": "tsiki",
+        "start_sec": 139.2,
+        "end_sec": 139.46,
+        "confidence": 0.999959,
+        "flagged": false,
+        "emitted_word": "tsiki"
+      },
+      {
+        "word": "ale",
+        "start_sec": 140.06,
+        "end_sec": 140.14,
+        "confidence": 0.99557,
+        "flagged": false,
+        "emitted_word": "al"
+      },
+      {
+        "word": "kohi",
+        "start_sec": 140.3,
+        "end_sec": 140.54,
+        "confidence": 0.996853,
+        "flagged": false,
+        "emitted_word": "khohi"
+      },
+      {
+        "word": "kehsv",
+        "start_sec": 140.6,
+        "end_sec": 140.96,
+        "confidence": 0.999766,
+        "flagged": false,
+        "emitted_word": "kehsv"
+      },
+      {
+        "word": "ayvki",
+        "start_sec": 141.3,
+        "end_sec": 141.8,
+        "confidence": 0.97926,
+        "flagged": false,
+        "emitted_word": "ayhvki"
+      },
+      {
+        "word": "tsihsa",
+        "start_sec": 142.58,
+        "end_sec": 142.86,
+        "confidence": 0.999874,
+        "flagged": false,
+        "emitted_word": "tsihsa"
+      },
+      {
+        "word": "kalonetv",
+        "start_sec": 142.9,
+        "end_sec": 143.48,
+        "confidence": 0.859144,
+        "flagged": false,
+        "emitted_word": "kalonetv"
+      },
+      {
+        "word": "akihstvtihskv'i",
+        "start_sec": 143.56,
+        "end_sec": 144.72,
+        "confidence": 0.895645,
+        "flagged": false,
+        "emitted_word": "akhstvtihskv'i"
+      }
+    ]
+  },
+  {
+    "verse_id": "180110",
+    "book": "philemon",
+    "chapter": 1,
+    "verse_idx": 10,
+    "audio_path": "split_audio/philemon_01_10.wav",
+    "start_sec": 145.1,
+    "end_sec": 155.09,
+    "duration_sec": 9.99,
+    "reference_sentence": "ᎬᏍᏗᏰᏗᎭ ᎠᏇᏥ ᎣᏂᏏᎹ ᎤᎬᏩᎵ ᎾᏍᎩ ᎥᏆᎸᎢᏛ ᎨᏒ ᎠᏆᏕᏁᎸᎯ ᏥᎩ.",
+    "cherokee_syllabary": "ᎬᏍᏗᏰᏗᎭ ᎠᏇᏥ ᎣᏂᏏᎹ ᎤᎬᏩᎵ ᎾᏍᎩ ᎥᏆᎸᎢᏛ ᎨᏒ ᎠᏆᏕᏁᎸᎯ ᏥᎩ.",
+    "emitted_text": "khstiyetiha akwetsi onihsima ukvwalhi nahski vkwlhv'itv kehsv akwatenhelvhi tsiki",
+    "greedy_hypothesis": "khstiyetiha akwetsi onihsima ukvwalhi nahski vkwlhv'itv kehsv akwatenhelvhi tsiki",
+    "greedy_confidence": 0.886229,
+    "guided_hypothesis": "khstiyetiha akwetsi onihsima ukvwalhi nahski vkwlhv'itv kehsv akwatenhelvhi tsiki",
+    "reconciled_phonetics": "khstiyetiha akwetsi onihsima ukvwalhi nahski vkwlhv'itv kehsv akwatenhelvhi tsiki",
+    "has_anomalies": false,
+    "words": [
+      {
+        "word": "kvhstiyetiha",
+        "start_sec": 145.98,
+        "end_sec": 146.84,
+        "confidence": 0.990606,
+        "flagged": false,
+        "emitted_word": "khstiyetiha"
+      },
+      {
+        "word": "akwetsi",
+        "start_sec": 147.02,
+        "end_sec": 147.6,
+        "confidence": 0.979355,
+        "flagged": false,
+        "emitted_word": "akwetsi"
+      },
+      {
+        "word": "onihsima",
+        "start_sec": 148.58,
+        "end_sec": 149.36,
+        "confidence": 0.977664,
+        "flagged": false,
+        "emitted_word": "onihsima"
+      },
+      {
+        "word": "ukvwali",
+        "start_sec": 149.62,
+        "end_sec": 150.26,
+        "confidence": 0.99991,
+        "flagged": false,
+        "emitted_word": "ukvwalhi"
+      },
+      {
+        "word": "nahski",
+        "start_sec": 151.26,
+        "end_sec": 151.6,
+        "confidence": 0.997615,
+        "flagged": false,
+        "emitted_word": "nahski"
+      },
+      {
+        "word": "vkwalv'itv",
+        "start_sec": 151.78,
+        "end_sec": 152.5,
+        "confidence": 0.136178,
+        "flagged": false,
+        "emitted_word": "vkwlhv'itv"
+      },
+      {
+        "word": "kehsv",
+        "start_sec": 152.56,
+        "end_sec": 152.92,
+        "confidence": 0.999724,
+        "flagged": false,
+        "emitted_word": "kehsv"
+      },
+      {
+        "word": "akwatenelvhi",
+        "start_sec": 153.54,
+        "end_sec": 154.5,
+        "confidence": 0.895168,
+        "flagged": false,
+        "emitted_word": "akwatenhelvhi"
+      },
+      {
+        "word": "tsiki",
+        "start_sec": 154.58,
+        "end_sec": 154.84,
+        "confidence": 0.999843,
+        "flagged": false,
+        "emitted_word": "tsiki"
+      }
+    ]
+  },
+  {
+    "verse_id": "180111",
+    "book": "philemon",
+    "chapter": 1,
+    "verse_idx": 11,
+    "audio_path": "split_audio/philemon_01_11.wav",
+    "start_sec": 155.09,
+    "end_sec": 166.61,
+    "duration_sec": 11.52,
+    "reference_sentence": "ᎾᏍᎩ ᏧᏩᎫᏔᏅᏒ ᏂᏣᏍᏕᎵᏍᎬᎾ ᏥᎨᏒᎩ, ᎪᎯᏍᎩᏂ ᏥᎩ ᏣᏍᏕᎵᏍᎩ, ᎠᎴ ᎠᏴ ᎠᎩᏍᏕᎵᏍᎩ;",
+    "cherokee_syllabary": "ᎾᏍᎩ ᏧᏩᎫᏔᏅᏒ ᏂᏣᏍᏕᎵᏍᎬᎾ ᏥᎨᏒᎩ, ᎪᎯᏍᎩᏂ ᏥᎩ ᏣᏍᏕᎵᏍᎩ, ᎠᎴ ᎠᏴ ᎠᎩᏍᏕᎵᏍᎩ;",
+    "emitted_text": "nahski tsuwakthanvhsv nitsahstelihskvna tsikehsvki khohihskini tsiki tsahstelihski ale ayv akhstelihski",
+    "greedy_hypothesis": "nahski tsuwakthanvhsv nitsahstelihskvna tsikehsvki khohihskini tsiki tsahstelihski ale ayv akhstelihski",
+    "greedy_confidence": 0.932368,
+    "guided_hypothesis": "nahski tsuwakthanvhsv nitsahstelihskvna tsikehsvki khohihskini tsiki tsahstelihski ale ayv akhstelihski",
+    "reconciled_phonetics": "nahski tsuwakthanvhsv nitsahstelihskvna tsikehsvki khohihskini tsiki tsahstelihski ale ayv akhstelihski",
+    "has_anomalies": false,
+    "words": [
+      {
+        "word": "nahski",
+        "start_sec": 155.84,
+        "end_sec": 156.16,
+        "confidence": 0.999544,
+        "flagged": false,
+        "emitted_word": "nahski"
+      },
+      {
+        "word": "tsuwakuthanvhsv",
+        "start_sec": 156.2,
+        "end_sec": 157.14,
+        "confidence": 0.977975,
+        "flagged": false,
+        "emitted_word": "tsuwakthanvhsv"
+      },
+      {
+        "word": "nitsahstelihskvna",
+        "start_sec": 157.72,
+        "end_sec": 158.9,
+        "confidence": 0.689192,
+        "flagged": false,
+        "emitted_word": "nitsahstelihskvna"
+      },
+      {
+        "word": "tsikehsvki",
+        "start_sec": 159.3,
+        "end_sec": 160.02,
+        "confidence": 0.922692,
+        "flagged": false,
+        "emitted_word": "tsikehsvki"
+      },
+      {
+        "word": "kohihskini",
+        "start_sec": 160.84,
+        "end_sec": 161.4,
+        "confidence": 0.980836,
+        "flagged": false,
+        "emitted_word": "khohihskini"
+      },
+      {
+        "word": "tsiki",
+        "start_sec": 161.56,
+        "end_sec": 161.86,
+        "confidence": 0.995665,
+        "flagged": false,
+        "emitted_word": "tsiki"
+      },
+      {
+        "word": "tsahstelihski",
+        "start_sec": 162.66,
+        "end_sec": 163.56,
+        "confidence": 0.935848,
+        "flagged": false,
+        "emitted_word": "tsahstelihski"
+      },
+      {
+        "word": "ale",
+        "start_sec": 164.24,
+        "end_sec": 164.4,
+        "confidence": 0.895412,
+        "flagged": false,
+        "emitted_word": "ale"
+      },
+      {
+        "word": "ayv",
+        "start_sec": 164.52,
+        "end_sec": 164.72,
+        "confidence": 0.953529,
+        "flagged": false,
+        "emitted_word": "ayv"
+      },
+      {
+        "word": "akihstelihski",
+        "start_sec": 165.72,
+        "end_sec": 166.54,
+        "confidence": 0.972986,
+        "flagged": false,
+        "emitted_word": "akhstelihski"
+      }
+    ]
+  },
+  {
+    "verse_id": "180112",
+    "book": "philemon",
+    "chapter": 1,
+    "verse_idx": 12,
+    "audio_path": "split_audio/philemon_01_12.wav",
+    "start_sec": 166.61,
+    "end_sec": 176.52,
+    "duration_sec": 9.91,
+    "reference_sentence": "ᎾᏍᎩ ᏔᎵᏁ ᎥᏥᏅᎵ; ᎾᏍᎩ ᎢᏳᏍᏗ ᏂᎯ ᏕᎯᏯᏓᏂᎸᏨᎭ, ᎾᏍᎩ ᎠᏋᏒ ᎠᎩᎾᏫ ᏥᎩ.",
+    "cherokee_syllabary": "ᎾᏍᎩ ᏔᎵᏁ ᎥᏥᏅᎵ; ᎾᏍᎩ ᎢᏳᏍᏗ ᏂᎯ ᏕᎯᏯᏓᏂᎸᏨᎭ, ᎾᏍᎩ ᎠᏋᏒ ᎠᎩᎾᏫ ᏥᎩ.",
+    "emitted_text": "nahski thaline vtsinvli nahski iyuhsti nihi tehiyatanilvtsvha nahski akwhsv akinawhi tsiki",
+    "greedy_hypothesis": "nahski thaline vtsinvli nahski iyuhsti nihi tehiyatanilvtsvha nahski akwhsv akinawhi tsiki",
+    "greedy_confidence": 0.888928,
+    "guided_hypothesis": "nahski thaline vtsinvli nahski iyuhsti nihi tehiyatanilvtsvha nahski akwhsv akinawhi tsiki",
+    "reconciled_phonetics": "nahski thaline vtsinvli nahski iyuhsti nihi tehiyatanilvtsvha nahski akwhsv akinawhi tsiki",
+    "has_anomalies": false,
+    "words": [
+      {
+        "word": "nahski",
+        "start_sec": 167.18,
+        "end_sec": 167.46,
+        "confidence": 0.92974,
+        "flagged": false,
+        "emitted_word": "nahski"
+      },
+      {
+        "word": "thaline",
+        "start_sec": 167.54,
+        "end_sec": 168.02,
+        "confidence": 0.999778,
+        "flagged": false,
+        "emitted_word": "thaline"
+      },
+      {
+        "word": "vtsinvli",
+        "start_sec": 168.2,
+        "end_sec": 169.06,
+        "confidence": 0.961453,
+        "flagged": false,
+        "emitted_word": "vtsinvli"
+      },
+      {
+        "word": "nahski",
+        "start_sec": 169.66,
+        "end_sec": 169.98,
+        "confidence": 0.998714,
+        "flagged": false,
+        "emitted_word": "nahski"
+      },
+      {
+        "word": "iyuhsti",
+        "start_sec": 170.08,
+        "end_sec": 170.54,
+        "confidence": 0.931865,
+        "flagged": false,
+        "emitted_word": "iyuhsti"
+      },
+      {
+        "word": "nihi",
+        "start_sec": 170.72,
+        "end_sec": 171.02,
+        "confidence": 0.931026,
+        "flagged": false,
+        "emitted_word": "nihi"
+      },
+      {
+        "word": "tehiyatanilvtsvha",
+        "start_sec": 172.0,
+        "end_sec": 173.48,
+        "confidence": 0.980489,
+        "flagged": false,
+        "emitted_word": "tehiyatanilvtsvha"
+      },
+      {
+        "word": "nahski",
+        "start_sec": 174.3,
+        "end_sec": 174.58,
+        "confidence": 0.93496,
+        "flagged": false,
+        "emitted_word": "nahski"
+      },
+      {
+        "word": "akwvhsv",
+        "start_sec": 174.72,
+        "end_sec": 175.1,
+        "confidence": 0.986021,
+        "flagged": false,
+        "emitted_word": "akwhsv"
+      },
+      {
+        "word": "akinawi",
+        "start_sec": 175.18,
+        "end_sec": 175.8,
+        "confidence": 0.181411,
+        "flagged": false,
+        "emitted_word": "akinawhi"
+      },
+      {
+        "word": "tsiki",
+        "start_sec": 176.1,
+        "end_sec": 176.36,
+        "confidence": 0.942752,
+        "flagged": false,
+        "emitted_word": "tsiki"
+      }
+    ]
+  },
+  {
+    "verse_id": "180113",
+    "book": "philemon",
+    "chapter": 1,
+    "verse_idx": 13,
+    "audio_path": "split_audio/philemon_01_13.wav",
+    "start_sec": 176.52,
+    "end_sec": 194.23,
+    "duration_sec": 17.71,
+    "reference_sentence": "ᎾᏍᎩ ᎠᏆᏚᎵᏍᎬᎩ ᏥᏯᎧᎯᏯᏍᏗᏱ ᎠᏂ ᎨᏙᎲᎢ, ᎾᏍᎩ ᏂᎯ ᏍᎩᏍᏕᎸᎯᏓᏍᏗ ᎨᏒ ᎠᎩᏍᏕᎸᎯᏓᏍᏗᏱ ᎥᏆᎸᎢᏛ ᎨᏒ ᎣᏍᏛ ᎧᏃᎮᏛ ᎠᎩᏍᏛᏗᏍᎬᎢ;",
+    "cherokee_syllabary": "ᎾᏍᎩ ᎠᏆᏚᎵᏍᎬᎩ ᏥᏯᎧᎯᏯᏍᏗᏱ ᎠᏂ ᎨᏙᎲᎢ, ᎾᏍᎩ ᏂᎯ ᏍᎩᏍᏕᎸᎯᏓᏍᏗ ᎨᏒ ᎠᎩᏍᏕᎸᎯᏓᏍᏗᏱ ᎥᏆᎸᎢᏛ ᎨᏒ ᎣᏍᏛ ᎧᏃᎮᏛ ᎠᎩᏍᏛᏗᏍᎬᎢ;",
+    "emitted_text": "nahski akwatulihskvki tsiyakhhiyahstiyi anhi ketohv'i nahski nihi hskihstelvhitahsti kehsv akhstelhitahstiyi vkwalhv'itv kehsv ohst khanohetv akhstvtihskv'i",
+    "greedy_hypothesis": "nahski akwatulihskvki tsiyakhhiyahstiyi anhi ketohv'i nahski nihi hskihstelvhitahsti kehsv akhstelhitahstiyi vkwalhv'itv kehsv ohst khanohetv akhstvtihskv'i",
+    "greedy_confidence": 0.764502,
+    "guided_hypothesis": "nahski akwatulihskvki tsiyakhhiyahstiyi anhi ketohv'i nahski nihi hskihstelvhitahsti kehsv akhstelhitahstiyi vkwalhv'itv kehsv ohst khanohetv akhstvtihskv'i",
+    "reconciled_phonetics": "nahski akwatulihskvki tsiyakhhiyahstiyi anhi ketohv'i nahski nihi hskihstelvhitahsti kehsv akhstelhitahstiyi vkwalhv'itv kehsv ohst khanohetv akhstvtihskv'i",
+    "has_anomalies": false,
+    "words": [
+      {
+        "word": "nahski",
+        "start_sec": 177.18,
+        "end_sec": 177.48,
+        "confidence": 0.892797,
+        "flagged": false,
+        "emitted_word": "nahski"
+      },
+      {
+        "word": "akwatulihskvki",
+        "start_sec": 177.58,
+        "end_sec": 178.88,
+        "confidence": 0.946173,
+        "flagged": false,
+        "emitted_word": "akwatulihskvki"
+      },
+      {
+        "word": "tsiyakhahiyahstiyi",
+        "start_sec": 179.48,
+        "end_sec": 180.82,
+        "confidence": 0.961763,
+        "flagged": false,
+        "emitted_word": "tsiyakhhiyahstiyi"
+      },
+      {
+        "word": "ani",
+        "start_sec": 181.2,
+        "end_sec": 181.42,
+        "confidence": 0.617136,
+        "flagged": false,
+        "emitted_word": "anhi"
+      },
+      {
+        "word": "ketohv'i",
+        "start_sec": 181.98,
+        "end_sec": 182.64,
+        "confidence": 0.139559,
+        "flagged": false,
+        "emitted_word": "ketohv'i"
+      },
+      {
+        "word": "nahski",
+        "start_sec": 183.38,
+        "end_sec": 183.72,
+        "confidence": 0.999615,
+        "flagged": false,
+        "emitted_word": "nahski"
+      },
+      {
+        "word": "nihi",
+        "start_sec": 184.08,
+        "end_sec": 184.36,
+        "confidence": 0.99992,
+        "flagged": false,
+        "emitted_word": "nihi"
+      },
+      {
+        "word": "hskihstelvhitahsti",
+        "start_sec": 184.5,
+        "end_sec": 185.84,
+        "confidence": 0.999123,
+        "flagged": false,
+        "emitted_word": "hskihstelvhitahsti"
+      },
+      {
+        "word": "kehsv",
+        "start_sec": 186.46,
+        "end_sec": 186.82,
+        "confidence": 0.987036,
+        "flagged": false,
+        "emitted_word": "kehsv"
+      },
+      {
+        "word": "akihstelvhitahstiyi",
+        "start_sec": 187.78,
+        "end_sec": 189.08,
+        "confidence": 0.936469,
+        "flagged": false,
+        "emitted_word": "akhstelhitahstiyi"
+      },
+      {
+        "word": "vkwalv'itv",
+        "start_sec": 189.72,
+        "end_sec": 190.6,
+        "confidence": 0.330734,
+        "flagged": false,
+        "emitted_word": "vkwalhv'itv"
+      },
+      {
+        "word": "kehsv",
+        "start_sec": 190.68,
+        "end_sec": 191.06,
+        "confidence": 0.309871,
+        "flagged": false,
+        "emitted_word": "kehsv"
+      },
+      {
+        "word": "ohstv",
+        "start_sec": 192.02,
+        "end_sec": 192.24,
+        "confidence": 0.999691,
+        "flagged": false,
+        "emitted_word": "ohst"
+      },
+      {
+        "word": "khanohetv",
+        "start_sec": 192.34,
+        "end_sec": 192.94,
+        "confidence": 0.349812,
+        "flagged": false,
+        "emitted_word": "khanohetv"
+      },
+      {
+        "word": "akihstvtihskv'i",
+        "start_sec": 193.12,
+        "end_sec": 194.1,
+        "confidence": 0.997835,
+        "flagged": false,
+        "emitted_word": "akhstvtihskv'i"
+      }
+    ]
+  },
+  {
+    "verse_id": "180114",
+    "book": "philemon",
+    "chapter": 1,
+    "verse_idx": 14,
+    "audio_path": "split_audio/philemon_01_14.wav",
+    "start_sec": 194.23,
+    "end_sec": 217.45,
+    "duration_sec": 23.22,
+    "reference_sentence": "ᎠᏎᏃ ᏂᎯ ᎣᏏᏳ ᏂᏣᏰᎸᏅᎾ ᎥᏝ ᏯᏆᏚᎸᎮ ᎪᎱᏍᏗ ᎠᏆᏛᏁᏗᏱ; ᎾᏍᎩ ᎣᏍᏛ ᏂᏍᏆᏛᏁᎲ ᎣᏏᏳ ᏣᏰᎸᏅ ᎬᏂᎨᏒ ᎢᏳᎵᏍᏙᏗᏱ, ᎥᏝᏃ ᎾᏍᎩ ᎠᏎ ᎢᏣᏛᏁᏗᏱ ᏂᏣᎵᏍᏓᏁᎲᎢ.",
+    "cherokee_syllabary": "ᎠᏎᏃ ᏂᎯ ᎣᏏᏳ ᏂᏣᏰᎸᏅᎾ ᎥᏝ ᏯᏆᏚᎸᎮ ᎪᎱᏍᏗ ᎠᏆᏛᏁᏗᏱ; ᎾᏍᎩ ᎣᏍᏛ ᏂᏍᏆᏛᏁᎲ ᎣᏏᏳ ᏣᏰᎸᏅ ᎬᏂᎨᏒ ᎢᏳᎵᏍᏙᏗᏱ, ᎥᏝᏃ ᎾᏍᎩ ᎠᏎ ᎢᏣᏛᏁᏗᏱ ᏂᏣᎵᏍᏓᏁᎲᎢ.",
+    "emitted_text": "ahsenho nihi ohsiyu ntsaylvnhvna vlha yakwatulhe kohuhsti akwatvnhehtiyi nahski ohstv nhskwatvnhehv ohsiyu tsaylvnhv kvnkehsv iyulhstohtiyi vlhanho nahski ahse itsatvnhehtiyi nitsalhstanehv'i",
+    "greedy_hypothesis": "ahsenho nihi ohsiyu ntsaylvnhvna vlha yakwatulhe kohuhsti akwatvnhehtiyi nahski ohstv nhskwatvnhehv ohsiyu tsaylvnhv kvnkehsv iyulhstohtiyi vlhanho nahski ahse itsatvnhehtiyi nitsalhstanehv'i",
+    "greedy_confidence": 0.843522,
+    "guided_hypothesis": "ahsenho nihi ohsiyu ntsaylvnhvna vlha yakwatulhe kohuhsti akwatvnhehtiyi nahski ohstv nhskwatvnhehv ohsiyu tsaylvnhv kvnkehsv iyulhstohtiyi vlhanho nahski ahse itsatvnhehtiyi nitsalhstanehv'i",
+    "reconciled_phonetics": "ahsenho nihi ohsiyu ntsaylvnhvna vlha yakwatulhe kohuhsti akwatvnhehtiyi nahski ohstv nhskwatvnhehv ohsiyu tsaylvnhv kvnkehsv iyulhstohtiyi vlhanho nahski ahse itsatvnhehtiyi nitsalhstanehv'i",
+    "has_anomalies": false,
+    "words": [
+      {
+        "word": "ahseno",
+        "start_sec": 194.86,
+        "end_sec": 195.32,
+        "confidence": 0.997661,
+        "flagged": false,
+        "emitted_word": "ahsenho"
+      },
+      {
+        "word": "nihi",
+        "start_sec": 195.56,
+        "end_sec": 195.88,
+        "confidence": 0.999921,
+        "flagged": false,
+        "emitted_word": "nihi"
+      },
+      {
+        "word": "ohsiyu",
+        "start_sec": 196.1,
+        "end_sec": 196.56,
+        "confidence": 0.999125,
+        "flagged": false,
+        "emitted_word": "ohsiyu"
+      },
+      {
+        "word": "nitsayelvnvna",
+        "start_sec": 197.34,
+        "end_sec": 198.4,
+        "confidence": 0.996101,
+        "flagged": false,
+        "emitted_word": "ntsaylvnhvna"
+      },
+      {
+        "word": "vtla",
+        "start_sec": 198.66,
+        "end_sec": 198.94,
+        "confidence": 0.999938,
+        "flagged": false,
+        "emitted_word": "vlha"
+      },
+      {
+        "word": "yakwatulvhe",
+        "start_sec": 199.74,
+        "end_sec": 201.78,
+        "confidence": 0.370843,
+        "flagged": false,
+        "emitted_word": "yakwatulhe"
+      },
+      {
+        "word": "kohuhsti",
+        "start_sec": 202.6,
+        "end_sec": 203.16,
+        "confidence": 0.317813,
+        "flagged": false,
+        "emitted_word": "kohuhsti"
+      },
+      {
+        "word": "akwatvnetiyi",
+        "start_sec": 203.4,
+        "end_sec": 204.24,
+        "confidence": 0.98588,
+        "flagged": false,
+        "emitted_word": "akwatvnhehtiyi"
+      },
+      {
+        "word": "nahski",
+        "start_sec": 204.84,
+        "end_sec": 205.16,
+        "confidence": 0.999521,
+        "flagged": false,
+        "emitted_word": "nahski"
+      },
+      {
+        "word": "ohstv",
+        "start_sec": 205.26,
+        "end_sec": 205.64,
+        "confidence": 0.999281,
+        "flagged": false,
+        "emitted_word": "ohstv"
+      },
+      {
+        "word": "nihskwatvnehv",
+        "start_sec": 206.3,
+        "end_sec": 207.26,
+        "confidence": 0.99415,
+        "flagged": false,
+        "emitted_word": "nhskwatvnhehv"
+      },
+      {
+        "word": "ohsiyu",
+        "start_sec": 208.1,
+        "end_sec": 208.56,
+        "confidence": 0.999964,
+        "flagged": false,
+        "emitted_word": "ohsiyu"
+      },
+      {
+        "word": "tsayelvnv",
+        "start_sec": 208.68,
+        "end_sec": 209.48,
+        "confidence": 0.932016,
+        "flagged": false,
+        "emitted_word": "tsaylvnhv"
+      },
+      {
+        "word": "kvnikehsv",
+        "start_sec": 210.4,
+        "end_sec": 210.96,
+        "confidence": 0.177452,
+        "flagged": false,
+        "emitted_word": "kvnkehsv"
+      },
+      {
+        "word": "iyulihstotiyi",
+        "start_sec": 211.1,
+        "end_sec": 211.98,
+        "confidence": 0.887234,
+        "flagged": false,
+        "emitted_word": "iyulhstohtiyi"
+      },
+      {
+        "word": "vtlano",
+        "start_sec": 212.88,
+        "end_sec": 213.32,
+        "confidence": 0.998282,
+        "flagged": false,
+        "emitted_word": "vlhanho"
+      },
+      {
+        "word": "nahski",
+        "start_sec": 213.4,
+        "end_sec": 213.76,
+        "confidence": 0.458318,
+        "flagged": false,
+        "emitted_word": "nahski"
+      },
+      {
+        "word": "ahse",
+        "start_sec": 213.84,
+        "end_sec": 214.12,
+        "confidence": 0.999928,
+        "flagged": false,
+        "emitted_word": "ahse"
+      },
+      {
+        "word": "itsatvnetiyi",
+        "start_sec": 214.64,
+        "end_sec": 215.56,
+        "confidence": 0.77011,
+        "flagged": false,
+        "emitted_word": "itsatvnhehtiyi"
+      },
+      {
+        "word": "nitsalihstanehv'i",
+        "start_sec": 216.16,
+        "end_sec": 217.34,
+        "confidence": 0.9869,
+        "flagged": false,
+        "emitted_word": "nitsalhstanehv'i"
+      }
+    ]
+  },
+  {
+    "verse_id": "180115",
+    "book": "philemon",
+    "chapter": 1,
+    "verse_idx": 15,
+    "audio_path": "split_audio/philemon_01_15.wav",
+    "start_sec": 217.45,
+    "end_sec": 227.01,
+    "duration_sec": 9.56,
+    "reference_sentence": "ᎾᏍᎩᏰᏃ ᎢᏳᏍᏗ ᏱᎩ ᏞᎦ ᏳᏓᏅᏒ ᎾᏍᎩ ᏘᏯᏓᏂᎸᎢᏍᏗ ᏂᎪᎯᎸ ᎤᏕᏗᏱ.",
+    "cherokee_syllabary": "ᎾᏍᎩᏰᏃ ᎢᏳᏍᏗ ᏱᎩ ᏞᎦ ᏳᏓᏅᏒ ᎾᏍᎩ ᏘᏯᏓᏂᎸᎢᏍᏗ ᏂᎪᎯᎸ ᎤᏕᏗᏱ.",
+    "emitted_text": "nahskiynho iyuhsti yiki lhek yutanvhsv nahski thiyatanilv'ihsti nikohilv utehtiyi",
+    "greedy_hypothesis": "nahskiynho iyuhsti yiki lhek yutanvhsv nahski thiyatanilv'ihsti nikohilv utehtiyi",
+    "greedy_confidence": 0.940682,
+    "guided_hypothesis": "nahskiynho iyuhsti yiki lhek yutanvhsv nahski thiyatanilv'ihsti nikohilv utehtiyi",
+    "reconciled_phonetics": "nahskiynho iyuhsti yiki lhek yutanvhsv nahski thiyatanilv'ihsti nikohilv utehtiyi",
+    "has_anomalies": false,
+    "words": [
+      {
+        "word": "nahskiyeno",
+        "start_sec": 218.06,
+        "end_sec": 218.78,
+        "confidence": 0.564143,
+        "flagged": false,
+        "emitted_word": "nahskiynho"
+      },
+      {
+        "word": "iyuhsti",
+        "start_sec": 218.9,
+        "end_sec": 219.44,
+        "confidence": 0.997869,
+        "flagged": false,
+        "emitted_word": "iyuhsti"
+      },
+      {
+        "word": "yiki",
+        "start_sec": 219.96,
+        "end_sec": 220.24,
+        "confidence": 0.99961,
+        "flagged": false,
+        "emitted_word": "yiki"
+      },
+      {
+        "word": "tleka",
+        "start_sec": 220.9,
+        "end_sec": 221.18,
+        "confidence": 0.998574,
+        "flagged": false,
+        "emitted_word": "lhek"
+      },
+      {
+        "word": "yutanvhsv",
+        "start_sec": 221.5,
+        "end_sec": 222.26,
+        "confidence": 0.987767,
+        "flagged": false,
+        "emitted_word": "yutanvhsv"
+      },
+      {
+        "word": "nahski",
+        "start_sec": 222.56,
+        "end_sec": 222.92,
+        "confidence": 0.971903,
+        "flagged": false,
+        "emitted_word": "nahski"
+      },
+      {
+        "word": "thiyatanilv'ihsti",
+        "start_sec": 223.54,
+        "end_sec": 225.08,
+        "confidence": 0.978542,
+        "flagged": false,
+        "emitted_word": "thiyatanilv'ihsti"
+      },
+      {
+        "word": "nikohilv",
+        "start_sec": 225.44,
+        "end_sec": 226.12,
+        "confidence": 0.967848,
+        "flagged": false,
+        "emitted_word": "nikohilv"
+      },
+      {
+        "word": "utetiyi",
+        "start_sec": 226.3,
+        "end_sec": 227.0,
+        "confidence": 0.999878,
+        "flagged": false,
+        "emitted_word": "utehtiyi"
+      }
+    ]
+  },
+  {
+    "verse_id": "180116",
+    "book": "philemon",
+    "chapter": 1,
+    "verse_idx": 16,
+    "audio_path": "split_audio/philemon_01_16.wav",
+    "start_sec": 227.01,
+    "end_sec": 256.18,
+    "duration_sec": 29.17,
+    "reference_sentence": "ᎥᏝ ᎿᎭᏉ ᎠᏥᏅᏏᏓᏍᏗ ᎾᏍᎩᏯᎢ, ᎤᏟᏍᎩᏂ ᎦᎸᏉᏗᏳ ᎡᏍᎦᏉ ᎠᏥᏅᏏᏓᏍᏗ, ᎣᏅᏟ ᎠᎨᏳᎯ ᎾᏍᎩᏯᎢ, ᎠᏴ Ꮀ ᎤᎬᏫᏳᎭ ᏥᎨᏳᎢ, ᏂᎯᏍᎩᏂ ᏂᎦᎥ ᎤᏟᎯᏳ ᎯᎨᏳᎢ, ᎾᏍᎩ Ꮎ ᎤᏇᏓᎵ ᎨᏒ ᎠᎴ ᎤᎬᏫᏳᎯ ᏕᏍᏓᏁᎶᏛᎢ?",
+    "cherokee_syllabary": "ᎥᏝ ᎿᎭᏉ ᎠᏥᏅᏏᏓᏍᏗ ᎾᏍᎩᏯᎢ, ᎤᏟᏍᎩᏂ ᎦᎸᏉᏗᏳ ᎡᏍᎦᏉ ᎠᏥᏅᏏᏓᏍᏗ, ᎣᏅᏟ ᎠᎨᏳᎯ ᎾᏍᎩᏯᎢ, ᎠᏴ Ꮀ ᎤᎬᏫᏳᎭ ᏥᎨᏳᎢ, ᏂᎯᏍᎩᏂ ᏂᎦᎥ ᎤᏟᎯᏳ ᎯᎨᏳᎢ, ᎾᏍᎩ Ꮎ ᎤᏇᏓᎵ ᎨᏒ ᎠᎴ ᎤᎬᏫᏳᎯ ᏕᏍᏓᏁᎶᏛᎢ?",
+    "emitted_text": "vtlha nhakwo atsinvhsitahsti nahskiya'i utlihskini kalvkwotiyu ehskakwo atsinvhsitahsti onvlhi akeyuhi nahskiya'i ayv ho ukvwiyuha tsikeyu'i nihihskini nika'v utlihiyu hikeyu'i nahski na ukwetlhi kehsv ale ukvwiyuhi tehstanelhohtv'i'",
+    "greedy_hypothesis": "vtlha nhakwo atsinvhsitahsti nahskiya'i utlihskini kalvkwotiyu ehskakwo atsinvhsitahsti onvlhi akeyuhi nahskiya'i ayv ho ukvwiyuha tsikeyu'i nihihskini nika'v utlihiyu hikeyu'i nahski na ukwetlhi kehsv ale ukvwiyuhi tehstanelhohtv'i'",
+    "greedy_confidence": 0.847482,
+    "guided_hypothesis": "vtlha nhakwo atsinvhsitahsti nahskiya'i utlihskini kalvkwotiyu ehskakwo atsinvhsitahsti onvlhi akeyuhi nahskiya'i ayv ho ukvwiyuha tsikeyu'i nihihskini nika'v utlihiyu hikeyu'i nahski na ukwetlhi kehsv ale ukvwiyuhi tehstanelhohtv'i'",
+    "reconciled_phonetics": "vtlha nhakwo atsinvhsitahsti nahskiya'i utlihskini kalvkwotiyu ehskakwo atsinvhsitahsti onvlhi akeyuhi nahskiya'i ayv ho ukvwiyuha tsikeyu'i nihihskini nika'v utlihiyu hikeyu'i nahski na ukwetlhi kehsv ale ukvwiyuhi tehstanelhohtv'i'",
+    "has_anomalies": false,
+    "words": [
+      {
+        "word": "vtla",
+        "start_sec": 227.52,
+        "end_sec": 227.92,
+        "confidence": 0.990502,
+        "flagged": false,
+        "emitted_word": "vtlha"
+      },
+      {
+        "word": "nhakwo",
+        "start_sec": 228.08,
+        "end_sec": 228.42,
+        "confidence": 0.299953,
+        "flagged": false,
+        "emitted_word": "nhakwo"
+      },
+      {
+        "word": "atsinvhsitahsti",
+        "start_sec": 229.22,
+        "end_sec": 230.26,
+        "confidence": 0.999885,
+        "flagged": false,
+        "emitted_word": "atsinvhsitahsti"
+      },
+      {
+        "word": "nahskiya'i",
+        "start_sec": 230.34,
+        "end_sec": 231.02,
+        "confidence": 0.994409,
+        "flagged": false,
+        "emitted_word": "nahskiya'i"
+      },
+      {
+        "word": "utlihskini",
+        "start_sec": 231.74,
+        "end_sec": 232.5,
+        "confidence": 0.976618,
+        "flagged": false,
+        "emitted_word": "utlihskini"
+      },
+      {
+        "word": "kalvkwotiyu",
+        "start_sec": 233.36,
+        "end_sec": 234.06,
+        "confidence": 0.97007,
+        "flagged": false,
+        "emitted_word": "kalvkwotiyu"
+      },
+      {
+        "word": "ehskakwo",
+        "start_sec": 234.68,
+        "end_sec": 235.22,
+        "confidence": 0.506987,
+        "flagged": false,
+        "emitted_word": "ehskakwo"
+      },
+      {
+        "word": "atsinvhsitahsti",
+        "start_sec": 235.3,
+        "end_sec": 236.32,
+        "confidence": 0.999609,
+        "flagged": false,
+        "emitted_word": "atsinvhsitahsti"
+      },
+      {
+        "word": "onvtli",
+        "start_sec": 237.04,
+        "end_sec": 237.74,
+        "confidence": 0.997574,
+        "flagged": false,
+        "emitted_word": "onvlhi"
+      },
+      {
+        "word": "akeyuhi",
+        "start_sec": 237.84,
+        "end_sec": 238.48,
+        "confidence": 0.988245,
+        "flagged": false,
+        "emitted_word": "akeyuhi"
+      },
+      {
+        "word": "nahskiya'i",
+        "start_sec": 239.06,
+        "end_sec": 239.76,
+        "confidence": 0.700903,
+        "flagged": false,
+        "emitted_word": "nahskiya'i"
+      },
+      {
+        "word": "ayv",
+        "start_sec": 240.6,
+        "end_sec": 240.82,
+        "confidence": 0.999929,
+        "flagged": false,
+        "emitted_word": "ayv"
+      },
+      {
+        "word": "ho",
+        "start_sec": 241.42,
+        "end_sec": 241.52,
+        "confidence": 0.999866,
+        "flagged": false,
+        "emitted_word": "ho"
+      },
+      {
+        "word": "ukvwiyuha",
+        "start_sec": 241.68,
+        "end_sec": 242.52,
+        "confidence": 0.966555,
+        "flagged": false,
+        "emitted_word": "ukvwiyuha"
+      },
+      {
+        "word": "tsikeyu'i",
+        "start_sec": 243.26,
+        "end_sec": 244.04,
+        "confidence": 0.983963,
+        "flagged": false,
+        "emitted_word": "tsikeyu'i"
+      },
+      {
+        "word": "nihihskini",
+        "start_sec": 244.84,
+        "end_sec": 245.42,
+        "confidence": 0.956112,
+        "flagged": false,
+        "emitted_word": "nihihskini"
+      },
+      {
+        "word": "nika'v",
+        "start_sec": 245.52,
+        "end_sec": 245.98,
+        "confidence": 0.999933,
+        "flagged": false,
+        "emitted_word": "nika'v"
+      },
+      {
+        "word": "utlihiyu",
+        "start_sec": 246.36,
+        "end_sec": 247.04,
+        "confidence": 0.998902,
+        "flagged": false,
+        "emitted_word": "utlihiyu"
+      },
+      {
+        "word": "hikeyu'i",
+        "start_sec": 247.72,
+        "end_sec": 248.48,
+        "confidence": 0.16163,
+        "flagged": false,
+        "emitted_word": "hikeyu'i"
+      },
+      {
+        "word": "nahski",
+        "start_sec": 249.3,
+        "end_sec": 249.64,
+        "confidence": 0.994763,
+        "flagged": false,
+        "emitted_word": "nahski"
+      },
+      {
+        "word": "na",
+        "start_sec": 249.7,
+        "end_sec": 249.8,
+        "confidence": 0.305841,
+        "flagged": false,
+        "emitted_word": "na"
+      },
+      {
+        "word": "ukwetali",
+        "start_sec": 250.0,
+        "end_sec": 250.74,
+        "confidence": 0.980239,
+        "flagged": false,
+        "emitted_word": "ukwetlhi"
+      },
+      {
+        "word": "kehsv",
+        "start_sec": 250.8,
+        "end_sec": 251.18,
+        "confidence": 0.999744,
+        "flagged": false,
+        "emitted_word": "kehsv"
+      },
+      {
+        "word": "ale",
+        "start_sec": 251.48,
+        "end_sec": 251.68,
+        "confidence": 0.997392,
+        "flagged": false,
+        "emitted_word": "ale"
+      },
+      {
+        "word": "ukvwiyuhi",
+        "start_sec": 252.5,
+        "end_sec": 253.46,
+        "confidence": 0.970923,
+        "flagged": false,
+        "emitted_word": "ukvwiyuhi"
+      },
+      {
+        "word": "tehstanelotv'i'",
+        "start_sec": 254.38,
+        "end_sec": 256.18,
+        "confidence": 0.293986,
+        "flagged": false,
+        "emitted_word": "tehstanelhohtv'i'"
+      }
+    ]
+  },
+  {
+    "verse_id": "180117",
+    "book": "philemon",
+    "chapter": 1,
+    "verse_idx": 17,
+    "audio_path": "split_audio/philemon_01_17.wav",
+    "start_sec": 256.18,
+    "end_sec": 267.48,
+    "duration_sec": 11.3,
+    "reference_sentence": "ᎾᏍᎩ ᎢᏳᏍᏗ ᎢᏳᏃ ᎣᎩᎾᏖᏉᎶᎯ ᏍᏇᎵᏎᎮᏍᏗ, ᏕᎯᏯᏓᏂᎸᏨᎭ ᎠᏴ ᏥᏕᏍᏆᏓᏂᎸᎪ ᎾᏍᎩᏯᎢ.",
+    "cherokee_syllabary": "ᎾᏍᎩ ᎢᏳᏍᏗ ᎢᏳᏃ ᎣᎩᎾᏖᏉᎶᎯ ᏍᏇᎵᏎᎮᏍᏗ, ᏕᎯᏯᏓᏂᎸᏨᎭ ᎠᏴ ᏥᏕᏍᏆᏓᏂᎸᎪ ᎾᏍᎩᏯᎢ.",
+    "emitted_text": "nahski iyuhsti iyunho okinathkwlohi hskwelihsehehsti tehiyatanilvtsvha ayv tsitehskwatanilvko nahskiya'i",
+    "greedy_hypothesis": "nahski iyuhsti iyunho okinathkwlohi hskwelihsehehsti tehiyatanilvtsvha ayv tsitehskwatanilvko nahskiya'i",
+    "greedy_confidence": 0.917812,
+    "guided_hypothesis": "nahski iyuhsti iyunho okinathkwlohi hskwelihsehehsti tehiyatanilvtsvha ayv tsitehskwatanilvko nahskiya'i",
+    "reconciled_phonetics": "nahski iyuhsti iyunho okinathkwlohi hskwelihsehehsti tehiyatanilvtsvha ayv tsitehskwatanilvko nahskiya'i",
+    "has_anomalies": false,
+    "words": [
+      {
+        "word": "nahski",
+        "start_sec": 256.2,
+        "end_sec": 256.48,
+        "confidence": 0.999914,
+        "flagged": false,
+        "emitted_word": "nahski"
+      },
+      {
+        "word": "iyuhsti",
+        "start_sec": 256.62,
+        "end_sec": 257.12,
+        "confidence": 0.999288,
+        "flagged": false,
+        "emitted_word": "iyuhsti"
+      },
+      {
+        "word": "iyuno",
+        "start_sec": 257.24,
+        "end_sec": 257.7,
+        "confidence": 0.997335,
+        "flagged": false,
+        "emitted_word": "iyunho"
+      },
+      {
+        "word": "okinathekwolohi",
+        "start_sec": 258.6,
+        "end_sec": 259.72,
+        "confidence": 0.987215,
+        "flagged": false,
+        "emitted_word": "okinathkwlohi"
+      },
+      {
+        "word": "hskwelihsehehsti",
+        "start_sec": 260.56,
+        "end_sec": 261.8,
+        "confidence": 0.999771,
+        "flagged": false,
+        "emitted_word": "hskwelihsehehsti"
+      },
+      {
+        "word": "tehiyatanilvtsvha",
+        "start_sec": 262.44,
+        "end_sec": 263.88,
+        "confidence": 0.997807,
+        "flagged": false,
+        "emitted_word": "tehiyatanilvtsvha"
+      },
+      {
+        "word": "ayv",
+        "start_sec": 264.7,
+        "end_sec": 264.92,
+        "confidence": 0.998187,
+        "flagged": false,
+        "emitted_word": "ayv"
+      },
+      {
+        "word": "tsitehskwatanilvko",
+        "start_sec": 265.24,
+        "end_sec": 266.36,
+        "confidence": 0.987803,
+        "flagged": false,
+        "emitted_word": "tsitehskwatanilvko"
+      },
+      {
+        "word": "nahskiya'i",
+        "start_sec": 266.6,
+        "end_sec": 267.34,
+        "confidence": 0.292991,
+        "flagged": false,
+        "emitted_word": "nahskiya'i"
+      }
+    ]
+  },
+  {
+    "verse_id": "180118",
+    "book": "philemon",
+    "chapter": 1,
+    "verse_idx": 18,
+    "audio_path": "split_audio/philemon_01_18.wav",
+    "start_sec": 267.48,
+    "end_sec": 277.54,
+    "duration_sec": 10.06,
+    "reference_sentence": "ᎢᏳᏃ ᎤᏣᏘᏂ ᏂᏣᏛᏁᎴᏍᏗ, ᎠᎴ ᎯᏚᎨᏍᏕ, ᎠᏴᏉ ᎠᏆᎫᏴᏗ ᏅᏁᎸᎭ;",
+    "cherokee_syllabary": "ᎢᏳᏃ ᎤᏣᏘᏂ ᏂᏣᏛᏁᎴᏍᏗ, ᎠᎴ ᎯᏚᎨᏍᏕ, ᎠᏴᏉ ᎠᏆᎫᏴᏗ ᏅᏁᎸᎭ;",
+    "emitted_text": "iyunho utsathini nitsatvnhelehsti ale hithukehste ayvkwo akwkhuhyti nvnelvha",
+    "greedy_hypothesis": "iyunho utsathini nitsatvnhelehsti ale hithukehste ayvkwo akwkhuhyti nvnelvha",
+    "greedy_confidence": 0.710975,
+    "guided_hypothesis": "iyunho utsathini nitsatvnhelehsti ale hithukehste ayvkwo akwkhuhyti nvnelvha",
+    "reconciled_phonetics": "iyunho utsathini nitsatvnhelehsti ale hithukehste ayvkwo akwkhuhyti nvnelvha",
+    "has_anomalies": false,
+    "words": [
+      {
+        "word": "iyuno",
+        "start_sec": 268.12,
+        "end_sec": 268.5,
+        "confidence": 0.949265,
+        "flagged": false,
+        "emitted_word": "iyunho"
+      },
+      {
+        "word": "utsathini",
+        "start_sec": 268.64,
+        "end_sec": 269.36,
+        "confidence": 0.998982,
+        "flagged": false,
+        "emitted_word": "utsathini"
+      },
+      {
+        "word": "nitsatvnelehsti",
+        "start_sec": 269.92,
+        "end_sec": 271.12,
+        "confidence": 0.998834,
+        "flagged": false,
+        "emitted_word": "nitsatvnhelehsti"
+      },
+      {
+        "word": "ale",
+        "start_sec": 271.86,
+        "end_sec": 272.04,
+        "confidence": 0.999381,
+        "flagged": false,
+        "emitted_word": "ale"
+      },
+      {
+        "word": "hitukehste",
+        "start_sec": 272.68,
+        "end_sec": 273.8,
+        "confidence": 0.072296,
+        "flagged": false,
+        "emitted_word": "hithukehste"
+      },
+      {
+        "word": "ayvkwo",
+        "start_sec": 274.48,
+        "end_sec": 274.9,
+        "confidence": 0.96228,
+        "flagged": false,
+        "emitted_word": "ayvkwo"
+      },
+      {
+        "word": "akwakuyvti",
+        "start_sec": 275.16,
+        "end_sec": 275.92,
+        "confidence": 0.059022,
+        "flagged": false,
+        "emitted_word": "akwkhuhyti"
+      },
+      {
+        "word": "nvnelvha",
+        "start_sec": 276.72,
+        "end_sec": 277.38,
+        "confidence": 0.647739,
+        "flagged": false,
+        "emitted_word": "nvnelvha"
+      }
+    ]
+  },
+  {
+    "verse_id": "180119",
+    "book": "philemon",
+    "chapter": 1,
+    "verse_idx": 19,
+    "audio_path": "split_audio/philemon_01_19.wav",
+    "start_sec": 277.54,
+    "end_sec": 295.25,
+    "duration_sec": 17.71,
+    "reference_sentence": "ᎠᏴ ᏉᎳ ᎠᏋᏒ ᎠᏉᏰᏃ ᎬᏓ ᎪᏪᎸᎦ, ᎠᏴ ᏓᎦᎫᏴᎯ; ᎥᏝᏍᎩᏂᏃᏅ ᏨᏒ ᎨᏒ ᎾᏍᏉ ᎬᏚᎦ ᏗᏍᏆᏓᏲᎯᏎᏗᏱ ᏱᎬᏲᏎᎭ.",
+    "cherokee_syllabary": "ᎠᏴ ᏉᎳ ᎠᏋᏒ ᎠᏉᏰᏃ ᎬᏓ ᎪᏪᎸᎦ, ᎠᏴ ᏓᎦᎫᏴᎯ; ᎥᏝᏍᎩᏂᏃᏅ ᏨᏒ ᎨᏒ ᎾᏍᏉ ᎬᏚᎦ ᏗᏍᏆᏓᏲᎯᏎᏗᏱ ᏱᎬᏲᏎᎭ.",
+    "emitted_text": "ayv kwola akwhsv akwoyen kvta kowelvka ayv takkuyvhi vlhahskininon tsvhsv kehsv nahskwo kvthuka tihskwatayohihsehtiyi yikvyohseha",
+    "greedy_hypothesis": "ayv kwola akwhsv akwoyen kvta kowelvka ayv takkuyvhi vlhahskininon tsvhsv kehsv nahskwo kvthuka tihskwatayohihsehtiyi yikvyohseha",
+    "greedy_confidence": 0.859088,
+    "guided_hypothesis": "ayv kwola akwhsv akwoyen kvta kowelvka ayv takkuyvhi vlhahskininon tsvhsv kehsv nahskwo kvthuka tihskwatayohihsehtiyi yikvyohseha",
+    "reconciled_phonetics": "ayv kwola akwhsv akwoyen kvta kowelvka ayv takkuyvhi vlhahskininon tsvhsv kehsv nahskwo kvthuka tihskwatayohihsehtiyi yikvyohseha",
+    "has_anomalies": false,
+    "words": [
+      {
+        "word": "ayv",
+        "start_sec": 278.2,
+        "end_sec": 278.36,
+        "confidence": 0.99991,
+        "flagged": false,
+        "emitted_word": "ayv"
+      },
+      {
+        "word": "kwola",
+        "start_sec": 278.48,
+        "end_sec": 278.86,
+        "confidence": 0.937989,
+        "flagged": false,
+        "emitted_word": "kwola"
+      },
+      {
+        "word": "akwvhsv",
+        "start_sec": 279.0,
+        "end_sec": 279.4,
+        "confidence": 0.990592,
+        "flagged": false,
+        "emitted_word": "akwhsv"
+      },
+      {
+        "word": "akwoyeno",
+        "start_sec": 279.44,
+        "end_sec": 279.96,
+        "confidence": 0.454266,
+        "flagged": false,
+        "emitted_word": "akwoyen"
+      },
+      {
+        "word": "kvta",
+        "start_sec": 280.86,
+        "end_sec": 281.2,
+        "confidence": 0.962389,
+        "flagged": false,
+        "emitted_word": "kvta"
+      },
+      {
+        "word": "kowelvka",
+        "start_sec": 281.3,
+        "end_sec": 281.96,
+        "confidence": 0.999811,
+        "flagged": false,
+        "emitted_word": "kowelvka"
+      },
+      {
+        "word": "ayv",
+        "start_sec": 282.92,
+        "end_sec": 283.18,
+        "confidence": 0.964669,
+        "flagged": false,
+        "emitted_word": "ayv"
+      },
+      {
+        "word": "takakuyvhi",
+        "start_sec": 284.26,
+        "end_sec": 285.16,
+        "confidence": 0.280225,
+        "flagged": false,
+        "emitted_word": "takkuyvhi"
+      },
+      {
+        "word": "vtlahskininonv",
+        "start_sec": 286.04,
+        "end_sec": 287.0,
+        "confidence": 0.994446,
+        "flagged": false,
+        "emitted_word": "vlhahskininon"
+      },
+      {
+        "word": "tsvhsv",
+        "start_sec": 287.6,
+        "end_sec": 287.92,
+        "confidence": 0.346561,
+        "flagged": false,
+        "emitted_word": "tsvhsv"
+      },
+      {
+        "word": "kehsv",
+        "start_sec": 288.0,
+        "end_sec": 288.28,
+        "confidence": 0.999716,
+        "flagged": false,
+        "emitted_word": "kehsv"
+      },
+      {
+        "word": "nahskwo",
+        "start_sec": 288.34,
+        "end_sec": 288.72,
+        "confidence": 0.993268,
+        "flagged": false,
+        "emitted_word": "nahskwo"
+      },
+      {
+        "word": "kvtuka",
+        "start_sec": 289.4,
+        "end_sec": 290.22,
+        "confidence": 0.993029,
+        "flagged": false,
+        "emitted_word": "kvthuka"
+      },
+      {
+        "word": "tihskwatayohihsetiyi",
+        "start_sec": 290.82,
+        "end_sec": 292.26,
+        "confidence": 0.973212,
+        "flagged": false,
+        "emitted_word": "tihskwatayohihsehtiyi"
+      },
+      {
+        "word": "yikvyohseha",
+        "start_sec": 292.98,
+        "end_sec": 293.82,
+        "confidence": 0.99623,
+        "flagged": false,
+        "emitted_word": "yikvyohseha"
+      }
+    ]
+  },
+  {
+    "verse_id": "180120",
+    "book": "philemon",
+    "chapter": 1,
+    "verse_idx": 20,
+    "audio_path": "split_audio/philemon_01_20.wav",
+    "start_sec": 295.25,
+    "end_sec": 306.95,
+    "duration_sec": 11.7,
+    "reference_sentence": "ᎥᎥ, ᏗᎾᏓᏅᏟ, ᎤᎵᎮᏍᏗ ᏍᏆᏓᏅᏓᏗᏍᏓ ᎤᎬᏫᏳᎯ ᎢᏳᏩᏂᏌᏛ; ᎯᎦᎵᏍᏓᏓᏉ ᎠᎩᎾᏫ ᎤᎬᏫᏳᎯ ᏕᎾᏁᎶᏛᎢ.",
+    "cherokee_syllabary": "ᎥᎥ, ᏗᎾᏓᏅᏟ, ᎤᎵᎮᏍᏗ ᏍᏆᏓᏅᏓᏗᏍᏓ ᎤᎬᏫᏳᎯ ᎢᏳᏩᏂᏌᏛ; ᎯᎦᎵᏍᏓᏓᏉ ᎠᎩᎾᏫ ᎤᎬᏫᏳᎯ ᏕᎾᏁᎶᏛᎢ.",
+    "emitted_text": "v'v tinahthanvtli ulihehsti hskwatanthatihsta ukvwiyuhi iywanhihsatv hikalhstatkwo akinawhi ukvwiyuhi tenanelhohtv'i",
+    "greedy_hypothesis": "v'v tinahthanvtli ulihehsti hskwatanthatihsta ukvwiyuhi iywanhihsatv hikalhstatkwo akinawhi ukvwiyuhi tenanelhohtv'i",
+    "greedy_confidence": 0.69086,
+    "guided_hypothesis": "v'v tinahthanvtli ulihehsti hskwatanthatihsta ukvwiyuhi iywanhihsatv hikalhstatkwo akinawhi ukvwiyuhi tenanelhohtv'i",
+    "reconciled_phonetics": "v'v tinahthanvtli ulihehsti hskwatanthatihsta ukvwiyuhi iywanhihsatv hikalhstatkwo akinawhi ukvwiyuhi tenanelhohtv'i",
+    "has_anomalies": true,
+    "words": [
+      {
+        "word": "v'v",
+        "start_sec": 294.5,
+        "end_sec": 294.6,
+        "confidence": 0.000124,
+        "flagged": true,
+        "emitted_word": "v'v"
+      },
+      {
+        "word": "tinatanvtli",
+        "start_sec": 295.1,
+        "end_sec": 295.96,
+        "confidence": 0.039206,
+        "flagged": true,
+        "emitted_word": "tinahthanvtli"
+      },
+      {
+        "word": "ulihehsti",
+        "start_sec": 296.68,
+        "end_sec": 297.62,
+        "confidence": 0.999058,
+        "flagged": false,
+        "emitted_word": "ulihehsti"
+      },
+      {
+        "word": "hskwatanvtatihsta",
+        "start_sec": 297.7,
+        "end_sec": 298.66,
+        "confidence": 0.980677,
+        "flagged": false,
+        "emitted_word": "hskwatanthatihsta"
+      },
+      {
+        "word": "ukvwiyuhi",
+        "start_sec": 299.34,
+        "end_sec": 300.02,
+        "confidence": 0.98984,
+        "flagged": false,
+        "emitted_word": "ukvwiyuhi"
+      },
+      {
+        "word": "iyuwanihsatv",
+        "start_sec": 300.16,
+        "end_sec": 301.06,
+        "confidence": 0.949383,
+        "flagged": false,
+        "emitted_word": "iywanhihsatv"
+      },
+      {
+        "word": "hikalihstatakwo",
+        "start_sec": 301.66,
+        "end_sec": 302.58,
+        "confidence": 0.259714,
+        "flagged": false,
+        "emitted_word": "hikalhstatkwo"
+      },
+      {
+        "word": "akinawi",
+        "start_sec": 303.2,
+        "end_sec": 303.84,
+        "confidence": 0.997991,
+        "flagged": false,
+        "emitted_word": "akinawhi"
+      },
+      {
+        "word": "ukvwiyuhi",
+        "start_sec": 304.52,
+        "end_sec": 305.22,
+        "confidence": 0.965318,
+        "flagged": false,
+        "emitted_word": "ukvwiyuhi"
+      },
+      {
+        "word": "tenanelotv'i",
+        "start_sec": 305.84,
+        "end_sec": 306.88,
+        "confidence": 0.727291,
+        "flagged": false,
+        "emitted_word": "tenanelhohtv'i"
+      }
+    ]
+  },
+  {
+    "verse_id": "180121",
+    "book": "philemon",
+    "chapter": 1,
+    "verse_idx": 21,
+    "audio_path": "split_audio/philemon_01_21.wav",
+    "start_sec": 306.95,
+    "end_sec": 321.38,
+    "duration_sec": 14.43,
+    "reference_sentence": "ᏦᎯᏳᏒ ᎠᏆᎵᏍᎦᏍᏙᏛ ᏫᎬᏲᏪᎳᏁᎸᎩ, ᏥᎦᏔᎲᎩ ᎾᏍᏉ ᏣᎶᏒᏍᏙᏗᏱ ᎨᏒ ᎿᎭᏛᏁᎲ ᏄᏍᏛ ᎬᏁᏤᎲᎢ.",
+    "cherokee_syllabary": "ᏦᎯᏳᏒ ᎠᏆᎵᏍᎦᏍᏙᏛ ᏫᎬᏲᏪᎳᏁᎸᎩ, ᏥᎦᏔᎲᎩ ᎾᏍᏉ ᏣᎶᏒᏍᏙᏗᏱ ᎨᏒ ᎿᎭᏛᏁᎲ ᏄᏍᏛ ᎬᏁᏤᎲᎢ.",
+    "emitted_text": "tsohiyuhsv akwalhskahstohtv wikvyowelanelvki tsikathahvki nahskwo tsalohsvhstohtiyi kehsv nhatvnehv nuhstv knetsehv'i",
+    "greedy_hypothesis": "tsohiyuhsv akwalhskahstohtv wikvyowelanelvki tsikathahvki nahskwo tsalohsvhstohtiyi kehsv nhatvnehv nuhstv knetsehv'i",
+    "greedy_confidence": 0.902766,
+    "guided_hypothesis": "tsohiyuhsv akwalhskahstohtv wikvyowelanelvki tsikathahvki nahskwo tsalohsvhstohtiyi kehsv nhatvnehv nuhstv knetsehv'i",
+    "reconciled_phonetics": "tsohiyuhsv akwalhskahstohtv wikvyowelanelvki tsikathahvki nahskwo tsalohsvhstohtiyi kehsv nhatvnehv nuhstv knetsehv'i",
+    "has_anomalies": false,
+    "words": [
+      {
+        "word": "tsohiyuhsv",
+        "start_sec": 307.52,
+        "end_sec": 308.28,
+        "confidence": 0.999923,
+        "flagged": false,
+        "emitted_word": "tsohiyuhsv"
+      },
+      {
+        "word": "akwalihskahstotv",
+        "start_sec": 309.0,
+        "end_sec": 310.16,
+        "confidence": 0.970462,
+        "flagged": false,
+        "emitted_word": "akwalhskahstohtv"
+      },
+      {
+        "word": "wikvyowelanelvki",
+        "start_sec": 311.0,
+        "end_sec": 312.42,
+        "confidence": 0.856466,
+        "flagged": false,
+        "emitted_word": "wikvyowelanelvki"
+      },
+      {
+        "word": "tsikathahvki",
+        "start_sec": 312.88,
+        "end_sec": 313.76,
+        "confidence": 0.997272,
+        "flagged": false,
+        "emitted_word": "tsikathahvki"
+      },
+      {
+        "word": "nahskwo",
+        "start_sec": 314.5,
+        "end_sec": 314.82,
+        "confidence": 0.999344,
+        "flagged": false,
+        "emitted_word": "nahskwo"
+      },
+      {
+        "word": "tsalohsvhstotiyi",
+        "start_sec": 315.24,
+        "end_sec": 316.62,
+        "confidence": 0.997401,
+        "flagged": false,
+        "emitted_word": "tsalohsvhstohtiyi"
+      },
+      {
+        "word": "kehsv",
+        "start_sec": 317.28,
+        "end_sec": 317.64,
+        "confidence": 0.999963,
+        "flagged": false,
+        "emitted_word": "kehsv"
+      },
+      {
+        "word": "nhatvnehv",
+        "start_sec": 318.42,
+        "end_sec": 319.24,
+        "confidence": 0.219295,
+        "flagged": false,
+        "emitted_word": "nhatvnehv"
+      },
+      {
+        "word": "nuhstv",
+        "start_sec": 319.68,
+        "end_sec": 320.06,
+        "confidence": 0.987691,
+        "flagged": false,
+        "emitted_word": "nuhstv"
+      },
+      {
+        "word": "kvnetsehv'i",
+        "start_sec": 320.52,
+        "end_sec": 321.32,
+        "confidence": 0.999843,
+        "flagged": false,
+        "emitted_word": "knetsehv'i"
+      }
+    ]
+  },
+  {
+    "verse_id": "180122",
+    "book": "philemon",
+    "chapter": 1,
+    "verse_idx": 22,
+    "audio_path": "split_audio/philemon_01_22.wav",
+    "start_sec": 321.38,
+    "end_sec": 334.28,
+    "duration_sec": 12.9,
+    "reference_sentence": "ᎠᎴ ᎾᏍᏉ ᏍᏆᏛᏅᎢᏍᏓᏁᎸᎭ ᏍᎩᏍᏆᏂᎪᏙᏗᏱ; ᎤᏚᎩᏰᏃ ᎠᏋᎭ ᎢᏣᏓᏙᎵᏍᏗᏍᎬ ᎢᏳᏩᏂᏐᏗᏱ ᏔᎵᏁ ᏫᏨᎷᏤᏗᏱ.",
+    "cherokee_syllabary": "ᎠᎴ ᎾᏍᏉ ᏍᏆᏛᏅᎢᏍᏓᏁᎸᎭ ᏍᎩᏍᏆᏂᎪᏙᏗᏱ; ᎤᏚᎩᏰᏃ ᎠᏋᎭ ᎢᏣᏓᏙᎵᏍᏗᏍᎬ ᎢᏳᏩᏂᏐᏗᏱ ᏔᎵᏁ ᏫᏨᎷᏤᏗᏱ.",
+    "emitted_text": "ale nahskwo hskwatnv'ihstanelvha hskhskwankotohtiyi uthukiyheno akwvha itsatatolihstihskv iywanhihsohtiyi thalin witsvluhtsehtiyi",
+    "greedy_hypothesis": "ale nahskwo hskwatnv'ihstanelvha hskhskwankotohtiyi uthukiyheno akwvha itsatatolihstihskv iywanhihsohtiyi thalin witsvluhtsehtiyi",
+    "greedy_confidence": 0.816795,
+    "guided_hypothesis": "ale nahskwo hskwatnv'ihstanelvha hskhskwankotohtiyi uthukiyheno akwvha itsatatolihstihskv iywanhihsohtiyi thalin witsvluhtsehtiyi",
+    "reconciled_phonetics": "ale nahskwo hskwatnv'ihstanelvha hskhskwankotohtiyi uthukiyheno akwvha itsatatolihstihskv iywanhihsohtiyi thalin witsvluhtsehtiyi",
+    "has_anomalies": false,
+    "words": [
+      {
+        "word": "ale",
+        "start_sec": 321.94,
+        "end_sec": 322.08,
+        "confidence": 0.999932,
+        "flagged": false,
+        "emitted_word": "ale"
+      },
+      {
+        "word": "nahskwo",
+        "start_sec": 322.18,
+        "end_sec": 322.54,
+        "confidence": 0.986262,
+        "flagged": false,
+        "emitted_word": "nahskwo"
+      },
+      {
+        "word": "hskwatvnv'ihstanelvha",
+        "start_sec": 322.7,
+        "end_sec": 324.38,
+        "confidence": 0.151717,
+        "flagged": false,
+        "emitted_word": "hskwatnv'ihstanelvha"
+      },
+      {
+        "word": "hskihskwanikototiyi",
+        "start_sec": 325.02,
+        "end_sec": 326.28,
+        "confidence": 0.221845,
+        "flagged": false,
+        "emitted_word": "hskhskwankotohtiyi"
+      },
+      {
+        "word": "utukiyeno",
+        "start_sec": 326.88,
+        "end_sec": 327.78,
+        "confidence": 0.928547,
+        "flagged": false,
+        "emitted_word": "uthukiyheno"
+      },
+      {
+        "word": "akwvha",
+        "start_sec": 328.1,
+        "end_sec": 328.82,
+        "confidence": 0.996158,
+        "flagged": false,
+        "emitted_word": "akwvha"
+      },
+      {
+        "word": "itsatatolihstihskv",
+        "start_sec": 329.4,
+        "end_sec": 330.7,
+        "confidence": 0.950311,
+        "flagged": false,
+        "emitted_word": "itsatatolihstihskv"
+      },
+      {
+        "word": "iyuwanihsotiyi",
+        "start_sec": 330.9,
+        "end_sec": 332.02,
+        "confidence": 0.975654,
+        "flagged": false,
+        "emitted_word": "iywanhihsohtiyi"
+      },
+      {
+        "word": "thaline",
+        "start_sec": 332.6,
+        "end_sec": 332.96,
+        "confidence": 0.999935,
+        "flagged": false,
+        "emitted_word": "thalin"
+      },
+      {
+        "word": "witsvlutsetiyi",
+        "start_sec": 333.1,
+        "end_sec": 334.16,
+        "confidence": 0.957585,
+        "flagged": false,
+        "emitted_word": "witsvluhtsehtiyi"
+      }
+    ]
+  },
+  {
+    "verse_id": "180123",
+    "book": "philemon",
+    "chapter": 1,
+    "verse_idx": 23,
+    "audio_path": "split_audio/philemon_01_23.wav",
+    "start_sec": 334.28,
+    "end_sec": 344.66,
+    "duration_sec": 10.38,
+    "reference_sentence": "ᏫᎨᏣᏲᎵᎦ ᎡᎦᏉ, ᏗᏧᎳᎭ ᎣᏍᏗᏴᎩ ᎦᎶᏁᏛ ᏥᏌ ᎣᎩᏂᏍᏛᏗᏍᎬᎢ;",
+    "cherokee_syllabary": "ᏫᎨᏣᏲᎵᎦ ᎡᎦᏉ, ᏗᏧᎳᎭ ᎣᏍᏗᏴᎩ ᎦᎶᏁᏛ ᏥᏌ ᎣᎩᏂᏍᏛᏗᏍᎬᎢ;",
+    "emitted_text": "wketsayolika ekakwo titsulaha ohstiyhvki kalonetv tsihsa oknihstvtihskv'i",
+    "greedy_hypothesis": "wketsayolika ekakwo titsulaha ohstiyhvki kalonetv tsihsa oknihstvtihskv'i",
+    "greedy_confidence": 0.473144,
+    "guided_hypothesis": "wketsayolika ekakwo titsulaha ohstiyhvki kalonetv tsihsa oknihstvtihskv'i",
+    "reconciled_phonetics": "wketsayolika ekakwo titsulaha ohstiyhvki kalonetv tsihsa oknihstvtihskv'i",
+    "has_anomalies": false,
+    "words": [
+      {
+        "word": "wiketsayolika",
+        "start_sec": 334.9,
+        "end_sec": 335.88,
+        "confidence": 0.421081,
+        "flagged": false,
+        "emitted_word": "wketsayolika"
+      },
+      {
+        "word": "ekakwo",
+        "start_sec": 336.64,
+        "end_sec": 337.42,
+        "confidence": 0.13375,
+        "flagged": false,
+        "emitted_word": "ekakwo"
+      },
+      {
+        "word": "titsulaha",
+        "start_sec": 338.14,
+        "end_sec": 338.84,
+        "confidence": 0.225979,
+        "flagged": false,
+        "emitted_word": "titsulaha"
+      },
+      {
+        "word": "ohstiyvki",
+        "start_sec": 339.9,
+        "end_sec": 340.7,
+        "confidence": 0.936409,
+        "flagged": false,
+        "emitted_word": "ohstiyhvki"
+      },
+      {
+        "word": "kalonetv",
+        "start_sec": 341.44,
+        "end_sec": 341.98,
+        "confidence": 0.95493,
+        "flagged": false,
+        "emitted_word": "kalonetv"
+      },
+      {
+        "word": "tsihsa",
+        "start_sec": 342.06,
+        "end_sec": 342.46,
+        "confidence": 0.155311,
+        "flagged": false,
+        "emitted_word": "tsihsa"
+      },
+      {
+        "word": "okinihstvtihskv'i",
+        "start_sec": 343.38,
+        "end_sec": 344.54,
+        "confidence": 0.484545,
+        "flagged": false,
+        "emitted_word": "oknihstvtihskv'i"
+      }
+    ]
+  },
+  {
+    "verse_id": "180124",
+    "book": "philemon",
+    "chapter": 1,
+    "verse_idx": 24,
+    "audio_path": "split_audio/philemon_01_24.wav",
+    "start_sec": 344.66,
+    "end_sec": 352.26,
+    "duration_sec": 7.6,
+    "reference_sentence": "ᎹᎦ, ᎡᎵᏍᏓᎦ, ᏗᎹ, ᎷᎦ, ᎢᏧᎳᎭ ᏦᎩᎸᏫᏍᏓᏁᎯ",
+    "cherokee_syllabary": "ᎹᎦ, ᎡᎵᏍᏓᎦ, ᏗᎹ, ᎷᎦ, ᎢᏧᎳᎭ ᏦᎩᎸᏫᏍᏓᏁᎯ",
+    "emitted_text": "maka elihstaka thima luka itsulaha tsokilvwhstanehi",
+    "greedy_hypothesis": "maka elihstaka thima luka itsulaha tsokilvwhstanehi",
+    "greedy_confidence": 0.97043,
+    "guided_hypothesis": "maka elihstaka thima luka itsulaha tsokilvwhstanehi",
+    "reconciled_phonetics": "maka elihstaka thima luka itsulaha tsokilvwhstanehi",
+    "has_anomalies": false,
+    "words": [
+      {
+        "word": "maka",
+        "start_sec": 345.28,
+        "end_sec": 345.72,
+        "confidence": 0.958885,
+        "flagged": false,
+        "emitted_word": "maka"
+      },
+      {
+        "word": "elihstaka",
+        "start_sec": 346.38,
+        "end_sec": 347.18,
+        "confidence": 0.99171,
+        "flagged": false,
+        "emitted_word": "elihstaka"
+      },
+      {
+        "word": "tima",
+        "start_sec": 347.74,
+        "end_sec": 348.08,
+        "confidence": 0.999135,
+        "flagged": false,
+        "emitted_word": "thima"
+      },
+      {
+        "word": "luka",
+        "start_sec": 348.72,
+        "end_sec": 349.04,
+        "confidence": 0.999857,
+        "flagged": false,
+        "emitted_word": "luka"
+      },
+      {
+        "word": "itsulaha",
+        "start_sec": 349.64,
+        "end_sec": 350.32,
+        "confidence": 0.914464,
+        "flagged": false,
+        "emitted_word": "itsulaha"
+      },
+      {
+        "word": "tsokilvwihstanehi",
+        "start_sec": 351.04,
+        "end_sec": 352.22,
+        "confidence": 0.95853,
+        "flagged": false,
+        "emitted_word": "tsokilvwhstanehi"
+      }
+    ]
+  },
+  {
+    "verse_id": "180125",
+    "book": "philemon",
+    "chapter": 1,
+    "verse_idx": 25,
+    "audio_path": "split_audio/philemon_01_25.wav",
+    "start_sec": 352.26,
+    "end_sec": 364.06,
+    "duration_sec": 11.8,
+    "reference_sentence": "ᎬᏩᎦᏘᏯ ᎤᏓᏙᎵᏍᏗ ᎨᏒ ᎢᎦᏤᎵ ᎤᎬᏫᏳᎯ ᏥᏌ ᎦᎶᏁᏏ ᏔᎵ ᎤᏛᏕᎨᏍᏗ ᏕᏣᏓᏅᏛᎢ.  ᎡᎺᏅ",
+    "cherokee_syllabary": "ᎬᏩᎦᏘᏯ ᎤᏓᏙᎵᏍᏗ ᎨᏒ ᎢᎦᏤᎵ ᎤᎬᏫᏳᎯ ᏥᏌ ᎦᎶᏁᏏ ᏔᎵ ᎤᏛᏕᎨᏍᏗ ᏕᏣᏓᏅᏛᎢ.  ᎡᎺᏅ",
+    "emitted_text": "kvwakthiya utatolihsti kehsv ikatseli ukvwiyuhi tsihsa kalonehs thali uthvtekehsti tetsatantv'i emenv",
+    "greedy_hypothesis": "kvwakthiya utatolihsti kehsv ikatseli ukvwiyuhi tsihsa kalonehs thali uthvtekehsti tetsatantv'i emenv",
+    "greedy_confidence": 0.799855,
+    "guided_hypothesis": "kvwakthiya utatolihsti kehsv ikatseli ukvwiyuhi tsihsa kalonehs thali uthvtekehsti tetsatantv'i emenv",
+    "reconciled_phonetics": "kvwakthiya utatolihsti kehsv ikatseli ukvwiyuhi tsihsa kalonehs thali uthvtekehsti tetsatantv'i emenv",
+    "has_anomalies": true,
+    "words": [
+      {
+        "word": "kvwakathiya",
+        "start_sec": 352.8,
+        "end_sec": 353.42,
+        "confidence": 0.999462,
+        "flagged": false,
+        "emitted_word": "kvwakthiya"
+      },
+      {
+        "word": "utatolihsti",
+        "start_sec": 353.56,
+        "end_sec": 354.38,
+        "confidence": 0.99632,
+        "flagged": false,
+        "emitted_word": "utatolihsti"
+      },
+      {
+        "word": "kehsv",
+        "start_sec": 354.4,
+        "end_sec": 354.72,
+        "confidence": 0.966486,
+        "flagged": false,
+        "emitted_word": "kehsv"
+      },
+      {
+        "word": "ikatseli",
+        "start_sec": 355.26,
+        "end_sec": 356.0,
+        "confidence": 0.952894,
+        "flagged": false,
+        "emitted_word": "ikatseli"
+      },
+      {
+        "word": "ukvwiyuhi",
+        "start_sec": 356.16,
+        "end_sec": 356.9,
+        "confidence": 0.983373,
+        "flagged": false,
+        "emitted_word": "ukvwiyuhi"
+      },
+      {
+        "word": "tsihsa",
+        "start_sec": 357.0,
+        "end_sec": 357.38,
+        "confidence": 0.954121,
+        "flagged": false,
+        "emitted_word": "tsihsa"
+      },
+      {
+        "word": "kalonehsi",
+        "start_sec": 357.96,
+        "end_sec": 358.54,
+        "confidence": 0.033941,
+        "flagged": true,
+        "emitted_word": "kalonehs"
+      },
+      {
+        "word": "thali",
+        "start_sec": 358.62,
+        "end_sec": 358.86,
+        "confidence": 0.999513,
+        "flagged": false,
+        "emitted_word": "thali"
+      },
+      {
+        "word": "utvtekehsti",
+        "start_sec": 359.8,
+        "end_sec": 361.06,
+        "confidence": 0.613669,
+        "flagged": false,
+        "emitted_word": "uthvtekehsti"
+      },
+      {
+        "word": "tetsatanvtv'i",
+        "start_sec": 361.72,
+        "end_sec": 362.68,
+        "confidence": 0.966126,
+        "flagged": false,
+        "emitted_word": "tetsatantv'i"
+      },
+      {
+        "word": "emenv",
+        "start_sec": 363.38,
+        "end_sec": 363.96,
+        "confidence": 0.332503,
+        "flagged": false,
+        "emitted_word": "emenv"
+      }
+    ]
+  }
+]

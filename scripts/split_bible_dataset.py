@@ -109,7 +109,7 @@ def main():
     )
 
     # Group by book and partition by chapter
-    book_rows: Dict[str, List[Dict[str, str]]] = {"mark": [], "matthew": []}
+    book_rows: Dict[str, List[Dict[str, str]]] = {}
     train_rows: List[Dict[str, str]] = []
     valid_rows: List[Dict[str, str]] = []
     test_rows: List[Dict[str, str]] = []
@@ -126,8 +126,9 @@ def main():
         sentence = (r.get("reconciled_phonetics") or emitted).strip()
 
         row = {"path": wav_path, "sentence": sentence}
-        if book in book_rows:
-            book_rows[book].append(row)
+        if book not in book_rows:
+            book_rows[book] = []
+        book_rows[book].append(row)
 
         splits = CHAPTER_SPLITS.get(book, {})
         valid_ch = set(splits.get("valid_chapters", []))

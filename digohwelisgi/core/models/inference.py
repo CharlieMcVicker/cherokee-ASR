@@ -260,23 +260,46 @@ def infer_emissions(
     input_tensor = torch.tensor(np.array([raw_input_values]), dtype=torch.float32)
 
     target_device = _resolve_device(device, model)
-    input_tensor = input_tensor.to(target_device)
 
-    try:
-        with torch.no_grad():
-            logits = model(input_tensor).logits
-    except NotImplementedError as e:
-        if str(target_device) == "mps":
+    if str(target_device) == "mps" and hasattr(model, "wav2vec2"):
+        # PyTorch MPS conv1d has a hard limitation where sequence lengths > 65k samples fail with NotImplementedError.
+        # Compute lightweight 7-layer feature extraction on CPU, run heavy 24-layer Transformer on MPS.
+        try:
+            with torch.no_grad():
+                model.wav2vec2.feature_extractor.to("cpu")
+                x_cpu = input_tensor.to("cpu")
+                feats = model.wav2vec2.feature_extractor(x_cpu)
+                feats = feats.transpose(1, 2).to("mps")
+                feats = model.wav2vec2.feature_projection(feats)[0]
+                encoder_out = model.wav2vec2.encoder(feats).last_hidden_state
+                logits = model.lm_head(encoder_out)
+        except Exception as hybrid_err:
             logger.warning(
-                "MPS inference failed with NotImplementedError. Falling back to CPU."
+                "MPS hybrid inference failed (%s). Falling back to full CPU.",
+                hybrid_err,
             )
             fallback_device = "cpu"
             model.to(fallback_device)
             input_tensor = input_tensor.to(fallback_device)
             with torch.no_grad():
                 logits = model(input_tensor).logits
-        else:
-            raise e
+    else:
+        input_tensor = input_tensor.to(target_device)
+        try:
+            with torch.no_grad():
+                logits = model(input_tensor).logits
+        except NotImplementedError as e:
+            if str(target_device) == "mps":
+                logger.warning(
+                    "MPS inference failed with NotImplementedError. Falling back to CPU."
+                )
+                fallback_device = "cpu"
+                model.to(fallback_device)
+                input_tensor = input_tensor.to(fallback_device)
+                with torch.no_grad():
+                    logits = model(input_tensor).logits
+            else:
+                raise e
 
     if logits.ndim == 3:
         logits = logits.squeeze(0)
