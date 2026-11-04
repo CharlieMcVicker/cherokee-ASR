@@ -143,11 +143,12 @@ class CherokeeASRModel(ASRModel):
         token: Optional[str] = None,
         eval_mode: bool = True,
         use_cache: bool = True,
+        config_filename: str = "best_model.json",
     ) -> CherokeeASRModel:
         """
-        Instantiate CherokeeASRModel using the best Cherokee model configuration discovered via best_model.json.
+        Instantiate CherokeeASRModel using the model configuration discovered via best_model.json (or config_filename).
         """
-        config = get_best_model_config()
+        config = get_best_model_config(config_filename=config_filename)
         return cls.from_config(
             config=config,
             device=device,

@@ -8,10 +8,10 @@ from transformers import Wav2Vec2ForCTC, Wav2Vec2Processor
 _MODEL_CACHE: dict[tuple[Any, ...], tuple[Wav2Vec2ForCTC, Wav2Vec2Processor, str]] = {}
 
 
-def get_best_model_config() -> dict[str, str]:
+def get_best_model_config(config_filename: str = "best_model.json") -> dict[str, str]:
     """
-    Finds and loads the best_model.json configuration file.
-    Traverses up from the directory containing this file until it finds best_model.json,
+    Finds and loads the specified model configuration file (defaults to best_model.json).
+    Traverses up from the directory containing this file until it finds the configuration file,
     or falls back to checking the current working directory, then the parent directories.
     If not found, returns the default fallback.
     """
@@ -21,7 +21,7 @@ def get_best_model_config() -> dict[str, str]:
     for start_dir in start_dirs:
         current_dir = start_dir
         while current_dir and current_dir != os.path.dirname(current_dir):
-            config_path = os.path.join(current_dir, "best_model.json")
+            config_path = os.path.join(current_dir, config_filename)
             if os.path.exists(config_path):
                 try:
                     with open(config_path, "r", encoding="utf-8") as f:
@@ -30,7 +30,7 @@ def get_best_model_config() -> dict[str, str]:
                             return config
                 except Exception as e:
                     print(
-                        f"Warning: Failed to load best_model.json from {config_path}: {e}"
+                        f"Warning: Failed to load {config_filename} from {config_path}: {e}"
                     )
             current_dir = os.path.dirname(current_dir)
 
