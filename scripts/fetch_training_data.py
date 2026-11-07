@@ -44,12 +44,38 @@ def fetch_dataset(
     token: str | None = None,
     revision: str | None = None,
     force: bool = False,
+    preserve_local_csvs: bool = False,
 ) -> Path:
     dest_path = dest.resolve()
 
-    if not force and is_already_populated(dest_path):
+    if not force and not preserve_local_csvs and is_already_populated(dest_path):
         logger.info("Dataset already populated at %s. Skipping download.", dest_path)
         return dest_path
+
+    # Snapshot local CSV and JSON label/vocab files before extraction if preserve_local_csvs is set
+    saved_local_files: dict[Path, bytes] = {}
+    if preserve_local_csvs:
+        processed_dir = dest_path / "training" / "processed"
+        if processed_dir.exists():
+            for ext in ("*.csv", "*.json"):
+                for fpath in processed_dir.glob(ext):
+                    if fpath.is_file():
+                        saved_local_files[fpath] = fpath.read_bytes()
+            logger.info(
+                "Preserving %d local CSV/JSON files in %s across archive extraction.",
+                len(saved_local_files),
+                processed_dir,
+            )
+
+    def _restore_preserved_files() -> None:
+        for fpath, content in saved_local_files.items():
+            fpath.parent.mkdir(parents=True, exist_ok=True)
+            fpath.write_bytes(content)
+        if saved_local_files:
+            logger.info(
+                "Restored %d local CSV/JSON files after dataset fetch.",
+                len(saved_local_files),
+            )
 
     logger.info(
         "Fetching dataset %s from Hugging Face Hub to %s...", repo_id, dest_path
@@ -69,7 +95,7 @@ def fetch_dataset(
         token or os.environ.get("HF_TOKEN") or os.environ.get("HUGGING_FACE_HUB_TOKEN")
     )
 
-    # Strategy 1: Fast single-request archive download (avoids 1,000 requests/5min HF rate limit)
+    # Strategy 1: Fast single-archive download (avoids 1,000 requests/5min HF rate limit)
     try:
         import tarfile
 
@@ -88,6 +114,7 @@ def fetch_dataset(
         )
         with tarfile.open(archive_path, "r:gz") as tar:
             tar.extractall(dest_path)
+        _restore_preserved_files()
         logger.info("Dataset successfully extracted to %s", dest_path)
         return dest_path
     except (EntryNotFoundError, Exception) as exc:
@@ -103,6 +130,7 @@ def fetch_dataset(
         local_dir=str(dest_path),
         token=hf_token,
     )
+    _restore_preserved_files()
 
     logger.info("Dataset successfully downloaded to %s", downloaded_dir)
     return Path(downloaded_dir)
@@ -141,6 +169,11 @@ def main() -> None:
         action="store_true",
         help="Force re-download even if dataset directory is already populated",
     )
+    parser.add_argument(
+        "--preserve-local-csvs",
+        action="store_true",
+        help="Preserve local CSV and vocabulary JSON files in data/training/processed across archive extraction",
+    )
 
     args = parser.parse_args()
     fetch_dataset(
@@ -149,6 +182,7 @@ def main() -> None:
         token=args.token,
         revision=args.revision,
         force=args.force,
+        preserve_local_csvs=args.preserve_local_csvs,
     )
 
 

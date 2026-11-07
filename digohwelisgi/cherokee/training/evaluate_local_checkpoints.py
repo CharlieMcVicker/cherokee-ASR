@@ -51,6 +51,7 @@ def _detect_columns(df):
         "audio_path",
     ]
     text_candidates = [
+        "cv_text",
         "sentence",
         "text",
         "transcription",
@@ -143,9 +144,22 @@ def main():
         "audio": df_test[audio_col].tolist(),
         "sentence": df_test[text_col].tolist(),
     }
-    features = Features(
-        {"audio": Audio(sampling_rate=TARGET_SAMPLE_RATE), "sentence": Value("string")}
-    )
+    feat_dict = {
+        "audio": Audio(sampling_rate=TARGET_SAMPLE_RATE),
+        "sentence": Value("string"),
+    }
+    if "tone_tokens" in df_test.columns:
+        data_dict["tone_tokens"] = (
+            df_test["tone_tokens"].fillna("").astype(str).tolist()
+        )
+        feat_dict["tone_tokens"] = Value("string")
+    if "canonical_toned" in df_test.columns:
+        data_dict["canonical_toned"] = (
+            df_test["canonical_toned"].fillna("").astype(str).tolist()
+        )
+        feat_dict["canonical_toned"] = Value("string")
+
+    features = Features(feat_dict)
     test_ds = Dataset.from_dict(data_dict, features=features)
 
     processor_path = args.processor
@@ -178,9 +192,10 @@ def main():
         batch["input_values"] = input_vals[0]
         return batch
 
+    keep_cols = {"sentence", "tone_tokens", "canonical_toned"}
     test_ds_prepared = test_ds.map(
         prepare_batch,
-        remove_columns=[c for c in test_ds.column_names if c != "sentence"],
+        remove_columns=[c for c in test_ds.column_names if c not in keep_cols],
         num_proc=1,
     )
 

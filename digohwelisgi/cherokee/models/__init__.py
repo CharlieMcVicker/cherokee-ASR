@@ -5,6 +5,11 @@ digohwelisgi.cherokee.models
 Cherokee ASR models and loader factories.
 """
 
+from digohwelisgi.cherokee.models.dual_head import (
+    DualDataCollatorCTCWithPadding,
+    Wav2Vec2DualCTCOutput,
+    Wav2Vec2ForDualCTC,
+)
 from digohwelisgi.cherokee.models.loader import (
     DEFAULT_CHEROKEE_FALLBACK_REPO,
     ASRResult,
@@ -19,4 +24,7 @@ __all__ = [
     "ASRResult",
     "WordConfidence",
     "DEFAULT_CHEROKEE_FALLBACK_REPO",
+    "Wav2Vec2DualCTCOutput",
+    "Wav2Vec2ForDualCTC",
+    "DualDataCollatorCTCWithPadding",
 ]

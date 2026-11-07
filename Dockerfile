@@ -40,6 +40,8 @@ RUN python3 -c "from transformers import Wav2Vec2ForCTC; Wav2Vec2ForCTC.from_pre
 
 COPY scripts /workspace/scripts
 COPY digohwelisgi /workspace/digohwelisgi
+COPY data/training/processed/*.csv data/training/processed/*.json /workspace/data/training/processed/
+COPY data/projects/cherokee_new_testament/train_csvs/*.csv /workspace/data/projects/cherokee_new_testament/train_csvs/
 ENV PYTHONPATH="/workspace:${PYTHONPATH}"
 
 

@@ -3,11 +3,11 @@
 ## 1. Executive Summary & Design Decisions
 
 ### Core Architecture & Strategy
-* **Split-Top ("Y-Network") Model**: Initialized from pretrained wav2vec2 / XLS-R.
+* **Split-Top ("Y-Network") Model**: Initialized from un-finetuned SSL `facebook/wav2vec2-large-xlsr-53` (24 Transformer layers; avoiding F0 erasure from toneless-finetuned checkpoints).
   * **Two Segmental Streams**: Both streams are segmental—one is a Consonant-Vowel (CV) model predicting base phonemic quality, and the other is a Moraic Tone model predicting discrete tone numbers per mora alongside onset separators.
-  * **Shared Trunk**: Transformer layers 1–10 capture shared acoustic and phonetic grounding.
-  * **Branch A (CV / Segmental Head)**: Cloned layers 11A–12A + Linear CTC head, outputting base consonants, vowels (`a, e, i, o, u, v`), and word boundaries (`|`). Trained on all data (CV-only Bible + tone-annotated orig).
-  * **Branch B (Moraic Tone Head)**: Cloned layers 11B–12B + Linear CTC head, outputting moraic tones, onset separators (`C`), and word boundaries (`|`). Trained with masked loss on the 3-hour tone subset.
+  * **Shared Trunk**: Transformer layers 1–22 (indices `0..21`, configurable via `--num-branch-layers 2`) capture shared acoustic and phonetic grounding.
+  * **Branch A (CV / Segmental Head)**: Cloned final 2 layers (23A–24A) + Linear CTC head (`19` tokens), outputting base consonants, vowels (`a, e, i, o, u, v`), and word boundaries (`|`). Trained on all data (CV-only Bible + tone-annotated orig).
+  * **Branch B (Moraic Tone Head)**: Cloned final 2 layers (23B–24B) + Linear CTC head (`10` attested tokens), outputting moraic tones, onset separators (`C`), and word boundaries (`|`). Trained with masked loss on the 3-hour tone subset.
   * **Equal Depth & Bidirectional Context**: Both heads operate non-causally with identical backpropagation depth, avoiding layer warmup lag or final-layer pitch erasure.
 
 ### Head B Ground Truth Representation
@@ -158,14 +158,14 @@ Each phase is strictly divided into **Implementation Tasks**, **Unit Tests**, an
 ### Phase 1: Orthography & Spelling Normalization Engine
 
 #### Implementation Tasks
-* [ ] **T1.1**: Fix contextual pre-aspiration regex in `digohwelisgi/cherokee/orthography/tones.py`:
+* [x] **T1.1**: Fix contextual pre-aspiration regex in `digohwelisgi/cherokee/orthography/tones.py`:
   ```python
   s = re.sub(r"([^ht\s])s", r"\1hs", s)
   ```
-* [ ] **T1.2**: Implement `standardize_glottal_stops(text: str) -> str` in `tones.py` unifying `['’ʼʔ‚?]` $\rightarrow$ `'` and stripping post-consonantal violations (`*C'`).
-* [ ] **T1.3**: Implement `resolve_vowel_hiatus(text: str) -> str` in `tones.py` inserting `'` between adjacent vowels across syllables.
-* [ ] **T1.4**: Update `respell_consonants(text: str) -> str` to enforce the strict priority rewrite order (stops, sonorants, sibilants, affricates).
-* [ ] **T1.5**: Update `convert_orthography` in `orthography.py` to propagate Standard 2 contextual sibilant pre-aspiration by default.
+* [x] **T1.2**: Implement `standardize_glottal_stops(text: str) -> str` in `tones.py` unifying `['’ʼʔ‚?]` $\rightarrow$ `'` and stripping post-consonantal violations (`*C'`).
+* [x] **T1.3**: Implement `resolve_vowel_hiatus(text: str) -> str` in `tones.py` inserting `'` between adjacent vowels across syllables.
+* [x] **T1.4**: Update `respell_consonants(text: str) -> str` to enforce the strict priority rewrite order (stops, sonorants, sibilants, affricates).
+* [x] **T1.5**: Update `convert_orthography` in `orthography.py` to propagate Standard 2 contextual sibilant pre-aspiration by default.
 
 #### Distinct Unit Tests (`digohwelisgi/cherokee/orthography/tests/test_tones_normalization.py`)
 * `test_sibilant_word_initial_vs_medial()`:
@@ -189,15 +189,15 @@ Each phase is strictly divided into **Implementation Tasks**, **Unit Tests**, an
 ### Phase 2: Moraic Tone Target Generator & Dual-Stream Sequence Reconciliation
 
 #### Implementation Tasks
-* [ ] **T2.1**: Implement `to_moraic_tone_tokens(raw_phonetic: str) -> Tuple[str, str]` in `digohwelisgi/cherokee/orthography/tones.py`:
-  * Parses phonetic Cherokee with tones (e.g. `21`, `32`, `22`, `:`) and consonants.
+* [x] **T2.1**: Implement `to_canonical_toned_tth(raw_phonetic: str, syllabary: Optional[str] = None)` and `to_moraic_tone_tokens(raw_phonetic: str) -> Tuple[str, str]` in `digohwelisgi/cherokee/orthography/tones.py`:
+  * Converts raw Feeling phonetics to canonical numeric-tone TTH first (using syllabary word-boundary alignment for `*` cleanup).
   * Emits `cv_text`: clean segmental stream with single phonemic vowels (`a, e, i, o, u, v`), zero colons, and zero numeric tones.
-  * Emits `tone_tokens`: space-separated sequence of `C`, moraic tone tokens (`1_1` to `4_2`), and word delimiters `|`.
+  * Emits `tone_tokens`: space-separated sequence of `C`, attested moraic tone tokens (`2_1`, `3_1`, `1_2`, `2_2`, `3_2`, `4_2`), and word delimiters `|`.
   * Correctly omits initial `C` when a word begins with a vowel.
-* [ ] **T2.2**: Implement `reconcile_dual_stream(cv_text: str, tone_tokens: str, mode: str = "dp") -> str`:
+* [x] **T2.2**: Implement `reconcile_dual_stream(cv_text: str, tone_tokens: str, mode: str = "dp") -> str`:
   * Mode `"fast"`: Deterministic regex/slot matching projecting mora count and tone numbers onto CV vowel slots.
   * Mode `"dp"`: Needleman-Wunsch sequence alignment using `C` and `|` boundary anchors to handle local insertions/deletions.
-* [ ] **T2.3**: Implement `moraic_tokens_to_pitch_contour(tone_tokens: str) -> List[Tuple[float, float]]` utility for downstream Praat and visual inspection.
+* [x] **T2.3**: Implement `moraic_tokens_to_pitch_contour(tone_tokens: str) -> List[Tuple[float, float]]` utility for downstream Praat and visual inspection.
 
 #### Distinct Unit Tests (`digohwelisgi/cherokee/orthography/tests/test_moraic_generator.py`)
 * `test_short_vowel_mora_mapping()`:
@@ -267,7 +267,7 @@ Each phase is strictly divided into **Implementation Tasks**, **Unit Tests**, an
 ### Phase 4: Model Architecture (`Wav2Vec2ForDualCTC`) & Masked Collator
 
 #### Implementation Tasks
-* [ ] **T4.1**: Implement `Wav2Vec2ForDualCTC(Wav2Vec2PreTrainedModel)` in `digohwelisgi/cherokee/models/dual_head.py`:
+* [x] **T4.1**: Implement `Wav2Vec2ForDualCTC(Wav2Vec2PreTrainedModel)` in `digohwelisgi/cherokee/models/dual_head.py`:
   * Initialize shared feature extractor and transformer trunk (Layers 1–10).
   * Branch A: Transformer Layers 11A–12A + `lm_head = nn.Linear(hidden_size, cv_vocab_size)`.
   * Branch B: Cloned Transformer Layers 11B–12B + `tone_lm_head = nn.Linear(hidden_size, tone_vocab_size)`.
@@ -277,9 +277,9 @@ Each phase is strictly divided into **Implementation Tasks**, **Unit Tests**, an
     * Compute CTC loss $\mathcal{L}_{\text{cv}}$ on all samples.
     * Compute masked CTC loss $\mathcal{L}_{\text{tone}}$ strictly on rows where `(tone_labels != -100).any()`.
     * Total loss: $\mathcal{L} = \mathcal{L}_{\text{cv}} + \lambda \mathcal{L}_{\text{tone}}$.
-* [ ] **T4.2**: Implement `DualDataCollatorCTCWithPadding`:
+* [x] **T4.2**: Implement `DualDataCollatorCTCWithPadding`:
   * Dynamically pads audio features, `labels` (padded with `-100`), and `tone_labels` (padded with `-100`).
-* [ ] **T4.3**: Integrate `AudioAugmenter` in the collator (pitch shift $\pm 1.5$ semitones, time stretch $0.9$–$1.1$, gaussian noise).
+* [x] **T4.3**: Integrate `AudioAugmenter` in the collator (pitch shift $\pm 1.5$ semitones, time stretch $0.9$–$1.1$, gaussian noise).
 
 #### Distinct Unit Tests (`digohwelisgi/cherokee/models/tests/test_dual_head_model.py`)
 * `test_dual_head_forward_backward_synthetic()`:
@@ -300,16 +300,16 @@ Each phase is strictly divided into **Implementation Tasks**, **Unit Tests**, an
 ### Phase 5: Multi-Task Training Pipeline & Evaluation Harness
 
 #### Implementation Tasks
-* [ ] **T5.1**: Implement Interleaved Balanced DataLoader in `train.py`:
+* [x] **T5.1**: Implement Interleaved Balanced DataLoader in `train.py`:
   * Alternates 50% Bible batches (CV-only) and 50% dictionary batches (CV + Tone) to prevent tone gradient starvation.
-* [ ] **T5.2**: Implement multi-task metric computation:
+* [x] **T5.2**: Implement multi-task metric computation:
   * Branch A: `wer` and `cer` on greedy decoded CV emissions.
   * Branch B: Tone Error Rate (`TER` / `tone_cer`) computed strictly on tone-annotated evaluation rows (`valid_orig`).
   * Reconciled metrics: `reconciled_cer` evaluating merged segmental + tone output.
-* [ ] **T5.3**: Configure Trainer:
+* [x] **T5.3**: Configure Trainer:
   * Set `metric_for_best_model="tone_cer"`, `greater_is_better=False`.
   * Support checkpoint saving with dual tokenizer artifacts.
-* [ ] **T5.4**: Update `evaluate_local_checkpoints.py` to evaluate dual-head checkpoints across clean and noisy test sets.
+* [x] **T5.4**: Update `evaluate_local_checkpoints.py` to evaluate dual-head checkpoints across clean and noisy test sets.
 
 #### Distinct Unit Tests (`digohwelisgi/cherokee/training/tests/test_metrics_and_eval.py`)
 * `test_compute_dual_metrics()`:
@@ -328,12 +328,12 @@ Each phase is strictly divided into **Implementation Tasks**, **Unit Tests**, an
 ### Phase 6: Core ASR Model Integration & Benchmark Evaluation
 
 #### Implementation Tasks
-* [ ] **T6.1**: Update `ModelOutput` currency in `digohwelisgi/core/models/models.py`:
+* [x] **T6.1**: Update `ModelOutput` currency in `digohwelisgi/core/models/models.py`:
   * Support optional `lpz_tone` and `tone_tokens` decoding alongside base `lpz`.
   * Add `.decode_reconciled()` method returning fully tone-annotated Cherokee phonetics.
-* [ ] **T6.2**: Update `CherokeeASRModel` in `digohwelisgi/cherokee/models/loader.py`:
+* [x] **T6.2**: Update `CherokeeASRModel` in `digohwelisgi/cherokee/models/loader.py`:
   * Detect dual-head architecture; run joint inference on audio chunks; cache dual emissions.
-* [ ] **T6.3**: Update `syllabary_enrichment` and `dialogue` pipelines:
+* [x] **T6.3**: Update `syllabary_enrichment` and `dialogue` pipelines:
   * Wire dual-head reconciled emissions into syllable reconciliation and Praat TextGrid exporters.
 * [ ] **T6.4**: Run comprehensive evaluation benchmark on `chr-wav2vec2-test.csv` (185 samples):
   * Measure Base CER, Tone TER, and Reconciled CER comparing Fast Slicing vs DP alignment.

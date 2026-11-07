@@ -324,12 +324,12 @@ def test_parse_args_hub_and_step_defaults(monkeypatch):
     assert args.eval_steps == 200
     assert args.save_steps == 400
     assert args.hub_strategy == "all_checkpoints"
-    assert args.hub_prefix == "length-only"
+    assert args.hub_prefix == "dual-tone-moraic"
     assert CONFIG["epochs"] == 30
     assert CONFIG["eval_steps"] == 200
     assert CONFIG["save_steps"] == 400
     assert CONFIG["hub_strategy"] == "all_checkpoints"
-    assert CONFIG["hub_prefix"] == "length-only"
+    assert CONFIG["hub_prefix"] == "dual-tone-moraic"
 
     # Custom override
     monkeypatch.setattr(

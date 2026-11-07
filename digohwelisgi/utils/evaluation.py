@@ -8,6 +8,10 @@ import numpy as np
 from tqdm import tqdm
 from torch.utils.data import DataLoader
 from digohwelisgi.cherokee.models import CherokeeASRModel
+from digohwelisgi.cherokee.orthography.tones import (
+    decode_tone_ids,
+    reconcile_dual_stream,
+)
 
 from jiwer import wer as jiwer_wer, cer as jiwer_cer
 
@@ -177,6 +181,7 @@ def run_evaluation(
         )
 
         all_logits = []
+        all_logits_tone = []
 
         # We run inference in batches
         for batch in tqdm(test_loader, desc=f"Inference ({label})"):
@@ -185,14 +190,28 @@ def run_evaluation(
             if attention_mask is not None:
                 attention_mask = attention_mask.to(asr_model.device)
 
-            with torch.no_grad():
-                outputs = asr_model.model(
-                    input_values=input_values, attention_mask=attention_mask
-                )
-                logits = outputs.logits
+            try:
+                with torch.no_grad():
+                    outputs = asr_model.model(
+                        input_values=input_values, attention_mask=attention_mask
+                    )
+            except NotImplementedError:
+                if str(asr_model.device) == "mps":
+                    asr_model.to("cpu")
+                    input_values = input_values.to("cpu")
+                    if attention_mask is not None:
+                        attention_mask = attention_mask.to("cpu")
+                    with torch.no_grad():
+                        outputs = asr_model.model(
+                            input_values=input_values, attention_mask=attention_mask
+                        )
+                else:
+                    raise
+            logits = outputs.logits
+            logits_tone = getattr(outputs, "logits_tone", None)
 
             if attention_mask is not None:
-                input_lengths = attention_mask.sum(dim=-1)
+                input_lengths = attention_mask.detach().cpu().sum(dim=-1)
                 feat_extractor = getattr(
                     asr_model.model, "_get_feat_extract_output_lengths", None
                 )
@@ -209,13 +228,27 @@ def run_evaluation(
                 output_lengths = [logits.shape[1]] * logits.shape[0]
 
             logits_np = logits.cpu().numpy()
+            logits_tone_np = (
+                logits_tone.cpu().numpy() if logits_tone is not None else None
+            )
             for i in range(len(logits_np)):
-                all_logits.append(logits_np[i, : int(output_lengths[i]), :])
+                out_len = int(output_lengths[i])
+                all_logits.append(logits_np[i, :out_len, :])
+                if logits_tone_np is not None:
+                    all_logits_tone.append(logits_tone_np[i, :out_len, :])
 
-        all_gold = [ex["sentence"] for ex in test_ds_prepared]
+        all_gold = [
+            ex.get("cv_text", ex.get("sentence", "")) for ex in test_ds_prepared
+        ]
 
         ckpt_rows = []
+        ref_tone_list = []
+        hyp_tone_list = []
+        ref_recon_list = []
+        hyp_recon_list = []
+
         for idx, logits in enumerate(all_logits):
+            ex_item = test_ds_prepared[idx]
             ref = all_gold[idx]
             res = asr_model.decode(logits, compute_word_confidences=False)
             hyp = res.text
@@ -233,6 +266,42 @@ def run_evaluation(
                 "wer": wer_val,
                 "cer": cer_val,
             }
+
+            if idx < len(all_logits_tone):
+                tone_pred_ids = np.argmax(all_logits_tone[idx], axis=-1).tolist()
+                hyp_tone = decode_tone_ids(
+                    tone_pred_ids, collapse_repeats=True, remove_pad=True
+                )
+                row["hyp_tone"] = hyp_tone
+
+                ref_tone = str(ex_item.get("tone_tokens", "") or "").strip()
+                if not ref_tone and "tone_labels" in ex_item:
+                    valid_t_ids = [
+                        int(t) for t in ex_item["tone_labels"] if int(t) >= 0
+                    ]
+                    if valid_t_ids:
+                        ref_tone = decode_tone_ids(
+                            valid_t_ids, collapse_repeats=False, remove_pad=True
+                        )
+
+                if ref_tone:
+                    row["gold_tone"] = ref_tone
+                    t_cer = float(jiwer_cer(safe(ref_tone), safe(hyp_tone)))
+                    row["tone_cer"] = t_cer
+                    ref_tone_list.append(safe(ref_tone))
+                    hyp_tone_list.append(safe(hyp_tone))
+
+                    ref_recon = str(ex_item.get("canonical_toned", "") or "").strip()
+                    if not ref_recon:
+                        ref_recon = reconcile_dual_stream(ref, ref_tone, mode="dp")
+                    hyp_recon = reconcile_dual_stream(hyp, hyp_tone, mode="dp")
+                    row["gold_reconciled"] = ref_recon
+                    row["hyp_reconciled"] = hyp_recon
+                    r_cer = float(jiwer_cer(safe(ref_recon), safe(hyp_recon)))
+                    row["reconciled_cer"] = r_cer
+                    ref_recon_list.append(safe(ref_recon))
+                    hyp_recon_list.append(safe(hyp_recon))
+
             ckpt_rows.append(row)
 
         rows_by_ckpt[label] = ckpt_rows
@@ -245,16 +314,20 @@ def run_evaluation(
         agg_wer = float(jiwer_wer(ref_list, hyp_list))
         agg_cer = float(jiwer_cer(ref_list, hyp_list))
 
-        ranking.append(
-            {
-                "checkpoint": label,
-                "path": path,
-                "wer": agg_wer,
-                "cer": agg_cer,
-                "median_wer": float(np.median(df["wer"])),
-                "median_cer": float(np.median(df["cer"])),
-            }
-        )
+        rank_entry = {
+            "checkpoint": label,
+            "path": path,
+            "wer": agg_wer,
+            "cer": agg_cer,
+            "median_wer": float(np.median(df["wer"])),
+            "median_cer": float(np.median(df["cer"])),
+        }
+        if ref_tone_list:
+            rank_entry["tone_cer"] = float(jiwer_cer(ref_tone_list, hyp_tone_list))
+            rank_entry["reconciled_cer"] = float(
+                jiwer_cer(ref_recon_list, hyp_recon_list)
+            )
+        ranking.append(rank_entry)
 
         clean_eval_cache(device)
         asr_model.to("cpu")

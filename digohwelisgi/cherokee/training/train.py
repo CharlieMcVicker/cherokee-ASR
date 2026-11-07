@@ -65,6 +65,19 @@ from transformers import (
     Wav2Vec2Processor,
 )
 
+from digohwelisgi.cherokee.models.dual_head import (
+    DualDataCollatorCTCWithPadding,
+    Wav2Vec2ForDualCTC,
+)
+from digohwelisgi.cherokee.orthography.tones import (
+    MORAIC_TONE_VOCAB,
+    SEGMENTAL_CV_VOCAB,
+    decode_tone_ids,
+    encode_cv_text,
+    encode_tone_tokens,
+    reconcile_dual_stream,
+    save_dual_vocabularies,
+)
 from digohwelisgi.core.audio import (
     AudioAugmentationConfig,
     AudioAugmenter,
@@ -96,8 +109,10 @@ CONFIG = {
     "ngrams": 4,
     "lmplz_path": "lmplz",  # Expected in system PATH, or specify full local path (e.g. /usr/local/bin/lmplz)
     "audio_column": None,  # Auto-detects columns like 'path', 'wav'
-    "text_column": None,  # Auto-detects columns like 'sentence', 'text'
+    "text_column": None,  # Auto-detects columns like 'cv_text', 'sentence', 'text'
     "max_steps": -1,
+    "max_train_samples": None,
+    "max_eval_samples": None,
     "batch_size": 8,
     "eval_batch_size": 8,
     "gradient_accumulation_steps": 2,
@@ -106,14 +121,17 @@ CONFIG = {
     "eval_steps": 200,
     "save_steps": 400,
     "hub_strategy": "all_checkpoints",
-    "hub_prefix": "length-only",
+    "hub_prefix": "dual-tone-moraic",
     "gradient_checkpointing": False,
+    "tone_loss_weight": 1.0,
+    "num_branch_layers": 2,
+    "vocab_tone_path": None,
     "augment": True,
     "time_stretch_min_rate": 0.9,
     "time_stretch_max_rate": 1.1,
     "time_stretch_p": 0.5,
-    "pitch_shift_min_semitones": -2.0,
-    "pitch_shift_max_semitones": 2.0,
+    "pitch_shift_min_semitones": -1.5,
+    "pitch_shift_max_semitones": 1.5,
     "pitch_shift_p": 0.5,
     "gaussian_noise_min_amplitude": 0.001,
     "gaussian_noise_max_amplitude": 0.01,
@@ -153,6 +171,7 @@ def _detect_columns(df, audio_col_override=None, text_col_override=None):
         "audio_path",
     ]
     text_candidates = [
+        "cv_text",
         "sentence",
         "text",
         "transcription",
@@ -219,52 +238,11 @@ def _resolve_audio_path(p, dataset_path):
     return p
 
 
-@dataclass
-class DataCollatorCTCWithPadding:
-    processor: Wav2Vec2Processor
-    padding: Union[bool, str] = True
-    augmenter: Optional[AudioAugmenter] = None
-    augment: bool = False
-
-    def __call__(
-        self, features: List[Dict[str, Union[List[int], torch.Tensor]]]
-    ) -> Dict[str, torch.Tensor]:
-        input_features = [{"input_values": f["input_values"]} for f in features]
-        label_features = [{"input_ids": f["labels"]} for f in features]
-
-        # Apply raw audio augmentation LIVE if enabled
-        if self.augment and self.augmenter is not None:
-            for feature in input_features:
-                audio_array = np.array(feature["input_values"], dtype=np.float32)
-                augmented_audio = self.augmenter(
-                    samples=audio_array, sample_rate=TARGET_SAMPLE_RATE
-                )
-                mean = np.mean(augmented_audio)
-                var = np.var(augmented_audio)
-                if var > 0:
-                    augmented_audio = (augmented_audio - mean) / float(
-                        np.sqrt(var + 1e-7)
-                    )
-                feature["input_values"] = augmented_audio.tolist()
-
-        batch = self.processor.pad(
-            input_features, padding=self.padding, return_tensors="pt"
-        )
-        labels_batch = self.processor.pad(
-            labels=label_features, padding=self.padding, return_tensors="pt"
-        )
-        if batch is None or labels_batch is None:
-            raise ValueError("Processor padding returned None.")
-
-        labels = labels_batch["input_ids"].masked_fill(
-            labels_batch["attention_mask"].ne(1), -100
-        )
-        batch["labels"] = labels
-        return batch  # type: ignore
+DataCollatorCTCWithPadding = DualDataCollatorCTCWithPadding
 
 
 class CTCTrainer(Trainer):
-    """Custom Trainer subclass to toggle live audio augmentation on data collator."""
+    """Custom Trainer subclass to toggle live audio augmentation and persist vocab_tone.json."""
 
     def get_train_dataloader(self):
         if hasattr(self.data_collator, "augment"):
@@ -275,6 +253,18 @@ class CTCTrainer(Trainer):
         if hasattr(self.data_collator, "augment"):
             setattr(self.data_collator, "augment", False)
         return super().get_eval_dataloader(eval_dataset)
+
+    def _save(self, output_dir: Optional[str] = None, state_dict=None):
+        super()._save(output_dir=output_dir, state_dict=state_dict)
+        target_dir = output_dir or self.args.output_dir
+        if target_dir and os.path.isdir(target_dir):
+            vocab_tone = getattr(self.model, "vocab_tone", dict(MORAIC_TONE_VOCAB))
+            vt_path = os.path.join(target_dir, "vocab_tone.json")
+            try:
+                with open(vt_path, "w", encoding="utf-8") as vf:
+                    json.dump(vocab_tone, vf, ensure_ascii=False, indent=2)
+            except Exception:
+                pass
 
 
 def parse_args():
@@ -503,6 +493,42 @@ def parse_args():
         default=CONFIG["gaussian_noise_max_amplitude"],
         help="Maximum amplitude for AddGaussianNoise (default: 0.01).",
     )
+    parser.add_argument(
+        "--base-checkpoint",
+        type=str,
+        default=CONFIG["base_checkpoint"],
+        help="Base checkpoint path or repo (default: facebook/wav2vec2-large-xlsr-53).",
+    )
+    parser.add_argument(
+        "--tone-loss-weight",
+        type=float,
+        default=CONFIG["tone_loss_weight"],
+        help="Multi-task loss weight lambda_tone for Moraic Tone CTC head (default: 1.0).",
+    )
+    parser.add_argument(
+        "--num-branch-layers",
+        type=int,
+        default=CONFIG["num_branch_layers"],
+        help="Number of top Transformer encoder layers forked into Branch A and Branch B (default: 2).",
+    )
+    parser.add_argument(
+        "--vocab-tone-path",
+        type=str,
+        default=CONFIG["vocab_tone_path"],
+        help="Optional custom path to vocab_tone.json.",
+    )
+    parser.add_argument(
+        "--max-train-samples",
+        type=int,
+        default=CONFIG["max_train_samples"],
+        help="Optional cap on training samples per domain for local smoke tests.",
+    )
+    parser.add_argument(
+        "--max-eval-samples",
+        type=int,
+        default=CONFIG["max_eval_samples"],
+        help="Optional cap on validation/test samples per domain for local smoke tests.",
+    )
     args = parser.parse_args()
 
     CONFIG["train_orig_csv"] = args.train_orig_csv
@@ -513,9 +539,12 @@ def parse_args():
     CONFIG["test_bible_csv"] = args.test_bible_csv
     CONFIG["audio_dir"] = args.audio_dir
     CONFIG["output_dir"] = args.output_dir
+    CONFIG["base_checkpoint"] = args.base_checkpoint
     CONFIG["epochs"] = args.epochs
     CONFIG["lmplz_path"] = args.lmplz_path
     CONFIG["max_steps"] = args.max_steps
+    CONFIG["max_train_samples"] = args.max_train_samples
+    CONFIG["max_eval_samples"] = args.max_eval_samples
     CONFIG["batch_size"] = args.batch_size
     CONFIG["eval_batch_size"] = args.eval_batch_size
     CONFIG["gradient_accumulation_steps"] = args.gradient_accumulation_steps
@@ -524,6 +553,9 @@ def parse_args():
     CONFIG["eval_steps"] = args.eval_steps
     CONFIG["save_steps"] = args.save_steps
     CONFIG["gradient_checkpointing"] = args.gradient_checkpointing
+    CONFIG["tone_loss_weight"] = args.tone_loss_weight
+    CONFIG["num_branch_layers"] = args.num_branch_layers
+    CONFIG["vocab_tone_path"] = args.vocab_tone_path
     CONFIG["push_to_hub"] = args.push_to_hub
     CONFIG["hub_strategy"] = args.hub_strategy
     CONFIG["hub_prefix"] = args.hub_prefix
@@ -597,7 +629,29 @@ def load_and_prepare_csvs():
             lambda p: _resolve_audio_path(p, CONFIG["audio_dir"])
         )
         df[text_col] = df[text_col].apply(normalize_text)
+        if "tone_tokens" in df.columns:
+            df["tone_tokens"] = df["tone_tokens"].fillna("").astype(str)
+        else:
+            df["tone_tokens"] = ""
+        if "canonical_toned" in df.columns:
+            df["canonical_toned"] = df["canonical_toned"].fillna("").astype(str)
+        else:
+            df["canonical_toned"] = ""
         df.dropna(subset=[audio_col, text_col], inplace=True)
+
+        max_train = CONFIG.get("max_train_samples")
+        max_eval = CONFIG.get("max_eval_samples")
+        if key.startswith("train_") and max_train is not None and int(max_train) > 0:
+            df = df.iloc[: int(max_train)].copy()
+            dfs[key] = df
+        elif (
+            (key.startswith("valid_") or key.startswith("test_"))
+            and max_eval is not None
+            and int(max_eval) > 0
+        ):
+            df = df.iloc[: int(max_eval)].copy()
+            dfs[key] = df
+
         print(f"Split {key}: {len(df)} samples")
 
     missing = [
@@ -612,23 +666,26 @@ def load_and_prepare_csvs():
 
 
 def build_vocabulary_and_processor(dfs, text_col, folder_model_files):
-    print("Building vocabulary across all 6 CSV splits...")
-    all_text = " ".join(pd.concat([df[text_col] for df in dfs.values()]).tolist())
-    vocab = sorted(set(all_text))
-    vocab_dict = {v: k for k, v in enumerate(vocab)}
-    if " " in vocab_dict:
-        vocab_dict["|"] = vocab_dict[" "]
-        del vocab_dict[" "]
-    vocab_dict["[UNK]"] = len(vocab_dict)
-    vocab_dict["[PAD]"] = len(vocab_dict)
+    print(
+        "Serializing canonical dual vocabularies (19 CV tokens, 10 Moraic Tone tokens)..."
+    )
+    vocab_path, vocab_tone_path = save_dual_vocabularies(CONFIG["output_dir"])
+    save_dual_vocabularies(folder_model_files)
+    if CONFIG.get("vocab_tone_path"):
+        custom_vt = str(CONFIG["vocab_tone_path"])
+        if os.path.exists(custom_vt) and os.path.abspath(custom_vt) != os.path.abspath(
+            str(vocab_tone_path)
+        ):
+            shutil.copy2(custom_vt, str(vocab_tone_path))
+            shutil.copy2(custom_vt, os.path.join(folder_model_files, "vocab_tone.json"))
 
-    vocab_path = os.path.join(CONFIG["output_dir"], "vocab.json")
-    with open(vocab_path, "w", encoding="utf-8") as f:
-        json.dump(vocab_dict, f, ensure_ascii=False)
-    print(f"Vocab saved (size={len(vocab_dict)}).")
+    print(
+        f"Dual vocabularies saved -> CV: {vocab_path} ({len(SEGMENTAL_CV_VOCAB)}), "
+        f"Tone: {vocab_tone_path} ({len(MORAIC_TONE_VOCAB)})."
+    )
 
     tokenizer = Wav2Vec2CTCTokenizer(
-        vocab_path,
+        str(vocab_path),
         unk_token="[UNK]",
         pad_token="[PAD]",
         word_delimiter_token="|",
@@ -644,6 +701,7 @@ def build_vocabulary_and_processor(dfs, text_col, folder_model_files):
         feature_extractor=feature_extractor,
         tokenizer=tokenizer,
     )
+    setattr(processor, "vocab_tone", dict(MORAIC_TONE_VOCAB))
     processor.save_pretrained(folder_model_files)
     print("Skipping KenLM language model building as requested.")
     return processor
@@ -656,29 +714,44 @@ def prepare_datasets(dfs, audio_col, text_col, processor):
         data_dict = {
             "audio_path": df[audio_col].tolist(),
             "sentence": df[text_col].tolist(),
+            "tone_tokens": (
+                df["tone_tokens"].fillna("").astype(str).tolist()
+                if "tone_tokens" in df.columns
+                else [""] * len(df)
+            ),
+            "canonical_toned": (
+                df["canonical_toned"].fillna("").astype(str).tolist()
+                if "canonical_toned" in df.columns
+                else [""] * len(df)
+            ),
         }
         return Dataset.from_dict(data_dict)
 
     def prepare_batch(batch):
         audio_array, sr = sf.read(batch["audio_path"])
+        if audio_array.ndim > 1:
+            audio_array = np.mean(audio_array, axis=1)
         batch["input_values"] = processor(audio_array, sampling_rate=sr).input_values[0]
         batch["input_length"] = len(batch["input_values"])
-        batch["labels"] = processor(text=batch["sentence"]).input_ids
+        batch["labels"] = encode_cv_text(batch["sentence"])
+        batch["tone_labels"] = encode_tone_tokens(batch.get("tone_tokens", ""))
         return batch
+
+    train_remove_cols = ["audio_path", "sentence", "tone_tokens", "canonical_toned"]
 
     # Prepare individual splits
     ds_train_orig = df_to_ds(dfs["train_orig"]).map(
-        prepare_batch, remove_columns=["audio_path", "sentence"], num_proc=1
+        prepare_batch, remove_columns=train_remove_cols, num_proc=1
     )
     ds_train_bible = df_to_ds(dfs["train_bible"]).map(
-        prepare_batch, remove_columns=["audio_path", "sentence"], num_proc=1
+        prepare_batch, remove_columns=train_remove_cols, num_proc=1
     )
 
     ds_valid_orig = df_to_ds(dfs["valid_orig"]).map(
-        prepare_batch, remove_columns=["audio_path", "sentence"], num_proc=1
+        prepare_batch, remove_columns=train_remove_cols, num_proc=1
     )
     ds_valid_bible = df_to_ds(dfs["valid_bible"]).map(
-        prepare_batch, remove_columns=["audio_path", "sentence"], num_proc=1
+        prepare_batch, remove_columns=train_remove_cols, num_proc=1
     )
 
     ds_test_orig = df_to_ds(dfs["test_orig"]).map(
@@ -718,22 +791,103 @@ def prepare_datasets(dfs, audio_col, text_col, processor):
     return train_ds, valid_ds, ds_test_orig, ds_test_bible
 
 
+def compute_dual_metrics(pred, processor, vocab_tone=MORAIC_TONE_VOCAB):
+    """
+    Computes multi-task evaluation metrics across both branches:
+    - `wer` and `cer` on Segmental CV predictions (all samples).
+    - `tone_cer` (Tone Error Rate / TER) strictly on tone-annotated samples (`tone_labels != -100`).
+    - `reconciled_cer` on tone-annotated samples after DP dual-stream reconciliation.
+    """
+
+    def _safe(s: str) -> str:
+        s_clean = str(s).strip()
+        return s_clean if s_clean else " "
+
+    if isinstance(pred.predictions, (tuple, list)):
+        logits_cv = pred.predictions[0]
+        logits_tone = pred.predictions[1] if len(pred.predictions) > 1 else None
+    else:
+        logits_cv = pred.predictions
+        logits_tone = None
+
+    if isinstance(pred.label_ids, (tuple, list)):
+        labels_cv = np.array(pred.label_ids[0], copy=True)
+        labels_tone = (
+            np.array(pred.label_ids[1], copy=True) if len(pred.label_ids) > 1 else None
+        )
+    else:
+        labels_cv = np.array(pred.label_ids, copy=True)
+        labels_tone = None
+
+    pred_cv_ids = np.argmax(logits_cv, axis=-1)
+    pad_id = processor.tokenizer.pad_token_id
+    labels_cv[labels_cv == -100] = pad_id
+
+    pred_str = processor.batch_decode(pred_cv_ids)
+    label_str = processor.batch_decode(labels_cv, group_tokens=False)
+
+    safe_preds = [_safe(p) for p in pred_str]
+    safe_refs = [_safe(r) for r in label_str]
+    wer = float(jiwer_wer(safe_refs, safe_preds))
+    cer = float(jiwer_cer(safe_refs, safe_preds))
+
+    tone_cer = cer
+    reconciled_cer = cer
+
+    if logits_tone is not None and labels_tone is not None:
+        valid_mask = (labels_tone != -100).any(axis=-1)
+        if np.any(valid_mask):
+            hyp_tones: List[str] = []
+            ref_tones: List[str] = []
+            hyp_recons: List[str] = []
+            ref_recons: List[str] = []
+
+            for idx in np.where(valid_mask)[0]:
+                pred_t_ids = np.argmax(logits_tone[idx], axis=-1).tolist()
+                hyp_t = decode_tone_ids(
+                    pred_t_ids,
+                    vocab=vocab_tone,
+                    collapse_repeats=True,
+                    remove_pad=True,
+                )
+                ref_t_ids = [int(t) for t in labels_tone[idx] if int(t) >= 0]
+                ref_t = decode_tone_ids(
+                    ref_t_ids,
+                    vocab=vocab_tone,
+                    collapse_repeats=False,
+                    remove_pad=True,
+                )
+
+                hyp_tones.append(_safe(hyp_t))
+                ref_tones.append(_safe(ref_t))
+
+                hyp_rec = reconcile_dual_stream(pred_str[idx], hyp_t, mode="dp")
+                ref_rec = reconcile_dual_stream(label_str[idx], ref_t, mode="dp")
+                hyp_recons.append(_safe(hyp_rec))
+                ref_recons.append(_safe(ref_rec))
+
+            tone_cer = float(jiwer_cer(ref_tones, hyp_tones))
+            reconciled_cer = float(jiwer_cer(ref_recons, hyp_recons))
+
+    return {
+        "wer": wer,
+        "cer": cer,
+        "tone_cer": tone_cer,
+        "reconciled_cer": reconciled_cer,
+    }
+
+
 def initialize_model_and_trainer(processor, train_ds, valid_ds, folder_model_files):
-    wer_metric = evaluate.load("wer")
-    cer_metric = evaluate.load("cer")
+    vocab_tone = getattr(processor, "vocab_tone", dict(MORAIC_TONE_VOCAB))
 
     def compute_metrics(pred):
-        pred_logits = pred.predictions
-        pred_ids = np.argmax(pred_logits, axis=-1)
-        pred.label_ids[pred.label_ids == -100] = processor.tokenizer.pad_token_id
-        pred_str = processor.batch_decode(pred_ids)
-        label_str = processor.batch_decode(pred.label_ids, group_tokens=False)
-        wer = wer_metric.compute(predictions=pred_str, references=label_str)
-        cer = cer_metric.compute(predictions=pred_str, references=label_str)
-        return {"wer": wer, "cer": cer}
+        return compute_dual_metrics(pred, processor, vocab_tone=vocab_tone)
 
-    print(f"Loading base checkpoint: {CONFIG['base_checkpoint']}")
-    model = Wav2Vec2ForCTC.from_pretrained(
+    print(
+        f"Loading base checkpoint into Wav2Vec2ForDualCTC: {CONFIG['base_checkpoint']} "
+        f"(num_branch_layers={CONFIG['num_branch_layers']}, tone_loss_weight={CONFIG['tone_loss_weight']})"
+    )
+    model = Wav2Vec2ForDualCTC.from_pretrained(
         CONFIG["base_checkpoint"],
         attention_dropout=0.1,
         hidden_dropout=0.1,
@@ -741,11 +895,18 @@ def initialize_model_and_trainer(processor, train_ds, valid_ds, folder_model_fil
         mask_time_prob=0.05,
         layerdrop=0.1,
         ctc_loss_reduction="mean",
+        ctc_zero_infinity=True,
         pad_token_id=processor.tokenizer.pad_token_id,
         vocab_size=len(processor.tokenizer),
+        num_branch_layers=int(CONFIG.get("num_branch_layers", 2)),
+        tone_vocab_size=len(vocab_tone),
+        tone_pad_token_id=int(vocab_tone["[PAD]"]),
+        tone_loss_weight=float(CONFIG.get("tone_loss_weight", 1.0)),
+        ignore_mismatched_sizes=True,
     )
+    setattr(model, "vocab_tone", vocab_tone)
 
-    model.freeze_feature_encoder()  # type: ignore
+    model.freeze_feature_encoder()
 
     training_args = TrainingArguments(
         output_dir=folder_model_files,
@@ -763,8 +924,10 @@ def initialize_model_and_trainer(processor, train_ds, valid_ds, folder_model_fil
         save_total_limit=20,
         logging_steps=100,
         load_best_model_at_end=True,
-        metric_for_best_model="wer",
+        metric_for_best_model="tone_cer",
         greater_is_better=False,
+        label_names=["labels", "tone_labels"],
+        remove_unused_columns=False,
         group_by_length=True,
         length_column_name="input_length",
         report_to="none",
@@ -948,8 +1111,13 @@ def evaluate_checkpoints_dual(
     )
 
     # Summarize best checkpoints on original test set
+    sort_cols = (
+        ["tone_cer", "reconciled_cer", "wer", "cer"]
+        if "tone_cer" in ranking_orig.columns
+        else ["wer", "cer", "median_wer", "median_cer"]
+    )
     ranking_orig = ranking_orig.sort_values(
-        by=["wer", "cer", "median_wer", "median_cer"],
+        by=sort_cols,
         ascending=True,
     ).reset_index(drop=True)
     best_ckpt_label = str(ranking_orig.iloc[0]["checkpoint"])
@@ -966,9 +1134,16 @@ def evaluate_checkpoints_dual(
 
     print(f"\n==========================================")
     print(f"ORIGINAL TEST SET EVALUATION SUMMARY:")
-    print(
-        f"Best Checkpoint: {best_ckpt_label} (WER: {best_wer:.4f}, CER: {best_cer:.4f})"
-    )
+    if "tone_cer" in ranking_orig.columns:
+        best_tcer = float(ranking_orig.iloc[0]["tone_cer"])
+        best_rcer = float(ranking_orig.iloc[0]["reconciled_cer"])
+        print(
+            f"Best Checkpoint: {best_ckpt_label} (TER: {best_tcer:.4f}, Reconciled CER: {best_rcer:.4f}, WER: {best_wer:.4f}, CER: {best_cer:.4f})"
+        )
+    else:
+        print(
+            f"Best Checkpoint: {best_ckpt_label} (WER: {best_wer:.4f}, CER: {best_cer:.4f})"
+        )
     print(f"==========================================\n")
 
     return (
@@ -1005,6 +1180,7 @@ def promote_best_checkpoint(
         print("Promoted checkpoint is already the root model directory.")
 
     processor.save_pretrained(folder_model_files)
+    save_dual_vocabularies(folder_model_files)
     print(f"Promoted {best_ckpt_label} to final model directory.")
 
 

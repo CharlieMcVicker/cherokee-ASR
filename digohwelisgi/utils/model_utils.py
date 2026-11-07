@@ -3,9 +3,12 @@ import os
 from typing import Any, Optional, Tuple, Union
 
 import torch
-from transformers import Wav2Vec2ForCTC, Wav2Vec2Processor
+from transformers import Wav2Vec2Config, Wav2Vec2ForCTC, Wav2Vec2Processor
 
-_MODEL_CACHE: dict[tuple[Any, ...], tuple[Wav2Vec2ForCTC, Wav2Vec2Processor, str]] = {}
+from digohwelisgi.cherokee.models.dual_head import Wav2Vec2ForDualCTC
+from digohwelisgi.cherokee.orthography.tones import MORAIC_TONE_VOCAB
+
+_MODEL_CACHE: dict[tuple[Any, ...], tuple[Any, Wav2Vec2Processor, str]] = {}
 
 
 def get_best_model_config(config_filename: str = "best_model.json") -> dict[str, str]:
@@ -83,7 +86,30 @@ def get_model(
         load_kwargs["revision"] = revision
 
     processor: Any = Wav2Vec2Processor.from_pretrained(proc_path, **load_kwargs)
-    model: Any = Wav2Vec2ForCTC.from_pretrained(path_or_repo, **load_kwargs)
+    try:
+        cfg = Wav2Vec2Config.from_pretrained(path_or_repo, **load_kwargs)
+        archs = getattr(cfg, "architectures", None) or []
+        is_dual = "Wav2Vec2ForDualCTC" in archs or hasattr(cfg, "tone_vocab_size")
+    except Exception:
+        is_dual = False
+
+    if is_dual:
+        model: Any = Wav2Vec2ForDualCTC.from_pretrained(path_or_repo, **load_kwargs)
+        vocab_tone = dict(MORAIC_TONE_VOCAB)
+        for cand_dir in (proc_path, path_or_repo):
+            if cand_dir and os.path.isdir(str(cand_dir)):
+                vt_path = os.path.join(str(cand_dir), "vocab_tone.json")
+                if os.path.exists(vt_path):
+                    try:
+                        with open(vt_path, "r", encoding="utf-8") as vf:
+                            vocab_tone = json.load(vf)
+                        break
+                    except Exception:
+                        pass
+        setattr(model, "vocab_tone", vocab_tone)
+        setattr(processor, "vocab_tone", vocab_tone)
+    else:
+        model = Wav2Vec2ForCTC.from_pretrained(path_or_repo, **load_kwargs)
 
     if eval_mode:
         model.eval()

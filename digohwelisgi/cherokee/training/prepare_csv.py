@@ -12,7 +12,13 @@ import random
 import wave
 import contextlib
 import csv
-from digohwelisgi.cherokee.orthography import remove_tones_and_double_vowels
+from pathlib import Path
+from digohwelisgi.cherokee.orthography import (
+    clean_punctuation_and_whitespace,
+    save_dual_vocabularies,
+    to_canonical_toned_tth,
+    to_moraic_tone_tokens,
+)
 
 
 def clean_transcription(text):
@@ -187,45 +193,30 @@ def main():
         if size is None or dur is None:
             continue
 
-        # 2. Reformat transcription
+        # 2. Reformat transcription into canonical toned TTH, cv_text, and tone_tokens
         raw_text = row[args.text_col]
+        raw_syl = row.get("syllabary", "") or ""
         if raw_text is None:
             continue
-        if isinstance(raw_text, str):
-            # First step: drop wordfinal ';' and replace word medial ';' with ':'
-            words = raw_text.split()
-            processed_words = []
-            for w in words:
-                stripped = w.rstrip(";")
-                processed_words.append(stripped.replace(";", ":"))
-            raw_text = " ".join(processed_words)
 
-            raw_text = raw_text.lower().replace("*", "").replace("ʔ", "'")
-            for char in ["ʼ", "‚"]:
-                raw_text = raw_text.replace(char, "")
-        norm_text, should_drop = remove_tones_and_double_vowels(raw_text)
-        if should_drop or norm_text is None:
+        canonical_toned, should_drop = to_canonical_toned_tth(
+            str(raw_text), syllabary=str(raw_syl)
+        )
+        if should_drop or not canonical_toned:
             dropped_tone_count += 1
             continue
 
-        # Clean colons
-        norm_text = norm_text.replace(":", "")
-        if not args.strip_colons:
-            # Replace doubled vowels VV with V: for long vowels when colons requested
-            for v in ["a", "e", "i", "o", "u", "v"]:
-                norm_text = norm_text.replace(v + v, v + ":")
-        cleaned_text = clean_transcription(norm_text)
-
-        if cleaned_text == "":
-            empty_transcripts += 1
-            continue
-
         # Drop rows containing 'f' or 'b'
-        if "f" in cleaned_text:
+        if "f" in canonical_toned:
             dropped_f_count += 1
             continue
-        if "b" in cleaned_text:
+        if "b" in canonical_toned:
             dropped_b_count += 1
+            continue
+
+        cv_text, tone_tokens = to_moraic_tone_tokens(canonical_toned)
+        if not cv_text or not tone_tokens:
+            empty_transcripts += 1
             continue
 
         # 3. Filter by duration
@@ -233,7 +224,16 @@ def main():
             duration_filtered += 1
             continue
 
-        valid_samples.append({"path": filepath, "sentence": cleaned_text})
+        cleaned_syl = clean_punctuation_and_whitespace(str(raw_syl).replace("*", ""))
+        valid_samples.append(
+            {
+                "path": filepath,
+                "cv_text": cv_text,
+                "tone_tokens": tone_tokens,
+                "canonical_toned": canonical_toned,
+                "syllabary": cleaned_syl,
+            }
+        )
 
     if missing_count > 0:
         print(
@@ -286,18 +286,45 @@ def main():
     def write_csv(data, filename):
         with open(filename, mode="w", encoding="utf-8", newline="") as out_f:
             writer = csv.writer(out_f)
-            writer.writerow(["path", "sentence"])
+            writer.writerow(["path", "cv_text", "tone_tokens", "canonical_toned"])
             for item in data:
-                writer.writerow([item["path"], item["sentence"]])
+                writer.writerow(
+                    [
+                        item["path"],
+                        item["cv_text"],
+                        item["tone_tokens"],
+                        item["canonical_toned"],
+                    ]
+                )
 
     print(f"\nWriting output CSV files...")
     write_csv(train_data, train_csv)
     write_csv(valid_data, valid_csv)
     write_csv(test_data, test_csv)
 
+    # Also update split_audio_syl_target.csv and dual vocabularies in the output directory
+    out_dir = Path(args.output_prefix).parent
+    syl_target_csv = out_dir / "split_audio_syl_target.csv"
+    with open(syl_target_csv, mode="w", encoding="utf-8", newline="") as syl_f:
+        syl_writer = csv.writer(syl_f)
+        syl_writer.writerow(["split", "audio_path", "syllabary", "target"])
+        for split_name, split_rows in [
+            ("train", train_data),
+            ("valid", valid_data),
+            ("test", test_data),
+        ]:
+            for item in split_rows:
+                syl_writer.writerow(
+                    [split_name, item["path"], item["syllabary"], item["cv_text"]]
+                )
+
+    vocab_cv_path, vocab_tone_path = save_dual_vocabularies(out_dir)
+
     print(f"Generated: {train_csv}")
     print(f"Generated: {valid_csv}")
     print(f"Generated: {test_csv}")
+    print(f"Generated: {syl_target_csv}")
+    print(f"Generated: {vocab_cv_path} and {vocab_tone_path}")
     print("Done!")
 
 

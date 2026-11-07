@@ -18,12 +18,14 @@ from digohwelisgi.cherokee.orthography.syllabary_map import (
     syllabary_to_phonetics,
 )
 from digohwelisgi.cherokee.orthography.tones import (
+    resolve_vowel_hiatus,
     respell_consonants,
+    standardize_glottal_stops,
     strip_tones_and_colons,
 )
 
 PUNCTUATION_REGEX = r"[\,\?\.\!\-\;\:\"\“\%\”\(\)\[\]\{\}«»…\´\‛]"
-GLOTTAL_VARIANTS_REGEX = r"[\’\‘\ʼ\ʻ\`]"
+GLOTTAL_VARIANTS_REGEX = r"[\’\‘\ʼ\ʻ\`\ʔ\‚]"
 VOWELS: Set[str] = set("aeiouvAEIOUV")
 
 
@@ -113,10 +115,12 @@ def convert_orthography(
                 out = respell_consonants(out)
                 if not contextual_preaspiration:
                     out = re.sub(r"(?<![ht])\b(s)", r"h\1", out)
-                out = re.sub(r"([aeiouvAEIOUV])(?=[aeiouvAEIOUV])", r"\1'", out)
+                out = resolve_vowel_hiatus(out)
+                out = standardize_glottal_stops(out)
                 return clean_punctuation_and_whitespace(out)
             if target == Orthography.DG:
-                out = re.sub(r"([aeiouvAEIOUV])(?=[aeiouvAEIOUV])", r"\1'", t)
+                out = resolve_vowel_hiatus(t)
+                out = standardize_glottal_stops(out)
                 return clean_punctuation_and_whitespace(out)
 
     elif source == Orthography.DG:
@@ -129,7 +133,8 @@ def convert_orthography(
             out = respell_consonants(out)
             if not contextual_preaspiration:
                 out = re.sub(r"(?<![ht])\b(s)", r"h\1", out)
-            out = re.sub(r"([aeiouvAEIOUV])(?=[aeiouvAEIOUV])", r"\1'", out)
+            out = resolve_vowel_hiatus(out)
+            out = standardize_glottal_stops(out)
             return clean_punctuation_and_whitespace(out)
 
     elif source == Orthography.TTH:

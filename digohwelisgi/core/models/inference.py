@@ -261,7 +261,12 @@ def infer_emissions(
 
     target_device = _resolve_device(device, model)
 
-    if str(target_device) == "mps" and hasattr(model, "wav2vec2"):
+    logits_tone: Optional[torch.Tensor] = None
+    if (
+        str(target_device) == "mps"
+        and hasattr(model, "wav2vec2")
+        and not hasattr(model, "tone_lm_head")
+    ):
         # PyTorch MPS conv1d has a hard limitation where sequence lengths > 65k samples fail with NotImplementedError.
         # Compute lightweight 7-layer feature extraction on CPU, run heavy 24-layer Transformer on MPS.
         try:
@@ -282,12 +287,16 @@ def infer_emissions(
             model.to(fallback_device)
             input_tensor = input_tensor.to(fallback_device)
             with torch.no_grad():
-                logits = model(input_tensor).logits
+                model_out = model(input_tensor)
+                logits = model_out.logits
+                logits_tone = getattr(model_out, "logits_tone", None)
     else:
         input_tensor = input_tensor.to(target_device)
         try:
             with torch.no_grad():
-                logits = model(input_tensor).logits
+                model_out = model(input_tensor)
+                logits = model_out.logits
+                logits_tone = getattr(model_out, "logits_tone", None)
         except NotImplementedError as e:
             if str(target_device) == "mps":
                 logger.warning(
@@ -297,14 +306,26 @@ def infer_emissions(
                 model.to(fallback_device)
                 input_tensor = input_tensor.to(fallback_device)
                 with torch.no_grad():
-                    logits = model(input_tensor).logits
+                    model_out = model(input_tensor)
+                    logits = model_out.logits
+                    logits_tone = getattr(model_out, "logits_tone", None)
             else:
                 raise e
 
     if logits.ndim == 3:
         logits = logits.squeeze(0)
+    if logits_tone is not None and logits_tone.ndim == 3:
+        logits_tone = logits_tone.squeeze(0)
 
     lpz = torch.nn.functional.log_softmax(logits, dim=-1).cpu().numpy()
+    lpz_tone: Optional[np.ndarray] = None
+    vocab_tone: Optional[Mapping[str, int]] = None
+    if logits_tone is not None:
+        lpz_tone = torch.nn.functional.log_softmax(logits_tone, dim=-1).cpu().numpy()
+        vocab_tone = getattr(
+            model, "vocab_tone", getattr(processor, "vocab_tone", None)
+        )
+
     vocab, metadata = extract_vocab_and_metadata(processor)
     metadata["sample_rate"] = TARGET_SAMPLE_RATE
     metadata["duration_sec"] = round(len(speech) / TARGET_SAMPLE_RATE, 4)
@@ -314,6 +335,8 @@ def infer_emissions(
         vocab=vocab,
         frame_duration_sec=FRAME_DURATION_SEC,
         metadata=metadata,
+        lpz_tone=lpz_tone,
+        vocab_tone=vocab_tone,
     )
 
     if cache_path is not None:
@@ -414,14 +437,15 @@ def infer_emissions_batch(
             attention_mask = attention_mask.to(target_device)
 
         batch_logits: Optional[torch.Tensor] = None
+        batch_logits_tone: Optional[torch.Tensor] = None
         try:
             with torch.no_grad():
                 if attention_mask is not None:
-                    batch_logits = model(
-                        input_values, attention_mask=attention_mask
-                    ).logits
+                    m_out = model(input_values, attention_mask=attention_mask)
                 else:
-                    batch_logits = model(input_values).logits
+                    m_out = model(input_values)
+                batch_logits = m_out.logits
+                batch_logits_tone = getattr(m_out, "logits_tone", None)
         except Exception as e:
             err_str = str(e).lower()
             is_oom = "out of memory" in err_str or (
@@ -461,11 +485,11 @@ def infer_emissions_batch(
                     attention_mask = attention_mask.to(target_device)
                 with torch.no_grad():
                     if attention_mask is not None:
-                        batch_logits = model(
-                            input_values, attention_mask=attention_mask
-                        ).logits
+                        m_out = model(input_values, attention_mask=attention_mask)
                     else:
-                        batch_logits = model(input_values).logits
+                        m_out = model(input_values)
+                    batch_logits = m_out.logits
+                    batch_logits_tone = getattr(m_out, "logits_tone", None)
             else:
                 raise e
 
@@ -487,12 +511,22 @@ def infer_emissions_batch(
         else:
             output_lengths = [batch_logits.shape[1]] * batch_logits.shape[0]
 
+        vocab_tone_batch = getattr(
+            model, "vocab_tone", getattr(processor, "vocab_tone", None)
+        )
+
         for b_i, global_idx in enumerate(curr_miss_indices):
             actual_len = int(output_lengths[b_i])
             sliced_logits = batch_logits[b_i, :actual_len, :]
             sliced_lpz = (
                 torch.nn.functional.log_softmax(sliced_logits, dim=-1).cpu().numpy()
             )
+            sliced_lpz_tone: Optional[np.ndarray] = None
+            if batch_logits_tone is not None:
+                sliced_t = batch_logits_tone[b_i, :actual_len, :]
+                sliced_lpz_tone = (
+                    torch.nn.functional.log_softmax(sliced_t, dim=-1).cpu().numpy()
+                )
 
             item_metadata = dict(metadata)
             sp_len = len(batch_speech[b_i])
@@ -504,6 +538,8 @@ def infer_emissions_batch(
                 vocab=vocab,
                 frame_duration_sec=FRAME_DURATION_SEC,
                 metadata=item_metadata,
+                lpz_tone=sliced_lpz_tone,
+                vocab_tone=vocab_tone_batch if sliced_lpz_tone is not None else None,
             )
             outputs[global_idx] = out_item
 
@@ -614,6 +650,8 @@ def infer_emissions_sliding_window(
     cur_start = 0
     total_samples = len(speech)
     lpz_list: List[np.ndarray] = []
+    lpz_tone_list: List[np.ndarray] = []
+    vocab_tone_sw: Optional[Mapping[str, int] | Mapping[int, str]] = None
     target_device = _resolve_device(device, model)
     vocab, metadata = extract_vocab_and_metadata(processor)
 
@@ -647,6 +685,14 @@ def infer_emissions_sliding_window(
         trimmed_lpz = chunk_lpz[left_idx:right_idx]
         lpz_list.append(trimmed_lpz)
 
+        if chunk_out.lpz_tone is not None:
+            chunk_lpz_tone = chunk_out.lpz_tone
+            if chunk_lpz_tone.ndim == 3:
+                chunk_lpz_tone = chunk_lpz_tone[0]
+            lpz_tone_list.append(chunk_lpz_tone[left_idx:right_idx])
+            if vocab_tone_sw is None:
+                vocab_tone_sw = chunk_out.vocab_tone
+
         if is_last:
             break
         cur_start += step_samples
@@ -656,6 +702,10 @@ def infer_emissions_sliding_window(
     else:
         stitched_lpz = np.concatenate(lpz_list, axis=0)
 
+    stitched_lpz_tone: Optional[np.ndarray] = (
+        np.concatenate(lpz_tone_list, axis=0) if lpz_tone_list else None
+    )
+
     metadata["sample_rate"] = TARGET_SAMPLE_RATE
     metadata["duration_sec"] = round(len(speech) / TARGET_SAMPLE_RATE, 4)
 
@@ -664,6 +714,8 @@ def infer_emissions_sliding_window(
         vocab=vocab,
         frame_duration_sec=FRAME_DURATION_SEC,
         metadata=metadata,
+        lpz_tone=stitched_lpz_tone,
+        vocab_tone=vocab_tone_sw,
     )
 
     if cache_path is not None:

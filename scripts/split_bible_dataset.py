@@ -17,6 +17,8 @@ import statistics
 from pathlib import Path
 from typing import Any, Dict, List
 
+from digohwelisgi.cherokee.orthography import normalize_standard2_cv
+
 # Define Chapter allocations per book
 # Target ~80% Train, ~10% Valid, ~10% Test without leaking chapters.
 CHAPTER_SPLITS = {
@@ -123,9 +125,12 @@ def main():
         idx = int(r.get("verse_idx", 0))
         wav_path = f"cherokee_new_testament/split_audio/{book}_{ch:02d}_{idx:02d}.wav"
         emitted = (r.get("greedy_hypothesis") or r.get("emitted_text") or "").strip()
-        sentence = (r.get("reconciled_phonetics") or emitted).strip()
+        raw_sentence = (r.get("reconciled_phonetics") or emitted).strip()
+        cv_text = normalize_standard2_cv(raw_sentence)
+        if not cv_text:
+            continue
 
-        row = {"path": wav_path, "sentence": sentence}
+        row = {"path": wav_path, "cv_text": cv_text, "tone_tokens": ""}
         if book not in book_rows:
             book_rows[book] = []
         book_rows[book].append(row)
@@ -155,7 +160,7 @@ def main():
     for book, rows in book_rows.items():
         csv_path = Path(args.train_csvs_dir) / f"{book}.csv"
         with open(csv_path, "w", newline="", encoding="utf-8") as f:
-            writer = csv.DictWriter(f, fieldnames=["path", "sentence"])
+            writer = csv.DictWriter(f, fieldnames=["path", "cv_text", "tone_tokens"])
             writer.writeheader()
             writer.writerows(rows)
         print(f"Saved {csv_path}: {len(rows)} verses")
@@ -171,7 +176,7 @@ def main():
         (test_out, test_rows),
     ]:
         with open(path, "w", newline="", encoding="utf-8") as f:
-            writer = csv.DictWriter(f, fieldnames=["path", "sentence"])
+            writer = csv.DictWriter(f, fieldnames=["path", "cv_text", "tone_tokens"])
             writer.writeheader()
             writer.writerows(rows)
         pct = len(rows) / len(accepted_records) * 100 if accepted_records else 0

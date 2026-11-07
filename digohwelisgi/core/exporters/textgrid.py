@@ -198,9 +198,12 @@ def export_textgrid(
     pad_sec: float = 0.10,
     source_metadata: Optional[Dict[str, Dict[str, Any]]] = None,
     additional_word_tiers: Optional[Mapping[str, Sequence[WordInterval]]] = None,
+    tone_intervals: Optional[Sequence[WordInterval]] = None,
+    tone_tier_name: str = "Moraic Tones",
 ) -> str:
     """
-    Generates Praat TextGrid with Chunks, Words, Padded Words, custom additional word tiers, and optional Emissions tiers.
+    Generates Praat TextGrid with Chunks, Words, Padded Words, custom additional word tiers,
+    optional Moraic Tones tier, and optional Emissions tiers.
 
     Args:
         alignment: AlignmentOutput object.
@@ -209,6 +212,8 @@ def export_textgrid(
         pad_sec: Padding seconds added to words for the Padded Words tier.
         source_metadata: Optional chunk metadata dictionary.
         additional_word_tiers: Optional mapping of tier name to Sequence of WordIntervals.
+        tone_intervals: Optional sequence of WordIntervals representing moraic tone tokens per word/span.
+        tone_tier_name: Name of the moraic tone tier (default: "Moraic Tones").
 
     Returns:
         Absolute or relative path to the generated TextGrid file.
@@ -224,6 +229,8 @@ def export_textgrid(
         for word_seq in additional_word_tiers.values():
             if word_seq:
                 total_end = max(total_end, max(w.end_sec for w in word_seq))
+    if tone_intervals:
+        total_end = max(total_end, max(w.end_sec for w in tone_intervals))
     if total_end <= 0.0:
         total_end = 1.0
 
@@ -271,6 +278,15 @@ def export_textgrid(
             ]
             tier_intervals = build_contiguous_intervals(tier_raw, total_end)
             builder.create_tier(tier_name, tier_intervals)
+
+    if tone_intervals:
+        tone_raw = [
+            {"start_sec": w.start_sec, "end_sec": w.end_sec, "text": w.word}
+            for w in tone_intervals
+            if w.word and w.word.strip()
+        ]
+        tone_contig = build_contiguous_intervals(tone_raw, total_end)
+        builder.create_tier(tone_tier_name, tone_contig)
 
     raw_token_items = [
         {
