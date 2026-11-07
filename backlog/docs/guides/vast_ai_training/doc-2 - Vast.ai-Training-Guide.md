@@ -3,90 +3,87 @@ id: doc-2
 title: Vast.ai Training Guide
 type: guide
 created_date: '2026-06-30 23:22'
-updated_date: '2026-06-30 23:52'
+updated_date: '2026-11-07 15:10'
 ---
-# Vast.ai Training Guide for Wav2Vec2
+# Vast.ai Training Guide for Cherokee Wav2Vec2 ASR
 
-This guide outlines the process for conducting a Wav2Vec2 training run on a remote GPU instance using **vast.ai**.
+This guide outlines the standard operating procedure for running Wav2Vec2 fine-tuning on a remote GPU instance using **vast.ai** and our dedicated Docker image (`charliemcvicker/asr:latest`).
 
-## 1. Prebaking Dependencies into a Custom Docker Image (Optional but Recommended) 🐳
+---
 
-Instead of compiling KenLM and installing Python packages from scratch on every run, you can build a prebaked Docker image using the provided [Dockerfile](file:///Users/charlesmcvicker/code/workshop-transcription/Dockerfile). This saves time, reduces setup costs, and ensures a completely consistent environment.
+## 1. Our Custom Docker Image (`charliemcvicker/asr:latest`) 🐳
+
+We train using our project's custom Docker image, built from the root [Dockerfile](file:///Users/julietmcvicker/code/workshop-transcription/Dockerfile). 
+
+### What is Prebaked in the Image:
+1. **Base Runtime**: `pytorch/pytorch:2.3.1-cuda12.1-cudnn8-runtime` with CUDA 12.1.
+2. **Audio & CTC Libraries**: Custom `ctc-segmentation`, `torchaudio`, `audiomentations`, `soundfile`, `librosa`, `jiwer`, `evaluate`, `transformers`.
+3. **Pre-cached Foundation Model**: `facebook/wav2vec2-large-xlsr-53` is pre-downloaded into the image cache during build (`RUN python3 -c "from transformers import Wav2Vec2ForCTC; Wav2Vec2ForCTC.from_pretrained('facebook/wav2vec2-large-xlsr-53')"`). This eliminates remote cold-start download delays on Vast.ai.
+4. **Codebase Packages**: `digohwelisgi` package and `scripts/` are baked into `/workspace` with `PYTHONPATH="/workspace:${PYTHONPATH}"`.
 
 ### Building & Pushing the Image:
-Run these commands locally (requires Docker installed and a Docker Hub account):
+When codebase architecture, model definitions (`Wav2Vec2ForDualCTC`), or dependencies change, rebuild and push the image locally:
 ```bash
-# 1. Build the image
-docker build -t your-docker-username/asr-w2v2-lm-prebaked:latest .
+# 1. Build the image locally
+docker build -t charliemcvicker/asr:latest .
 
 # 2. Push to Docker Hub
-docker push your-docker-username/asr-w2v2-lm-prebaked:latest
+docker push charliemcvicker/asr:latest
 ```
 
 ---
 
-## 2. Configuring Private Registry Credentials on Vast.ai 🔒
-
-If you push your Docker image to a private repository on Docker Hub, GitHub Container Registry (GHCR), or another provider, you must configure Vast.ai with your registry credentials so it can pull the image:
-
-1. Log in to the [Vast.ai Console](https://vast.ai/).
-2. Navigate to the **[Account settings page](https://vast.ai/console/account/)**.
-3. Locate the **Docker Registry Login** section.
-4. Enter your registry information:
-   - **Registry**: For Docker Hub, use `index.docker.io` (or leave empty if it defaults to Docker Hub). For GitHub, use `ghcr.io`.
-   - **Username**: Your registry username.
-   - **Password**: Your password or Personal Access Token (for security, it's best to use a read-only Access Token).
-5. Click **Log In / Save**.
-
----
-
-## 3. Instance Selection and Launch
+## 2. Vast.ai Template Configuration & Instance Selection
 
 1. **Sign in to Vast.ai**: Go to [Vast.ai Console](https://vast.ai/).
 2. **Template Configuration**:
-   - Choose a GPU instance with **at least 24 GB of VRAM** (e.g., RTX 3090, RTX 4090, or A6000) to ensure large batch sizes and stability during CTC loss calculation.
-   - Set the Docker Image to: `your-docker-username/asr-w2v2-lm-prebaked:latest` (or `rolandocoto/asr-w2v2-lm-python310` if you prefer to install manually).
-   - Ensure the disk allocation is **at least 50 GB** to accommodate the raw audio files, datasets, intermediate KenLM outputs, and multiple model checkpoints.
-   - Select **Use SSH** (recommended) or **Jupyter Lab** for remote access.
-3. **Launch the Instance** and note down the connection details:
-   - **IP Address**: `[IP]`
-   - **Port**: `[PORT]`
+   * **Docker Image**: `charliemcvicker/asr:latest`
+   * **Disk Allocation**: **At least 50 GB** (accommodates remote audio downloads, Hugging Face transformers cache, and intermediate ~4.5 GB model checkpoints).
+   * **Launch Mode**: Select **Use SSH** (recommended).
+3. **GPU Hardware Recommendation**:
+   * Choose an instance with **at least 24 GB of VRAM** (e.g., RTX 3090, RTX 4090, RTX A5000, or A6000) to ensure large batch sizes ($\ge 8$), stability during dual-head CTC loss calculation, and fast execution.
+4. **Launch the Instance** and note down connection details:
+   * **IP Address**: `[IP]`
+   * **Port**: `[PORT]`
 
 ---
 
-## 4. Fetching Training Data from Hugging Face Hub 🚀
+## 3. Remote Data Fetching (Zero Audio Re-uploading) 🚀
 
-Instead of manually transferring gigabytes of audio files via `scp` or baking them into the Docker image, the training dataset is hosted on Hugging Face Hub (`charliemcvicker/cherokee-asr-data`).
+The raw audio files (462 MB) are hosted on Hugging Face Hub (`charliemcvicker/cherokee-asr-data`). You do **not** need to re-package or re-upload audio when labels change.
 
-Inside your remote vast.ai instance (`/workspace`), fetch the dataset using the automated, idempotent fetch script:
+Inside your remote Vast.ai SSH session:
 
 ```bash
-# If the Hugging Face repository is private, export your token first:
-export HF_TOKEN="hf_your_hugging_face_token_here"
+# 1. Connect via SSH
+ssh -p [PORT] root@[IP]
 
-# Fetch all training splits and referenced audio (462 MB, ~10 seconds):
-python3 scripts/fetch_training_data.py
+# 2. Navigate to workspace
+cd /workspace
+
+# 3. Pull latest git branch containing updated split CSVs and tokenizers
+git clone -b feature/dual-head-tone-asr https://github.com/CharlieMcVicker/workshop-transcription.git repo
+cd /workspace/repo
+
+# 4. Set environment
+export HF_TOKEN="hf_your_hugging_face_token_here"
+export PYTHONPATH="/workspace/repo:${PYTHONPATH}"
+
+# 5. Fetch 462 MB remote audio without clobbering updated local CSV splits
+python3 scripts/fetch_training_data.py --preserve-local-csvs
 ```
 
-The script automatically downloads and unpacks the exact directory structure into `/workspace/data`:
-- `data/training/processed/chr-wav2vec2-*.csv`
-- `data/training/processed/bible-wav2vec2-*.csv`
-- `data/training/processed/sentence_audio/`
+The script downloads and unpacks:
+- `data/training/processed/sentence_audio/` (1,482 files)
 - `data/projects/cherokee_new_testament/split_audio/`
 
-*(Note: The fetch script is idempotent—if the dataset is already present on a persistent volume mount, it immediately skips downloading).*
+*(Note: `--preserve-local-csvs` ensures the newly generated git-tracked CSV labels on disk are not overwritten by the older CSVs in the remote audio archive).*
 
 ---
 
-## 5. Remote Setup & Verification
+## 4. Remote Environment Sanity Check
 
-SSH into your rented instance:
-
-```bash
-ssh -p [PORT] root@[IP]
-```
-
-Once connected, run the following verification checks:
+Once connected, run quick verification checks inside the container:
 
 1. **Verify GPU Status**:
    ```bash
@@ -94,86 +91,75 @@ Once connected, run the following verification checks:
    ```
 2. **Verify CUDA availability in PyTorch**:
    ```bash
-   python3 -c "import torch; print('CUDA active:', torch.cuda.is_available()); print('Device count:', torch.cuda.device_count())"
+   python3 -c "import torch; print('CUDA active:', torch.cuda.is_available()); print('Device:', torch.cuda.get_device_name(0))"
    ```
-3. **Verify Dependencies / Build Tools (Only needed if NOT using the prebaked image)**:
-   If some Python dependencies or KenLM builds are missing:
+3. **Verify Pre-cached Foundation Model**:
    ```bash
-   pip install transformers datasets accelerate evaluate jiwer pyctcdecode torchaudio pandas numpy
-   
-   apt-get update && apt-get install -y build-essential cmake libboost-system-dev libboost-thread-dev libboost-program-options-dev libboost-test-dev libeigen3-dev zlib1g-dev libbz2-dev liblzma-dev
-   git clone https://github.com/kpu/kenlm && cd kenlm && mkdir build && cd build && cmake .. && make -j
+   python3 -c "from transformers import Wav2Vec2ForCTC; m = Wav2Vec2ForCTC.from_pretrained('facebook/wav2vec2-large-xlsr-53'); print('Model loaded successfully!')"
    ```
 
 ---
 
-## 6. Cost-Saving Testing / Smoke Testing
+## 5. Cost-Saving Pre-Flight / Smoke Test (10 Steps)
 
-Before renting a high-end GPU (like an RTX 4090 or A6000) for a full run:
-
-1. **Rent a Cheap GPU**:
-   Rent an entry-level GPU instance on vast.ai, such as an **RTX 3060, RTX 2080 Ti, or GTX 1080 Ti**. These usually cost **$0.05 to $0.15/hour**.
-2. **Run a Smoke Test (5-10 Steps)**:
-   Run the training script with the `--max-steps` argument set to `10`. This compiles the graphs, loads the dataset, performs forward/backward passes, calculates CTC loss, and completes a checkpoint write to verify the entire pipeline runs without memory/driver errors:
-
-   ```bash
-   python3 -m transcription.training.train \
-     --train-csv /workspace/cim-wav2vec2-train.csv \
-     --valid-csv /workspace/cim-wav2vec2-valid.csv \
-     --test-csv /workspace/cim-wav2vec2-test.csv \
-     --audio-dir /workspace/sentence_audio \
-     --output-dir /workspace/output_w2v2 \
-     --lmplz-path /workspace/kenlm/build/bin/lmplz \
-     --max-steps 10
-   ```
-   *(Note: If using the prebaked image, `lmplz` is in the system PATH, so you can omit `--lmplz-path` or set it to `lmplz`)*
-
----
-
-## 7. Run the Full Training with Hugging Face Hub Backups
-
-To run the training on your high-performance GPU instance and automatically push saving checkpoints to Hugging Face Hub (as a free private repository backup):
+Before starting an overnight 30-epoch run, run a 10-step sanity test to verify tensor dimensions, forward/backward passes, dual loss calculation, and checkpoint writing:
 
 ```bash
-python3 -m transcription.training.train \
-  --train-csv /workspace/cim-wav2vec2-train.csv \
-  --valid-csv /workspace/cim-wav2vec2-valid.csv \
-  --test-csv /workspace/cim-wav2vec2-test.csv \
-  --audio-dir /workspace/sentence_audio \
-  --output-dir /workspace/output_w2v2 \
-  --lmplz-path /workspace/kenlm/build/bin/lmplz \
-  --push-to-hub \
-  --hub-model-id "your-hf-username/your-model-name" \
-  --hub-token "your_hugging_face_write_token"
+python3 -m digohwelisgi.cherokee.training.train \
+  --train-orig-csv data/training/processed/chr-wav2vec2-train.csv \
+  --train-bible-csv data/training/processed/bible-wav2vec2-train.csv \
+  --valid-orig-csv data/training/processed/chr-wav2vec2-valid.csv \
+  --valid-bible-csv data/training/processed/bible-wav2vec2-valid.csv \
+  --audio-dir data/training/processed/sentence_audio \
+  --output-dir /workspace/output_smoke_test \
+  --max-steps 10 \
+  --max-train-samples 16 \
+  --max-eval-samples 8
 ```
 
 ---
 
-## 8. Managing Overnight Runs & Fail-safes 🛡️
+## 6. Full Training Run with Hugging Face Continuous Backups 🛡️
 
-### Stopped vs. Destroyed Instances:
-* **Stopped**: If your credits run out, or your bid is outpriced, or you manually stop the instance, the machine is paused. **Your data inside `/workspace` is preserved**. You will only pay a very small disk storage fee (approx. $0.005/GB/month) while it is stopped. You can click **Start** later, boot it back up, and download your files.
-* **Destroyed**: If you click **Destroy** (trash bin icon) on the Vast.ai console, the VM is deleted entirely, and all data is lost.
+Run training under `tmux` so that disconnecting SSH does not interrupt training. Continuous checkpoint uploads to Hugging Face protect against instance spot-preemption:
+
+```bash
+# Start a detachable tmux session
+tmux new -s training
+
+# Run full training
+python3 -m digohwelisgi.cherokee.training.train \
+  --train-orig-csv data/training/processed/chr-wav2vec2-train.csv \
+  --train-bible-csv data/training/processed/bible-wav2vec2-train.csv \
+  --valid-orig-csv data/training/processed/chr-wav2vec2-valid.csv \
+  --valid-bible-csv data/training/processed/bible-wav2vec2-valid.csv \
+  --test-orig-csv data/training/processed/chr-wav2vec2-test.csv \
+  --test-bible-csv data/training/processed/bible-wav2vec2-test.csv \
+  --audio-dir data/training/processed/sentence_audio \
+  --output-dir /workspace/output_w2v2 \
+  --push-to-hub \
+  --hub-model-id "charliemcvicker/cherokee-wav2vec2-dual-head" \
+  --hub-token "$HF_TOKEN" \
+  --epochs 30
+```
+*Detach from tmux*: Press `Ctrl+B`, then `D`.
+*Reattach later*: Run `tmux attach -t training`.
 
 ---
 
-## 9. Retrieving Checkpoints and Results 📥
+## 7. Instance Lifecycle Management
 
-Since Wav2Vec2 checkpoints are large (approx. 4.5 GB per checkpoint folder), you should use a download command that supports resuming in case of network drops. 
+* **Stopped Instance**: If your bid is outpriced, or you stop the instance manually, the machine is paused. **Your data inside `/workspace` is preserved**. You only pay a minimal disk fee (~$0.005/GB/month). You can restart it later and resume.
+* **Destroyed Instance**: Clicking the trash icon deletes the container and disk permanently. Ensure your best checkpoint has pushed to Hugging Face or has been downloaded locally first.
 
-Run one of these commands **from your local terminal** (not inside the SSH session):
+---
 
-### Option A: Using `rsync` (Recommended - supports resuming)
+## 8. Retrieving Checkpoints and Results Locally 📥
+
+To download the checkpoints to your local machine (run **from your local terminal**, not inside SSH):
+
+### Using `rsync` (Supports Resuming):
 ```bash
 rsync -avzP -e 'ssh -p [PORT]' root@[IP]:/workspace/output_w2v2/ ./output_w2v2/
 ```
-* `-a`: Archive mode (preserves file attributes and recursion).
-* `-v`: Verbose output.
-* `-z`: Compress file data during transfer.
-* `-P`: Shows progress bar and keeps partially transferred files (enabling resume).
-* `-e 'ssh -p [PORT]'`: Directs `rsync` to connect using the custom port.
-
-### Option B: Using standard `scp`
-```bash
-scp -P [PORT] -r root@[IP]:/workspace/output_w2v2 ./
-```
+*(Checkpoints pushed to Hugging Face Hub also serve as an immediate zero-loss backup).*

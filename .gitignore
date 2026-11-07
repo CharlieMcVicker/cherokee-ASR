@@ -34,6 +34,7 @@ remote_output_w2v2/
 
 # log files
 run*.txt
+transcript.txt
 data/results/test_inference_results.csv
 data/results/batch_inference_results.csv
 data/results/CVCS_all.csv
