@@ -40,7 +40,7 @@ The codebase is modularized into four distinct architectural layers:
 ### Module Paths
 - **`digohwelisgi.core`**: Language-agnostic foundational engine.
   - `digohwelisgi.core.audio`: `AudioChunk`, `segment_long_audio`, `SileroVADDetector`, `mask_non_speech_logits`, `AudioAugmenter`, `AudioAugmentationConfig`, `create_audio_augmenter`.
-  - `digohwelisgi.core.models`: `ModelOutput` (universal currency with `.npz` caching), standalone inference (`infer_emissions`, `infer_emissions_batch`), and `ASRModel`.
+  - `digohwelisgi.core.models`: `ModelOutput` (universal multi-stream currency with `.npz` caching and `.tone` / `.get_stream()` auxiliary streams), standalone inference (`infer_emissions`, `infer_emissions_batch`, `infer_emissions_sliding_window`), `ASRModel`, and `VirtualHeadModel` (`.as_head()`).
   - `digohwelisgi.core.alignment`: Pure domain models (`TextChunk`, `TokenEmission`, `WordInterval`, `AlignedChunk`, `AlignmentOutput`), DP aligners (`NeedlemanWunschWordAligner`, `SlidingWindowDTWAligner`), CTC segmentation aligner (`CTCSegmentationAligner`), and generic distance protocols (`DistanceMetric`, `DefaultCERDistanceMetric`).
   - `digohwelisgi.core.datasets`: `DatasetSplit`, `PackagedAudioRecord`, `PackagingManifest`, `package_audio_dataset`, `upload_to_huggingface_hub`.
   - `digohwelisgi.core.exporters`: `TextGridBuilder`, `export_textgrid`, `export_manifest`, `export_debug_json`.
@@ -49,8 +49,8 @@ The codebase is modularized into four distinct architectural layers:
   - `digohwelisgi.cherokee.phonotactics`: Surface phonotactic rules, transition masks, syncope/intrusion masks, and `prepare_cherokee_text`.
   - `digohwelisgi.cherokee.distance`: `PhonologicalConfusionCostMetric`, `ConfusionMatrixCostMetric`.
   - `digohwelisgi.cherokee.codeswitching`: `SyntheticTargetProjector`, `CodeSwitchedPreparer`, compound clitic segmentation.
-  - `digohwelisgi.cherokee.enrichment`: `SyllableAlignmentEngine`, `reconcile_phonetics`, `reconcile_alignment_words`.
-  - `digohwelisgi.cherokee.models`: `CherokeeASRModel` loader.
+  - `digohwelisgi.cherokee.enrichment`: `SyllableAlignmentEngine`, `reconcile_phonetics`, `reconcile_alignment_words`, and `reconcile_model_output`.
+  - `digohwelisgi.cherokee.models`: `CherokeeASRModel` loader with `.segmental` and `.tone` virtual head views, and `Wav2Vec2ForDualCTC` multi-task architecture.
   - `digohwelisgi.cherokee.training`: Wav2Vec2 fine-tuning, dataset split preparation, and checkpoint evaluation.
 - **`digohwelisgi.pipelines`**: End-to-end domain orchestration pipelines.
   - `digohwelisgi.pipelines.scripture`: `ScripturePipeline`, `align_chapter`.
