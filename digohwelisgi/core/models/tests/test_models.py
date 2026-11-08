@@ -13,7 +13,7 @@ from digohwelisgi.core.models.inference import (
     preprocess_audio,
 )
 
-from digohwelisgi.core.models.model import ASRModel
+from digohwelisgi.core.models.model import ASRModel, VirtualHeadModel
 from digohwelisgi.cherokee.models import CherokeeASRModel
 
 
@@ -66,6 +66,64 @@ class TestModelOutput(unittest.TestCase):
             self.assertEqual(loaded.frame_duration_sec, 0.02)
             self.assertEqual(loaded.metadata.get("test_key"), "test_val")
             self.assertEqual(loaded.decode_greedy(), "ad l")
+
+    def test_auxiliary_streams_and_tone_property(self):
+        # Single-head output has empty auxiliary streams and None tone
+        single_head = ModelOutput(lpz=self.lpz, vocab=self.vocab)
+        self.assertEqual(single_head.auxiliary_streams, {})
+        self.assertIsNone(single_head.tone)
+        self.assertIsNone(single_head.lpz_tone)
+        self.assertIsNone(single_head.vocab_tone)
+
+        # Multi-head output with tone auxiliary stream
+        tone_vocab = {"[PAD]": 0, "C": 1, "2_1": 2, "|": 3}
+        tone_lpz = np.full((5, 4), -10.0, dtype=np.float32)
+        tone_lpz[0, 1] = 0.0  # 'C'
+        tone_lpz[1, 2] = 0.0  # '2_1'
+        tone_stream = ModelOutput(lpz=tone_lpz, vocab=tone_vocab)
+
+        dual_head = ModelOutput(
+            lpz=self.lpz,
+            vocab=self.vocab,
+            auxiliary_streams={"tone": tone_stream},
+        )
+        self.assertIsNotNone(dual_head.tone)
+        self.assertIs(dual_head.tone, tone_stream)
+        self.assertIs(dual_head.get_stream("tone"), tone_stream)
+        self.assertIsNone(dual_head.get_stream("unknown"))
+        assert dual_head.lpz_tone is not None
+        np.testing.assert_allclose(dual_head.lpz_tone, tone_lpz)
+        self.assertEqual(dual_head.vocab_tone, tone_vocab)
+        self.assertEqual(dual_head.decode_tone_tokens(), "C 2_1")
+
+    def test_save_and_load_with_auxiliary_streams(self):
+        import tempfile
+
+        tone_vocab = {"[PAD]": 0, "C": 1, "2_1": 2, "|": 3}
+        tone_lpz = np.full((5, 4), -10.0, dtype=np.float32)
+        tone_lpz[0, 1] = 0.0
+        tone_lpz[1, 2] = 0.0
+
+        output = ModelOutput(
+            lpz=self.lpz,
+            vocab=self.vocab,
+            lpz_tone=tone_lpz,
+            vocab_tone=tone_vocab,
+            metadata={"source": "test_dual"},
+        )
+
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            dest = Path(tmp_dir) / "dual_output.npz"
+            output.save(dest)
+            self.assertTrue(dest.exists())
+
+            loaded = ModelOutput.load(dest)
+            self.assertIsNotNone(loaded.tone)
+            assert loaded.tone is not None
+            np.testing.assert_allclose(loaded.lpz, output.lpz)
+            np.testing.assert_allclose(loaded.tone.lpz, tone_lpz)
+            self.assertEqual(loaded.decode_tone_tokens(), "C 2_1")
+            self.assertEqual(loaded.metadata.get("source"), "test_dual")
 
 
 class TestStandaloneInference(unittest.TestCase):
@@ -240,6 +298,67 @@ class TestASRModelWrapper(unittest.TestCase):
         out = asr_model.infer_sliding_window(pcm, chunk_seconds=5.0, margin_seconds=0.5)
         self.assertIsInstance(out, ModelOutput)
         self.assertEqual(out.decode_greedy(), "ad l")
+
+    def test_virtual_head_model_and_as_head(self):
+        # Setup mock model with auxiliary tone stream
+        tone_vocab = {"[PAD]": 0, "C": 1, "2_1": 2, "|": 3}
+        tone_lpz = np.full((4, 4), -10.0, dtype=np.float32)
+        tone_lpz[0, 1] = 10.0  # 'C'
+        tone_lpz[1, 2] = 10.0  # '2_1'
+        tone_stream = ModelOutput(lpz=tone_lpz, vocab=tone_vocab)
+
+        primary_out = ModelOutput(
+            lpz=np.full((4, 5), 0.0, dtype=np.float32),
+            vocab={"[PAD]": 0, "a": 1, "d": 2, "l": 3, "|": 4},
+            auxiliary_streams={"tone": tone_stream},
+        )
+
+        mock_parent = MagicMock(spec=ASRModel)
+        mock_parent.model = MagicMock()
+        mock_parent.processor = MagicMock()
+        mock_parent.model_name = "test_parent"
+        mock_parent.device = "cpu"
+        mock_parent.cache_dir = None
+        mock_parent.infer.return_value = primary_out
+        mock_parent.infer_batch.return_value = [primary_out]
+        mock_parent.infer_sliding_window.return_value = primary_out
+
+        head_model = VirtualHeadModel(parent=mock_parent, head_name="tone")
+        self.assertIsInstance(head_model, ASRModel)
+        self.assertEqual(head_model.model_name, "test_parent_tone")
+
+        pcm = np.zeros(16000, dtype=np.float32)
+        out = head_model.infer(pcm)
+        self.assertIs(out, tone_stream)
+        mock_parent.infer.assert_called_once()
+
+        out_batch = head_model.infer_batch([pcm])
+        self.assertEqual(len(out_batch), 1)
+        self.assertIs(out_batch[0], tone_stream)
+
+        out_sw = head_model.infer_sliding_window(pcm)
+        self.assertIs(out_sw, tone_stream)
+
+        # Missing head raises ValueError
+        missing_head_model = VirtualHeadModel(
+            parent=mock_parent, head_name="nonexistent"
+        )
+        with self.assertRaises(ValueError):
+            missing_head_model.infer(pcm)
+
+    def test_cherokee_asr_model_segmental_and_tone_views(self):
+        cherokee_model = CherokeeASRModel(
+            model=self.mock_model,
+            processor=self.mock_proc,
+            device="cpu",
+            model_name="cherokee_views_test",
+        )
+        self.assertIs(cherokee_model.segmental, cherokee_model)
+
+        tone_view = cherokee_model.tone
+        self.assertIsInstance(tone_view, VirtualHeadModel)
+        self.assertEqual(tone_view.head_name, "tone")
+        self.assertEqual(tone_view.model_name, "cherokee_views_test_tone")
 
 
 class TestSlidingWindowInference(unittest.TestCase):

@@ -1,6 +1,6 @@
 # Core language-agnostic components
 from digohwelisgi.core.models.output import ModelOutput
-from digohwelisgi.core.models.model import ASRModel
+from digohwelisgi.core.models.model import ASRModel, VirtualHeadModel
 from digohwelisgi.core.models.inference import (
     infer_emissions,
     infer_emissions_batch,
@@ -45,6 +45,7 @@ from digohwelisgi.core.datasets import (
 __all__ = [
     "ModelOutput",
     "ASRModel",
+    "VirtualHeadModel",
     "infer_emissions",
     "infer_emissions_batch",
     "preprocess_audio",

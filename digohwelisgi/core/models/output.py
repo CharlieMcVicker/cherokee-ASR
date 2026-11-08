@@ -15,11 +15,13 @@ from typing import Any, Callable, Dict, List, Mapping, Optional, Sequence, Union
 import numpy as np
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, init=False)
 class ModelOutput:
     """
     Universal rich data container holding raw acoustic model emissions (lpz),
     associated vocabulary/token mappings, frame timing, and pure projection methods.
+    Supports arbitrary named auxiliary streams (such as secondary CTC heads) where
+    each auxiliary stream is itself an instance of ModelOutput.
 
     Attributes:
         lpz: Log-probabilities matrix of shape (T, V) or (B, T, V).
@@ -27,30 +29,74 @@ class ModelOutput:
         vocab: Dictionary mapping token strings to integer IDs or integer IDs to strings.
         frame_duration_sec: Duration of each acoustic frame in seconds (default: 0.02s / 20ms).
         metadata: Optional dictionary holding arbitrary contextual data (e.g. sample_rate, duration).
-        lpz_tone: Optional moraic tone log-probabilities matrix of shape (T, V_tone).
-        vocab_tone: Optional dictionary mapping moraic tone token strings to integer IDs (or vice versa).
+        auxiliary_streams: Mapping of stream name to auxiliary ModelOutput instances.
     """
 
     lpz: np.ndarray
     vocab: Mapping[str, int] | Mapping[int, str]
-    frame_duration_sec: float = 0.02
-    metadata: Dict[str, Any] = field(default_factory=dict)
-    lpz_tone: Optional[np.ndarray] = None
-    vocab_tone: Optional[Mapping[str, int] | Mapping[int, str]] = None
+    frame_duration_sec: float
+    metadata: Dict[str, Any]
+    auxiliary_streams: Dict[str, ModelOutput]
 
-    def __post_init__(self) -> None:
-        if not isinstance(self.lpz, np.ndarray):
-            object.__setattr__(self, "lpz", np.asarray(self.lpz))
-        if self.lpz_tone is not None and not isinstance(self.lpz_tone, np.ndarray):
-            object.__setattr__(self, "lpz_tone", np.asarray(self.lpz_tone))
+    def __init__(
+        self,
+        lpz: np.ndarray,
+        vocab: Mapping[str, int] | Mapping[int, str],
+        frame_duration_sec: float = 0.02,
+        metadata: Optional[Dict[str, Any]] = None,
+        auxiliary_streams: Optional[Dict[str, ModelOutput]] = None,
+        lpz_tone: Optional[np.ndarray] = None,
+        vocab_tone: Optional[Mapping[str, int] | Mapping[int, str]] = None,
+    ) -> None:
+        if not isinstance(lpz, np.ndarray):
+            lpz = np.asarray(lpz)
+        object.__setattr__(self, "lpz", lpz)
+        object.__setattr__(self, "vocab", vocab)
+        object.__setattr__(self, "frame_duration_sec", frame_duration_sec)
+        object.__setattr__(self, "metadata", metadata if metadata is not None else {})
+
+        streams: Dict[str, ModelOutput] = (
+            dict(auxiliary_streams) if auxiliary_streams else {}
+        )
+        if lpz_tone is not None and "tone" not in streams:
+            v_tone = vocab_tone if vocab_tone is not None else {}
+            streams["tone"] = ModelOutput(
+                lpz=lpz_tone,
+                vocab=v_tone,
+                frame_duration_sec=frame_duration_sec,
+            )
+        object.__setattr__(self, "auxiliary_streams", streams)
+
+    @property
+    def tone(self) -> Optional[ModelOutput]:
+        """Convenience property for auxiliary tone stream if present."""
+        return self.auxiliary_streams.get("tone")
+
+    def get_stream(self, name: str) -> Optional[ModelOutput]:
+        """Retrieve an auxiliary emission stream by name."""
+        return self.auxiliary_streams.get(name)
+
+    @property
+    def lpz_tone(self) -> Optional[np.ndarray]:
+        """Backwards-compatible accessor for tone log-probabilities."""
+        t = self.tone
+        return t.lpz if t is not None else None
+
+    @property
+    def vocab_tone(self) -> Optional[Mapping[str, int] | Mapping[int, str]]:
+        """Backwards-compatible accessor for tone vocabulary."""
+        t = self.tone
+        return t.vocab if t is not None else None
 
     @property
     def id_to_token(self) -> Dict[int, str]:
         """Resolve mapping from integer token ID to token string."""
         if not self.vocab:
             return {}
-        # Check if keys are integers
-        sample_key = next(iter(self.vocab.keys()))
+        try:
+            sample_key = next(iter(self.vocab.keys()))
+        except (StopIteration, TypeError):
+            return {}
         if isinstance(sample_key, (int, np.integer)):
             return {int(k): str(v) for k, v in self.vocab.items()}  # type: ignore
         else:
@@ -61,7 +107,10 @@ class ModelOutput:
         """Resolve mapping from token string to integer token ID."""
         if not self.vocab:
             return {}
-        sample_key = next(iter(self.vocab.keys()))
+        try:
+            sample_key = next(iter(self.vocab.keys()))
+        except (StopIteration, TypeError):
+            return {}
         if isinstance(sample_key, str):
             return {str(k): int(v) for k, v in self.vocab.items()}  # type: ignore
         else:
@@ -252,7 +301,7 @@ class ModelOutput:
 
     def save(self, path: Union[str, Path]) -> None:
         """
-        Persists ModelOutput to a compressed .npz archive.
+        Persists ModelOutput to a compressed .npz archive, including all auxiliary streams.
 
         Args:
             path: Destination file path (appends .npz if not present).
@@ -272,14 +321,23 @@ class ModelOutput:
             "frame_duration_sec": np.array(self.frame_duration_sec, dtype=np.float64),
             "meta_json": np.array(meta_json),
         }
-        if self.lpz_tone is not None:
-            save_kwargs["lpz_tone"] = self.lpz_tone.astype(np.float32)
-        if self.vocab_tone is not None:
-            vocab_tone_json = json.dumps(
-                {str(k): int(v) for k, v in self.tone_token_to_id.items()},
+        aux_names = list(self.auxiliary_streams.keys())
+        save_kwargs["aux_streams_json"] = np.array(json.dumps(aux_names))
+        for name, stream in self.auxiliary_streams.items():
+            save_kwargs[f"aux_{name}_lpz"] = stream.lpz.astype(np.float32)
+            stream_vocab_json = json.dumps(
+                {str(k): int(v) for k, v in stream.token_to_id.items()},
                 ensure_ascii=False,
             )
-            save_kwargs["vocab_tone_json"] = np.array(vocab_tone_json)
+            save_kwargs[f"aux_{name}_vocab_json"] = np.array(stream_vocab_json)
+            save_kwargs[f"aux_{name}_meta_json"] = np.array(
+                json.dumps(stream.metadata, ensure_ascii=False)
+            )
+
+        # Backwards compatibility for existing tools expecting lpz_tone and vocab_tone_json:
+        if self.tone is not None:
+            save_kwargs["lpz_tone"] = self.tone.lpz.astype(np.float32)
+            save_kwargs["vocab_tone_json"] = save_kwargs["aux_tone_vocab_json"]
 
         np.savez_compressed(dest, **save_kwargs)
 
@@ -308,18 +366,38 @@ class ModelOutput:
                 else 0.02
             )
             metadata = json.loads(str(data["meta_json"])) if "meta_json" in data else {}
-            lpz_tone = data["lpz_tone"] if "lpz_tone" in data else None
-            vocab_tone = (
-                json.loads(str(data["vocab_tone_json"]))
-                if "vocab_tone_json" in data
-                else None
-            )
+
+            auxiliary_streams: Dict[str, ModelOutput] = {}
+            if "aux_streams_json" in data:
+                aux_names = json.loads(str(data["aux_streams_json"]))
+                for name in aux_names:
+                    aux_lpz = data[f"aux_{name}_lpz"]
+                    aux_vocab = json.loads(str(data[f"aux_{name}_vocab_json"]))
+                    aux_meta = (
+                        json.loads(str(data[f"aux_{name}_meta_json"]))
+                        if f"aux_{name}_meta_json" in data
+                        else {}
+                    )
+                    auxiliary_streams[name] = ModelOutput(
+                        lpz=aux_lpz,
+                        vocab=aux_vocab,
+                        frame_duration_sec=frame_duration,
+                        metadata=aux_meta,
+                    )
+            elif "lpz_tone" in data and "vocab_tone_json" in data:
+                # Backwards compatibility for legacy single-archive files
+                aux_lpz = data["lpz_tone"]
+                aux_vocab = json.loads(str(data["vocab_tone_json"]))
+                auxiliary_streams["tone"] = ModelOutput(
+                    lpz=aux_lpz,
+                    vocab=aux_vocab,
+                    frame_duration_sec=frame_duration,
+                )
 
         return cls(
             lpz=lpz,
             vocab=vocab,
             frame_duration_sec=frame_duration,
             metadata=metadata,
-            lpz_tone=lpz_tone,
-            vocab_tone=vocab_tone,
+            auxiliary_streams=auxiliary_streams,
         )

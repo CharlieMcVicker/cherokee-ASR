@@ -15,7 +15,8 @@ from typing import Any, Dict, List, Optional, Sequence, Union
 import numpy as np
 import torch
 
-from digohwelisgi.core.models.model import ASRModel
+from digohwelisgi.core.models.model import ASRModel, VirtualHeadModel
+from digohwelisgi.core.models.output import ModelOutput
 from digohwelisgi.utils.model_utils import get_best_model_config, get_model
 
 logger = logging.getLogger(__name__)
@@ -77,6 +78,22 @@ class CherokeeASRModel(ASRModel):
             model_name=model_name,
             cache_dir=cache_dir,
         )
+
+    @property
+    def segmental(self) -> ASRModel:
+        """Return the primary segmental model view (self)."""
+        return self
+
+    @property
+    def tone(self) -> VirtualHeadModel:
+        """Return a virtual ASRModel view targeting the moraic tone head."""
+        return self.as_head("tone")
+
+    def decode_reconciled(self, output: ModelOutput, mode: str = "dp") -> str:
+        """
+        Reconcile dual-stream emissions from a ModelOutput into Cherokee numeric-tone notation.
+        """
+        return output.decode_reconciled(mode=mode)
 
     @classmethod
     def from_pretrained(

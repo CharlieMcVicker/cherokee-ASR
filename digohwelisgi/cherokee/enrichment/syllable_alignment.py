@@ -12,6 +12,7 @@ from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 from digohwelisgi.core.alignment.models import AlignmentOutput, WordInterval
+from digohwelisgi.core.models.output import ModelOutput
 from digohwelisgi.cherokee.orthography import (
     CHEROKEE_SYLLABARY_MAP,
     syllabary_to_phonetics,
@@ -534,6 +535,27 @@ class SyllableAlignmentEngine:
         return reconcile_alignment_by_chunk(alignment, syllabary_lookup)
 
 
+def reconcile_model_output(
+    output: ModelOutput,
+    mode: str = "dp",
+) -> str:
+    """
+    Pure projection: Reconciles segmental CV and moraic tone streams from a ModelOutput
+    into canonical Cherokee numeric-tone notation (e.g. 'na3 a2ni22tshu34tsa2').
+    Falls back to greedy text transcription if the tone stream is absent.
+    """
+    cv_text = output.decode_greedy()
+    tone_output = output.tone
+    if tone_output is None:
+        return cv_text
+    tone_str = output.decode_tone_tokens(collapse_repeats=True, remove_pad=True)
+    if not tone_str:
+        return cv_text
+    from digohwelisgi.cherokee.orthography.tones import reconcile_dual_stream
+
+    return reconcile_dual_stream(cv_text, tone_str, mode=mode)
+
+
 __all__ = [
     "SyllableAlignment",
     "SyllableAlignmentEngine",
@@ -543,6 +565,7 @@ __all__ = [
     "is_cherokee_syllable",
     "reconcile_alignment_by_chunk",
     "reconcile_alignment_words",
+    "reconcile_model_output",
     "reconcile_phonetics",
     "reconcile_word_intervals",
 ]

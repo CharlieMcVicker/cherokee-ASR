@@ -224,6 +224,7 @@ class Wav2Vec2ForDualCTC(Wav2Vec2PreTrainedModel):
         return_dict: Optional[bool] = None,
         labels: Optional[torch.Tensor] = None,
         tone_labels: Optional[torch.Tensor] = None,
+        compute_tone: bool = True,
     ) -> Union[Tuple[Any, ...], Wav2Vec2DualCTCOutput]:
         return_dict = (
             return_dict if return_dict is not None else self.config.use_return_dict
@@ -244,36 +245,38 @@ class Wav2Vec2ForDualCTC(Wav2Vec2PreTrainedModel):
         logits = self.lm_head(hidden_states_cv)
 
         # Branch B (Moraic Tone): taps Shared Trunk at `branch_split_idx` (output of layer N - K - 1)
-        if self.num_branch_layers > 0 and outputs.hidden_states is not None:
-            tone_hidden = outputs.hidden_states[self.branch_split_idx]
-            extended_attention_mask = self._prepare_extended_attention_mask(
-                tone_hidden, attention_mask
-            )
-            for layer in self.tone_branch_layers:
-                dropout_probability = torch.rand([])
-                skip_the_layer = self.training and (
-                    dropout_probability < self.config.layerdrop
+        logits_tone: Optional[torch.Tensor] = None
+        if compute_tone:
+            if self.num_branch_layers > 0 and outputs.hidden_states is not None:
+                tone_hidden = outputs.hidden_states[self.branch_split_idx]
+                extended_attention_mask = self._prepare_extended_attention_mask(
+                    tone_hidden, attention_mask
                 )
-                if not skip_the_layer:
-                    layer_outputs = layer(
-                        tone_hidden,
-                        attention_mask=extended_attention_mask,
-                        output_attentions=False,
+                for layer in self.tone_branch_layers:
+                    dropout_probability = torch.rand([])
+                    skip_the_layer = self.training and (
+                        dropout_probability < self.config.layerdrop
                     )
-                    tone_hidden = layer_outputs[0]
-            if self.tone_layer_norm is not None:
-                tone_hidden = self.tone_layer_norm(tone_hidden)
-        else:
-            tone_hidden = outputs[0]
+                    if not skip_the_layer:
+                        layer_outputs = layer(
+                            tone_hidden,
+                            attention_mask=extended_attention_mask,
+                            output_attentions=False,
+                        )
+                        tone_hidden = layer_outputs[0]
+                if self.tone_layer_norm is not None:
+                    tone_hidden = self.tone_layer_norm(tone_hidden)
+            else:
+                tone_hidden = outputs[0]
 
-        tone_hidden = self.tone_dropout(tone_hidden)
-        logits_tone = self.tone_lm_head(tone_hidden)
+            tone_hidden = self.tone_dropout(tone_hidden)
+            logits_tone = self.tone_lm_head(tone_hidden)
 
         loss: Optional[torch.Tensor] = None
         loss_cv: Optional[torch.Tensor] = None
         loss_tone: Optional[torch.Tensor] = None
 
-        if labels is not None or tone_labels is not None:
+        if labels is not None or (tone_labels is not None and logits_tone is not None):
             if attention_mask is not None:
                 raw_lengths: Any = self._get_feat_extract_output_lengths(
                     attention_mask.detach().cpu().sum(-1).to(torch.long)  # type: ignore[arg-type]
@@ -329,7 +332,7 @@ class Wav2Vec2ForDualCTC(Wav2Vec2PreTrainedModel):
                         )
                 self.last_loss_cv = float(loss_cv.detach().cpu().item())
 
-            if tone_labels is not None:
+            if tone_labels is not None and logits_tone is not None:
                 valid_tone_rows = (tone_labels != -100).any(dim=-1)
                 if valid_tone_rows.any():
                     valid_tone_labels = tone_labels[valid_tone_rows]

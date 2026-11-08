@@ -289,14 +289,16 @@ def infer_emissions(
             with torch.no_grad():
                 model_out = model(input_tensor)
                 logits = model_out.logits
-                logits_tone = getattr(model_out, "logits_tone", None)
+                raw_lt = getattr(model_out, "logits_tone", None)
+                logits_tone = raw_lt if isinstance(raw_lt, torch.Tensor) else None
     else:
         input_tensor = input_tensor.to(target_device)
         try:
             with torch.no_grad():
                 model_out = model(input_tensor)
                 logits = model_out.logits
-                logits_tone = getattr(model_out, "logits_tone", None)
+                raw_lt = getattr(model_out, "logits_tone", None)
+                logits_tone = raw_lt if isinstance(raw_lt, torch.Tensor) else None
         except NotImplementedError as e:
             if str(target_device) == "mps":
                 logger.warning(
@@ -308,7 +310,8 @@ def infer_emissions(
                 with torch.no_grad():
                     model_out = model(input_tensor)
                     logits = model_out.logits
-                    logits_tone = getattr(model_out, "logits_tone", None)
+                    raw_lt = getattr(model_out, "logits_tone", None)
+                    logits_tone = raw_lt if isinstance(raw_lt, torch.Tensor) else None
             else:
                 raise e
 
@@ -322,9 +325,8 @@ def infer_emissions(
     vocab_tone: Optional[Mapping[str, int]] = None
     if logits_tone is not None:
         lpz_tone = torch.nn.functional.log_softmax(logits_tone, dim=-1).cpu().numpy()
-        vocab_tone = getattr(
-            model, "vocab_tone", getattr(processor, "vocab_tone", None)
-        )
+        raw_vt = getattr(model, "vocab_tone", getattr(processor, "vocab_tone", None))
+        vocab_tone = raw_vt if isinstance(raw_vt, Mapping) else None
 
     vocab, metadata = extract_vocab_and_metadata(processor)
     metadata["sample_rate"] = TARGET_SAMPLE_RATE
@@ -445,7 +447,10 @@ def infer_emissions_batch(
                 else:
                     m_out = model(input_values)
                 batch_logits = m_out.logits
-                batch_logits_tone = getattr(m_out, "logits_tone", None)
+                raw_blt = getattr(m_out, "logits_tone", None)
+                batch_logits_tone = (
+                    raw_blt if isinstance(raw_blt, torch.Tensor) else None
+                )
         except Exception as e:
             err_str = str(e).lower()
             is_oom = "out of memory" in err_str or (
@@ -511,9 +516,8 @@ def infer_emissions_batch(
         else:
             output_lengths = [batch_logits.shape[1]] * batch_logits.shape[0]
 
-        vocab_tone_batch = getattr(
-            model, "vocab_tone", getattr(processor, "vocab_tone", None)
-        )
+        raw_vtb = getattr(model, "vocab_tone", getattr(processor, "vocab_tone", None))
+        vocab_tone_batch = raw_vtb if isinstance(raw_vtb, Mapping) else None
 
         for b_i, global_idx in enumerate(curr_miss_indices):
             actual_len = int(output_lengths[b_i])

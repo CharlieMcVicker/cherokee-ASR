@@ -16,6 +16,7 @@ from digohwelisgi.cherokee.enrichment.syllable_alignment import (
     is_cherokee_syllable,
     reconcile_alignment_by_chunk,
     reconcile_alignment_words,
+    reconcile_model_output,
     reconcile_phonetics,
     reconcile_word_intervals,
 )
@@ -29,6 +30,7 @@ __all__ = [
     "is_cherokee_syllable",
     "reconcile_alignment_by_chunk",
     "reconcile_alignment_words",
+    "reconcile_model_output",
     "reconcile_phonetics",
     "reconcile_word_intervals",
 ]

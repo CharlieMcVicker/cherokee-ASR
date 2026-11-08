@@ -248,7 +248,13 @@ def load_dataset(
         with open(path, "r", encoding="utf-8") as f:
             reader = csv.DictReader(f)
             for idx, row in enumerate(reader):
-                raw_ref = row.get("sentence") or row.get("reference") or ""
+                raw_ref = (
+                    row.get("sentence")
+                    or row.get("reference")
+                    or row.get("cv_text")
+                    or row.get("phonetic")
+                    or ""
+                )
                 clean_ref = normalize_text(raw_ref)
 
                 # Filter out bad data: rows containing 'd' or 'g' in reference

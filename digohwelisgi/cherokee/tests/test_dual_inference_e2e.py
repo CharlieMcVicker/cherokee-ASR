@@ -32,6 +32,8 @@ from digohwelisgi.core.alignment.models import (
 )
 from digohwelisgi.core.exporters.textgrid import export_textgrid
 from digohwelisgi.core.models.output import ModelOutput
+from digohwelisgi.core.models.model import VirtualHeadModel
+from digohwelisgi.cherokee.enrichment import reconcile_model_output
 
 
 def _make_one_hot_lpz(token_ids: list[int], vocab_size: int, pad_id: int) -> np.ndarray:
@@ -133,10 +135,27 @@ def test_cherokee_asr_model_dual_checkpoint_loading(tmp_path: Path) -> None:
     out = asr.infer(dummy_audio)
     assert out.lpz_tone is not None
     assert out.vocab_tone is not None
+    assert out.tone is not None
     assert out.lpz.shape[0] == out.lpz_tone.shape[0]
     assert out.lpz.shape[1] == len(SEGMENTAL_CV_VOCAB)
     assert out.lpz_tone.shape[1] == len(MORAIC_TONE_VOCAB)
     assert isinstance(out.decode_reconciled(), str)
+    assert reconcile_model_output(out) == out.decode_reconciled()
+    assert asr.decode_reconciled(out) == out.decode_reconciled()
+
+    # Verify virtual head views
+    assert asr.segmental is asr
+    assert isinstance(asr.tone, VirtualHeadModel)
+    tone_out = asr.tone.infer(dummy_audio)
+    assert tone_out.lpz.shape[1] == len(MORAIC_TONE_VOCAB)
+
+    # Verify forward pass with compute_tone=False
+    import torch
+
+    inputs = torch.zeros((1, 8000), dtype=torch.float32)
+    dual_out_no_tone = model(inputs, compute_tone=False)
+    assert dual_out_no_tone.logits is not None
+    assert dual_out_no_tone.logits_tone is None
 
 
 def test_textgrid_exporter_with_tones(tmp_path: Path) -> None:
