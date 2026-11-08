@@ -109,6 +109,12 @@ In canonical **`T/TH`**, tones and vowel lengths are decoupled/stripped, and the
 - **Desktop Transcriber (`syllabary_transcriber`)**:
   - Backend transcribes audio to `TTH` $\rightarrow$ frontend renders native `SYLLABARY` glyphs.
 
+## Multi-Task Training & Infrastructure Protocol
+- **Dataset Column Contract**: Dual-head training and evaluation CSVs enforce 4 columns: `path,cv_text,tone_tokens,canonical_toned`. All dataset readers must support the canonical fallback: `row.get("cv_text") or row.get("sentence") or row.get("reference") or row.get("phonetic") or ""`.
+- **Instance Provisioning & Disk Sizing**: Remote GPU training instances require **$\ge 50\text{ GB}$** disk space. AdamW optimizer states require 2.5 GB per checkpoint; `train.py` defaults to `save_total_limit=2` and supports `--save-only-model` for intermediate checkpoints to prevent disk exhaustion.
+- **Convergence Policy**: 50 epochs (8,550 steps) is the empirical convergence envelope for Wav2Vec2 on Cherokee (yielding 4.83% tone CER, 2.63% segmental CER, 16.50% WER on Feeling 1975, and 3.69% CER on unseen Bible verses). Continuing training past 50 epochs causes validation loss drift and risks overfitting.
+- **Resilient Hub Uploads**: Checkpoint synchronization utilizes `upload_checkpoint_resilient` with exponential backoff retries and optimizer state exclusion to avoid monolithic Xet/CAS batch timeouts.
+
 ## Documentation Maintenance & Freshness
 - **Keep Documentation Synchronized**: When adding new modules, refactoring subsystem architecture, changing CLI tools, or modifying testing procedures, immediately update this `AGENTS.md` and the corresponding guide in `backlog/docs/` (managed via `backlog doc` CLI).
 - **Prune Obsolete Instructions**: Actively remove superseded workflows, deprecated flags, or outdated setup instructions to prevent agent confusion.

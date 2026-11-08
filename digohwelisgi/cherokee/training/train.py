@@ -16,7 +16,8 @@ import subprocess
 import sys
 import unicodedata
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Union
+from pathlib import Path
+from typing import Dict, List, Optional, Sequence, Union
 
 import evaluate
 import numpy as np
@@ -120,7 +121,8 @@ CONFIG = {
     "save_strategy": "steps",
     "eval_steps": 200,
     "save_steps": 400,
-    "save_total_limit": 3,
+    "save_total_limit": 2,
+    "save_only_model": False,
     "hub_strategy": "all_checkpoints",
     "hub_prefix": "dual-tone-moraic",
     "gradient_checkpointing": False,
@@ -384,7 +386,13 @@ def parse_args():
         "--save-total-limit",
         type=int,
         default=CONFIG["save_total_limit"],
-        help="Maximum number of checkpoints to keep locally on disk (default: 3).",
+        help="Maximum number of checkpoints to keep locally on disk (default: 2).",
+    )
+    parser.add_argument(
+        "--save-only-model",
+        action="store_true",
+        default=CONFIG.get("save_only_model", False),
+        help="Skip saving heavy optimizer and scheduler states in checkpoints to save disk space (default: False).",
     )
     parser.add_argument(
         "--gradient-checkpointing",
@@ -560,6 +568,7 @@ def parse_args():
     CONFIG["eval_steps"] = args.eval_steps
     CONFIG["save_steps"] = args.save_steps
     CONFIG["save_total_limit"] = args.save_total_limit
+    CONFIG["save_only_model"] = args.save_only_model
     CONFIG["gradient_checkpointing"] = args.gradient_checkpointing
     CONFIG["tone_loss_weight"] = args.tone_loss_weight
     CONFIG["num_branch_layers"] = args.num_branch_layers
@@ -933,7 +942,8 @@ def initialize_model_and_trainer(processor, train_ds, valid_ds, folder_model_fil
         fp16=torch.cuda.is_available(),
         learning_rate=3e-4,
         warmup_ratio=0.1,
-        save_total_limit=CONFIG.get("save_total_limit", 3),
+        save_total_limit=CONFIG.get("save_total_limit", 2),
+        save_only_model=CONFIG.get("save_only_model", False),
         logging_steps=100,
         load_best_model_at_end=True,
         metric_for_best_model="tone_cer",
@@ -1056,6 +1066,69 @@ def resolve_resume_checkpoint(args, folder_model_files):
     return resume_checkpoint
 
 
+def upload_checkpoint_resilient(
+    repo_id: str,
+    folder_path: Union[str, Path],
+    token: Optional[str] = None,
+    max_retries: int = 4,
+    exclude_patterns: Sequence[str] = (
+        "optimizer.pt",
+        "optimizer.bin",
+        "scheduler.pt",
+        "*.pt.tmp",
+    ),
+) -> None:
+    """
+    Uploads checkpoint files to Hugging Face Hub file-by-file with exponential backoff retries,
+    avoiding monolithic Xet/CAS commit timeouts on large directories.
+    Excludes large optimizer and scheduler states by default.
+    """
+    from huggingface_hub import HfApi
+    import time
+
+    api = HfApi(token=token)
+    api.create_repo(repo_id=repo_id, repo_type="model", exist_ok=True)
+    folder = Path(folder_path)
+
+    for item in sorted(folder.rglob("*")):
+        if item.is_dir():
+            continue
+        rel_path = item.relative_to(folder).as_posix()
+        matched = False
+        for pat in exclude_patterns:
+            if pat.startswith("*") and rel_path.endswith(pat[1:]):
+                matched = True
+                break
+            elif rel_path == pat or rel_path.endswith("/" + pat):
+                matched = True
+                break
+        if matched:
+            print(f"Skipping excluded checkpoint artifact: {rel_path}")
+            continue
+
+        for attempt in range(1, max_retries + 1):
+            try:
+                api.upload_file(
+                    path_or_fileobj=str(item),
+                    path_in_repo=rel_path,
+                    repo_id=repo_id,
+                    repo_type="model",
+                )
+                print(f"Uploaded {rel_path} successfully.")
+                break
+            except Exception as err:
+                if attempt == max_retries:
+                    print(
+                        f"Failed to upload {rel_path} after {max_retries} attempts: {err}"
+                    )
+                    raise err
+                delay = 2**attempt
+                print(
+                    f"Retry {attempt}/{max_retries} for {rel_path} after error: {err}. Waiting {delay}s..."
+                )
+                time.sleep(delay)
+
+
 def train_model(trainer, resume_checkpoint, folder_model_files, processor):
     print("Starting training...")
     trainer.train(resume_from_checkpoint=resume_checkpoint)
@@ -1065,9 +1138,19 @@ def train_model(trainer, resume_checkpoint, folder_model_files, processor):
 
     if CONFIG["push_to_hub"]:
         print("Pushing best combined-validation model to Hugging Face Hub...")
-        trainer.push_to_hub(
-            commit_message="Best checkpoint on combined validation set (load_best_model_at_end)"
-        )
+        try:
+            trainer.push_to_hub(
+                commit_message="Best checkpoint on combined validation set (load_best_model_at_end)"
+            )
+        except Exception as e:
+            print(
+                f"Warning: Standard push_to_hub failed ({e}). Falling back to resilient file-by-file uploader..."
+            )
+            upload_checkpoint_resilient(
+                repo_id=CONFIG["hub_model_id"],
+                folder_path=folder_model_files,
+                token=CONFIG["hub_token"],
+            )
         if CONFIG["hub_model_id"]:
             from huggingface_hub import HfApi
 

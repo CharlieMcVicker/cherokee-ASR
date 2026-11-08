@@ -323,11 +323,15 @@ def test_parse_args_hub_and_step_defaults(monkeypatch):
     assert args.epochs == 30
     assert args.eval_steps == 200
     assert args.save_steps == 400
+    assert args.save_total_limit == 2
+    assert args.save_only_model is False
     assert args.hub_strategy == "all_checkpoints"
     assert args.hub_prefix == "dual-tone-moraic"
     assert CONFIG["epochs"] == 30
     assert CONFIG["eval_steps"] == 200
     assert CONFIG["save_steps"] == 400
+    assert CONFIG["save_total_limit"] == 2
+    assert CONFIG["save_only_model"] is False
     assert CONFIG["hub_strategy"] == "all_checkpoints"
     assert CONFIG["hub_prefix"] == "dual-tone-moraic"
 
@@ -343,6 +347,9 @@ def test_parse_args_hub_and_step_defaults(monkeypatch):
             "300",
             "--save-steps",
             "500",
+            "--save-total-limit",
+            "1",
+            "--save-only-model",
             "--hub-strategy",
             "every_save",
             "--hub-prefix",
@@ -356,10 +363,12 @@ def test_parse_args_hub_and_step_defaults(monkeypatch):
     assert args.epochs == 25
     assert args.eval_steps == 300
     assert args.save_steps == 500
+    assert args.save_total_limit == 1
+    assert args.save_only_model is True
     assert args.hub_strategy == "every_save"
     assert args.hub_prefix == "custom-exp"
-    assert CONFIG["hub_strategy"] == "every_save"
-    assert CONFIG["hub_prefix"] == "custom-exp"
+    assert CONFIG["save_total_limit"] == 1
+    assert CONFIG["save_only_model"] is True
     assert "user/custom-exp-" in CONFIG["hub_model_id"]
 
 
@@ -406,3 +415,38 @@ def test_train_model_pushes_and_tags_hub(monkeypatch):
         repo_type="model",
         exist_ok=True,
     )
+
+
+def test_upload_checkpoint_resilient_filters_and_retries(tmp_path, monkeypatch):
+    from digohwelisgi.cherokee.training.train import upload_checkpoint_resilient
+
+    checkpoint_dir = tmp_path / "checkpoint-100"
+    checkpoint_dir.mkdir()
+    (checkpoint_dir / "model.safetensors").write_text("weights")
+    (checkpoint_dir / "config.json").write_text("{}")
+    (checkpoint_dir / "optimizer.pt").write_text("heavy_optimizer")
+    (checkpoint_dir / "scheduler.pt").write_text("heavy_scheduler")
+
+    uploaded = []
+    mock_api_instance = MagicMock()
+
+    def mock_upload_file(path_or_fileobj, path_in_repo, repo_id, repo_type):
+        uploaded.append(path_in_repo)
+
+    mock_api_instance.upload_file = mock_upload_file
+    monkeypatch.setattr("huggingface_hub.HfApi", lambda token=None: mock_api_instance)
+
+    upload_checkpoint_resilient(
+        repo_id="test-user/test-model",
+        folder_path=str(checkpoint_dir),
+        token="test-token",
+    )
+
+    mock_api_instance.create_repo.assert_called_once_with(
+        repo_id="test-user/test-model", repo_type="model", exist_ok=True
+    )
+    # optimizer.pt and scheduler.pt must be excluded
+    assert "optimizer.pt" not in uploaded
+    assert "scheduler.pt" not in uploaded
+    assert "config.json" in uploaded
+    assert "model.safetensors" in uploaded
