@@ -5,9 +5,6 @@ from typing import Any, Optional, Tuple, Union
 import torch
 from transformers import Wav2Vec2Config, Wav2Vec2ForCTC, Wav2Vec2Processor
 
-from digohwelisgi.cherokee.models.dual_head import Wav2Vec2ForDualCTC
-from digohwelisgi.cherokee.orthography.tones import MORAIC_TONE_VOCAB
-
 _MODEL_CACHE: dict[tuple[Any, ...], tuple[Any, Wav2Vec2Processor, str]] = {}
 
 
@@ -49,13 +46,14 @@ def get_model(
     token: Optional[str] = None,
     eval_mode: bool = True,
     use_cache: bool = True,
-) -> Tuple[Wav2Vec2ForCTC, Wav2Vec2Processor, str]:
+    config_filename: str = "best_model.json",
+) -> Tuple[Any, Wav2Vec2Processor, str]:
     """
     Unified entrypoint to load a Wav2Vec2 model and processor based on repository/path and revision.
-    If path_or_repo is None, automatically loads the configuration from best_model.json.
+    If path_or_repo is None, automatically loads the configuration from best_model.json (or config_filename).
     """
     if path_or_repo is None:
-        config = get_best_model_config()
+        config = get_best_model_config(config_filename=config_filename)
         path_or_repo = config["repo"]
         if revision is None:
             revision = config.get("revision")
@@ -94,8 +92,12 @@ def get_model(
         is_dual = False
 
     if is_dual:
+        from digohwelisgi.cherokee.models.dual_head import Wav2Vec2ForDualCTC
+        from digohwelisgi.cherokee.orthography.tones import MORAIC_TONE_VOCAB
+
         model: Any = Wav2Vec2ForDualCTC.from_pretrained(path_or_repo, **load_kwargs)
         vocab_tone = dict(MORAIC_TONE_VOCAB)
+        found_vt = False
         for cand_dir in (proc_path, path_or_repo):
             if cand_dir and os.path.isdir(str(cand_dir)):
                 vt_path = os.path.join(str(cand_dir), "vocab_tone.json")
@@ -103,9 +105,23 @@ def get_model(
                     try:
                         with open(vt_path, "r", encoding="utf-8") as vf:
                             vocab_tone = json.load(vf)
+                        found_vt = True
                         break
                     except Exception:
                         pass
+        if not found_vt and path_or_repo and not os.path.isdir(str(path_or_repo)):
+            try:
+                from huggingface_hub import hf_hub_download
+
+                vt_file = hf_hub_download(
+                    repo_id=str(path_or_repo),
+                    filename="vocab_tone.json",
+                    **load_kwargs,
+                )
+                with open(vt_file, "r", encoding="utf-8") as vf:
+                    vocab_tone = json.load(vf)
+            except Exception:
+                pass
         setattr(model, "vocab_tone", vocab_tone)
         setattr(processor, "vocab_tone", vocab_tone)
     else:
@@ -126,9 +142,10 @@ def get_best_model(
     token: Optional[str] = None,
     eval_mode: bool = True,
     use_cache: bool = True,
-) -> Tuple[Wav2Vec2ForCTC, Wav2Vec2Processor, str]:
+    config_filename: str = "best_model.json",
+) -> Tuple[Any, Wav2Vec2Processor, str]:
     """
-    Loads the best model and processor as specified in best_model.json.
+    Loads the best model and processor as specified in best_model.json (or config_filename).
     """
     return get_model(
         path_or_repo=None,
@@ -137,4 +154,5 @@ def get_best_model(
         token=token,
         eval_mode=eval_mode,
         use_cache=use_cache,
+        config_filename=config_filename,
     )

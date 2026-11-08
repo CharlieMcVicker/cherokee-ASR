@@ -114,7 +114,7 @@ class TestCherokeeASRModel(unittest.TestCase):
         with self.assertRaises(ValueError):
             CherokeeASRModel.from_config({}, device="cpu")
 
-    @patch("transformers.Wav2Vec2ForCTC.from_pretrained")
+    @patch("digohwelisgi.cherokee.models.dual_head.Wav2Vec2ForDualCTC.from_pretrained")
     @patch("transformers.Wav2Vec2Processor.from_pretrained")
     def test_factory_get_best_model(self, mock_proc_load, mock_model_load):
         mock_proc = MagicMock()
@@ -124,6 +124,7 @@ class TestCherokeeASRModel(unittest.TestCase):
 
         model = CherokeeASRModel.get_best_model(device="cpu")
         self.assertIsInstance(model, CherokeeASRModel)
+        self.assertEqual(model.model, mock_model)
 
     @patch("transformers.Wav2Vec2ForCTC.from_pretrained")
     @patch("transformers.Wav2Vec2Processor.from_pretrained")
@@ -143,7 +144,7 @@ class TestCherokeeASRModel(unittest.TestCase):
         self.assertEqual(model.processor, mock_proc)
         mock_model_load.assert_called_with("test/custom-repo", revision="rev1")
 
-    @patch("transformers.Wav2Vec2ForCTC.from_pretrained")
+    @patch("digohwelisgi.cherokee.models.dual_head.Wav2Vec2ForDualCTC.from_pretrained")
     @patch("transformers.Wav2Vec2Processor.from_pretrained")
     def test_factory_from_pretrained_or_best_none_repo(
         self, mock_proc_load, mock_model_load
@@ -182,18 +183,17 @@ class TestCherokeeASRModel(unittest.TestCase):
         self.assertEqual(mock_model_load.call_count, 2)
         mock_model_load.assert_called_with("facebook/wav2vec2-base-960h")
 
+    @patch("digohwelisgi.cherokee.models.dual_head.Wav2Vec2ForDualCTC.from_pretrained")
     @patch("transformers.Wav2Vec2ForCTC.from_pretrained")
     @patch("transformers.Wav2Vec2Processor.from_pretrained")
     def test_factory_from_pretrained_or_best_fallback_on_none_failure(
-        self, mock_proc_load, mock_model_load
+        self, mock_proc_load, mock_ctc_load, mock_dual_load
     ):
         mock_proc = MagicMock()
         mock_model = MagicMock()
         mock_proc_load.return_value = mock_proc
-        mock_model_load.side_effect = [
-            RuntimeError("Best model unreachable"),
-            mock_model,
-        ]
+        mock_dual_load.side_effect = RuntimeError("Best model unreachable")
+        mock_ctc_load.return_value = mock_model
 
         model = CherokeeASRModel.from_pretrained_or_best(
             path_or_repo=None,
@@ -201,8 +201,9 @@ class TestCherokeeASRModel(unittest.TestCase):
             device="cpu",
         )
         self.assertIsInstance(model, CherokeeASRModel)
-        self.assertEqual(mock_model_load.call_count, 2)
-        mock_model_load.assert_called_with("facebook/wav2vec2-base-960h")
+        self.assertEqual(mock_dual_load.call_count, 1)
+        self.assertEqual(mock_ctc_load.call_count, 1)
+        mock_ctc_load.assert_called_with("facebook/wav2vec2-base-960h")
 
     @patch("transformers.Wav2Vec2ForCTC.from_pretrained")
     @patch("transformers.Wav2Vec2Processor.from_pretrained")

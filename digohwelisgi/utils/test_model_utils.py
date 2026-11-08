@@ -40,7 +40,7 @@ class TestModelUtils(unittest.TestCase):
             self.assertEqual(config["repo"], "custom/best-repo")
             self.assertEqual(config["revision"], "rev-best")
 
-    @patch("transformers.Wav2Vec2ForCTC.from_pretrained")
+    @patch("digohwelisgi.cherokee.models.dual_head.Wav2Vec2ForDualCTC.from_pretrained")
     @patch("transformers.Wav2Vec2Processor.from_pretrained")
     def test_get_model_defaults(self, mock_proc_load, mock_model_load):
         mock_proc = MagicMock()
@@ -58,20 +58,43 @@ class TestModelUtils(unittest.TestCase):
 
     @patch("transformers.Wav2Vec2ForCTC.from_pretrained")
     @patch("transformers.Wav2Vec2Processor.from_pretrained")
-    def test_get_model_and_get_best_model(self, mock_proc_load, mock_model_load):
+    def test_get_model_single_head_config(self, mock_proc_load, mock_model_load):
         mock_proc = MagicMock()
         mock_model = MagicMock()
         mock_proc_load.return_value = mock_proc
         mock_model_load.return_value = mock_model
 
+        model, processor, device = get_model(
+            device="cpu", config_filename="best_model_single_head.json"
+        )
+
+        self.assertEqual(model, mock_model)
+        self.assertEqual(processor, mock_proc)
+        self.assertEqual(device, "cpu")
+        mock_model.eval.assert_called_once()
+        mock_model.to.assert_called_once_with("cpu")
+
+    @patch("digohwelisgi.cherokee.models.dual_head.Wav2Vec2ForDualCTC.from_pretrained")
+    @patch("transformers.Wav2Vec2ForCTC.from_pretrained")
+    @patch("transformers.Wav2Vec2Processor.from_pretrained")
+    def test_get_model_and_get_best_model(
+        self, mock_proc_load, mock_ctc_load, mock_dual_load
+    ):
+        mock_proc = MagicMock()
+        mock_dual_model = MagicMock()
+        mock_ctc_model = MagicMock()
+        mock_proc_load.return_value = mock_proc
+        mock_dual_load.return_value = mock_dual_model
+        mock_ctc_load.return_value = mock_ctc_model
+
         m1, p1, d1 = get_best_model(device="cpu")
-        self.assertEqual(m1, mock_model)
+        self.assertEqual(m1, mock_dual_model)
         self.assertEqual(p1, mock_proc)
         self.assertEqual(d1, "cpu")
 
         m2, p2, d2 = get_model("custom/repo", revision="rev123", device="cpu")
-        self.assertEqual(m2, mock_model)
-        mock_model_load.assert_called_with("custom/repo", revision="rev123")
+        self.assertEqual(m2, mock_ctc_model)
+        mock_ctc_load.assert_called_with("custom/repo", revision="rev123")
 
     @patch("transformers.Wav2Vec2ForCTC.from_pretrained")
     @patch("transformers.Wav2Vec2Processor.from_pretrained")
