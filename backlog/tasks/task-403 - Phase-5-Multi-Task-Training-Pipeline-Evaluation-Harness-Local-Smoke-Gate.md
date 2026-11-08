@@ -5,13 +5,12 @@ status: Done
 assignee:
   - '@self'
 created_date: '2026-11-07 21:25'
-updated_date: '2026-11-07 23:15'
+updated_date: '2026-11-08 02:15'
 labels: []
 dependencies:
   - TASK-402
 modified_files:
-  - Dockerfile
-  - .dockerignore
+  - digohwelisgi/cherokee/training/train.py
 ordinal: 436300
 ---
 
@@ -35,6 +34,12 @@ Wire Wav2Vec2ForDualCTC, 50/50 interleaved sampling, and multi-task evaluation m
 2. Update digohwelisgi/utils/evaluation.py and digohwelisgi/cherokee/training/evaluate_local_checkpoints.py for dual-head checkpoint evaluation.
 3. Add digohwelisgi/cherokee/training/tests/test_metrics_and_eval.py and run local 5-step smoke test.
 <!-- SECTION:PLAN:END -->
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+Added --save-total-limit (default 3) and preserved exact --hub-model-id on resume.
+<!-- SECTION:NOTES:END -->
 
 ## Final Summary
 

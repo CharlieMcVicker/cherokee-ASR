@@ -120,6 +120,7 @@ CONFIG = {
     "save_strategy": "steps",
     "eval_steps": 200,
     "save_steps": 400,
+    "save_total_limit": 3,
     "hub_strategy": "all_checkpoints",
     "hub_prefix": "dual-tone-moraic",
     "gradient_checkpointing": False,
@@ -380,6 +381,12 @@ def parse_args():
         help="Save step interval when save_strategy='steps' (default: 400).",
     )
     parser.add_argument(
+        "--save-total-limit",
+        type=int,
+        default=CONFIG["save_total_limit"],
+        help="Maximum number of checkpoints to keep locally on disk (default: 3).",
+    )
+    parser.add_argument(
         "--gradient-checkpointing",
         action="store_true",
         default=CONFIG["gradient_checkpointing"],
@@ -552,6 +559,7 @@ def parse_args():
     CONFIG["save_strategy"] = args.save_strategy
     CONFIG["eval_steps"] = args.eval_steps
     CONFIG["save_steps"] = args.save_steps
+    CONFIG["save_total_limit"] = args.save_total_limit
     CONFIG["gradient_checkpointing"] = args.gradient_checkpointing
     CONFIG["tone_loss_weight"] = args.tone_loss_weight
     CONFIG["num_branch_layers"] = args.num_branch_layers
@@ -577,20 +585,24 @@ def parse_args():
     CONFIG["gaussian_noise_max_amplitude"] = args.gaussian_noise_max_amplitude
 
     if CONFIG["push_to_hub"]:
-        run_start_time = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-        hub_pfx = str(CONFIG.get("hub_prefix", "")).strip()
-        prefix = f"{hub_pfx}-{run_start_time}" if hub_pfx else run_start_time
+        is_resuming = bool(args.resume_from_checkpoint or args.resume_from_repo)
         base_name = (
             CONFIG["hub_model_id"] if CONFIG["hub_model_id"] else "wav2vec2-large-xlsr"
         )
-        if "/" in base_name:
-            parts = base_name.split("/")
-            if len(parts) == 2:
-                CONFIG["hub_model_id"] = f"{parts[0]}/{prefix}-{parts[1]}"
+        if is_resuming and CONFIG["hub_model_id"]:
+            CONFIG["hub_model_id"] = base_name
+        else:
+            run_start_time = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+            hub_pfx = str(CONFIG.get("hub_prefix", "")).strip()
+            prefix = f"{hub_pfx}-{run_start_time}" if hub_pfx else run_start_time
+            if "/" in base_name:
+                parts = base_name.split("/")
+                if len(parts) == 2:
+                    CONFIG["hub_model_id"] = f"{parts[0]}/{prefix}-{parts[1]}"
+                else:
+                    CONFIG["hub_model_id"] = f"{prefix}-{base_name}"
             else:
                 CONFIG["hub_model_id"] = f"{prefix}-{base_name}"
-        else:
-            CONFIG["hub_model_id"] = f"{prefix}-{base_name}"
         print(f"Hugging Face Hub Model ID set to: {CONFIG['hub_model_id']}")
 
     return args
@@ -921,7 +933,7 @@ def initialize_model_and_trainer(processor, train_ds, valid_ds, folder_model_fil
         fp16=torch.cuda.is_available(),
         learning_rate=3e-4,
         warmup_ratio=0.1,
-        save_total_limit=20,
+        save_total_limit=CONFIG.get("save_total_limit", 3),
         logging_steps=100,
         load_best_model_at_end=True,
         metric_for_best_model="tone_cer",
