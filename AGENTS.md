@@ -115,6 +115,15 @@ In canonical **`T/TH`**, tones and vowel lengths are decoupled/stripped, and the
 - **Convergence Policy**: 50 epochs (8,550 steps) is the empirical convergence envelope for Wav2Vec2 on Cherokee (yielding 4.83% tone CER, 2.63% segmental CER, 16.50% WER on Feeling 1975, and 3.69% CER on unseen Bible verses). Continuing training past 50 epochs causes validation loss drift and risks overfitting.
 - **Resilient Hub Uploads**: Checkpoint synchronization utilizes `upload_checkpoint_resilient` with exponential backoff retries and optimizer state exclusion to avoid monolithic Xet/CAS batch timeouts.
 
+## Post-Training Model Promotion & Artifact Recomputation Protocol
+When a new model is trained and selected for promotion, downstream artifacts must be recomputed in sequence (full procedure documented in [`doc-24`](file:///Users/julietmcvicker/code/workshop-transcription/backlog/docs/guides/post_training_recomputation/doc-24%20-%20Post-Model-Training-Lifecycle-and-Artifact-Recomputation-Guide.md)):
+1. **Model Hub Staging & Pointer Promotion**: Upload weights and configs via `scripts/push_checkpoint_to_hub.py`. Snapshot previous model configuration to `best_model_<baseline>.json` and update `best_model.json`.
+2. **ARPAbet Acoustic Confusion Matrix (`scripts/recompute_arpabet_matrix.py`)**: Re-estimate EM transition matrix on 5,000 LibriSpeech clips with device acceleration (`mps`/`cuda`) and update `DEFAULT_CONFUSION_MATRIX_PATH` in `digohwelisgi/cherokee/codeswitching/projector.py`.
+3. **Scripture Realignment & Verse Slicing (`scripts/realign_bible.py`)**: Invalidate `runs/cache/ctc_emissions` and realign all 52 Cherokee NT chapters (`--book all`), updating sliced audio, TextGrids, and alignment records.
+4. **Bible Split Filtering & Re-generation (`scripts/split_bible_dataset.py`)**: Recompute word-confidence distribution (`--min-word-confidence 0.15`) and regenerate `bible-wav2vec2-{train,valid,test}.csv`.
+5. **Dual-Head Decoupling**: For dual-head models, Tier 1 aligners bind to `asr_model.segmental`, while Praat TextGrids and tone diagnostics extract from `asr_model.tone`.
+6. **Optional / Legacy DP Aligner Sweeps (`scripts/run_noisy_eval.py`)**: Low-priority calibration of multi-SNR substitution cost JSON for legacy `NeedlemanWunschWordAligner` / `PhonologicalConfusionCostMetric` (production pipelines use phonotactic CTC segmentation).
+
 ## Documentation Maintenance & Freshness
 - **Keep Documentation Synchronized**: When adding new modules, refactoring subsystem architecture, changing CLI tools, or modifying testing procedures, immediately update this `AGENTS.md` and the corresponding guide in `backlog/docs/` (managed via `backlog doc` CLI).
 - **Prune Obsolete Instructions**: Actively remove superseded workflows, deprecated flags, or outdated setup instructions to prevent agent confusion.
